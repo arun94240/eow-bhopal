@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EOW Bhopal — Leave Application</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #eef4fa;
+  --primary: #134d8a;
+  --primary-dark: #0a3760;
+  --primary-soft: #d4e3f3;
+  --good: #1e6b3e;
+  --good-soft: #d6ecdf;
+  --danger: #a62a23;
+  --ink: #0f1729;
+  --ink-soft: #3e4a63;
+  --ink-faint: #7783a0;
+  --line: #c9d4e3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; padding: 20px 14px; }
+.hindi { font-family: 'Tiro Devanagari Hindi', 'Inter', sans-serif; }
+.container { max-width: 580px; margin: 0 auto; }
+
+.header { background: var(--primary); color: white; padding: 22px 24px; border-radius: 12px 12px 0 0; text-align: center; }
+.header .crest-mark { width: 50px; height: 50px; background: white; color: var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.header h1 { font-size: 19px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.9; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.form-card { background: white; border-radius: 0 0 12px 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.form-title { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.form-subtitle { font-size: 13px; color: var(--ink-soft); margin-bottom: 22px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.form-label .req { color: var(--danger); }
+.form-label .optional { color: var(--ink-faint); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 4px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 11px 13px; border: 1px solid var(--line); background: white; font-family: inherit; font-size: 15px; color: var(--ink); border-radius: 6px; }
+.form-input[readonly] { background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+.btn-submit { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 6px; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+.btn-submit:hover { background: var(--primary-dark); }
+.btn-submit:disabled { background: var(--ink-faint); cursor: not-allowed; }
+
+.success-screen { display: none; text-align: center; padding: 60px 20px; }
+.success-screen.visible { display: block; }
+.success-icon { width: 80px; height: 80px; background: var(--good-soft); color: var(--good); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 18px; }
+.success-screen h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+.success-screen p { font-size: 14px; color: var(--ink-soft); margin-bottom: 24px; }
+.btn-again { display: inline-block; padding: 11px 24px; background: var(--primary); color: white; border: none; border-radius: 6px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+.error-msg { background: #f5d4d1; border: 1px solid var(--danger); color: var(--danger); padding: 10px 14px; border-radius: 5px; font-size: 13px; margin-top: 12px; display: none; }
+.error-msg.visible { display: block; }
+
+.loading { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--primary-soft); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.config-card { background: white; padding: 24px; border-radius: 12px; margin: 40px auto; max-width: 460px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.config-card h2 { color: var(--primary); margin-bottom: 6px; font-size: 18px; }
+.config-card p { color: var(--ink-soft); font-size: 13px; margin-bottom: 16px; }
+.config-card label { font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; display: block; margin-bottom: 6px; margin-top: 12px; }
+.config-card input { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 5px; font-family: monospace; font-size: 11px; }
+.config-card button { width: 100%; padding: 11px; background: var(--primary); color: white; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+
+.footer-note { text-align: center; font-size: 11px; color: var(--ink-faint); margin-top: 18px; padding: 12px; }
+
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div id="configScreen" class="config-card" style="display:none;">
+  <h2>Setup Required</h2>
+  <p>Enter Supabase credentials</p>
+  <label>Supabase URL</label>
+  <input type="text" id="cfg-url" placeholder="https://xxx.supabase.co">
+  <label>Anon Key</label>
+  <input type="text" id="cfg-key" placeholder="eyJhbGc...">
+  <button onclick="saveConfig()">Connect</button>
+</div>
+
+<div id="mainApp" style="display:none;">
+  <div class="container">
+
+    <div class="header">
+      <div class="crest-mark">EOW</div>
+      <h1>EOW Office Bhopal</h1>
+      <p>Leave Application</p>
+    </div>
+
+    <div class="form-card">
+
+      <div id="formScreen">
+        <div class="form-title hindi">अवकाश आवेदन</div>
+        <div class="form-subtitle">Submit your leave request — it will go to SP for approval.</div>
+
+        <div class="form-group">
+          <label class="form-label">Name <span class="req">*</span></label>
+          <select class="form-select" id="lf-name">
+            <option value="">— चुनें —</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">Type <span class="req">*</span></label>
+            <select class="form-select" id="lf-type">
+              <option value="">— Select —</option>
+              <option value="CL">CL (Casual)</option>
+              <option value="EL">EL (Earned)</option>
+              <option value="SL">SL (Special)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Days <span class="optional">(auto)</span></label>
+            <input type="text" class="form-input" id="lf-days" readonly value="—">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">From <span class="req">*</span></label>
+            <input type="date" class="form-input" id="lf-from" onchange="lfCalcDays()">
+          </div>
+          <div>
+            <label class="form-label">To <span class="req">*</span></label>
+            <input type="date" class="form-input" id="lf-to" onchange="lfCalcDays()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cause <span class="req">*</span></label>
+          <select class="form-select" id="lf-cause" onchange="lfCauseChange()">
+            <option value="">— Select —</option>
+            <option>व्यक्तिगत कार्य / Personal work</option>
+            <option>पारिवारिक कार्य / Family matter</option>
+            <option>स्वास्थ्य / Medical</option>
+            <option>विवाह समारोह / Marriage in family</option>
+            <option>अंत्येष्टि / Bereavement</option>
+            <option>धार्मिक यात्रा / Religious visit</option>
+            <option>बच्चों की परीक्षा / Children's exams</option>
+            <option>प्रशिक्षण / Training (official)</option>
+            <option>यात्रा / Travel</option>
+            <option>अन्य / Other</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="lf-cause-other-wrap" style="display:none;">
+          <label class="form-label">Specify Other Cause</label>
+          <input type="text" class="form-input" id="lf-cause-other">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Address during leave <span class="optional">(optional)</span></label>
+          <input type="text" class="form-input" id="lf-address" placeholder="Where you'll be...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contact Number <span class="optional">(optional)</span></label>
+          <input type="tel" class="form-input" id="lf-contact" placeholder="10 digits">
+        </div>
+
+        <button class="btn-submit" id="submit-btn" onclick="submitLeave()">Submit Application</button>
+
+        <div class="error-msg" id="errorMsg"></div>
+      </div>
+
+      <div class="success-screen" id="successScreen">
+        <div class="success-icon">✓</div>
+        <h2>आवेदन जमा हो गया</h2>
+        <p>Your application has been submitted to SP for approval. You will be informed of the decision.</p>
+        <button class="btn-again" onclick="resetForm()">Submit Another</button>
+      </div>
+
+    </div>
+
+    <div class="footer-note">For Officers and Staff · EOW Bhopal</div>
+
+  </div>
+</div>
+
+<script>
+var supa = null;
+var SUPABASE_URL = localStorage.getItem('eow_supa_url');
+var SUPABASE_KEY = localStorage.getItem('eow_supa_key');
+
+function saveConfig() {
+  var url = document.getElementById('cfg-url').value.trim();
+  var key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Both fields required'); return; }
+  localStorage.setItem('eow_supa_url', url);
+  localStorage.setItem('eow_supa_key', key);
+  location.reload();
+}
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  document.getElementById('configScreen').style.display = 'block';
+} else {
+  document.getElementById('mainApp').style.display = 'block';
+  supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
+function escapeHtml(s) { if (s == null) return ''; return String(s).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function showError(msg) { var e = document.getElementById('errorMsg'); e.textContent = msg; e.classList.add('visible'); setTimeout(function(){ e.classList.remove('visible'); }, 4000); }
+
+async function loadOfficers() {
+  try {
+    var r = await supa.from('io_master').select('name').eq('status', 'Active').order('name');
+    var names = (r.data || []).map(function(o){ return o.name; });
+    var sel = document.getElementById('lf-name');
+    sel.innerHTML = '<option value="">— चुनें —</option>' + names.map(function(n){ return '<option>'+escapeHtml(n)+'</option>'; }).join('');
+  } catch(e) {
+    showError('Connection error');
+  }
+}
+
+function lfCalcDays() {
+  var f = document.getElementById('lf-from').value;
+  var t = document.getElementById('lf-to').value;
+  if (!f || !t) { document.getElementById('lf-days').value = '—'; return; }
+  var days = Math.floor((new Date(t) - new Date(f)) / 86400000) + 1;
+  document.getElementById('lf-days').value = days > 0 ? days : '—';
+}
+
+function lfCauseChange() {
+  var v = document.getElementById('lf-cause').value;
+  document.getElementById('lf-cause-other-wrap').style.display = (v === 'अन्य / Other') ? '' : 'none';
+}
+
+async function submitLeave() {
+  var name = document.getElementById('lf-name').value;
+  var type = document.getElementById('lf-type').value;
+  var from = document.getElementById('lf-from').value;
+  var to = document.getElementById('lf-to').value;
+  var cause = document.getElementById('lf-cause').value;
+  var days = document.getElementById('lf-days').value;
+  if (!name || !type || !from || !to || !cause || days === '—') { showError('कृपया सभी आवश्यक fields भरें'); return; }
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> Submitting...';
+
+  try {
+    var r = await supa.from('pending_approvals').insert({
+      officer_name: name,
+      leave_type: type,
+      days: parseInt(days),
+      from_date: from,
+      to_date: to,
+      cause: cause,
+      cause_other: document.getElementById('lf-cause-other').value,
+      address: document.getElementById('lf-address').value,
+      contact: document.getElementById('lf-contact').value
+    });
+    if (r.error) throw r.error;
+    document.getElementById('formScreen').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Application';
+    showError('Submit failed: ' + (e.message || 'try again'));
+  }
+}
+
+function resetForm() {
+  document.getElementById('successScreen').classList.remove('visible');
+  document.getElementById('formScreen').style.display = 'block';
+  ['lf-name','lf-type','lf-from','lf-to','lf-cause','lf-cause-other','lf-address','lf-contact'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('lf-days').value = '—';
+  document.getElementById('lf-cause-other-wrap').style.display = 'none';
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('submit-btn').innerHTML = 'Submit Application';
+}
+
+if (supa) loadOfficers();
+</script>
+</body>
+</html>
