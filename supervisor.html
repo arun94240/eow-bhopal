@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EOW Bhopal — Supervisor</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #c4d2e5; --surface: #fff; --surface-alt: #b2c2da;
+  --ink: #050d1c; --ink-soft: #1f2a40; --ink-faint: #4a5670;
+  --line: #6a7a95; --line-soft: #94a3bb;
+  --primary: #134d8a; --primary-dark: #062a52; --primary-soft: #b8cce4;
+  --accent: #f5b942; --accent-dark: #d99c1d;
+  --good: #134c2a; --good-soft: #b8dac4;
+  --warn: #7a4509; --warn-soft: #ecd0a8;
+  --danger: #7d1c17; --danger-soft: #e8b8b3;
+  --neutral: #2a3242; --neutral-soft: #b8bfca;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; }
+.hindi { font-family: 'Tiro Devanagari Hindi', 'Inter', sans-serif; }
+
+.config-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+.config-card { background: white; padding: 32px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+.config-card h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; color: var(–primary); }
+.config-card p { color: var(–ink-soft); font-size: 13px; margin-bottom: 20px; }
+.config-card label { display: block; font-size: 11px; font-weight: 600; color: var(–ink-soft); text-transform: uppercase; margin-bottom: 6px; margin-top: 14px; }
+.config-card input { width: 100%; padding: 10px 13px; border: 1px solid var(–line); border-radius: 5px; font-family: monospace; font-size: 12px; }
+.config-card button { width: 100%; padding: 11px; background: var(–primary); color: white; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; margin-top: 18px; font-size: 14px; }
+.config-card .hint { font-size: 11px; color: var(–ink-faint); margin-top: 4px; }
+
+header { background: linear-gradient(135deg, #062a52 0%, #0a3760 50%, #134d8a 100%); color: white; padding: 16px 24px; position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-bottom: 4px solid #f5b942; }
+.header-inner { max-width: 1500px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.crest { display: flex; align-items: center; gap: 12px; }
+.crest-mark { width: 48px; height: 48px; background: white; color: #062a52; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; letter-spacing: -0.5px; flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,0,0,0.25); border: 2px solid #f5b942; }
+.crest-text h1 { font-size: 19px; font-weight: 800; line-height: 1.15; color: white; letter-spacing: 0.01em; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.crest-text .tagline { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ffd980; margin-top: 3px; font-weight: 700; }
+.header-meta { text-align: right; font-size: 12px; color: white; }
+.header-meta .date { font-size: 14px; color: white; font-weight: 700; }
+#cloud-status { font-size: 11px; color: white; margin-top: 4px; padding: 3px 12px; background: rgba(75,200,120,0.25); border: 1px solid rgba(75,200,120,0.5); border-radius: 12px; display: inline-block; font-weight: 600; }
+
+main { max-width: 1500px; margin: 0 auto; padding: 24px 32px 60px; }
+
+.section-tabs { display: flex; gap: 4px; margin-bottom: 22px; background: #0a3760; padding: 8px; border: 3px solid #062a52; border-radius: 10px; flex-wrap: wrap; box-shadow: 0 6px 16px rgba(0,0,0,0.35); }
+.section-tab { padding: 11px 15px; font-family: inherit; font-size: 13px; font-weight: 700; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: white; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 7px; white-space: nowrap; transition: all 0.18s ease; letter-spacing: 0.01em; text-shadow: 0 1px 1px rgba(0,0,0,0.3); }
+.section-tab:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.5); }
+.section-tab.active { background: #4a90d9; color: white; border-color: #6cb0f5; box-shadow: 0 3px 10px rgba(74,144,217,0.6), inset 0 1px 0 rgba(255,255,255,0.3); font-weight: 800; }
+.section-tab .count { background: rgba(0,0,0,0.4); padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; color: white; min-width: 22px; text-align: center; }
+.section-tab.active .count { background: rgba(0,0,0,0.4); color: white; }
+.global-search-wrap { margin-bottom: 18px; position: relative; }
+.global-search-box { display: flex; align-items: center; background: white; border: 2px solid var(–primary); border-radius: 10px; padding: 4px 6px 4px 14px; box-shadow: 0 3px 10px rgba(6,42,82,0.18); transition: all 0.15s; }
+.global-search-box:focus-within { border-color: var(–primary-dark); box-shadow: 0 4px 16px rgba(6,42,82,0.28); }
+.global-search-icon { font-size: 16px; margin-right: 8px; opacity: 0.7; }
+.global-search-box input { flex: 1; border: none; outline: none; padding: 11px 8px; font-family: inherit; font-size: 14px; color: var(–ink); background: transparent; }
+.global-search-box input::placeholder { color: var(–ink-faint); font-style: italic; }
+.global-search-clear { background: var(–surface-alt); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; color: var(–ink-soft); font-weight: 700; }
+.global-search-clear:hover { background: var(–line-soft); color: var(–ink); }
+.global-search-results { margin-top: 12px; max-height: 60vh; overflow-y: auto; }
+.global-search-results:empty { display: none; }
+.gs-section { background: white; border: 2px solid var(–line-soft); border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(6,42,82,0.1); }
+.gs-section-title { font-size: 12px; font-weight: 700; color: var(–primary-dark); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid var(–primary-soft); display: flex; justify-content: space-between; align-items: center; }
+.gs-section-title .gs-count { background: var(–primary); color: white; padding: 2px 9px; border-radius: 12px; font-size: 11px; }
+.gs-row { padding: 9px 12px; border-radius: 5px; cursor: pointer; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 13px; transition: background 0.1s; }
+.gs-row:hover { background: var(–surface-alt); }
+.gs-serial { font-family: monospace; font-weight: 700; color: var(–primary-dark); background: var(–primary-soft); padding: 3px 9px; border-radius: 4px; font-size: 12px; flex-shrink: 0; }
+.gs-row-content { flex: 1; min-width: 200px; color: var(–ink); }
+.gs-row-meta { font-size: 11px; color: var(–ink-soft); margin-top: 2px; }
+.gs-empty { padding: 24px; text-align: center; color: var(–ink-faint); font-size: 13px; }
+mark.gs-highlight { background: #ffe680; color: var(–ink); padding: 1px 3px; border-radius: 2px; font-weight: 700; }
+
+/* PRAGATI TOGGLE TABS */
+.pragati-toggle { display: flex; gap: 8px; margin-bottom: 18px; }
+.pragati-tab { padding: 10px 18px; font-family: inherit; font-size: 13px; font-weight: 600; background: var(–surface); color: var(–ink-soft); border: 2px solid var(–line-soft); cursor: pointer; border-radius: 6px; box-shadow: 0 2px 4px rgba(6,42,82,0.08); transition: all 0.15s; }
+.pragati-tab:hover { color: var(–ink); border-color: var(–primary); }
+.pragati-tab.active { background: var(–primary); color: white; border-color: var(–primary-dark); box-shadow: 0 3px 10px rgba(6,42,82,0.3); }
+
+/* CALENDAR */
+.calendar-wrap { background: var(–surface); border: 2px solid var(–line-soft); border-radius: 8px; padding: 18px; box-shadow: 0 2px 6px rgba(6,42,82,0.12); }
+.calendar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 2px solid var(–line-soft); flex-wrap: wrap; }
+.cal-month-year { font-size: 18px; font-weight: 700; color: var(–primary-dark); flex: 1; text-align: center; min-width: 160px; }
+.cal-nav-btn, .cal-today-btn { padding: 7px 14px; font-family: inherit; font-size: 13px; font-weight: 600; background: var(–primary-soft); color: var(–primary-dark); border: 1px solid var(–primary); border-radius: 5px; cursor: pointer; }
+.cal-nav-btn:hover, .cal-today-btn:hover { background: var(–primary); color: white; }
+.cal-today-btn { background: var(–accent, #f5b942); color: var(–primary-dark); border-color: var(–accent-dark, #d99c1d); font-weight: 700; }
+
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day-name { padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: var(–ink-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+.cal-day { padding: 10px 6px; text-align: center; border: 1px solid var(–line-soft); border-radius: 5px; cursor: pointer; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: white; transition: all 0.15s; }
+.cal-day:hover { border-color: var(–primary); background: var(–primary-soft); }
+.cal-day.empty { background: transparent; border: none; cursor: default; }
+.cal-day.empty:hover { background: transparent; border: none; }
+.cal-day.today { border: 2px solid var(–primary-dark); background: var(–primary-soft); font-weight: 700; }
+.cal-day.has-updates { background: linear-gradient(135deg, #d4e5f5 0%, #b8d4ed 100%); border-color: var(–primary); font-weight: 600; color: var(–primary-dark); }
+.cal-day.has-updates.heavy { background: linear-gradient(135deg, #4a90d9 0%, var(–primary-dark) 100%); color: white; border-color: var(–primary-dark); }
+.cal-day.selected { box-shadow: 0 0 0 3px var(–primary); transform: scale(1.05); z-index: 1; }
+.cal-day-num { font-size: 14px; font-weight: 600; }
+.cal-day-badge { font-size: 10px; padding: 1px 6px; background: var(–primary-dark); color: white; border-radius: 8px; font-weight: 700; }
+.cal-day.heavy .cal-day-badge { background: rgba(255,255,255,0.3); }
+
+.cal-day-details { margin-top: 18px; }
+.cal-day-details:empty { display: none; }
+.cal-detail-header { background: var(–primary-dark); color: white; padding: 14px 18px; border-radius: 8px 8px 0 0; font-weight: 700; font-size: 14px; }
+.cal-detail-header span.count { background: rgba(255,255,255,0.25); padding: 2px 9px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+.cal-update-row { background: white; border: 2px solid var(–line-soft); border-top: none; padding: 14px 18px; cursor: pointer; transition: background 0.1s; }
+.cal-update-row:hover { background: var(–surface-alt); }
+.cal-update-row:last-child { border-radius: 0 0 8px 8px; }
+.cal-update-meta { display: flex; gap: 10px; margin-bottom: 6px; align-items: center; flex-wrap: wrap; }
+.cal-update-io { font-weight: 700; color: var(–primary-dark); font-size: 13px; }
+.cal-update-tag { font-family: monospace; font-size: 11px; background: var(–primary-soft); color: var(–primary-dark); padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+.cal-update-time { font-size: 11px; color: var(–ink-faint); margin-left: auto; }
+.cal-update-action { font-size: 13px; color: var(–ink); font-weight: 600; }
+.cal-update-detail { font-size: 12px; color: var(–ink-soft); margin-top: 4px; padding-left: 10px; border-left: 2px solid var(–line); }
+.cal-update-next { font-size: 12px; color: var(–primary); margin-top: 4px; font-weight: 500; }
+
+@media (max-width: 600px) {
+.cal-day { min-height: 42px; padding: 6px 2px; }
+.cal-day-num { font-size: 12px; }
+.cal-day-badge { font-size: 9px; padding: 0 4px; }
+.cal-day-name { padding: 4px; font-size: 10px; }
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 16px 20px; background: white; border: 2px solid #94a3bb; border-radius: 8px; box-shadow: 0 3px 10px rgba(6,42,82,0.18); flex-wrap: wrap; gap: 12px; border-left: 6px solid #134d8a; }
+.section-header h2 { font-size: 22px; font-weight: 800; color: #062a52; }
+.section-header .desc { font-size: 13px; color: var(–ink-soft); margin-top: 4px; font-weight: 500; }
+
+.btn { padding: 9px 16px; font-family: inherit; font-size: 13px; font-weight: 600; border: 1.5px solid var(–line); background: white; color: var(–ink); border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(6,42,82,0.1); transition: all 0.15s; }
+.btn:hover { border-color: var(–primary); background: var(–surface-alt); }
+.btn-primary { background: #134d8a; color: white !important; border-color: #062a52; box-shadow: 0 2px 6px rgba(19,77,138,0.4); font-weight: 700; }
+.btn-primary:hover { background: #062a52; border-color: #062a52; box-shadow: 0 3px 10px rgba(19,77,138,0.5); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-danger { color: var(–danger); border-color: var(–danger-soft); background: white; }
+.btn-danger:hover { background: var(–danger-soft); border-color: var(–danger); }
+.btn-success { background: #1a6035; color: white !important; border-color: #134c2a; box-shadow: 0 2px 6px rgba(26,96,53,0.4); font-weight: 700; }
+.btn-success:hover { background: #134c2a; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.stat-card { background: white; border: 2px solid #94a3bb; padding: 16px 18px; cursor: pointer; border-radius: 8px; box-shadow: 0 3px 8px rgba(6,42,82,0.15); transition: all 0.15s; border-left: 4px solid #134d8a; }
+.stat-card:hover { border-color: #134d8a; border-left-color: #062a52; background: #eef4fa; box-shadow: 0 5px 14px rgba(6,42,82,0.25); transform: translateY(-2px); }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #2d3a52; font-weight: 700; margin-bottom: 8px; }
+.stat-value { font-size: 30px; font-weight: 800; color: #062a52; line-height: 1; }
+.stat-detail { font-size: 11px; color: var(–ink-faint); margin-top: 5px; }
+
+.dual-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
+.panel { background: var(–surface); border: 2px solid var(–line-soft); padding: 18px 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(6,42,82,0.12); }
+.panel-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(–ink); }
+.panel-subtitle { font-size: 12px; color: var(–ink-soft); margin-bottom: 14px; }
+
+.feed-item { padding: 12px 0; border-bottom: 1px solid var(–line-soft); }
+.feed-item:last-child { border: none; }
+.feed-meta { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+.feed-io { font-weight: 600; font-size: 13px; color: var(–primary); }
+.feed-tag { font-size: 10px; background: var(–primary-soft); color: var(–primary-dark); padding: 2px 7px; border-radius: 3px; font-weight: 700; font-family: monospace; }
+.feed-time { font-size: 11px; color: var(–ink-faint); margin-left: auto; }
+.feed-action { font-size: 13px; color: var(–ink); margin-bottom: 4px; }
+.feed-detail { font-size: 12px; color: var(–ink-soft); padding-left: 10px; border-left: 2px solid var(–line); margin-top: 4px; }
+
+.toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.search-input, .filter-select { padding: 10px 14px; font-family: inherit; font-size: 13px; border: 2px solid #94a3bb; background: white; border-radius: 6px; min-width: 130px; color: var(–ink); font-weight: 500; box-shadow: 0 1px 3px rgba(6,42,82,0.08); }
+.search-input { min-width: 220px; }
+.search-input:focus, .filter-select:focus { outline: none; border-color: #134d8a; box-shadow: 0 0 0 3px rgba(19,77,138,0.2); }
+.search-input::placeholder { color: var(–ink-faint); }
+
+.table-wrap { background: var(–surface); border: 2px solid var(–line-soft); border-radius: 8px; overflow: auto; box-shadow: 0 2px 6px rgba(6,42,82,0.12); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1100px; }
+thead { background: var(–surface-alt); position: sticky; top: 0; z-index: 1; }
+th { padding: 11px 14px; text-align: left; font-weight: 600; font-size: 11px; color: var(–ink-soft); border-bottom: 1px solid var(–line); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+td { padding: 12px 14px; border-bottom: 1px solid var(–line-soft); vertical-align: middle; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(–surface-alt); }
+.serial-cell { font-family: monospace; font-weight: 700; color: var(–primary); font-size: 12px; white-space: nowrap; }
+.empty-state { padding: 60px 20px; text-align: center; color: var(–ink-faint); }
+.empty-state h3 { font-size: 16px; color: var(–ink-soft); margin-bottom: 6px; font-weight: 500; }
+
+.badge { display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 500; border-radius: 3px; white-space: nowrap; }
+.badge-primary { background: var(–primary-soft); color: var(–primary-dark); }
+.badge-good { background: var(–good-soft); color: var(–good); }
+.badge-neutral { background: var(–neutral-soft); color: var(–neutral); }
+
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,41,0.55); z-index: 1000; overflow-y: auto; padding: 30px 16px; }
+.modal-overlay.active { display: block; }
+.modal { background: white; width: 100%; max-width: 800px; margin: 0 auto; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); overflow: hidden; }
+.modal-header { padding: 20px 24px; border-bottom: 3px solid #f5b942; background: linear-gradient(135deg, #062a52 0%, #134d8a 100%); display: flex; justify-content: space-between; align-items: center; color: white; }
+.modal-eyebrow { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #f5b942; font-weight: 700; margin-bottom: 4px; }
+.modal-title { font-size: 20px; font-weight: 700; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.close-btn { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.4); width: 36px; height: 36px; font-size: 22px; cursor: pointer; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; line-height: 1; font-weight: 700; }
+.close-btn:hover { background: rgba(255,255,255,0.25); border-color: white; }
+.modal-body { padding: 22px 24px; max-height: calc(100vh - 220px); overflow-y: auto; }
+.modal-footer { padding: 16px 24px; border-top: 2px solid var(–line-soft); display: flex; justify-content: flex-end; gap: 10px; background: #eef4fa; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: span 2; }
+.form-label { font-size: 12px; font-weight: 800; color: #062a52; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
+.form-label .req { color: #c0392b; font-weight: 800; }
+.form-label .optional { color: var(–ink-faint); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 4px; font-size: 11px; }
+.form-input, .form-select, .form-textarea { padding: 11px 14px; border: 2px solid #94a3bb; background: white; font-family: inherit; font-size: 15px; color: var(–ink); border-radius: 6px; width: 100%; box-sizing: border-box; min-height: 44px; -webkit-appearance: none; appearance: none; font-weight: 500; }
+.form-textarea { resize: vertical; min-height: 80px; -webkit-appearance: auto; }
+.form-input[type=“date”] { -webkit-appearance: none; appearance: none; background-image: url(“data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23062a52' stroke-width='2'><rect x='3' y='4' width='18' height='18' rx='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>”); background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px; min-height: 44px; }
+.form-select { background-image: url(“data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23062a52' stroke-width='3'><polyline points='6 9 12 15 18 9'/></svg>”); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; cursor: pointer; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #134d8a; box-shadow: 0 0 0 3px rgba(19,77,138,0.2); }
+.form-input[readonly] { background: #e7eef7; color: var(–ink-soft); font-family: monospace; font-weight: 700; cursor: not-allowed; }
+
+.attach-area { border: 1px dashed var(–line); background: var(–surface-alt); padding: 14px; text-align: center; cursor: pointer; border-radius: 5px; }
+.attach-area:hover { border-color: var(–primary); background: var(–primary-soft); }
+.attach-area p { font-size: 12px; color: var(–ink-soft); }
+.attach-list { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.attach-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(–surface-alt); font-size: 12px; border-radius: 3px; }
+.attach-item .remove { color: var(–danger); cursor: pointer; font-weight: 700; padding: 0 6px; }
+.attach-item a { color: var(–primary); text-decoration: none; flex: 1; }
+.link-input-group { display: flex; gap: 6px; margin-bottom: 6px; }
+.link-input-group input { flex: 1; }
+.link-list { display: flex; flex-direction: column; gap: 4px; }
+.link-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(–surface-alt); font-size: 12px; border-radius: 3px; }
+.link-item a { color: var(–primary); text-decoration: none; word-break: break-all; flex: 1; }
+
+.leave-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.leave-card { background: var(–surface); border: 2px solid var(–line-soft); padding: 16px 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(6,42,82,0.12); }
+.leave-card .type { font-size: 13px; font-weight: 700; color: var(–primary); }
+.leave-card .full-name { font-size: 11px; color: var(–ink-faint); margin-bottom: 10px; }
+.leave-card .total { font-size: 22px; font-weight: 700; display: flex; align-items: baseline; gap: 4px; }
+.leave-card .total small { font-size: 12px; color: var(–ink-soft); font-weight: 400; }
+
+.approval-card { background: var(–warn-soft); border: 1px solid var(–warn); border-left-width: 4px; padding: 12px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; border-radius: 4px; }
+.approval-info { flex: 1; }
+.approval-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.approval-meta { display: flex; gap: 14px; font-size: 12px; color: var(–ink-soft); flex-wrap: wrap; margin-bottom: 4px; }
+
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(–ink); color: white; padding: 12px 18px; border-radius: 5px; font-size: 13px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.25); border-left: 3px solid var(–primary); max-width: 360px; }
+
+.io-master-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.io-card { background: var(–surface); border: 2px solid var(–line-soft); border-radius: 8px; padding: 18px; cursor: pointer; box-shadow: 0 2px 6px rgba(6,42,82,0.12); transition: all 0.15s; }
+.io-card:hover { border-color: var(–primary); box-shadow: 0 4px 14px rgba(6,42,82,0.2); transform: translateY(-2px); }
+.io-card.inactive { opacity: 0.6; }
+.io-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.io-photo { width: 56px; height: 56px; border-radius: 50%; background: var(–primary-soft); color: var(–primary); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; overflow: hidden; flex-shrink: 0; border: 2px solid var(–line); }
+.io-photo img { width: 100%; height: 100%; object-fit: cover; }
+.io-card-info { flex: 1; min-width: 0; }
+.io-card-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; word-break: break-word; }
+.io-card-rank { font-size: 12px; color: var(–ink-soft); }
+.io-card-meta { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(–ink-soft); padding-top: 10px; border-top: 1px solid var(–line-soft); }
+.io-card-footer { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(–line-soft); display: flex; justify-content: space-between; align-items: center; }
+.io-card-cases strong { color: var(–primary); font-weight: 700; font-size: 14px; }
+.photo-upload-area { width: 100px; height: 100px; border-radius: 50%; background: var(–primary-soft); border: 2px dashed var(–line); display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 0 auto 14px; overflow: hidden; color: var(–primary); font-size: 28px; font-weight: 600; }
+.photo-upload-area img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 768px) {
+header { padding: 14px 16px; }
+main { padding: 16px; }
+.dual-grid { grid-template-columns: 1fr; }
+.leave-summary { grid-template-columns: 1fr; }
+.form-grid { grid-template-columns: 1fr; }
+.form-group.full { grid-column: span 1; }
+.modal-body, .modal-header, .modal-footer { padding-left: 18px; padding-right: 18px; }
+.io-master-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- CONFIG SCREEN -->
+
+<div id="configScreen" class="config-screen" style="display:none;">
+  <div class="config-card">
+    <h1>EOW Bhopal — First Time Setup</h1>
+    <p>Enter Supabase credentials. Get from Supabase → Settings → API.</p>
+    <label>Supabase Project URL</label>
+    <input type="text" id="cfg-url" placeholder="https://xxxxx.supabase.co">
+    <div class="hint">Should look like: https://abcd1234.supabase.co (NO trailing slash)</div>
+    <label>Supabase anon Public Key</label>
+    <input type="text" id="cfg-key" placeholder="eyJhbGc...">
+    <div class="hint">The "anon public" key (long string starting with eyJ)</div>
+    <button onclick="saveConfig()">Connect to Cloud →</button>
+    <button onclick="clearConfig()" style="background:#999;margin-top:8px;">Reset Saved Config</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+
+<div id="mainApp" style="display:none;">
+<header>
+  <div class="header-inner">
+    <div class="crest">
+      <div class="crest-mark">EOW</div>
+      <div class="crest-text">
+        <h1>EOW Office Bhopal</h1>
+        <div class="tagline">Supervisor Dashboard · MP Police</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="date" id="hdr-date">—</div>
+      <div id="cloud-status">Connecting...</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- GLOBAL SEARCH -->
+
+  <div class="global-search-wrap">
+    <div class="global-search-box">
+      <span class="global-search-icon">🔍</span>
+      <input type="text" id="global-search" placeholder="कोई भी number, नाम, या serial खोजें... (e.g., 001, Rajesh, C-001)" oninput="performGlobalSearch()" autocomplete="off">
+      <button class="global-search-clear" onclick="clearGlobalSearch()" id="global-search-clear" style="display:none;">✕</button>
+    </div>
+    <div id="global-search-results" class="global-search-results"></div>
+  </div>
+
+  <div class="section-tabs">
+    <button class="section-tab active" data-section="overview">Overview</button>
+    <button class="section-tab" data-section="complaints">Complaints <span class="count" id="cnt-complaints">0</span></button>
+    <button class="section-tab" data-section="rcomplaints">R-Complaints <span class="count" id="cnt-rcomplaints">0</span></button>
+    <button class="section-tab" data-section="rcs">RCs <span class="count" id="cnt-rcs">0</span></button>
+    <button class="section-tab" data-section="pes">PEs <span class="count" id="cnt-pes">0</span></button>
+    <button class="section-tab" data-section="strs">STRs <span class="count" id="cnt-strs">0</span></button>
+    <button class="section-tab" data-section="sutra">सूत्र सूचना <span class="count" id="cnt-sutra">0</span></button>
+    <button class="section-tab" data-section="court">Court Cases <span class="count" id="cnt-court">0</span></button>
+    <button class="section-tab" data-section="leaves">Leaves <span class="count" id="cnt-leaves">0</span></button>
+    <button class="section-tab" data-section="iomaster">IO Master <span class="count" id="cnt-iomaster">0</span></button>
+    <button class="section-tab" data-section="pragati">प्रगति प्रतिवेदन</button>
+    <button class="section-tab" data-section="avkash">अवकाश आवेदन</button>
+  </div>
+
+  <!-- OVERVIEW -->
+
+  <section id="overview" class="section active">
+    <div class="section-header"><div><h2>Overview</h2><div class="desc">Office of the Superintendent of Police, EOW, Bhopal</div></div></div>
+    <div class="stats-grid">
+      <div class="stat-card" onclick="switchSection('complaints')"><div class="stat-label">Complaints</div><div class="stat-value" id="ov-complaints">0</div></div>
+      <div class="stat-card" onclick="switchSection('rcomplaints')"><div class="stat-label">R-Complaints</div><div class="stat-value" id="ov-rcomplaints">0</div></div>
+      <div class="stat-card" onclick="switchSection('rcs')"><div class="stat-label">RCs</div><div class="stat-value" id="ov-rcs">0</div></div>
+      <div class="stat-card" onclick="switchSection('pes')"><div class="stat-label">PEs</div><div class="stat-value" id="ov-pes">0</div></div>
+      <div class="stat-card" onclick="switchSection('strs')"><div class="stat-label">STRs</div><div class="stat-value" id="ov-strs">0</div></div>
+      <div class="stat-card" onclick="switchSection('sutra')"><div class="stat-label">सूत्र सूचना</div><div class="stat-value" id="ov-sutra">0</div></div>
+      <div class="stat-card" onclick="switchSection('court')"><div class="stat-label">Court Cases</div><div class="stat-value" id="ov-court">0</div></div>
+      <div class="stat-card" onclick="switchSection('iomaster')"><div class="stat-label">Active IOs</div><div class="stat-value" id="ov-iomaster">0</div><div class="stat-detail" id="ov-iomaster-total">— total</div></div>
+      <div class="stat-card" onclick="switchSection('leaves')"><div class="stat-label">On Leave Today</div><div class="stat-value" id="ov-leaves-today">0</div><div class="stat-detail" id="ov-leaves-pending">— pending</div></div>
+    </div>
+    <div class="dual-grid">
+      <div class="panel"><div class="panel-title">Daily Updates Feed</div><div class="panel-subtitle">Live entries from IOs</div><div id="overview-feed"><div class="empty-state"><h3>No updates yet</h3></div></div></div>
+      <div class="panel"><div class="panel-title">Pending Leave Approvals</div><div class="panel-subtitle">Awaiting your decision</div><div id="overview-approvals"><div class="empty-state"><h3>No applications pending</h3></div></div></div>
+    </div>
+  </section>
+
+  <!-- 6 ENQUIRY SECTIONS -->
+
+  <section id="complaints" class="section">
+    <div class="section-header"><div><h2>Complaints</h2></div><div><button class="btn btn-primary" data-action="add" data-type="complaints">+ Add Entry</button></div></div>
+    <div class="toolbar"><input type="search" class="search-input" placeholder="Search…" oninput="renderTable('complaints')"><select class="filter-select io-filter" onchange="renderTable('complaints')"><option value="">All IOs</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>No</th><th>Date</th><th>IO (Rank · Name)</th><th>Complainant</th><th>Non-Complainant</th><th>Last Action Date</th><th>Brief</th><th>Files</th><th></th></tr></thead><tbody id="complaints-body"></tbody></table></div>
+  </section>
+
+  <section id="rcomplaints" class="section">
+    <div class="section-header"><div><h2>R-Complaints</h2></div><div><button class="btn btn-primary" data-action="add" data-type="rcomplaints">+ Add Entry</button></div></div>
+    <div class="toolbar"><input type="search" class="search-input" placeholder="Search…" oninput="renderTable('rcomplaints')"><select class="filter-select io-filter" onchange="renderTable('rcomplaints')"><option value="">All IOs</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>No</th><th>Date</th><th>IO (Rank · Name)</th><th>Complainant</th><th>Non-Complainant</th><th>Last Action Date</th><th>Brief</th><th>Files</th><th></th></tr></thead><tbody id="rcomplaints-body"></tbody></table></div>
+  </section>
+
+  <section id="rcs" class="section">
+    <div class="section-header"><div><h2>RCs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="rcs">+ Add Entry</button></div></div>
+    <div class="toolbar"><input type="search" class="search-input" placeholder="Search…" oninput="renderTable('rcs')"><select class="filter-select io-filter" onchange="renderTable('rcs')"><option value="">All IOs</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>No</th><th>Date</th><th>IO (Rank · Name)</th><th>Complainant</th><th>Non-Complainant</th><th>Last Action Date</th><th>Brief</th><th>Files</th><th></th></tr></thead><tbody id="rcs-body"></tbody></table></div>
+  </section>
+
+  <section id="pes" class="section">
+    <div class="section-header"><div><h2>PEs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="pes">+ Add Entry</button></div></div>
+    <div class="toolbar"><input type="search" class="search-input" placeholder="Search…" oninput="renderTable('pes')"><select class="filter-select io-filter" onchange="renderTable('pes')"><option value="">All IOs</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>No</th><th>Date</th><th>IO (Rank · Name)</th><th>Complainant</th><th>Non-Complainant</th><th>Last Action Date</th><th>Brief</th><th>Files</th><th></th></tr></thead><tbody id="pes-body"></tbody></table></div>
+  </section>
+
+  <section id="strs" class="section">
+    <div class="section-header"><div><h2>STRs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="strs">+ Add Entry</button></div></div>
+    <div class="toolbar"><input type="search" class="search-input" placeholder="Search…" oninput="renderTable('strs')"><select class="filter-select io-filter" onchange="renderTable('strs')"><option value="">All IOs</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>No</th><th>Date</th><th>IO (Rank · Name)</th><th>Complainant</th><th>Non-Complainant</th><th>Last Action Date</th><th>Brief</th><th>Files</th><th></th></tr></thead><tbody id="strs-body"></tbody></table></div>
+  </section>
+
+  <section id="sutra" class="section">
+    <div class="section-header"><div><h2>सूत्र सूचना</h2></div><div><button class="btn btn-primary" data-action="add" data-type="sutra">+ Add Entry</button></div></div>
+    <div class="toolbar"><input type="search" class="search-input" placeholder="Search…" oninput="renderTable('sutra')"><select class="filter-select io-filter" onchange="renderTable('sutra')"><option value="">All IOs</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>No</th><th>Date</th><th>IO (Rank · Name)</th><th>Complainant</th><th>Non-Complainant</th><th>Last Action Date</th><th>Brief</th><th>Files</th><th></th></tr></thead><tbody id="sutra-body"></tbody></table></div>
+  </section>
+
+  <!-- COURT -->
+
+  <section id="court" class="section">
+    <div class="section-header"><div><h2>Court Cases</h2></div><div><button class="btn btn-primary" data-action="add-court">+ Add Court Case</button></div></div>
+    <div class="toolbar">
+      <input type="search" class="search-input" id="search-court" placeholder="Search…" oninput="renderCourtTable()">
+      <select class="filter-select" id="filter-court-type" onchange="renderCourtTable()"><option value="">All Courts</option><option>District Court</option><option>High Court</option><option>Supreme Court</option></select>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>Court</th><th>CNR No</th><th>Type</th><th>Petitioner</th><th>Respondent</th><th>Last Hearing</th><th>Next Hearing</th><th>In-Charge</th><th></th></tr></thead><tbody id="court-body"></tbody></table></div>
+  </section>
+
+  <!-- LEAVES -->
+
+  <section id="leaves" class="section">
+    <div class="section-header"><div><h2>Leaves Register</h2></div><div><button class="btn btn-primary" data-action="add-leave">+ Add Leave</button></div></div>
+    <div class="leave-summary">
+      <div class="leave-card"><div class="type">CL</div><div class="full-name">Casual · 16/year</div><div class="total" id="lv-cl-total">0 <small>days</small></div></div>
+      <div class="leave-card"><div class="type">EL</div><div class="full-name">Earned · 30/year</div><div class="total" id="lv-el-total">0 <small>days</small></div></div>
+      <div class="leave-card"><div class="type">SL</div><div class="full-name">Special · 15/year</div><div class="total" id="lv-sl-total">0 <small>days</small></div></div>
+    </div>
+    <div class="panel" id="approvals-panel" style="margin-bottom:18px;display:none;">
+      <div class="panel-title">Pending Approvals</div>
+      <div id="leaves-approvals"></div>
+    </div>
+    <div class="toolbar"><input type="search" class="search-input" id="search-leave" placeholder="Search…" oninput="renderLeaveTable()"><select class="filter-select" id="filter-leave-type" onchange="renderLeaveTable()"><option value="">All Types</option><option>CL</option><option>EL</option><option>SL</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Sr No</th><th>Officer</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Cause</th><th>Status</th><th>Remaining</th><th></th></tr></thead><tbody id="leaves-body"></tbody></table></div>
+  </section>
+
+  <!-- IO MASTER -->
+
+  <section id="iomaster" class="section">
+    <div class="section-header"><div><h2>IO Master</h2><div class="desc">Officers and staff database</div></div><div><button class="btn btn-primary" data-action="add-io">+ Add Officer</button></div></div>
+    <div class="toolbar"><input type="search" class="search-input" id="search-io" placeholder="Search…" oninput="renderIOMaster()"><select class="filter-select" id="filter-io-status" onchange="renderIOMaster()"><option value="">All Status</option><option>Active</option><option>Inactive</option></select></div>
+    <div id="io-master-list"><div class="empty-state"><h3>No officers added yet</h3></div></div>
+  </section>
+
+  <!-- PRAGATI PRATIVEDAN (IO Daily Update Form embedded) -->
+
+  <section id="pragati" class="section">
+    <div class="section-header"><div><h2>दैनिक प्रगति प्रतिवेदन</h2><div class="desc">Submit updates या calendar में देखें कब-कब क्या हुआ</div></div></div>
+
+```
+<!-- View Toggle Buttons -->
+<div class="pragati-toggle">
+  <button class="pragati-tab active" id="pragati-tab-form" onclick="switchPragatiView('form')">📝 Submit Update</button>
+  <button class="pragati-tab" id="pragati-tab-calendar" onclick="switchPragatiView('calendar')">📅 Calendar View</button>
+</div>
+
+<!-- FORM VIEW -->
+<div id="pragati-form-view">
+  <div style="background:var(--surface);border:2px solid var(--line-soft);border-radius:8px;padding:24px;box-shadow:0 2px 6px rgba(6,42,82,0.12);max-width:720px;">
+    <div class="form-grid" style="grid-template-columns:1fr;">
+      <div class="form-group">
+        <label class="form-label">IO का नाम <span class="req">*</span></label>
+        <select class="form-select" id="pf-io" onchange="pfUpdateTypes()"><option value="">— चुनें —</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">प्रकरण का प्रकार <span class="req">*</span></label>
+        <select class="form-select" id="pf-type" onchange="pfUpdateCases()"><option value="">— पहले IO चुनें —</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">विशिष्ट प्रकरण <span class="req">*</span></label>
+        <select class="form-select" id="pf-case"><option value="">— पहले प्रकार चुनें —</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">क्या किया? <span class="req">*</span></label>
+        <select class="form-select" id="pf-action">
+          <option value="">— चुनें —</option>
+          <option>दस्तावेज़/अभिलेख प्राप्त किए</option>
+          <option>कथन/बयान दर्ज किए</option>
+          <option>स्थल निरीक्षण/जाँच की</option>
+          <option>स्पष्टीकरण/जवाब प्राप्त किया</option>
+          <option>सूचना/समन/नोटिस जारी किया</option>
+          <option>बैंक खातों/लेन-देन की जाँच की</option>
+          <option>FSL/तकनीकी विश्लेषण हेतु भेजा</option>
+          <option>अन्य विभाग से समन्वय</option>
+          <option>आरोपी/संदिग्ध से पूछताछ</option>
+          <option>प्रतिवेदन/रिपोर्ट तैयार की</option>
+          <option>अन्य</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">विवरण <span class="optional">(optional)</span></label>
+        <textarea class="form-textarea" id="pf-detail" rows="3" placeholder="संक्षिप्त विवरण…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">आगे क्या करना है <span class="req">*</span></label>
+        <textarea class="form-textarea" id="pf-next" rows="2" placeholder="अगला कदम…"></textarea>
+      </div>
+    </div>
+    <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn" onclick="pfReset()">Clear</button>
+      <button class="btn btn-primary" onclick="pfSubmit()">Submit Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR VIEW -->
+<div id="pragati-calendar-view" style="display:none;">
+  <div class="calendar-wrap">
+    <div class="calendar-header">
+      <button class="cal-nav-btn" onclick="calNav(-1)">‹ Prev</button>
+      <div class="cal-month-year" id="cal-month-year">—</div>
+      <button class="cal-nav-btn" onclick="calNav(1)">Next ›</button>
+      <button class="cal-today-btn" onclick="calToday()">Today</button>
+    </div>
+    <div class="calendar-grid">
+      <div class="cal-day-name">Sun</div><div class="cal-day-name">Mon</div><div class="cal-day-name">Tue</div>
+      <div class="cal-day-name">Wed</div><div class="cal-day-name">Thu</div><div class="cal-day-name">Fri</div>
+      <div class="cal-day-name">Sat</div>
+    </div>
+    <div class="calendar-grid" id="cal-days"></div>
+  </div>
+  <div id="cal-day-details" class="cal-day-details"></div>
+</div>
+```
+
+  </section>
+
+  <!-- AVKASH AVEDAN (Leave Application Form embedded) -->
+
+  <section id="avkash" class="section">
+    <div class="section-header"><div><h2>अवकाश आवेदन</h2><div class="desc">किसी भी officer/staff के लिए leave application</div></div></div>
+    <div style="background:var(--surface);border:2px solid var(--line-soft);border-radius:8px;padding:24px;box-shadow:0 2px 6px rgba(6,42,82,0.12);max-width:720px;">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Officer/Staff <span class="req">*</span></label>
+          <select class="form-select" id="af-name"><option value="">— चुनें —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type <span class="req">*</span></label>
+          <select class="form-select" id="af-type"><option value="">— Select —</option><option value="CL">CL (Casual)</option><option value="EL">EL (Earned)</option><option value="SL">SL (Special)</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Days <span class="optional">(auto)</span></label>
+          <input type="text" class="form-input" id="af-days" readonly value="—">
+        </div>
+        <div class="form-group">
+          <label class="form-label">From Date <span class="req">*</span></label>
+          <input type="date" class="form-input" id="af-from" onchange="afCalcDays()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">To Date <span class="req">*</span></label>
+          <input type="date" class="form-input" id="af-to" onchange="afCalcDays()">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Cause <span class="req">*</span></label>
+          <select class="form-select" id="af-cause" onchange="afCauseChange()">
+            <option value="">— Select —</option>
+            <option>व्यक्तिगत कार्य / Personal work</option>
+            <option>पारिवारिक कार्य / Family matter</option>
+            <option>स्वास्थ्य / Medical</option>
+            <option>विवाह समारोह / Marriage in family</option>
+            <option>अंत्येष्टि / Bereavement</option>
+            <option>धार्मिक यात्रा / Religious visit</option>
+            <option>बच्चों की परीक्षा / Children's exams</option>
+            <option>प्रशिक्षण / Training (official)</option>
+            <option>यात्रा / Travel</option>
+            <option>अन्य / Other</option>
+          </select>
+        </div>
+        <div class="form-group full" id="af-cause-other-wrap" style="display:none;">
+          <label class="form-label">Specify Other Cause</label>
+          <input type="text" class="form-input" id="af-cause-other">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address during leave</label>
+          <input type="text" class="form-input" id="af-address">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Number</label>
+          <input type="tel" class="form-input" id="af-contact">
+        </div>
+      </div>
+      <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn" onclick="afReset()">Clear</button>
+        <button class="btn btn-primary" onclick="afSubmit()">Submit Application</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<div class="modal-overlay" id="entryModal"><div class="modal">
+  <div class="modal-header"><div><div class="modal-eyebrow" id="entry-eyebrow">New Entry</div><div class="modal-title" id="entry-title">—</div></div><button class="close-btn" onclick="closeModal('entryModal')">×</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="form-group"><label class="form-label">Serial No <span class="optional">(auto)</span></label><input type="text" class="form-input" id="ef-serial" readonly></div>
+    <div class="form-group"><label class="form-label" id="ef-no-label">Complaint No <span class="req">*</span></label><input type="text" class="form-input" id="ef-no" placeholder="e.g., 203-10"></div>
+    <div class="form-group"><label class="form-label">दिनांक / Date <span class="req">*</span></label><input type="date" class="form-input" id="ef-date"></div>
+    <div class="form-group"><label class="form-label">IO (Rank · Name)</label><select class="form-select" id="ef-io"></select></div>
+    <div class="form-group"><label class="form-label">Complainant's Name</label><input type="text" class="form-input" id="ef-comp"></div>
+    <div class="form-group"><label class="form-label">Non-Complainant's Name</label><input type="text" class="form-input" id="ef-noncomp"></div>
+    <div class="form-group"><label class="form-label">Last Date of Action / कार्यवाही दिनांक</label><input type="date" class="form-input" id="ef-actdate"></div>
+    <div class="form-group full"><label class="form-label">Brief / संक्षिप्त विवरण</label><textarea class="form-textarea" id="ef-brief" rows="3"></textarea></div>
+    <div class="form-group full">
+      <label class="form-label">Attachments</label>
+      <div class="attach-area" onclick="document.getElementById('ef-files').click()"><p>📎 Click to attach files</p></div>
+      <input type="file" id="ef-files" multiple style="display:none" onchange="handleEntryFiles(event)">
+      <div class="attach-list" id="ef-attach-list"></div>
+    </div>
+    <div class="form-group full">
+      <label class="form-label">Links</label>
+      <div class="link-input-group"><input type="url" class="form-input" id="ef-link-input" placeholder="https://…"><button type="button" class="btn" onclick="addEntryLink()">+ Add</button></div>
+      <div class="link-list" id="ef-link-list"></div>
+    </div>
+  </div></div>
+  <div class="modal-footer"><button class="btn btn-danger" id="ef-delete" onclick="deleteEntry()" style="display:none;">Delete</button><div style="flex:1"></div><button class="btn" onclick="closeModal('entryModal')">Cancel</button><button class="btn btn-primary" onclick="saveEntry()">Save</button></div>
+</div></div>
+
+<div class="modal-overlay" id="courtModal"><div class="modal">
+  <div class="modal-header"><div><div class="modal-eyebrow" id="court-eyebrow">New Court Case</div><div class="modal-title">Court Case</div></div><button class="close-btn" onclick="closeModal('courtModal')">×</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="form-group"><label class="form-label">Serial No <span class="optional">(auto)</span></label><input type="text" class="form-input" id="cf-serial" readonly></div>
+    <div class="form-group"><label class="form-label">Court <span class="req">*</span></label><select class="form-select" id="cf-court"><option value="">— Select —</option><option>District Court</option><option>High Court</option><option>Supreme Court</option></select></div>
+    <div class="form-group"><label class="form-label">CNR No <span class="req">*</span></label><input type="text" class="form-input" id="cf-cnr"></div>
+    <div class="form-group"><label class="form-label">Type <span class="req">*</span></label><select class="form-select" id="cf-type" onchange="cfTypeChange()"><option value="">— Select —</option><option>Writ Petition (WP)</option><option>Criminal Appeal (Crl.A)</option><option>Criminal Revision (Crl.R)</option><option>Bail Application</option><option>MCRC</option><option>Quashing Petition (482)</option><option>Other</option></select></div>
+    <div class="form-group" id="cf-type-other-wrap" style="display:none;"><label class="form-label">Specify Type</label><input type="text" class="form-input" id="cf-type-other"></div>
+    <div class="form-group"><label class="form-label">Petitioner</label><input type="text" class="form-input" id="cf-petitioner"></div>
+    <div class="form-group"><label class="form-label">Respondent</label><input type="text" class="form-input" id="cf-respondent"></div>
+    <div class="form-group"><label class="form-label">Last Hearing</label><input type="date" class="form-input" id="cf-last"></div>
+    <div class="form-group"><label class="form-label">Next Hearing</label><input type="date" class="form-input" id="cf-next"></div>
+    <div class="form-group full"><label class="form-label">In-Charge Officer</label><select class="form-select" id="cf-incharge"></select></div>
+  </div></div>
+  <div class="modal-footer"><button class="btn btn-danger" id="cf-delete" onclick="deleteCourt()" style="display:none;">Delete</button><div style="flex:1"></div><button class="btn" onclick="closeModal('courtModal')">Cancel</button><button class="btn btn-primary" onclick="saveCourt()">Save</button></div>
+</div></div>
+
+<div class="modal-overlay" id="leaveModal"><div class="modal" style="max-width:640px;">
+  <div class="modal-header"><div><div class="modal-eyebrow" id="lv-eyebrow">New Leave</div><div class="modal-title">Leave</div></div><button class="close-btn" onclick="closeModal('leaveModal')">×</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="form-group"><label class="form-label">Serial No <span class="optional">(auto)</span></label><input type="text" class="form-input" id="lv-serial" readonly></div>
+    <div class="form-group"><label class="form-label">Officer <span class="req">*</span></label><select class="form-select" id="lv-name"></select></div>
+    <div class="form-group"><label class="form-label">Type <span class="req">*</span></label><select class="form-select" id="lv-type"><option value="">— Select —</option><option>CL</option><option>EL</option><option>SL</option></select></div>
+    <div class="form-group"><label class="form-label">Days <span class="req">*</span></label><input type="number" class="form-input" id="lv-days" min="1"></div>
+    <div class="form-group"><label class="form-label">From</label><input type="date" class="form-input" id="lv-from"></div>
+    <div class="form-group"><label class="form-label">To</label><input type="date" class="form-input" id="lv-to"></div>
+    <div class="form-group full"><label class="form-label">Cause</label><input type="text" class="form-input" id="lv-cause"></div>
+  </div></div>
+  <div class="modal-footer"><button class="btn btn-danger" id="lv-delete" onclick="deleteLeave()" style="display:none;">Delete</button><div style="flex:1"></div><button class="btn" onclick="closeModal('leaveModal')">Cancel</button><button class="btn btn-primary" onclick="saveLeave()">Save</button></div>
+</div></div>
+
+<div class="modal-overlay" id="approvalModal"><div class="modal" style="max-width:560px;">
+  <div class="modal-header"><div><div class="modal-eyebrow">Leave Application</div><div class="modal-title" id="ap-title">—</div></div><button class="close-btn" onclick="closeModal('approvalModal')">×</button></div>
+  <div class="modal-body"><div id="ap-detail" style="margin-bottom:14px;font-size:13px;line-height:1.7;"></div><div class="form-group full"><label class="form-label">Remarks</label><textarea class="form-textarea" id="ap-remarks" rows="3"></textarea></div></div>
+  <div class="modal-footer"><button class="btn btn-danger" onclick="decideApproval('reject')">✗ Reject</button><div style="flex:1"></div><button class="btn" onclick="closeModal('approvalModal')">Cancel</button><button class="btn btn-success" onclick="decideApproval('approve')">✓ Approve</button></div>
+</div></div>
+
+<div class="modal-overlay" id="ioModal"><div class="modal" style="max-width:600px;">
+  <div class="modal-header"><div><div class="modal-eyebrow" id="io-eyebrow">New Officer</div><div class="modal-title">Add Officer</div></div><button class="close-btn" onclick="closeModal('ioModal')">×</button></div>
+  <div class="modal-body">
+    <div class="photo-upload-area" id="io-photo-area" onclick="document.getElementById('io-photo-input').click()"><span id="io-photo-placeholder">+</span></div>
+    <div style="text-align:center;font-size:11px;color:var(--ink-faint);margin-bottom:14px;">Click to upload photo (optional)</div>
+    <input type="file" id="io-photo-input" accept="image/*" style="display:none" onchange="handleIOPhoto(event)">
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Name <span class="req">*</span></label><input type="text" class="form-input" id="io-name"></div>
+      <div class="form-group"><label class="form-label">Rank <span class="req">*</span></label><select class="form-select" id="io-rank"><option value="">— Select —</option><option>Inspector</option><option>Sub-Inspector (SI)</option><option>Asst. Sub-Inspector (ASI)</option><option>Head Constable (HC)</option><option>Constable</option><option>DSP</option><option>Addl. SP</option><option>Stenographer</option><option>Clerk</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="io-status"><option>Active</option><option>Inactive</option></select></div>
+      <div class="form-group"><label class="form-label">Mobile</label><input type="tel" class="form-input" id="io-mobile"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="io-email"></div>
+    </div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-danger" id="io-delete" onclick="deleteIO()" style="display:none;">Remove</button><div style="flex:1"></div><button class="btn" onclick="closeModal('ioModal')">Cancel</button><button class="btn btn-primary" onclick="saveIO()">Save</button></div>
+</div></div>
+
+<script>
+// ============ CONFIG ============
+var supa = null;
+
+// Allow reset via URL parameter: ?reset=1
+if (window.location.search.indexOf('reset=1') > -1) {
+  localStorage.removeItem('eow_supa_url');
+  localStorage.removeItem('eow_supa_key');
+  // Remove the query param and reload
+  window.location.href = window.location.pathname;
+}
+
+var SUPABASE_URL = (localStorage.getItem('eow_supa_url') || '').trim().replace(/\/+$/, '');
+var SUPABASE_KEY = (localStorage.getItem('eow_supa_key') || '').trim();
+
+// Auto-clean any stale path from URL (in case old version had /rest/v1/ saved)
+if (SUPABASE_URL && SUPABASE_URL.indexOf('/rest/') > -1) {
+  SUPABASE_URL = SUPABASE_URL.split('/rest/')[0];
+  localStorage.setItem('eow_supa_url', SUPABASE_URL);
+}
+
+function saveConfig() {
+  var url = document.getElementById('cfg-url').value.trim().replace(/\/+$/, '');
+  var key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Both fields required'); return; }
+  if (url.indexOf('supabase.co') === -1) { alert('Invalid URL. Must contain supabase.co'); return; }
+  if (key.indexOf('eyJ') !== 0) { alert('Invalid key. Must start with eyJ'); return; }
+  localStorage.setItem('eow_supa_url', url);
+  localStorage.setItem('eow_supa_key', key);
+  location.reload();
+}
+function clearConfig() {
+  if (!confirm('Reset config? You will need to enter Supabase URL and key again.')) return;
+  localStorage.removeItem('eow_supa_url');
+  localStorage.removeItem('eow_supa_key');
+  location.reload();
+}
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  document.getElementById('configScreen').style.display = 'flex';
+} else {
+  document.getElementById('mainApp').style.display = 'block';
+  try {
+    supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch(e) {
+    alert('Failed to initialize Supabase: ' + e.message);
+  }
+}
+
+// ============ STATE ============
+var state = {
+  enquiries: { complaints: [], rcomplaints: [], rcs: [], pes: [], strs: [], sutra: [] },
+  courts: [], leaves: [], pendingApprovals: [], ioMaster: [], ioUpdates: []
+};
+var editing = { type: null, id: null };
+var editingCourt = null, editingLeave = null, editingIO = null;
+var pendingFiles = [], pendingLinks = [];
+var pendingIOPhoto = null;
+var currentApproval = null;
+
+var ENQ_LABELS = { complaints: 'Complaints', rcomplaints: 'R-Complaints', rcs: 'RCs', pes: 'PEs', strs: 'STRs', sutra: 'सूत्र सूचना' };
+var ENQ_PREFIX = { complaints: 'C', rcomplaints: 'RC', rcs: 'RCS', pes: 'PE', strs: 'STR', sutra: 'SS' };
+
+// ============ HELPERS ============
+function todayISO() { return new Date().toISOString().split('T')[0]; }
+function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }); }
+function escapeHtml(s) { if (s == null) return ''; return String(s).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function toast(msg, isError) {
+  var t = document.createElement('div');
+  t.className = 'toast';
+  if (isError) { t.style.borderLeftColor = 'var(--danger)'; t.style.background = 'var(--danger)'; }
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, isError ? 5000 : 2200);
+}
+function showError(operation, err) {
+  console.error(operation + ' error:', err);
+  var msg = 'Error in ' + operation + ':\n\n';
+  msg += 'Message: ' + (err.message || err.error_description || JSON.stringify(err)) + '\n';
+  if (err.code) msg += 'Code: ' + err.code + '\n';
+  if (err.hint) msg += 'Hint: ' + err.hint + '\n';
+  if (err.details) msg += 'Details: ' + err.details + '\n';
+  alert(msg);
+}
+function getInitials(name) { if (!name) return '?'; var p = name.trim().split(/\s+/); if (p.length === 1) return p[0].charAt(0).toUpperCase(); return (p[0].charAt(0) + p[p.length-1].charAt(0)).toUpperCase(); }
+function formatRelative(iso) { var d = (Date.now() - new Date(iso))/1000; if (d<60) return 'just now'; if (d<3600) return Math.floor(d/60)+'m ago'; if (d<86400) return Math.floor(d/3600)+'h ago'; if (d<604800) return Math.floor(d/86400)+'d ago'; return fmtDate(iso); }
+
+function generateSerial(type) { var arr = state.enquiries[type] || []; return String(arr.length+1); }
+function generateCourtSerial() { return String(state.courts.length+1); }
+function generateLeaveSerial() { return String(state.leaves.length+1); }
+
+function getActiveIONames() { return state.ioMaster.filter(function(io){ return io.status === 'Active'; }).map(function(io){ return io.name; }).sort(); }
+
+function countAssignedCases(name) {
+  var n = 0;
+  Object.keys(ENQ_LABELS).forEach(function(t){ n += state.enquiries[t].filter(function(e){ return e.io_name === name; }).length; });
+  n += state.courts.filter(function(c){ return c.incharge_officer === name; }).length;
+  return n;
+}
+
+// ============ FILE UPLOAD (with safer path handling) ============
+async function uploadFileToStorage(file) {
+  // Build a very safe path: only ASCII alphanumeric, dot, dash, underscore
+  var ext = '';
+  var nameOnly = file.name || 'file';
+  var dotIdx = nameOnly.lastIndexOf('.');
+  if (dotIdx > 0 && dotIdx < nameOnly.length - 1) {
+    ext = '.' + nameOnly.substring(dotIdx + 1).toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+  // Generate a fully safe filename (no original name characters)
+  var safePath = Date.now() + '_' + Math.random().toString(36).substring(2, 10) + ext;
+
+  var r = await supa.storage.from('attachments').upload(safePath, file, {
+    cacheControl: '3600',
+    upsert: false,
+    contentType: file.type || 'application/octet-stream'
+  });
+  if (r.error) throw r.error;
+  var pub = supa.storage.from('attachments').getPublicUrl(safePath);
+  return { name: file.name, type: file.type, size: file.size, url: pub.data.publicUrl, path: safePath };
+}
+
+// ============ CLOUD LOAD ============
+async function loadAllFromCloud() {
+  if (!supa) return;
+  try {
+    document.getElementById('cloud-status').textContent = 'Syncing...';
+
+    var ioRes = await supa.from('io_master').select('*').order('name');
+    if (ioRes.error) throw ioRes.error;
+    state.ioMaster = ioRes.data || [];
+
+    var enqRes = await supa.from('enquiries').select('*').order('date', { ascending: false });
+    if (enqRes.error) throw enqRes.error;
+    var allEnq = enqRes.data || [];
+    Object.keys(ENQ_LABELS).forEach(function(t){ state.enquiries[t] = allEnq.filter(function(e){ return e.category === t; }); });
+
+    var courtRes = await supa.from('court_cases').select('*').order('next_hearing');
+    if (courtRes.error) throw courtRes.error;
+    state.courts = courtRes.data || [];
+
+    var leavesRes = await supa.from('leaves').select('*').order('from_date', { ascending: false });
+    if (leavesRes.error) throw leavesRes.error;
+    state.leaves = leavesRes.data || [];
+
+    var pendRes = await supa.from('pending_approvals').select('*').order('submitted_at', { ascending: false });
+    if (pendRes.error) throw pendRes.error;
+    state.pendingApprovals = pendRes.data || [];
+
+    var updRes = await supa.from('io_updates').select('*').order('created_at', { ascending: false }).limit(50);
+    if (updRes.error) throw updRes.error;
+    state.ioUpdates = updRes.data || [];
+
+    document.getElementById('cloud-status').textContent = '✓ Connected';
+    refreshAll();
+  } catch (e) {
+    document.getElementById('cloud-status').textContent = '⚠ Connection error';
+    showError('Loading data from cloud', e);
+  }
+}
+
+function refreshAll() {
+  renderOverview();
+  Object.keys(ENQ_LABELS).forEach(function(t){ renderTable(t); });
+  renderCourtTable();
+  renderLeaveTable();
+  renderIOMaster();
+}
+
+// ============ NAV ============
+function switchSection(id) {
+  document.querySelectorAll('.section-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  var tab = document.querySelector('.section-tab[data-section="'+id+'"]');
+  if (tab) tab.classList.add('active');
+  var sec = document.getElementById(id);
+  if (sec) sec.classList.add('active');
+
+  // Populate forms when those tabs are opened
+  if (id === 'pragati') populatePragatiForm();
+  if (id === 'avkash') populateAvkashForm();
+}
+
+if (supa) {
+  document.querySelectorAll('.section-tab').forEach(function(btn){
+    btn.addEventListener('click', function(){ switchSection(btn.dataset.section); });
+  });
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-action]');
+    if (!t) return;
+    var a = t.dataset.action;
+    if (a === 'add') openEntryModal(t.dataset.type);
+    else if (a === 'add-court') openCourtModal();
+    else if (a === 'add-leave') openLeaveModal();
+    else if (a === 'add-io') openIOModal();
+  });
+}
+
+function updateHeader() {
+  var d = new Date();
+  document.getElementById('hdr-date').textContent = d.toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+}
+
+// ============ OVERVIEW ============
+function renderOverview() {
+  Object.keys(ENQ_LABELS).forEach(function(t){
+    var arr = state.enquiries[t] || [];
+    document.getElementById('ov-'+t).textContent = arr.length;
+    document.getElementById('cnt-'+t).textContent = arr.length;
+  });
+  document.getElementById('ov-court').textContent = state.courts.length;
+  document.getElementById('cnt-court').textContent = state.courts.length;
+  document.getElementById('cnt-leaves').textContent = state.leaves.length;
+  document.getElementById('cnt-iomaster').textContent = state.ioMaster.length;
+  var active = state.ioMaster.filter(function(io){ return io.status === 'Active'; }).length;
+  document.getElementById('ov-iomaster').textContent = active;
+  document.getElementById('ov-iomaster-total').textContent = state.ioMaster.length + ' total';
+  var today = todayISO();
+  var onLeave = state.leaves.filter(function(l){ return l.from_date <= today && l.to_date >= today; }).length;
+  document.getElementById('ov-leaves-today').textContent = onLeave;
+  document.getElementById('ov-leaves-pending').textContent = state.pendingApprovals.length + ' pending';
+
+  var feedEl = document.getElementById('overview-feed');
+  if (!state.ioUpdates.length) feedEl.innerHTML = '<div class="empty-state"><h3>No updates yet</h3></div>';
+  else feedEl.innerHTML = state.ioUpdates.slice(0,8).map(function(u){
+    return '<div class="feed-item"><div class="feed-meta"><span class="feed-io">'+escapeHtml(u.io_name)+'</span><span class="feed-tag">'+escapeHtml(u.case_serial || u.case_type)+'</span><span class="feed-time">'+formatRelative(u.created_at)+'</span></div>'+
+      '<div class="feed-action"><strong>'+escapeHtml(u.action)+'</strong></div>'+
+      (u.detail ? '<div class="feed-detail">'+escapeHtml(u.detail)+'</div>' : '')+
+      (u.next_step ? '<div style="font-size:12px;color:var(--primary);margin-top:6px;">→ '+escapeHtml(u.next_step)+'</div>' : '')+
+      '</div>';
+  }).join('');
+
+  var apEl = document.getElementById('overview-approvals');
+  if (!state.pendingApprovals.length) apEl.innerHTML = '<div class="empty-state"><h3>No applications pending</h3></div>';
+  else apEl.innerHTML = state.pendingApprovals.slice(0,4).map(function(a){
+    return '<div class="approval-card"><div class="approval-info"><div class="approval-name">'+escapeHtml(a.officer_name)+'</div>'+
+      '<div class="approval-meta"><span><strong>'+escapeHtml(a.leave_type)+'</strong> · '+a.days+' days</span><span>'+fmtDate(a.from_date)+' → '+fmtDate(a.to_date)+'</span></div>'+
+      '<div style="font-size:13px;">'+escapeHtml(a.cause)+'</div></div>'+
+      '<button class="btn btn-sm btn-success" onclick="openApproval(\''+a.id+'\')">Review</button></div>';
+  }).join('');
+}
+
+// ============ ENQUIRY TABLE ============
+function renderTable(type) {
+  var sec = document.getElementById(type);
+  if (!sec) return;
+  var search = (sec.querySelector('.search-input').value || '').toLowerCase();
+  var ioFilter = sec.querySelector('.io-filter').value;
+  var rows = (state.enquiries[type] || []).slice();
+  if (search) rows = rows.filter(function(r){ return [r.serial, r.no, r.complainant, r.non_complainant, r.brief, r.io_name].some(function(v){ return (v||'').toString().toLowerCase().indexOf(search) > -1; }); });
+  if (ioFilter) rows = rows.filter(function(r){ return r.io_name === ioFilter; });
+
+  var tbody = document.getElementById(type+'-body');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><h3>No entries yet</h3></div></td></tr>';
+  } else {
+    tbody.innerHTML = rows.map(function(r){
+      return '<tr onclick="openEntryModal(\''+type+'\',\''+r.id+'\')">'+
+        '<td><span class="serial-cell">'+escapeHtml(r.serial)+'</span></td>'+
+        '<td>'+escapeHtml(r.no || '')+'</td>'+
+        '<td>'+fmtDate(r.date)+'</td>'+
+        '<td>'+escapeHtml(r.io_name || '—')+'</td>'+
+        '<td>'+escapeHtml(r.complainant || '—')+'</td>'+
+        '<td>'+escapeHtml(r.non_complainant || '—')+'</td>'+
+        '<td>'+fmtDate(r.action_date)+'</td>'+
+        '<td style="max-width:280px;">'+escapeHtml((r.brief||'').slice(0,100))+((r.brief||'').length>100?'…':'')+'</td>'+
+        '<td>'+((r.attachments||[]).length?'📎'+r.attachments.length:'')+((r.links||[]).length?' 🔗'+r.links.length:'')+'</td>'+
+        '<td><button class="btn btn-sm" onclick="event.stopPropagation();openEntryModal(\''+type+'\',\''+r.id+'\')">Open</button></td></tr>';
+    }).join('');
+  }
+  var ioSel = sec.querySelector('.io-filter');
+  var cur = ioSel.value;
+  ioSel.innerHTML = '<option value="">All IOs</option>' + getActiveIONames().map(function(i){ return '<option'+(i===cur?' selected':'')+'>'+escapeHtml(i)+'</option>'; }).join('');
+}
+
+// ============ ENTRY MODAL ============
+function openEntryModal(type, id) {
+  editing.type = type;
+  editing.id = id || null;
+  pendingFiles = []; pendingLinks = [];
+  refreshIODropdown('ef-io');
+  document.getElementById('entry-eyebrow').textContent = id ? 'Edit Entry' : 'New Entry';
+  document.getElementById('entry-title').textContent = ENQ_LABELS[type];
+
+  // Set dynamic "No" label based on category
+  var noLabels = {
+    complaints: 'Complaint No', rcomplaints: 'R-Complaint No',
+    rcs: 'RC No', pes: 'PE No', strs: 'STR No', sutra: 'सूत्र सूचना No'
+  };
+  document.getElementById('ef-no-label').innerHTML = (noLabels[type] || 'No') + ' <span class="req">*</span>';
+
+  var entry;
+  if (id) {
+    entry = state.enquiries[type].find(function(e){ return e.id === id; });
+    if (!entry) { toast('Not found'); return; }
+    document.getElementById('ef-delete').style.display = 'inline-flex';
+  } else {
+    entry = { serial: generateSerial(type), date: todayISO() };
+    document.getElementById('ef-delete').style.display = 'none';
+  }
+  document.getElementById('ef-serial').value = entry.serial || '';
+  document.getElementById('ef-no').value = entry.no || '';
+  document.getElementById('ef-date').value = entry.date || todayISO();
+  document.getElementById('ef-io').value = entry.io_name || '';
+  document.getElementById('ef-comp').value = entry.complainant || '';
+  document.getElementById('ef-noncomp').value = entry.non_complainant || '';
+  document.getElementById('ef-actdate').value = entry.action_date || '';
+  document.getElementById('ef-brief').value = entry.brief || '';
+  pendingFiles = (entry.attachments || []).slice();
+  pendingLinks = (entry.links || []).slice();
+  renderAttachList('ef-attach-list', pendingFiles);
+  renderLinkList('ef-link-list', pendingLinks);
+  document.getElementById('entryModal').classList.add('active');
+}
+
+async function saveEntry() {
+  var no = document.getElementById('ef-no').value;
+  var date = document.getElementById('ef-date').value;
+  if (!no || !date) { toast('No and Date required', true); return; }
+  var data = {
+    category: editing.type,
+    no: no, date: date,
+    io_name: document.getElementById('ef-io').value || null,
+    complainant: document.getElementById('ef-comp').value || null,
+    non_complainant: document.getElementById('ef-noncomp').value || null,
+    action_date: document.getElementById('ef-actdate').value || null,
+    brief: document.getElementById('ef-brief').value || null,
+    attachments: pendingFiles, links: pendingLinks
+  };
+  try {
+    if (editing.id) {
+      var r = await supa.from('enquiries').update(data).eq('id', editing.id);
+      if (r.error) throw r.error;
+    } else {
+      data.serial = document.getElementById('ef-serial').value;
+      var r2 = await supa.from('enquiries').insert(data);
+      if (r2.error) throw r2.error;
+    }
+    toast('Saved');
+    closeModal('entryModal');
+    await loadAllFromCloud();
+  } catch (e) { showError('Save Entry', e); }
+}
+
+async function deleteEntry() {
+  if (!confirm('Delete this entry?')) return;
+  try {
+    var r = await supa.from('enquiries').delete().eq('id', editing.id);
+    if (r.error) throw r.error;
+    toast('Deleted');
+    closeModal('entryModal');
+    await loadAllFromCloud();
+  } catch (e) { showError('Delete Entry', e); }
+}
+
+async function handleEntryFiles(e) {
+  var files = Array.from(e.target.files);
+  toast('Uploading ' + files.length + ' file(s)...');
+  for (var i = 0; i < files.length; i++) {
+    try { var f = await uploadFileToStorage(files[i]); pendingFiles.push(f); }
+    catch(err){ showError('File upload', err); }
+  }
+  renderAttachList('ef-attach-list', pendingFiles);
+  e.target.value = '';
+}
+
+function addEntryLink() {
+  var inp = document.getElementById('ef-link-input');
+  var url = inp.value.trim();
+  if (!url) return;
+  pendingLinks.push({ url: url });
+  inp.value = '';
+  renderLinkList('ef-link-list', pendingLinks);
+}
+
+function renderAttachList(elId, list) {
+  var el = document.getElementById(elId);
+  if (!list || !list.length) { el.innerHTML = ''; return; }
+  el.innerHTML = list.map(function(f, i){ return '<div class="attach-item"><a href="'+escapeHtml(f.url)+'" target="_blank">📄 '+escapeHtml(f.name)+'</a><span class="remove" onclick="removeAttach(\''+elId+'\','+i+')">×</span></div>'; }).join('');
+}
+function removeAttach(elId, idx) {
+  if (elId === 'ef-attach-list') { pendingFiles.splice(idx,1); renderAttachList(elId, pendingFiles); }
+}
+function renderLinkList(elId, list) {
+  var el = document.getElementById(elId);
+  if (!list || !list.length) { el.innerHTML = ''; return; }
+  el.innerHTML = list.map(function(l, i){ return '<div class="link-item"><a href="'+escapeHtml(l.url)+'" target="_blank">🔗 '+escapeHtml(l.url)+'</a><span class="remove" onclick="removeLink(\''+elId+'\','+i+')" style="color:var(--danger);cursor:pointer;font-weight:700;">×</span></div>'; }).join('');
+}
+function removeLink(elId, idx) {
+  if (elId === 'ef-link-list') { pendingLinks.splice(idx,1); renderLinkList(elId, pendingLinks); }
+}
+
+// ============ COURT ============
+function openCourtModal(id) {
+  editingCourt = id || null;
+  refreshIODropdown('cf-incharge');
+  var c;
+  if (id) {
+    c = state.courts.find(function(x){ return x.id === id; });
+    if (!c) { toast('Not found'); return; }
+    document.getElementById('court-eyebrow').textContent = 'Edit Court Case';
+    document.getElementById('cf-delete').style.display = 'inline-flex';
+  } else {
+    c = { serial: generateCourtSerial() };
+    document.getElementById('court-eyebrow').textContent = 'New Court Case';
+    document.getElementById('cf-delete').style.display = 'none';
+  }
+  document.getElementById('cf-serial').value = c.serial || '';
+  document.getElementById('cf-court').value = c.court || '';
+  document.getElementById('cf-cnr').value = c.cnr_no || '';
+  document.getElementById('cf-type').value = c.case_type || '';
+  document.getElementById('cf-type-other').value = c.case_type_other || '';
+  document.getElementById('cf-petitioner').value = c.petitioner || '';
+  document.getElementById('cf-respondent').value = c.respondent || '';
+  document.getElementById('cf-last').value = c.last_hearing || '';
+  document.getElementById('cf-next').value = c.next_hearing || '';
+  document.getElementById('cf-incharge').value = c.incharge_officer || '';
+  cfTypeChange();
+  document.getElementById('courtModal').classList.add('active');
+}
+function cfTypeChange() {
+  document.getElementById('cf-type-other-wrap').style.display = (document.getElementById('cf-type').value === 'Other') ? '' : 'none';
+}
+
+async function saveCourt() {
+  var cnr = document.getElementById('cf-cnr').value;
+  var court = document.getElementById('cf-court').value;
+  if (!cnr || !court) { toast('Court and CNR required', true); return; }
+  var data = {
+    court: court, cnr_no: cnr,
+    case_type: document.getElementById('cf-type').value || null,
+    case_type_other: document.getElementById('cf-type-other').value || null,
+    petitioner: document.getElementById('cf-petitioner').value || null,
+    respondent: document.getElementById('cf-respondent').value || null,
+    last_hearing: document.getElementById('cf-last').value || null,
+    next_hearing: document.getElementById('cf-next').value || null,
+    incharge_officer: document.getElementById('cf-incharge').value || null,
+    attachments: [], links: []
+  };
+  try {
+    if (editingCourt) {
+      var r = await supa.from('court_cases').update(data).eq('id', editingCourt);
+      if (r.error) throw r.error;
+    } else {
+      data.serial = document.getElementById('cf-serial').value;
+      var r2 = await supa.from('court_cases').insert(data);
+      if (r2.error) throw r2.error;
+    }
+    toast('Saved');
+    closeModal('courtModal');
+    await loadAllFromCloud();
+  } catch (e) { showError('Save Court Case', e); }
+}
+
+async function deleteCourt() {
+  if (!confirm('Delete?')) return;
+  try {
+    var r = await supa.from('court_cases').delete().eq('id', editingCourt);
+    if (r.error) throw r.error;
+    toast('Deleted'); closeModal('courtModal'); await loadAllFromCloud();
+  } catch(e) { showError('Delete Court Case', e); }
+}
+
+function renderCourtTable() {
+  var search = (document.getElementById('search-court').value || '').toLowerCase();
+  var fType = document.getElementById('filter-court-type').value;
+  var rows = state.courts.slice();
+  if (search) rows = rows.filter(function(c){ return [c.cnr_no, c.petitioner, c.respondent, c.serial].some(function(v){ return (v||'').toLowerCase().indexOf(search)>-1; }); });
+  if (fType) rows = rows.filter(function(c){ return c.court === fType; });
+  var tbody = document.getElementById('court-body');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><h3>No court cases yet</h3></div></td></tr>'; return; }
+  tbody.innerHTML = rows.map(function(c){
+    return '<tr onclick="openCourtModal(\''+c.id+'\')">'+
+      '<td><span class="serial-cell">'+escapeHtml(c.serial)+'</span></td>'+
+      '<td>'+escapeHtml(c.court)+'</td>'+
+      '<td><span style="font-family:monospace;">'+escapeHtml(c.cnr_no)+'</span></td>'+
+      '<td>'+escapeHtml(c.case_type === 'Other' ? c.case_type_other : c.case_type)+'</td>'+
+      '<td>'+escapeHtml(c.petitioner || '—')+'</td>'+
+      '<td>'+escapeHtml(c.respondent || '—')+'</td>'+
+      '<td>'+fmtDate(c.last_hearing)+'</td>'+
+      '<td>'+fmtDate(c.next_hearing)+'</td>'+
+      '<td>'+escapeHtml(c.incharge_officer || '—')+'</td>'+
+      '<td><button class="btn btn-sm" onclick="event.stopPropagation();openCourtModal(\''+c.id+'\')">Open</button></td></tr>';
+  }).join('');
+}
+
+// ============ LEAVES ============
+function getRemaining(name, type) {
+  var limits = { CL: 16, EL: 30, SL: 15 };
+  var year = new Date().getFullYear();
+  var used = state.leaves.filter(function(l){ return l.officer_name === name && l.leave_type === type && new Date(l.from_date || l.created_at).getFullYear() === year; }).reduce(function(s,l){ return s + (parseInt(l.days)||0); }, 0);
+  return limits[type] - used;
+}
+
+function openLeaveModal(id) {
+  editingLeave = id || null;
+  refreshIODropdown('lv-name');
+  var l;
+  if (id) {
+    l = state.leaves.find(function(x){ return x.id === id; });
+    if (!l) { toast('Not found'); return; }
+    document.getElementById('lv-eyebrow').textContent = 'Edit Leave';
+    document.getElementById('lv-delete').style.display = 'inline-flex';
+  } else {
+    l = { serial: generateLeaveSerial() };
+    document.getElementById('lv-eyebrow').textContent = 'New Leave';
+    document.getElementById('lv-delete').style.display = 'none';
+  }
+  document.getElementById('lv-serial').value = l.serial || '';
+  document.getElementById('lv-name').value = l.officer_name || '';
+  document.getElementById('lv-type').value = l.leave_type || '';
+  document.getElementById('lv-days').value = l.days || '';
+  document.getElementById('lv-from').value = l.from_date || '';
+  document.getElementById('lv-to').value = l.to_date || '';
+  document.getElementById('lv-cause').value = l.cause || '';
+  document.getElementById('leaveModal').classList.add('active');
+}
+
+async function saveLeave() {
+  var name = document.getElementById('lv-name').value;
+  var type = document.getElementById('lv-type').value;
+  var days = document.getElementById('lv-days').value;
+  if (!name || !type || !days) { toast('Required fields missing', true); return; }
+  var data = {
+    officer_name: name, leave_type: type, days: parseInt(days),
+    from_date: document.getElementById('lv-from').value || null,
+    to_date: document.getElementById('lv-to').value || null,
+    cause: document.getElementById('lv-cause').value || null,
+    status: 'approved'
+  };
+  try {
+    if (editingLeave) { var r = await supa.from('leaves').update(data).eq('id', editingLeave); if (r.error) throw r.error; }
+    else { data.serial = document.getElementById('lv-serial').value; var r2 = await supa.from('leaves').insert(data); if (r2.error) throw r2.error; }
+    toast('Saved');
+    closeModal('leaveModal');
+    await loadAllFromCloud();
+  } catch (e) { showError('Save Leave', e); }
+}
+
+async function deleteLeave() {
+  if (!confirm('Delete?')) return;
+  try {
+    var r = await supa.from('leaves').delete().eq('id', editingLeave);
+    if (r.error) throw r.error;
+    toast('Deleted'); closeModal('leaveModal'); await loadAllFromCloud();
+  } catch(e) { showError('Delete Leave', e); }
+}
+
+function renderLeaveTable() {
+  var apPanel = document.getElementById('approvals-panel');
+  if (state.pendingApprovals.length) {
+    apPanel.style.display = 'block';
+    document.getElementById('leaves-approvals').innerHTML = state.pendingApprovals.map(function(a){
+      return '<div class="approval-card"><div class="approval-info"><div class="approval-name">'+escapeHtml(a.officer_name)+'</div>'+
+        '<div class="approval-meta"><span><strong>'+escapeHtml(a.leave_type)+'</strong> · '+a.days+' days</span><span>'+fmtDate(a.from_date)+' → '+fmtDate(a.to_date)+'</span></div>'+
+        '<div style="font-size:13px;">'+escapeHtml(a.cause)+(a.cause_other?': '+escapeHtml(a.cause_other):'')+'</div></div>'+
+        '<button class="btn btn-sm btn-success" onclick="openApproval(\''+a.id+'\')">Review</button></div>';
+    }).join('');
+  } else { apPanel.style.display = 'none'; }
+
+  var year = new Date().getFullYear();
+  var cl=0, el=0, sl=0;
+  state.leaves.forEach(function(l){
+    if (new Date(l.from_date || l.created_at).getFullYear() !== year) return;
+    if (l.leave_type === 'CL') cl += parseInt(l.days)||0;
+    if (l.leave_type === 'EL') el += parseInt(l.days)||0;
+    if (l.leave_type === 'SL') sl += parseInt(l.days)||0;
+  });
+  document.getElementById('lv-cl-total').innerHTML = cl + ' <small>days / 16</small>';
+  document.getElementById('lv-el-total').innerHTML = el + ' <small>days / 30</small>';
+  document.getElementById('lv-sl-total').innerHTML = sl + ' <small>days / 15</small>';
+
+  var search = (document.getElementById('search-leave').value || '').toLowerCase();
+  var fType = document.getElementById('filter-leave-type').value;
+  var rows = state.leaves.slice();
+  if (search) rows = rows.filter(function(l){ return (l.officer_name||'').toLowerCase().indexOf(search) > -1; });
+  if (fType) rows = rows.filter(function(l){ return l.leave_type === fType; });
+
+  var tbody = document.getElementById('leaves-body');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><h3>No leaves yet</h3></div></td></tr>'; return; }
+  tbody.innerHTML = rows.map(function(l){
+    var rem = getRemaining(l.officer_name, l.leave_type);
+    return '<tr onclick="openLeaveModal(\''+l.id+'\')">'+
+      '<td><span class="serial-cell">'+escapeHtml(l.serial)+'</span></td>'+
+      '<td>'+escapeHtml(l.officer_name)+'</td>'+
+      '<td><span class="badge badge-primary">'+escapeHtml(l.leave_type)+'</span></td>'+
+      '<td>'+fmtDate(l.from_date)+'</td>'+
+      '<td>'+fmtDate(l.to_date)+'</td>'+
+      '<td><strong>'+l.days+'</strong></td>'+
+      '<td style="max-width:240px;">'+escapeHtml(l.cause || '—')+'</td>'+
+      '<td><span class="badge badge-good">'+escapeHtml(l.status||'approved')+'</span></td>'+
+      '<td>'+rem+'</td>'+
+      '<td><button class="btn btn-sm" onclick="event.stopPropagation();openLeaveModal(\''+l.id+'\')">Open</button></td></tr>';
+  }).join('');
+}
+
+// ============ IO MASTER ============
+function refreshIODropdown(elId) {
+  var sel = document.getElementById(elId); if (!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">— Select —</option>' + getActiveIONames().map(function(i){ return '<option'+(i===cur?' selected':'')+'>'+escapeHtml(i)+'</option>'; }).join('');
+}
+
+function openIOModal(id) {
+  editingIO = id || null;
+  pendingIOPhoto = null;
+  var io;
+  if (id) {
+    io = state.ioMaster.find(function(x){ return x.id === id; });
+    if (!io) { toast('Not found'); return; }
+    document.getElementById('io-eyebrow').textContent = 'Edit Officer';
+    document.getElementById('io-delete').style.display = 'inline-flex';
+  } else {
+    io = { name: '', rank: '', mobile: '', email: '', photo_url: '', status: 'Active' };
+    document.getElementById('io-eyebrow').textContent = 'New Officer';
+    document.getElementById('io-delete').style.display = 'none';
+  }
+  document.getElementById('io-name').value = io.name || '';
+  document.getElementById('io-rank').value = io.rank || '';
+  document.getElementById('io-status').value = io.status || 'Active';
+  document.getElementById('io-mobile').value = io.mobile || '';
+  document.getElementById('io-email').value = io.email || '';
+  pendingIOPhoto = io.photo_url || null;
+  updateIOPhotoArea();
+  document.getElementById('ioModal').classList.add('active');
+}
+
+function updateIOPhotoArea() {
+  var area = document.getElementById('io-photo-area');
+  var name = document.getElementById('io-name').value;
+  if (pendingIOPhoto) area.innerHTML = '<img src="'+pendingIOPhoto+'">';
+  else area.innerHTML = '<span>'+(name ? getInitials(name) : '+')+'</span>';
+}
+
+async function handleIOPhoto(e) {
+  var f = e.target.files[0]; if (!f) return;
+  toast('Uploading photo...');
+  try {
+    var uploaded = await uploadFileToStorage(f);
+    pendingIOPhoto = uploaded.url;
+    updateIOPhotoArea();
+    toast('Photo uploaded ✓');
+  } catch(err) {
+    pendingIOPhoto = null;
+    showError('Photo upload', err);
+  }
+  e.target.value = '';
+}
+
+async function saveIO() {
+  var name = document.getElementById('io-name').value.trim();
+  var rank = document.getElementById('io-rank').value;
+  if (!name || !rank) { toast('Name and Rank required', true); return; }
+
+  // Build clean data object - never send undefined
+  var data = {
+    name: name,
+    rank: rank,
+    status: document.getElementById('io-status').value || 'Active',
+    mobile: document.getElementById('io-mobile').value || null,
+    email: document.getElementById('io-email').value || null,
+    photo_url: (pendingIOPhoto && typeof pendingIOPhoto === 'string') ? pendingIOPhoto : null
+  };
+
+  try {
+    if (editingIO) {
+      var r = await supa.from('io_master').update(data).eq('id', editingIO);
+      if (r.error) throw r.error;
+    } else {
+      var r2 = await supa.from('io_master').insert(data);
+      if (r2.error) throw r2.error;
+    }
+    toast('Saved ✓');
+    closeModal('ioModal');
+    await loadAllFromCloud();
+  } catch (e) { showError('Save Officer', e); }
+}
+
+async function deleteIO() {
+  if (!confirm('Remove this officer? Tip: Set Inactive instead to preserve history.')) return;
+  try {
+    var r = await supa.from('io_master').delete().eq('id', editingIO);
+    if (r.error) throw r.error;
+    toast('Removed'); closeModal('ioModal'); await loadAllFromCloud();
+  } catch(e) { showError('Delete Officer', e); }
+}
+
+function renderIOMaster() {
+  var search = (document.getElementById('search-io').value || '').toLowerCase();
+  var sf = document.getElementById('filter-io-status').value;
+  var list = state.ioMaster.slice();
+  if (search) list = list.filter(function(io){ return io.name.toLowerCase().indexOf(search) > -1 || (io.rank||'').toLowerCase().indexOf(search) > -1; });
+  if (sf) list = list.filter(function(io){ return io.status === sf; });
+  var c = document.getElementById('io-master-list');
+  if (!list.length) { c.className = ''; c.innerHTML = '<div class="empty-state"><h3>No officers found</h3></div>'; return; }
+  c.className = 'io-master-grid';
+  c.innerHTML = list.map(function(io){
+    var cc = countAssignedCases(io.name);
+    var photoHTML = io.photo_url ? '<img src="'+io.photo_url+'">' : '<span>'+getInitials(io.name)+'</span>';
+    var sb = io.status === 'Active' ? '<span class="badge badge-good">Active</span>' : '<span class="badge badge-neutral">Inactive</span>';
+    return '<div class="io-card '+(io.status==='Inactive'?'inactive':'')+'" onclick="openIOModal(\''+io.id+'\')">'+
+      '<div class="io-card-header"><div class="io-photo">'+photoHTML+'</div>'+
+      '<div class="io-card-info"><div class="io-card-name">'+escapeHtml(io.name)+'</div><div class="io-card-rank">'+escapeHtml(io.rank||'—')+'</div></div></div>'+
+      '<div class="io-card-meta">'+
+      (io.mobile ? '<div>📞 '+escapeHtml(io.mobile)+'</div>' : '')+
+      (io.email ? '<div>✉️ '+escapeHtml(io.email)+'</div>' : '')+
+      (!io.mobile && !io.email ? '<div style="color:var(--ink-faint);font-style:italic;">No contact</div>' : '')+
+      '</div>'+
+      '<div class="io-card-footer"><div class="io-card-cases"><strong>'+cc+'</strong> case'+(cc===1?'':'s')+'</div>'+sb+'</div></div>';
+  }).join('');
+}
+
+// ============ APPROVAL ============
+function openApproval(id) {
+  currentApproval = state.pendingApprovals.find(function(a){ return a.id === id; });
+  if (!currentApproval) return;
+  document.getElementById('ap-title').textContent = currentApproval.officer_name + ' — ' + currentApproval.leave_type;
+  document.getElementById('ap-detail').innerHTML =
+    '<div><strong>Days:</strong> '+currentApproval.days+'</div>'+
+    '<div><strong>Period:</strong> '+fmtDate(currentApproval.from_date)+' to '+fmtDate(currentApproval.to_date)+'</div>'+
+    '<div><strong>Cause:</strong> '+escapeHtml(currentApproval.cause)+(currentApproval.cause_other?' — '+escapeHtml(currentApproval.cause_other):'')+'</div>'+
+    (currentApproval.address ? '<div><strong>Address:</strong> '+escapeHtml(currentApproval.address)+'</div>' : '')+
+    (currentApproval.contact ? '<div><strong>Contact:</strong> '+escapeHtml(currentApproval.contact)+'</div>' : '');
+  document.getElementById('ap-remarks').value = '';
+  document.getElementById('approvalModal').classList.add('active');
+}
+
+async function decideApproval(decision) {
+  if (!currentApproval) return;
+  var remarks = document.getElementById('ap-remarks').value;
+  try {
+    if (decision === 'approve') {
+      var r = await supa.from('leaves').insert({
+        serial: generateLeaveSerial(),
+        officer_name: currentApproval.officer_name,
+        leave_type: currentApproval.leave_type,
+        days: currentApproval.days,
+        from_date: currentApproval.from_date,
+        to_date: currentApproval.to_date,
+        cause: currentApproval.cause + (currentApproval.cause_other ? ': '+currentApproval.cause_other : ''),
+        address: currentApproval.address,
+        contact: currentApproval.contact,
+        remarks: remarks,
+        status: 'approved'
+      });
+      if (r.error) throw r.error;
+      toast('Approved');
+    } else {
+      toast('Rejected');
+    }
+    var r2 = await supa.from('pending_approvals').delete().eq('id', currentApproval.id);
+    if (r2.error) throw r2.error;
+    closeModal('approvalModal');
+    await loadAllFromCloud();
+  } catch(e) { showError('Approval', e); }
+}
+
+// ============ MODAL ============
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+  if (id === 'entryModal') { editing = { type: null, id: null }; pendingFiles = []; pendingLinks = []; }
+  if (id === 'courtModal') editingCourt = null;
+  if (id === 'leaveModal') editingLeave = null;
+  if (id === 'approvalModal') currentApproval = null;
+  if (id === 'ioModal') { editingIO = null; pendingIOPhoto = null; }
+}
+
+// ============ PRAGATI PRATIVEDAN (embedded form) ============
+function populatePragatiForm() {
+  var sel = document.getElementById('pf-io');
+  var ioNames = getActiveIONames();
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">— चुनें —</option>' + ioNames.map(function(n){ return '<option'+(n===cur?' selected':'')+'>'+escapeHtml(n)+'</option>'; }).join('');
+}
+
+function pfUpdateTypes() {
+  var io = document.getElementById('pf-io').value;
+  var typeSel = document.getElementById('pf-type');
+  var caseSel = document.getElementById('pf-case');
+  caseSel.innerHTML = '<option value="">— पहले प्रकार चुनें —</option>';
+  if (!io) {
+    typeSel.innerHTML = '<option value="">— पहले IO चुनें —</option>';
+    return;
+  }
+  var availableTypes = [];
+  Object.keys(ENQ_LABELS).forEach(function(t){
+    if (state.enquiries[t].some(function(e){ return e.io_name === io; })) availableTypes.push(t);
+  });
+  if (state.courts.some(function(c){ return c.incharge_officer === io; })) availableTypes.push('court');
+  if (!availableTypes.length) {
+    typeSel.innerHTML = '<option value="">— इस IO को कोई case assigned नहीं है —</option>';
+    return;
+  }
+  typeSel.innerHTML = '<option value="">— चुनें —</option>' + availableTypes.map(function(t){ return '<option value="'+t+'">'+escapeHtml(t === 'court' ? 'Court Cases' : ENQ_LABELS[t])+'</option>'; }).join('');
+}
+
+function pfUpdateCases() {
+  var io = document.getElementById('pf-io').value;
+  var typeVal = document.getElementById('pf-type').value;
+  var caseSel = document.getElementById('pf-case');
+  if (!typeVal) { caseSel.innerHTML = '<option value="">— पहले प्रकार चुनें —</option>'; return; }
+  var cases;
+  if (typeVal === 'court') {
+    cases = state.courts.filter(function(c){ return c.incharge_officer === io; });
+    caseSel.innerHTML = '<option value="">— चुनें —</option>' + cases.map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.serial)+' · '+escapeHtml(c.cnr_no)+'</option>'; }).join('');
+  } else {
+    cases = state.enquiries[typeVal].filter(function(e){ return e.io_name === io; });
+    caseSel.innerHTML = '<option value="">— चुनें —</option>' + cases.map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.serial)+' · '+escapeHtml((c.brief||'').slice(0,40))+'</option>'; }).join('');
+  }
+}
+
+async function pfSubmit() {
+  var io = document.getElementById('pf-io').value;
+  var type = document.getElementById('pf-type').value;
+  var caseId = document.getElementById('pf-case').value;
+  var action = document.getElementById('pf-action').value;
+  var detail = document.getElementById('pf-detail').value;
+  var next = document.getElementById('pf-next').value;
+  if (!io || !type || !caseId || !action || !next) { toast('कृपया सभी आवश्यक fields भरें', true); return; }
+
+  var caseSerial = '';
+  if (type === 'court') { var c = state.courts.find(function(x){ return x.id === caseId; }); caseSerial = c ? c.serial : ''; }
+  else { var c2 = state.enquiries[type].find(function(x){ return x.id === caseId; }); caseSerial = c2 ? c2.serial : ''; }
+
+  try {
+    var r = await supa.from('io_updates').insert({
+      io_name: io, case_type: type, case_id: caseId, case_serial: caseSerial,
+      action: action, detail: detail, next_step: next
+    });
+    if (r.error) throw r.error;
+    toast('✓ Update submitted');
+    pfReset();
+    await loadAllFromCloud();
+    setTimeout(function(){ switchSection('overview'); }, 800);
+  } catch(e) { showError('Submit Pragati', e); }
+}
+
+function pfReset() {
+  document.getElementById('pf-io').value = '';
+  document.getElementById('pf-type').innerHTML = '<option value="">— पहले IO चुनें —</option>';
+  document.getElementById('pf-case').innerHTML = '<option value="">— पहले प्रकार चुनें —</option>';
+  document.getElementById('pf-action').value = '';
+  document.getElementById('pf-detail').value = '';
+  document.getElementById('pf-next').value = '';
+}
+
+// ============ AVKASH AVEDAN (embedded form) ============
+function populateAvkashForm() {
+  var sel = document.getElementById('af-name');
+  var ioNames = getActiveIONames();
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">— चुनें —</option>' + ioNames.map(function(n){ return '<option'+(n===cur?' selected':'')+'>'+escapeHtml(n)+'</option>'; }).join('');
+}
+
+function afCalcDays() {
+  var f = document.getElementById('af-from').value;
+  var t = document.getElementById('af-to').value;
+  if (!f || !t) { document.getElementById('af-days').value = '—'; return; }
+  var days = Math.floor((new Date(t) - new Date(f)) / 86400000) + 1;
+  document.getElementById('af-days').value = days > 0 ? days : '—';
+}
+
+function afCauseChange() {
+  document.getElementById('af-cause-other-wrap').style.display = (document.getElementById('af-cause').value === 'अन्य / Other') ? '' : 'none';
+}
+
+async function afSubmit() {
+  var name = document.getElementById('af-name').value;
+  var type = document.getElementById('af-type').value;
+  var from = document.getElementById('af-from').value;
+  var to = document.getElementById('af-to').value;
+  var cause = document.getElementById('af-cause').value;
+  var days = document.getElementById('af-days').value;
+  if (!name || !type || !from || !to || !cause || days === '—') { toast('कृपया सभी आवश्यक fields भरें', true); return; }
+  try {
+    var r = await supa.from('pending_approvals').insert({
+      officer_name: name, leave_type: type, days: parseInt(days),
+      from_date: from, to_date: to, cause: cause,
+      cause_other: document.getElementById('af-cause-other').value,
+      address: document.getElementById('af-address').value,
+      contact: document.getElementById('af-contact').value
+    });
+    if (r.error) throw r.error;
+    toast('✓ Application submitted for approval');
+    afReset();
+    await loadAllFromCloud();
+    setTimeout(function(){ switchSection('leaves'); }, 800);
+  } catch(e) { showError('Submit Avkash', e); }
+}
+
+function afReset() {
+  ['af-name','af-type','af-from','af-to','af-cause','af-cause-other','af-address','af-contact'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('af-days').value = '—';
+  document.getElementById('af-cause-other-wrap').style.display = 'none';
+}
+
+// ============ GLOBAL SEARCH ============
+function performGlobalSearch() {
+  var q = (document.getElementById('global-search').value || '').trim().toLowerCase();
+  var clearBtn = document.getElementById('global-search-clear');
+  var resultsEl = document.getElementById('global-search-results');
+
+  if (!q) {
+    clearBtn.style.display = 'none';
+    resultsEl.innerHTML = '';
+    return;
+  }
+  clearBtn.style.display = 'inline-flex';
+
+  var html = '';
+  var totalHits = 0;
+
+  // Search in each enquiry category
+  Object.keys(ENQ_LABELS).forEach(function(t){
+    var matches = state.enquiries[t].filter(function(r){
+      return matchEntry(r, q);
+    });
+    if (matches.length) {
+      totalHits += matches.length;
+      html += renderSearchSection(ENQ_LABELS[t], matches.length, matches.map(function(r){
+        return renderSearchRow(r.serial, (r.no ? 'No: ' + r.no + ' · ' : '') + (r.complainant || '—') + (r.brief ? ' · ' + (r.brief.slice(0,60)) : ''),
+          'IO: ' + (r.io_name || '—') + ' · ' + fmtDate(r.date), q,
+          function(){ switchSection(t); openEntryModal(t, r.id); });
+      }).join(''));
+    }
+  });
+
+  // Search in court cases
+  var courtMatches = state.courts.filter(function(c){
+    return matchCourt(c, q);
+  });
+  if (courtMatches.length) {
+    totalHits += courtMatches.length;
+    html += renderSearchSection('Court Cases', courtMatches.length, courtMatches.map(function(c){
+      return renderSearchRow(c.serial, (c.cnr_no || '—') + ' · ' + (c.petitioner || '—') + ' vs ' + (c.respondent || '—'),
+        c.court + ' · In-charge: ' + (c.incharge_officer || '—'), q,
+        function(){ switchSection('court'); openCourtModal(c.id); });
+    }).join(''));
+  }
+
+  // Search in leaves
+  var leaveMatches = state.leaves.filter(function(l){
+    return matchLeave(l, q);
+  });
+  if (leaveMatches.length) {
+    totalHits += leaveMatches.length;
+    html += renderSearchSection('Leaves', leaveMatches.length, leaveMatches.map(function(l){
+      return renderSearchRow(l.serial, l.officer_name + ' · ' + l.leave_type + ' · ' + l.days + ' days',
+        fmtDate(l.from_date) + ' → ' + fmtDate(l.to_date) + ' · ' + (l.cause || ''), q,
+        function(){ switchSection('leaves'); openLeaveModal(l.id); });
+    }).join(''));
+  }
+
+  // Search in IO Master
+  var ioMatches = state.ioMaster.filter(function(io){
+    return (io.name || '').toLowerCase().indexOf(q) > -1
+      || (io.rank || '').toLowerCase().indexOf(q) > -1
+      || (io.mobile || '').indexOf(q) > -1
+      || (io.email || '').toLowerCase().indexOf(q) > -1;
+  });
+  if (ioMatches.length) {
+    totalHits += ioMatches.length;
+    html += renderSearchSection('IO Master', ioMatches.length, ioMatches.map(function(io){
+      var assignedCount = countAssignedCases(io.name);
+      return renderSearchRow('—', io.name + ' · ' + io.rank,
+        (io.mobile ? '📞 ' + io.mobile + ' · ' : '') + assignedCount + ' cases · ' + io.status, q,
+        function(){ switchSection('iomaster'); openIOModal(io.id); });
+    }).join(''));
+  }
+
+  if (!totalHits) {
+    html = '<div class="gs-section"><div class="gs-empty">कोई मिलान नहीं — "<strong>' + escapeHtml(q) + '</strong>" के लिए कुछ नहीं मिला</div></div>';
+  }
+
+  resultsEl.innerHTML = html;
+
+  // Attach click handlers
+  var rows = resultsEl.querySelectorAll('.gs-row');
+  for (var i = 0; i < rows.length; i++) {
+    (function(row){
+      row.addEventListener('click', function(){
+        var fn = window['__gs_handler_' + row.dataset.idx];
+        if (fn) fn();
+      });
+    })(rows[i]);
+  }
+}
+
+function matchEntry(r, q) {
+  var fields = [r.serial, r.no, r.complainant, r.non_complainant, r.brief, r.io_name];
+  return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+}
+
+function matchCourt(c, q) {
+  var fields = [c.serial, c.cnr_no, c.case_type, c.case_type_other, c.petitioner, c.respondent, c.incharge_officer, c.court];
+  return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+}
+
+function matchLeave(l, q) {
+  var fields = [l.serial, l.officer_name, l.leave_type, l.cause, String(l.days)];
+  return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+}
+
+var __gs_idx = 0;
+function renderSearchSection(title, count, rowsHtml) {
+  return '<div class="gs-section"><div class="gs-section-title">' + escapeHtml(title) +
+    '<span class="gs-count">' + count + '</span></div>' + rowsHtml + '</div>';
+}
+
+function renderSearchRow(serial, content, meta, q, handler) {
+  __gs_idx++;
+  window['__gs_handler_' + __gs_idx] = handler;
+  return '<div class="gs-row" data-idx="' + __gs_idx + '">' +
+    '<span class="gs-serial">' + escapeHtml(serial) + '</span>' +
+    '<div class="gs-row-content">' + highlightMatch(escapeHtml(content), q) +
+    '<div class="gs-row-meta">' + highlightMatch(escapeHtml(meta), q) + '</div></div></div>';
+}
+
+function highlightMatch(text, q) {
+  if (!q) return text;
+  var safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  var re = new RegExp('(' + safeQ + ')', 'gi');
+  return text.replace(re, '<mark class="gs-highlight">$1</mark>');
+}
+
+function clearGlobalSearch() {
+  document.getElementById('global-search').value = '';
+  document.getElementById('global-search-clear').style.display = 'none';
+  document.getElementById('global-search-results').innerHTML = '';
+  document.getElementById('global-search').focus();
+}
+
+// ============ PRAGATI CALENDAR VIEW ============
+var calCurrentMonth = new Date().getMonth();
+var calCurrentYear = new Date().getFullYear();
+var calSelectedDate = null;
+
+function switchPragatiView(view) {
+  var formView = document.getElementById('pragati-form-view');
+  var calView = document.getElementById('pragati-calendar-view');
+  var formTab = document.getElementById('pragati-tab-form');
+  var calTab = document.getElementById('pragati-tab-calendar');
+
+  if (view === 'calendar') {
+    formView.style.display = 'none';
+    calView.style.display = 'block';
+    formTab.classList.remove('active');
+    calTab.classList.add('active');
+    renderCalendar();
+  } else {
+    formView.style.display = 'block';
+    calView.style.display = 'none';
+    formTab.classList.add('active');
+    calTab.classList.remove('active');
+    populatePragatiForm();
+  }
+}
+
+function calNav(direction) {
+  calCurrentMonth += direction;
+  if (calCurrentMonth < 0) { calCurrentMonth = 11; calCurrentYear--; }
+  if (calCurrentMonth > 11) { calCurrentMonth = 0; calCurrentYear++; }
+  calSelectedDate = null;
+  document.getElementById('cal-day-details').innerHTML = '';
+  renderCalendar();
+}
+
+function calToday() {
+  var d = new Date();
+  calCurrentMonth = d.getMonth();
+  calCurrentYear = d.getFullYear();
+  calSelectedDate = d.toISOString().split('T')[0];
+  renderCalendar();
+  showDayDetails(calSelectedDate);
+}
+
+function renderCalendar() {
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-year').textContent = monthNames[calCurrentMonth] + ' ' + calCurrentYear;
+
+  // Count updates per date for the current month
+  var updatesByDate = {};
+  state.ioUpdates.forEach(function(u){
+    var d = new Date(u.created_at);
+    if (d.getMonth() === calCurrentMonth && d.getFullYear() === calCurrentYear) {
+      var key = d.toISOString().split('T')[0];
+      updatesByDate[key] = (updatesByDate[key] || 0) + 1;
+    }
+  });
+
+  // First day of month, total days in month
+  var firstDay = new Date(calCurrentYear, calCurrentMonth, 1);
+  var daysInMonth = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
+  var startWeekday = firstDay.getDay();
+
+  var todayStr = new Date().toISOString().split('T')[0];
+
+  var html = '';
+  // Empty cells before first day
+  for (var i = 0; i < startWeekday; i++) {
+    html += '<div class="cal-day empty"></div>';
+  }
+  // Day cells
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = calCurrentYear + '-' + String(calCurrentMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var count = updatesByDate[dateStr] || 0;
+    var classes = ['cal-day'];
+    if (dateStr === todayStr) classes.push('today');
+    if (count > 0) classes.push('has-updates');
+    if (count >= 5) classes.push('heavy');
+    if (calSelectedDate === dateStr) classes.push('selected');
+
+    html += '<div class="' + classes.join(' ') + '" onclick="selectCalDay(\'' + dateStr + '\')">' +
+      '<div class="cal-day-num">' + d + '</div>' +
+      (count > 0 ? '<div class="cal-day-badge">' + count + '</div>' : '') +
+      '</div>';
+  }
+  document.getElementById('cal-days').innerHTML = html;
+}
+
+function selectCalDay(dateStr) {
+  calSelectedDate = dateStr;
+  renderCalendar();
+  showDayDetails(dateStr);
+}
+
+function showDayDetails(dateStr) {
+  var dayUpdates = state.ioUpdates.filter(function(u){
+    return u.created_at && u.created_at.split('T')[0] === dateStr;
+  }).sort(function(a,b){ return a.created_at.localeCompare(b.created_at); });
+
+  var detailsEl = document.getElementById('cal-day-details');
+
+  if (!dayUpdates.length) {
+    detailsEl.innerHTML = '<div class="cal-detail-header">📅 ' + fmtDate(dateStr) + ' <span class="count">0 updates</span></div>' +
+      '<div style="background:white;border:2px solid var(--line-soft);border-top:none;padding:30px;border-radius:0 0 8px 8px;text-align:center;color:var(--ink-faint);">इस दिन कोई update नहीं हुआ था</div>';
+    return;
+  }
+
+  var html = '<div class="cal-detail-header">📅 ' + fmtDate(dateStr) +
+    ' <span class="count">' + dayUpdates.length + ' update' + (dayUpdates.length === 1 ? '' : 's') + '</span></div>';
+
+  html += dayUpdates.map(function(u){
+    var time = new Date(u.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    return '<div class="cal-update-row" onclick="openUpdateCase(\'' + u.case_type + '\',\'' + u.case_id + '\')">' +
+      '<div class="cal-update-meta">' +
+      '<span class="cal-update-io">' + escapeHtml(u.io_name) + '</span>' +
+      '<span class="cal-update-tag">' + escapeHtml(u.case_serial || u.case_type) + '</span>' +
+      '<span class="cal-update-time">' + time + '</span>' +
+      '</div>' +
+      '<div class="cal-update-action">' + escapeHtml(u.action) + '</div>' +
+      (u.detail ? '<div class="cal-update-detail">' + escapeHtml(u.detail) + '</div>' : '') +
+      (u.next_step ? '<div class="cal-update-next">→ ' + escapeHtml(u.next_step) + '</div>' : '') +
+      '</div>';
+  }).join('');
+
+  detailsEl.innerHTML = html;
+}
+
+function openUpdateCase(caseType, caseId) {
+  if (!caseId) { toast('Case reference not found'); return; }
+  if (caseType === 'court') {
+    openCourtModal(caseId);
+  } else if (Object.keys(ENQ_LABELS).indexOf(caseType) > -1) {
+    switchSection(caseType);
+    setTimeout(function(){ openEntryModal(caseType, caseId); }, 100);
+  }
+}
+
+// ============ INIT ============
+if (supa) {
+  updateHeader();
+  setInterval(updateHeader, 60000);
+  loadAllFromCloud();
+  setInterval(loadAllFromCloud, 30000);
+}
+</script>
+
+</body>
+</html>
