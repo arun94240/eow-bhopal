@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EOW Bhopal — IO Daily Update</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #eef4fa;
+  --primary: #062a52;        /* navy from supervisor */
+  --primary-dark: #051f3d;
+  --primary-soft: #e6eef8;
+  --golden: #f5b942;         /* golden accent */
+  --golden-dark: #e8a82e;
+  --good: #1e6b3e;
+  --good-soft: #d6ecdf;
+  --danger: #a62a23;
+  --ink: #0f1729;
+  --ink-soft: #3e4a63;
+  --ink-faint: #7783a0;
+  --line: #c9d4e3;
+  --line-soft: #dde6f0;
+  --surface: #fff;
+  --surface-alt: #e3edf7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; padding: 20px 14px; }
+.hindi { font-family: 'Tiro Devanagari Hindi', 'Inter', sans-serif; }
+
+.container { max-width: 580px; margin: 0 auto; }
+
+.header {
+background: var(–primary);
+color: white;
+padding: 22px 24px;
+border-radius: 12px 12px 0 0;
+text-align: center;
+}
+.header .crest-mark {
+width: 50px; height: 50px;
+background: white; color: var(–primary);
+border-radius: 50%;
+display: inline-flex;
+align-items: center; justify-content: center;
+font-size: 16px; font-weight: 700;
+margin-bottom: 10px;
+}
+.header h1 { font-size: 19px; font-weight: 600; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.9; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.form-card {
+background: white;
+border-radius: 0 0 12px 12px;
+padding: 24px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.form-title { font-size: 17px; font-weight: 600; color: var(–ink); margin-bottom: 6px; }
+.form-subtitle { font-size: 13px; color: var(–ink-soft); margin-bottom: 22px; }
+
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 12px; font-weight: 700; color: var(–ink-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.form-label .req { color: var(–danger); }
+.form-label .optional { color: var(–ink-faint); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 4px; }
+.form-input, .form-select, .form-textarea {
+width: 100%;
+padding: 11px 13px;
+border: 1px solid var(–line);
+background: white;
+font-family: inherit;
+font-size: 15px;
+color: var(–ink);
+border-radius: 6px;
+}
+.form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+outline: none;
+border-color: var(–primary);
+box-shadow: 0 0 0 3px var(–primary-soft);
+}
+.form-input:disabled, .form-select:disabled { background: #f5f5f5; color: var(–ink-faint); }
+
+.btn-submit {
+width: 100%;
+padding: 14px;
+background: linear-gradient(135deg, var(–golden) 0%, var(–golden-dark) 100%);
+color: var(–primary);
+border: 2px solid var(–primary);
+border-radius: 6px;
+font-family: inherit;
+font-size: 15px;
+font-weight: 700;
+letter-spacing: 0.02em;
+cursor: pointer;
+margin-top: 10px;
+transition: all 0.15s;
+box-shadow: 0 3px 10px rgba(245,185,66,0.35);
+}
+.btn-submit:hover {
+transform: translateY(-1px);
+box-shadow: 0 5px 14px rgba(245,185,66,0.45);
+}
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled {
+background: var(–ink-faint);
+color: white;
+border-color: var(–ink-faint);
+cursor: not-allowed;
+box-shadow: none;
+transform: none;
+}
+
+.success-screen {
+display: none;
+text-align: center;
+padding: 60px 20px;
+}
+.success-screen.visible { display: block; }
+.success-icon {
+width: 80px; height: 80px;
+background: var(–good-soft);
+color: var(–good);
+border-radius: 50%;
+display: inline-flex;
+align-items: center; justify-content: center;
+font-size: 38px;
+margin-bottom: 18px;
+}
+.success-screen h2 { font-size: 22px; color: var(–ink); margin-bottom: 8px; }
+.success-screen p { font-size: 14px; color: var(–ink-soft); margin-bottom: 24px; }
+.btn-again {
+display: inline-block;
+padding: 11px 24px;
+background: var(–primary);
+color: white;
+border: none;
+border-radius: 6px;
+font-family: inherit;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+text-decoration: none;
+}
+
+.error-msg {
+background: #f5d4d1;
+border: 1px solid var(–danger);
+color: var(–danger);
+padding: 10px 14px;
+border-radius: 5px;
+font-size: 13px;
+margin-top: 12px;
+display: none;
+}
+.error-msg.visible { display: block; }
+
+.loading {
+display: inline-block;
+width: 14px; height: 14px;
+border: 2px solid var(–primary-soft);
+border-top-color: var(–primary);
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.config-card {
+background: white;
+padding: 24px;
+border-radius: 12px;
+margin: 40px auto;
+max-width: 460px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+.config-card h2 { color: var(–primary); margin-bottom: 6px; font-size: 18px; }
+.config-card p { color: var(–ink-soft); font-size: 13px; margin-bottom: 16px; }
+.config-card label { font-size: 11px; font-weight: 600; color: var(–ink-soft); text-transform: uppercase; display: block; margin-bottom: 6px; margin-top: 12px; }
+.config-card input { width: 100%; padding: 9px 12px; border: 1px solid var(–line); border-radius: 5px; font-family: monospace; font-size: 11px; }
+.config-card button { width: 100%; padding: 11px; background: var(–primary); color: white; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+
+.footer-note {
+text-align: center;
+font-size: 11px;
+color: var(–ink-faint);
+margin-top: 18px;
+padding: 12px;
+}
+
+/* Date quick-pick buttons (Today / Yesterday / Specific) */
+.date-quick-pick {
+display: flex;
+gap: 6px;
+flex-wrap: wrap;
+}
+.date-quick-btn {
+flex: 1;
+min-width: 90px;
+padding: 9px 12px;
+background: white;
+color: var(–ink-soft);
+border: 1.5px solid var(–line);
+border-radius: 6px;
+font-family: inherit;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.15s;
+}
+.date-quick-btn:hover {
+border-color: var(–primary);
+color: var(–primary);
+}
+.date-quick-btn.active {
+background: linear-gradient(135deg, var(–golden) 0%, var(–golden-dark) 100%);
+color: var(–primary);
+border-color: var(–primary);
+box-shadow: 0 2px 6px rgba(245,185,66,0.4);
+font-weight: 800;
+}
+
+/* Attachment zone */
+.attach-zone {
+border: 2px dashed var(–line);
+border-radius: 8px;
+padding: 24px 16px;
+text-align: center;
+cursor: pointer;
+background: #f5f8fc;
+transition: all 0.2s;
+}
+.attach-zone:hover {
+border-color: var(–primary);
+background: var(–primary-soft);
+}
+.attach-zone-icon {
+font-size: 32px;
+margin-bottom: 8px;
+}
+.attach-zone-text {
+font-size: 14px;
+font-weight: 600;
+color: var(–primary);
+margin-bottom: 4px;
+}
+.attach-zone-hint {
+font-size: 11px;
+color: var(–ink-faint);
+}
+.attach-counter {
+margin-top: 10px;
+font-size: 12px;
+color: var(–ink-soft);
+text-align: right;
+font-weight: 600;
+}
+.attach-list {
+margin-top: 10px;
+display: flex;
+flex-direction: column;
+gap: 6px;
+}
+.attach-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 8px 10px;
+background: white;
+border: 1px solid var(–line);
+border-radius: 6px;
+}
+.attach-item-icon {
+width: 36px; height: 36px;
+border-radius: 4px;
+display: flex; align-items: center; justify-content: center;
+font-size: 18px;
+flex-shrink: 0;
+background: var(–primary-soft);
+color: var(–primary);
+overflow: hidden;
+}
+.attach-item-icon img {
+width: 100%; height: 100%; object-fit: cover;
+}
+.attach-item-info {
+flex: 1;
+min-width: 0;
+}
+.attach-item-name {
+font-size: 12px;
+font-weight: 600;
+color: var(–ink);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+.attach-item-size {
+font-size: 10px;
+color: var(–ink-faint);
+margin-top: 2px;
+}
+.attach-item-status {
+font-size: 10px;
+font-weight: 700;
+padding: 2px 6px;
+border-radius: 3px;
+}
+.attach-item-status.pending { background: #fff3cd; color: #6b3a06; }
+.attach-item-status.uploading { background: var(–primary-soft); color: var(–primary); }
+.attach-item-status.done { background: var(–good-soft); color: var(–good); }
+.attach-item-status.error { background: #f5d4d1; color: var(–danger); }
+.attach-item-remove {
+background: transparent;
+border: none;
+color: var(–danger);
+font-size: 18px;
+cursor: pointer;
+padding: 4px 8px;
+font-weight: 700;
+}
+.attach-item-remove:hover { background: #f5d4d1; border-radius: 4px; }
+.attach-progress {
+height: 4px;
+background: var(–line);
+border-radius: 2px;
+margin-top: 4px;
+overflow: hidden;
+}
+.attach-progress-bar {
+height: 100%;
+background: var(–primary);
+transition: width 0.3s;
+}
+</style>
+
+</head>
+<body>
+
+<div id="configScreen" class="config-card" style="display:none;">
+  <h2>Setup Required</h2>
+  <p>Enter Supabase credentials (one-time setup, get from your supervisor)</p>
+  <label>Supabase URL</label>
+  <input type="text" id="cfg-url" placeholder="https://xxx.supabase.co">
+  <label>Anon Key</label>
+  <input type="text" id="cfg-key" placeholder="eyJhbGc...">
+  <button onclick="saveConfig()">Connect</button>
+</div>
+
+<div id="mainApp" style="display:none;">
+  <div class="container">
+
+```
+<div class="header">
+  <div class="crest-mark">EOW</div>
+  <h1>EOW Office Bhopal</h1>
+  <p>दैनिक प्रगति प्रतिवेदन</p>
+</div>
+
+<div class="form-card">
+
+  <div id="formScreen">
+    <div class="form-title hindi">आज का अपडेट दर्ज करें</div>
+    <div class="form-subtitle">अपने प्रकरण में जो भी कार्यवाही हुई हो, यहाँ बताएँ।</div>
+
+    <div class="form-group">
+      <label class="form-label">IO का नाम <span class="req">*</span></label>
+      <select class="form-select" id="iof-io" onchange="iofUpdateTypes()">
+        <option value="">— चुनें —</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">प्रकरण का प्रकार <span class="req">*</span></label>
+      <select class="form-select" id="iof-type" onchange="iofUpdateCases()" disabled>
+        <option value="">— पहले अपना नाम चुनें —</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">विशिष्ट प्रकरण <span class="req">*</span></label>
+      <select class="form-select" id="iof-case" disabled>
+        <option value="">— पहले प्रकार चुनें —</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📅 किस दिनांक का update? <span class="req">*</span></label>
+      <div class="date-quick-pick">
+        <button type="button" class="date-quick-btn active" data-day="today" onclick="iofSetDate('today')">आज (Today)</button>
+        <button type="button" class="date-quick-btn" data-day="yesterday" onclick="iofSetDate('yesterday')">कल (Yesterday)</button>
+        <button type="button" class="date-quick-btn" data-day="specific" onclick="iofSetDate('specific')">कोई दिनांक</button>
+      </div>
+      <input type="date" class="form-input" id="iof-date" style="margin-top:8px;">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">क्या किया? <span class="req">*</span></label>
+      <select class="form-select" id="iof-action" onchange="iofActionChange()">
+        <option value="">— चुनें —</option>
+        <option>दस्तावेज़/अभिलेख प्राप्त किए</option>
+        <option>कथन/बयान दर्ज किए</option>
+        <option>स्थल निरीक्षण/जाँच की</option>
+        <option>स्पष्टीकरण/जवाब प्राप्त किया</option>
+        <option>सूचना/समन/नोटिस जारी किया</option>
+        <option>बैंक खातों/लेन-देन की जाँच की</option>
+        <option>FSL/तकनीकी विश्लेषण हेतु भेजा</option>
+        <option>अन्य विभाग से समन्वय</option>
+        <option>आरोपी/संदिग्ध से पूछताछ</option>
+        <option>प्रतिवेदन/रिपोर्ट तैयार की</option>
+        <option>अन्य</option>
+      </select>
+      <input type="text" class="form-input" id="iof-action-other" placeholder="कृपया लिखें — क्या कार्यवाही की?" style="margin-top:8px; display:none;">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">विवरण <span class="optional">(optional)</span></label>
+      <textarea class="form-textarea" id="iof-detail" rows="3" placeholder="संक्षिप्त विवरण…"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">आगे क्या करना है <span class="req">*</span></label>
+      <textarea class="form-textarea" id="iof-next" rows="2" placeholder="अगला कदम…"></textarea>
+    </div>
+
+    <!-- ATTACHMENTS SECTION -->
+    <div class="form-group">
+      <label class="form-label">📎 Attachments <span class="optional">(photos, PDFs, Word, Excel — max 10 files, 25 MB each)</span></label>
+      <div class="attach-zone" id="iof-attach-zone" onclick="document.getElementById('iof-files').click()">
+        <input type="file" id="iof-files" multiple accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" style="display:none;" onchange="iofHandleFiles(event)">
+        <div class="attach-zone-prompt">
+          <div class="attach-zone-icon">📎</div>
+          <div class="attach-zone-text">Tap here to upload files</div>
+          <div class="attach-zone-hint">Photos · PDFs · Word · Excel</div>
+        </div>
+      </div>
+      <div class="attach-counter" id="iof-attach-counter" style="display:none;"></div>
+      <div class="attach-list" id="iof-attach-list"></div>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitUpdate()">Submit Update</button>
+
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2>धन्यवाद!</h2>
+    <p>आपका update SP कार्यालय में पहुँच गया है।</p>
+    <button class="btn-again" onclick="resetForm()">Submit Another Update</button>
+  </div>
+
+</div>
+
+<div class="footer-note">For Investigating Officers · EOW Bhopal</div>
+```
+
+  </div>
+</div>
+
+<script>
+var supa = null;
+var SUPABASE_URL = localStorage.getItem('eow_supa_url');
+var SUPABASE_KEY = localStorage.getItem('eow_supa_key');
+
+function saveConfig() {
+  var url = document.getElementById('cfg-url').value.trim();
+  var key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Both fields required'); return; }
+  localStorage.setItem('eow_supa_url', url);
+  localStorage.setItem('eow_supa_key', key);
+  location.reload();
+}
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  document.getElementById('configScreen').style.display = 'block';
+} else {
+  document.getElementById('mainApp').style.display = 'block';
+  supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
+var allIOs = [];
+var enquiriesData = { complaints: [], rcomplaints: [], rcs: [], pes: [], strs: [], sutra: [] };
+var courtsData = [];
+
+var ENQ_LABELS = { complaints: 'Complaints', rcomplaints: 'R-Complaints', rcs: 'RCs', pes: 'PEs', strs: 'STRs', sutra: 'सूत्र सूचना' };
+
+function escapeHtml(s) { if (s == null) return ''; return String(s).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function showError(msg) { var e = document.getElementById('errorMsg'); e.textContent = msg; e.classList.add('visible'); setTimeout(function(){ e.classList.remove('visible'); }, 4000); }
+
+// Normalize IO names for loose matching across data sources
+// Strips: case, spaces, dots, commas, dashes, slashes — keeps only alphanumeric
+// "DSP DK Singh"        → "dspdksingh"
+// "DSP D K Singh"       → "dspdksingh"  (matches above!)
+// "DSP D.K. Singh"      → "dspdksingh"
+// "DSP D K Singh "      → "dspdksingh"
+// "TI Aarti Goutam"     → "tiaartigautam"  (different from "Aarti Gautam"!)
+// Note: spelling differences (Goutam vs Gautam) still won't match.
+function normalizeIOName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+// Rank hierarchy for sorting (lower number = higher seniority)
+var RANK_ORDER = {
+  'SP': 1, 'ASP': 2, 'DSP': 3, 'Inspector': 4, 'TI': 5,
+  'SI': 6, 'ASI': 7, 'HC': 8, 'Const': 9, 'Constable': 9
+};
+function getRankOrder(rank) {
+  return RANK_ORDER[String(rank || '').trim()] || 99;
+}
+// Sort an IO array by rank (senior first), then alphabetically by name
+function sortIOsByRank(ios) {
+  return [...ios].sort(function(a, b){
+    var ra = getRankOrder(a.rank), rb = getRankOrder(b.rank);
+    if (ra !== rb) return ra - rb;
+    return String(a.name || '').localeCompare(String(b.name || ''));
+  });
+}
+
+async function loadInitialData() {
+  try {
+    // Fetch IO master with id + rank for proper joining
+    var ioRes = await supa.from('io_master').select('id,name,rank,is_io,status').eq('status', 'Active').eq('is_io', true);
+    allIOs = sortIOsByRank(ioRes.data || []);
+    var sel = document.getElementById('iof-io');
+    // value=id (for backend match), text=display name (Rank + Name)
+    sel.innerHTML = '<option value="">— चुनें —</option>' + allIOs.map(function(io){ 
+      var displayName = (io.rank ? io.rank + ' ' : '') + io.name;
+      return '<option value="' + io.id + '">' + escapeHtml(displayName) + '</option>'; 
+    }).join('');
+
+    // Fetch enquiries — io_id is the new linkable field; io_name is fallback for old data
+    var enqRes = await supa.from('enquiries').select('id,category,no,entry_year,date,io_name,io_id,brief,serial');
+    var allEnq = enqRes.data || [];
+    Object.keys(ENQ_LABELS).forEach(function(t){ enquiriesData[t] = allEnq.filter(function(e){ return e.category === t; }); });
+
+    // Fetch court cases with incharge_io_id
+    var courtRes = await supa.from('court_cases').select('id,case_type,case_no,court,cnr_no,incharge_officer,incharge_io_id,serial');
+    courtsData = courtRes.data || [];
+  } catch(e) {
+    showError('Connection error: ' + (e.message || 'check your link'));
+  }
+}
+
+function iofUpdateTypes() {
+  var ioId = document.getElementById('iof-io').value;
+  var typeSel = document.getElementById('iof-type');
+  var caseSel = document.getElementById('iof-case');
+  caseSel.innerHTML = '<option value="">— पहले प्रकार चुनें —</option>';
+  caseSel.disabled = true;
+  if (!ioId) {
+    typeSel.innerHTML = '<option value="">— पहले अपना नाम चुनें —</option>';
+    typeSel.disabled = true;
+    return;
+  }
+  var availableTypes = [];
+  Object.keys(ENQ_LABELS).forEach(function(t){
+    if (enquiriesData[t].some(function(e){ return e.io_id === ioId; })) availableTypes.push(t);
+  });
+  if (courtsData.some(function(c){ return c.incharge_io_id === ioId; })) availableTypes.push('court');
+
+  if (!availableTypes.length) {
+    typeSel.innerHTML = '<option value="">— आपको कोई case assign नहीं है —</option>';
+    typeSel.disabled = true;
+    return;
+  }
+  typeSel.innerHTML = '<option value="">— चुनें —</option>' + availableTypes.map(function(t){ return '<option value="'+t+'">'+escapeHtml(t === 'court' ? 'Court Cases' : ENQ_LABELS[t])+'</option>'; }).join('');
+  typeSel.disabled = false;
+}
+
+function iofUpdateCases() {
+  var ioId = document.getElementById('iof-io').value;
+  var typeVal = document.getElementById('iof-type').value;
+  var caseSel = document.getElementById('iof-case');
+  if (!typeVal) { caseSel.innerHTML = '<option value="">— पहले प्रकार चुनें —</option>'; caseSel.disabled = true; return; }
+  var cases;
+  if (typeVal === 'court') {
+    cases = courtsData.filter(function(c){ return c.incharge_io_id === ioId; });
+    caseSel.innerHTML = '<option value="">— चुनें —</option>' + cases.map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.serial)+' · '+escapeHtml(c.cnr_no || c.case_no || '')+'</option>'; }).join('');
+  } else {
+    cases = enquiriesData[typeVal].filter(function(e){ return e.io_id === ioId; });
+    caseSel.innerHTML = '<option value="">— चुनें —</option>' + cases.map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.serial)+' · '+escapeHtml((c.brief||'').slice(0,40))+'</option>'; }).join('');
+  }
+  caseSel.disabled = false;
+}
+
+// ---- Date quick-pick handlers ----
+function iofGetTodayISO() {
+  var d = new Date();
+  var yyyy = d.getFullYear();
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  var dd = String(d.getDate()).padStart(2, '0');
+  return yyyy + '-' + mm + '-' + dd;
+}
+
+function iofSetDate(mode) {
+  var dateInput = document.getElementById('iof-date');
+  var btns = document.querySelectorAll('.date-quick-btn');
+  btns.forEach(function(b){ b.classList.remove('active'); });
+  var activeBtn = document.querySelector('.date-quick-btn[data-day="' + mode + '"]');
+  if (activeBtn) activeBtn.classList.add('active');
+  
+  if (mode === 'today') {
+    dateInput.value = iofGetTodayISO();
+    dateInput.readOnly = true;
+  } else if (mode === 'yesterday') {
+    var d = new Date();
+    d.setDate(d.getDate() - 1);
+    dateInput.value = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    dateInput.readOnly = true;
+  } else {
+    // specific — open the date picker for editing
+    dateInput.readOnly = false;
+    if (!dateInput.value) dateInput.value = iofGetTodayISO();
+    dateInput.focus();
+    if (typeof dateInput.showPicker === 'function') {
+      try { dateInput.showPicker(); } catch(e) {}
+    }
+  }
+}
+
+// ---- Action dropdown change handler — show "अन्य" text box ----
+function iofActionChange() {
+  var sel = document.getElementById('iof-action');
+  var otherInput = document.getElementById('iof-action-other');
+  if (sel.value === 'अन्य') {
+    otherInput.style.display = 'block';
+    otherInput.focus();
+  } else {
+    otherInput.style.display = 'none';
+    otherInput.value = '';
+  }
+}
+
+// ============ ATTACHMENT HANDLING ============
+var pendingAttachments = []; // {id, file, status, url, name, size}
+var MAX_FILES = 10;
+var MAX_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+
+function iofFormatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(2) + ' MB';
+}
+
+function iofGetFileIcon(file) {
+  var name = (file.name || '').toLowerCase();
+  if (file.type && file.type.indexOf('image/') === 0) return null; // will use image preview
+  if (name.endsWith('.pdf')) return '📄';
+  if (name.endsWith('.doc') || name.endsWith('.docx')) return '📝';
+  if (name.endsWith('.xls') || name.endsWith('.xlsx')) return '📊';
+  return '📎';
+}
+
+function iofHandleFiles(event) {
+  var files = Array.from(event.target.files || []);
+  event.target.value = ''; // reset so same file can be selected again after remove
+  
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    if (pendingAttachments.length >= MAX_FILES) {
+      showError('अधिकतम ' + MAX_FILES + ' files ही allowed हैं');
+      break;
+    }
+    if (f.size > MAX_SIZE_BYTES) {
+      showError(f.name + ' — file size 25 MB से अधिक है');
+      continue;
+    }
+    pendingAttachments.push({
+      id: 'att_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+      file: f,
+      status: 'pending',
+      url: null,
+      name: f.name,
+      size: f.size,
+      type: f.type,
+      progress: 0
+    });
+  }
+  iofRenderAttachmentList();
+}
+
+function iofRenderAttachmentList() {
+  var listEl = document.getElementById('iof-attach-list');
+  var counterEl = document.getElementById('iof-attach-counter');
+  if (!pendingAttachments.length) {
+    listEl.innerHTML = '';
+    counterEl.style.display = 'none';
+    return;
+  }
+  
+  // Counter
+  var totalSize = pendingAttachments.reduce(function(s, a){ return s + a.size; }, 0);
+  counterEl.textContent = pendingAttachments.length + ' of ' + MAX_FILES + ' files · ' + iofFormatBytes(totalSize);
+  counterEl.style.display = 'block';
+  
+  // List
+  listEl.innerHTML = pendingAttachments.map(function(a){
+    var icon = iofGetFileIcon(a.file);
+    var iconHtml;
+    if (!icon && a.file.type && a.file.type.indexOf('image/') === 0) {
+      // image preview
+      var blobUrl = URL.createObjectURL(a.file);
+      iconHtml = '<img src="' + blobUrl + '" alt="">';
+    } else {
+      iconHtml = icon || '📎';
+    }
+    var statusLabel = {
+      pending: 'Pending',
+      uploading: 'Uploading…',
+      done: '✓ Uploaded',
+      error: '✗ Failed'
+    }[a.status] || a.status;
+    var progressBar = a.status === 'uploading' ? 
+      '<div class="attach-progress"><div class="attach-progress-bar" style="width:' + a.progress + '%"></div></div>' : '';
+    return '<div class="attach-item" data-id="' + a.id + '">' +
+      '<div class="attach-item-icon">' + iconHtml + '</div>' +
+      '<div class="attach-item-info">' +
+        '<div class="attach-item-name">' + escapeHtml(a.name) + '</div>' +
+        '<div class="attach-item-size">' + iofFormatBytes(a.size) + ' · <span class="attach-item-status ' + a.status + '">' + statusLabel + '</span></div>' +
+        progressBar +
+      '</div>' +
+      (a.status !== 'uploading' ? '<button class="attach-item-remove" onclick="iofRemoveAttachment(\'' + a.id + '\')">×</button>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function iofRemoveAttachment(id) {
+  var idx = pendingAttachments.findIndex(function(a){ return a.id === id; });
+  if (idx < 0) return;
+  // If already uploaded to storage, attempt cleanup (fire-and-forget)
+  var item = pendingAttachments[idx];
+  if (item.status === 'done' && item.storagePath) {
+    supa.storage.from('io-attachments').remove([item.storagePath]).catch(function(){});
+  }
+  pendingAttachments.splice(idx, 1);
+  iofRenderAttachmentList();
+}
+
+// Sanitize filename for storage path (keep extension, remove special chars)
+function iofSanitizeName(name) {
+  var dot = name.lastIndexOf('.');
+  var ext = dot >= 0 ? name.slice(dot).toLowerCase() : '';
+  var base = (dot >= 0 ? name.slice(0, dot) : name)
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .slice(0, 60);
+  return base + ext;
+}
+
+// Upload all pending attachments to Supabase Storage
+// Returns array of {url, name, size, type, path} for successful uploads
+async function iofUploadAttachments() {
+  var uploaded = [];
+  for (var i = 0; i < pendingAttachments.length; i++) {
+    var att = pendingAttachments[i];
+    if (att.status === 'done' && att.url) {
+      uploaded.push({ url: att.url, name: att.name, size: att.size, type: att.type, path: att.storagePath });
+      continue;
+    }
+    if (att.status !== 'pending') continue;
+    
+    att.status = 'uploading';
+    att.progress = 50; // simple indicator (Supabase JS client doesn't expose progress easily)
+    iofRenderAttachmentList();
+    
+    var ts = Date.now();
+    var path = ts + '_' + att.id + '_' + iofSanitizeName(att.name);
+    try {
+      var r = await supa.storage.from('io-attachments').upload(path, att.file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: att.type || 'application/octet-stream'
+      });
+      if (r.error) throw r.error;
+      // Get public URL
+      var urlRes = supa.storage.from('io-attachments').getPublicUrl(path);
+      att.status = 'done';
+      att.progress = 100;
+      att.url = urlRes.data.publicUrl;
+      att.storagePath = path;
+      uploaded.push({ url: att.url, name: att.name, size: att.size, type: att.type, path: path });
+      iofRenderAttachmentList();
+    } catch (e) {
+      att.status = 'error';
+      att.progress = 0;
+      iofRenderAttachmentList();
+      throw new Error('"' + att.name + '" upload failed: ' + (e.message || 'unknown error'));
+    }
+  }
+  return uploaded;
+}
+
+// ============ END ATTACHMENT HANDLING ============
+
+async function submitUpdate() {
+  var ioId = document.getElementById('iof-io').value;
+  var type = document.getElementById('iof-type').value;
+  var caseId = document.getElementById('iof-case').value;
+  var updateDate = document.getElementById('iof-date').value;
+  var action = document.getElementById('iof-action').value;
+  var actionOther = document.getElementById('iof-action-other').value.trim();
+  var detail = document.getElementById('iof-detail').value;
+  var next = document.getElementById('iof-next').value;
+
+  if (!ioId || !type || !caseId || !action || !next) { showError('कृपया सभी आवश्यक fields भरें'); return; }
+  if (!updateDate) { showError('कृपया दिनांक चुनें'); return; }
+  // If "अन्य" selected, free text is required
+  if (action === 'अन्य' && !actionOther) { showError('कृपया लिखें — क्या कार्यवाही की?'); return; }
+
+  // Get IO display name (Rank + Name) from io_master
+  var ioObj = allIOs.find(function(x){ return x.id === ioId; });
+  var ioDisplayName = ioObj ? ((ioObj.rank ? ioObj.rank + ' ' : '') + ioObj.name) : '';
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> Submitting...';
+
+  var caseSerial = '';
+  if (type === 'court') { var c = courtsData.find(function(x){ return x.id === caseId; }); caseSerial = c ? c.serial : ''; }
+  else { var c2 = enquiriesData[type].find(function(x){ return x.id === caseId; }); caseSerial = c2 ? c2.serial : ''; }
+
+  try {
+    // Upload any attached files first
+    var uploadedFiles = [];
+    if (pendingAttachments.length > 0) {
+      btn.innerHTML = '<span class="loading"></span> Uploading files...';
+      uploadedFiles = await iofUploadAttachments();
+      btn.innerHTML = '<span class="loading"></span> Saving...';
+    }
+    
+    var r = await supa.from('io_updates').insert({
+      io_name: ioDisplayName,
+      case_type: type, case_id: caseId, case_serial: caseSerial,
+      update_date: updateDate,
+      action: action,
+      action_other: action === 'अन्य' ? actionOther : null,
+      detail: detail, next_step: next,
+      attachments: uploadedFiles
+    });
+    if (r.error) throw r.error;
+    document.getElementById('formScreen').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Update';
+    showError('Submit failed: ' + (e.message || 'try again'));
+  }
+}
+
+function resetForm() {
+  document.getElementById('successScreen').classList.remove('visible');
+  document.getElementById('formScreen').style.display = 'block';
+  document.getElementById('iof-io').value = '';
+  iofUpdateTypes();
+  document.getElementById('iof-action').value = '';
+  document.getElementById('iof-action-other').value = '';
+  document.getElementById('iof-action-other').style.display = 'none';
+  document.getElementById('iof-detail').value = '';
+  document.getElementById('iof-next').value = '';
+  // Clear attachments
+  pendingAttachments = [];
+  iofRenderAttachmentList();
+  iofSetDate('today');
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('submit-btn').innerHTML = 'Submit Update';
+}
+
+if (supa) {
+  loadInitialData();
+  iofSetDate('today'); // initialize date field to today on page load
+}
+</script>
+
+</body>
+</html>
