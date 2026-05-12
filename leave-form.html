@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EOW Bhopal — Leave Application</title>
+
+<!-- PWA: Manifest + Theme + Apple Touch Icon -->
+<link rel="manifest" href="/avkash-manifest.json">
+<meta name="theme-color" content="#062a52">
+<link rel="apple-touch-icon" href="/icons/avkash-apple-touch.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="अवकाश">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -737,6 +746,17 @@ function resetForm() {
 }
 
 if (supa) loadOfficers();
+</script>
+
+<!-- PWA: Register Avkash service worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/avkash-sw.js', { scope: '/leave-form.html' })
+      .then(function(reg) { console.log('[Avkash PWA] Service worker registered'); })
+      .catch(function(err) { console.warn('[Avkash PWA] SW registration failed:', err); });
+  });
+}
 </script>
 </body>
 </html>

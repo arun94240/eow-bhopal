@@ -1,0 +1,32 @@
+{
+  "name": "EOW अवकाश Application",
+  "short_name": "अवकाश",
+  "description": "Leave Application Form — EOW Bhopal",
+  "start_url": "/leave-form.html",
+  "scope": "/leave-form.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#062a52",
+  "theme_color": "#062a52",
+  "lang": "hi-IN",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/avkash-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/avkash-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/avkash-apple-touch.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
