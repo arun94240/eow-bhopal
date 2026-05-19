@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EOW Bhopal — उपस्थिति / Attendance</title>
+<meta name="theme-color" content="#062a52">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="उपस्थिति">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #eef4fa;
+  --primary: #062a52;
+  --primary-dark: #051f3d;
+  --golden: #f5b942;
+  --golden-dark: #e8a82e;
+  --good: #1e6b3e;
+  --good-soft: #d6ecdf;
+  --danger: #a62a23;
+  --danger-soft: #fde8e8;
+  --ink: #0f1729;
+  --ink-soft: #3e4a63;
+  --ink-faint: #7783a0;
+  --line: #c9d4e3;
+  --line-soft: #dde6f0;
+  --surface: #fff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+  padding: 18px 12px;
+}
+.hindi { font-family: 'Tiro Devanagari Hindi', 'Inter', sans-serif; }
+.container { max-width: 560px; margin: 0 auto; }
+
+.header {
+  background: var(--primary);
+  color: white;
+  padding: 20px;
+  border-radius: 12px 12px 0 0;
+  text-align: center;
+}
+.header .crest { font-size: 34px; margin-bottom: 6px; }
+.header h1 { font-size: 18px; font-weight: 800; }
+.header .sub { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+
+.card {
+  background: var(--surface);
+  border-radius: 0 0 12px 12px;
+  padding: 22px 20px;
+  box-shadow: 0 8px 28px rgba(6,42,82,0.12);
+}
+.field { margin-bottom: 16px; }
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 7px;
+}
+.input {
+  width: 100%;
+  padding: 13px 14px;
+  font-size: 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  font-family: inherit;
+  outline: none;
+}
+.input:focus { border-color: var(--primary); }
+.pin-input {
+  letter-spacing: 8px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+}
+.btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-go { background: var(--good); color: white; }
+.btn-out { background: var(--golden); color: var(--primary); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.msg {
+  padding: 12px 14px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: none;
+}
+.msg.err { background: var(--danger-soft); color: var(--danger); display: block; }
+.msg.ok  { background: var(--good-soft); color: var(--good); display: block; }
+.msg.info{ background: #e3f0fc; color: var(--primary); display: block; }
+
+.staff-box {
+  background: #f4f8fd;
+  border: 1.5px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.staff-box .nm { font-size: 18px; font-weight: 800; color: var(--primary); }
+.staff-box .rk { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+
+.status-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.status-pill {
+  flex: 1;
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line-soft);
+  background: #fafcff;
+}
+.status-pill .sp-lbl { font-size: 11px; color: var(--ink-faint); font-weight: 700; }
+.status-pill .sp-val { font-size: 15px; font-weight: 800; margin-top: 3px; color: var(--ink); }
+.status-pill.done { background: var(--good-soft); border-color: #aacdb7; }
+.status-pill.done .sp-val { color: var(--good); }
+
+.gps-box {
+  background: #fff8e8;
+  border: 1.5px solid var(--golden);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #7a5a12;
+  margin-bottom: 16px;
+  display: none;
+}
+.gps-box.show { display: block; }
+.gps-box.ok { background: var(--good-soft); border-color: #aacdb7; color: var(--good); }
+
+.hide { display: none !important; }
+.foot {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-top: 16px;
+}
+.spin {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: sp 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="crest">🏛️</div>
+    <h1 class="hindi">आर्थिक अपराध अन्वेषण ब्यूरो, भोपाल</h1>
+    <div class="sub hindi">कार्यालय उपस्थिति / Office Attendance</div>
+  </div>
+  <div class="card">
+
+    <!-- ===== PIN LOGIN ===== -->
+    <div id="login-view">
+      <div id="login-msg" class="msg"></div>
+      <div class="field">
+        <label class="label hindi">अपना PIN दर्ज करें / Enter your PIN</label>
+        <input type="tel" id="pin-input" class="input pin-input" maxlength="4"
+               inputmode="numeric" pattern="[0-9]*" placeholder="••••" autocomplete="off">
+      </div>
+      <button class="btn btn-primary hindi" id="login-btn" onclick="doLogin()">आगे बढ़ें / Continue</button>
+      <div class="foot hindi">यही PIN सभी जगह — नोटिस, प्रगति, अवकाश, उपस्थिति</div>
+    </div>
+
+    <!-- ===== ATTENDANCE ACTION ===== -->
+    <div id="action-view" class="hide">
+      <div id="action-msg" class="msg"></div>
+
+      <div class="staff-box">
+        <div class="nm hindi" id="staff-name">—</div>
+        <div class="rk" id="staff-rank">—</div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-pill" id="pill-in">
+          <div class="sp-lbl hindi">आगमन / Check-In</div>
+          <div class="sp-val" id="in-val">—</div>
+        </div>
+        <div class="status-pill" id="pill-out">
+          <div class="sp-lbl hindi">प्रस्थान / Check-Out</div>
+          <div class="sp-val" id="out-val">—</div>
+        </div>
+      </div>
+
+      <div id="gps-box" class="gps-box">
+        <span id="gps-text" class="hindi">📍 स्थान प्राप्त किया जा रहा है…</span>
+      </div>
+
+      <button class="btn btn-go hindi" id="mark-btn" onclick="markAttendance()">
+        <span id="mark-btn-text">📍 आगमन दर्ज करें / Mark Check-In</span>
+      </button>
+
+      <div id="complete-box" class="hide">
+        <div class="msg ok hindi" style="display:block;">
+          ✅ आज की उपस्थिति पूर्ण — धन्यवाद!<br>
+          <span style="font-size:12px;font-weight:600;">आगमन एवं प्रस्थान दोनों दर्ज हो चुके हैं।</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary hindi" style="margin-top:12px;background:#64748b;" onclick="resetForm()">
+        🔄 दूसरा PIN / Switch User
+      </button>
+      <div class="foot hindi">📍 स्थान अनिवार्य — कार्यालय से ही दर्ज करें</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var SUPABASE_URL = 'https://hwfdeqlqavakyakugyqq.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZmRlcWxxYXZha3lha3VneXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczODE0MzksImV4cCI6MjA5Mjk1NzQzOX0.QPp6vuVl_LqNZ-2GYMNx5m56L7XSWe0A7IiFcmoHeSw';
+var supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+var currentStaff = null;   // {id, name, rank, pin}
+var todayRow = null;       // attendance_log row for today (if any)
+var mode = null;           // 'in' | 'out'
+var gps = null;            // {lat, long, acc}
+
+function todayYMD() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtTime(ts) {
+  if (!ts) return '—';
+  try {
+    return new Date(ts).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
+  } catch(e){ return '—'; }
+}
+function showMsg(elId, txt, cls) {
+  var el = document.getElementById(elId);
+  el.textContent = txt;
+  el.className = 'msg ' + cls;
+}
+function getDisplayName(s) {
+  var nm = String(s.name||'').trim();
+  var rk = s.rank ? String(s.rank).trim() : '';
+  if (!rk) return nm;
+  var nl = nm.toLowerCase(), rl = rk.toLowerCase();
+  if (nl === rl || nl.indexOf(rl + ' ') === 0) return nm;
+  return rk + ' ' + nm;
+}
+
+// ===== LOGIN =====
+async function doLogin() {
+  var pin = (document.getElementById('pin-input').value || '').trim();
+  if (!/^\d{4}$/.test(pin)) {
+    showMsg('login-msg', 'कृपया 4-अंकीय PIN दर्ज करें', 'err');
+    return;
+  }
+  var btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>जाँच…';
+  try {
+    var res = await supa.from('io_master').select('id,name,rank,pin').eq('pin', pin).limit(1);
+    if (res.error) throw res.error;
+    if (!res.data || !res.data.length) {
+      showMsg('login-msg', '❌ गलत PIN — पुनः प्रयास करें', 'err');
+      btn.disabled = false;
+      btn.innerHTML = 'आगे बढ़ें / Continue';
+      return;
+    }
+    currentStaff = res.data[0];
+    await loadTodayStatus();
+    document.getElementById('login-view').classList.add('hide');
+    document.getElementById('action-view').classList.remove('hide');
+  } catch(e) {
+    showMsg('login-msg', '⚠ त्रुटि: ' + (e.message || e), 'err');
+    btn.disabled = false;
+    btn.innerHTML = 'आगे बढ़ें / Continue';
+  }
+}
+
+// ===== LOAD TODAY STATUS (smart IN/OUT detect) =====
+async function loadTodayStatus() {
+  document.getElementById('staff-name').textContent = getDisplayName(currentStaff);
+  document.getElementById('staff-rank').textContent = currentStaff.rank || '';
+
+  var res = await supa.from('attendance_log').select('*')
+    .eq('staff_id', currentStaff.id).eq('att_date', todayYMD()).limit(1);
+  todayRow = (res.data && res.data.length) ? res.data[0] : null;
+
+  var inVal = document.getElementById('in-val');
+  var outVal = document.getElementById('out-val');
+  var pillIn = document.getElementById('pill-in');
+  var pillOut = document.getElementById('pill-out');
+  var markBtn = document.getElementById('mark-btn');
+  var markTxt = document.getElementById('mark-btn-text');
+  var completeBox = document.getElementById('complete-box');
+
+  if (!todayRow) {
+    // No record → CHECK-IN
+    mode = 'in';
+    inVal.textContent = '—'; outVal.textContent = '—';
+    markTxt.textContent = '📍 आगमन दर्ज करें / Mark Check-In';
+    markBtn.className = 'btn btn-go hindi';
+    markBtn.classList.remove('hide');
+    completeBox.classList.add('hide');
+    showMsg('action-msg', 'नमस्ते! कृपया आगमन (Check-In) दर्ज करें।', 'info');
+  } else if (todayRow.check_in_time && !todayRow.check_out_time) {
+    // Only IN done → CHECK-OUT
+    mode = 'out';
+    inVal.textContent = fmtTime(todayRow.check_in_time);
+    pillIn.classList.add('done');
+    outVal.textContent = '—';
+    markTxt.textContent = '📍 प्रस्थान दर्ज करें / Mark Check-Out';
+    markBtn.className = 'btn btn-out hindi';
+    markBtn.classList.remove('hide');
+    completeBox.classList.add('hide');
+    showMsg('action-msg', 'आगमन दर्ज है। अब प्रस्थान (Check-Out) दर्ज करें।', 'info');
+  } else {
+    // Both done → complete
+    mode = null;
+    inVal.textContent = fmtTime(todayRow.check_in_time);
+    outVal.textContent = fmtTime(todayRow.check_out_time);
+    pillIn.classList.add('done');
+    pillOut.classList.add('done');
+    markBtn.classList.add('hide');
+    completeBox.classList.remove('hide');
+    document.getElementById('action-msg').className = 'msg';
+  }
+
+  if (mode) startGps();
+}
+
+// ===== GPS =====
+function startGps() {
+  var box = document.getElementById('gps-box');
+  var txt = document.getElementById('gps-text');
+  box.className = 'gps-box show';
+  txt.textContent = '📍 स्थान प्राप्त किया जा रहा है…';
+  gps = null;
+  document.getElementById('mark-btn').disabled = true;
+
+  if (!navigator.geolocation) {
+    box.className = 'gps-box show';
+    txt.textContent = '⚠ इस डिवाइस में GPS उपलब्ध नहीं';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      gps = {
+        lat: pos.coords.latitude,
+        long: pos.coords.longitude,
+        acc: pos.coords.accuracy
+      };
+      box.className = 'gps-box show ok';
+      txt.innerHTML = '✅ स्थान प्राप्त (सटीकता ~' + Math.round(gps.acc) + 'm) — '
+        + '<a href="https://maps.google.com/?q=' + gps.lat + ',' + gps.long
+        + '" target="_blank" style="color:inherit;text-decoration:underline;">मानचित्र देखें</a>';
+      document.getElementById('mark-btn').disabled = false;
+    },
+    function(err){
+      box.className = 'gps-box show';
+      txt.textContent = '⚠ स्थान नहीं मिला: ' + (err.message || 'अनुमति दें') + ' — पुनः प्रयास हेतु पृष्ठ रिफ्रेश करें';
+      document.getElementById('mark-btn').disabled = true;
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+// ===== MARK ATTENDANCE =====
+async function markAttendance() {
+  if (!mode) return;
+  if (!gps) {
+    showMsg('action-msg', '⚠ स्थान अनिवार्य है — कृपया प्रतीक्षा करें या पुनः प्रयास करें', 'err');
+    return;
+  }
+  var btn = document.getElementById('mark-btn');
+  btn.disabled = true;
+  var origTxt = document.getElementById('mark-btn-text').textContent;
+  document.getElementById('mark-btn-text').innerHTML = '<span class="spin"></span>दर्ज हो रहा है…';
+
+  try {
+    var nowISO = new Date().toISOString();
+    if (mode === 'in') {
+      var payload = {
+        staff_id: currentStaff.id,
+        staff_name: getDisplayName(currentStaff),
+        staff_rank: currentStaff.rank || '',
+        att_date: todayYMD(),
+        check_in_time: nowISO,
+        check_in_lat: gps.lat,
+        check_in_long: gps.long,
+        check_in_acc: gps.acc
+      };
+      var r = await supa.from('attendance_log').insert(payload);
+      if (r.error) throw r.error;
+      showMsg('action-msg', '✅ आगमन दर्ज — ' + fmtTime(nowISO), 'ok');
+    } else if (mode === 'out') {
+      var up = {
+        check_out_time: nowISO,
+        check_out_lat: gps.lat,
+        check_out_long: gps.long,
+        check_out_acc: gps.acc
+      };
+      var r2 = await supa.from('attendance_log').update(up)
+        .eq('staff_id', currentStaff.id).eq('att_date', todayYMD());
+      if (r2.error) throw r2.error;
+      showMsg('action-msg', '✅ प्रस्थान दर्ज — ' + fmtTime(nowISO), 'ok');
+    }
+    // Reload status (will show complete or next step)
+    await loadTodayStatus();
+    document.getElementById('gps-box').className = 'gps-box';
+  } catch(e) {
+    showMsg('action-msg', '⚠ त्रुटि: ' + (e.message || e), 'err');
+    btn.disabled = false;
+    document.getElementById('mark-btn-text').textContent = origTxt;
+  }
+}
+
+function resetForm() {
+  currentStaff = null; todayRow = null; mode = null; gps = null;
+  document.getElementById('pin-input').value = '';
+  document.getElementById('login-msg').className = 'msg';
+  document.getElementById('action-msg').className = 'msg';
+  document.getElementById('gps-box').className = 'gps-box';
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-btn').innerHTML = 'आगे बढ़ें / Continue';
+  document.getElementById('action-view').classList.add('hide');
+  document.getElementById('login-view').classList.remove('hide');
+  document.getElementById('pin-input').focus();
+}
+
+// Enter key submits PIN
+document.getElementById('pin-input').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('pin-input').focus();
+</script>
+</body>
+</html>
