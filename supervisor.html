@@ -4807,13 +4807,14 @@ body.view-mobile .notices-matrix-tiles .notices-matrix-tile .nmt-key {
 /* End Notices Matrices CSS */
 
 /* ════════════════════════════════════════════════════════════
-   CUSTOM TAGS — entry/court form section + picker modal
+   CUSTOM TAGS — Inline Widget (Option B: inline swatches)
    ════════════════════════════════════════════════════════════ */
 
+/* Outer container in form */
 .custom-tags-section {
   border: 2px dashed #c9d4e3;
   border-radius: 10px;
-  padding: 14px;
+  padding: 12px;
   background: #f8fbff;
   margin-top: 10px;
 }
@@ -4827,82 +4828,92 @@ body.view-mobile .notices-matrix-tiles .notices-matrix-tile .nmt-key {
 .ct-icon { font-size: 18px; }
 .ct-title { font-size: 14px; font-weight: 800; color: #062a52; }
 .ct-hint { font-size: 11px; color: #64748b; font-style: italic; }
-.ct-tags-display {
+
+/* INLINE TAGS WIDGET */
+.itw {
+  border: 1.5px solid #c9d4e3;
+  border-radius: 10px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+.itw-section {
+  padding: 10px 12px;
+}
+.itw-section + .itw-section {
+  border-top: 1px dashed #c9d4e3;
+}
+.itw-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 7px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  min-height: 32px;
-  padding: 4px 0;
-}
-.ct-tags-display:empty::before {
-  content: 'कोई tag नहीं — neeche "Tag जोड़ें" बटन से जोड़ें';
-  font-size: 11.5px;
-  font-style: italic;
-  color: #94a3b8;
-}
-.ct-actions {
-  margin-top: 8px;
-}
-.ct-pick-btn {
-  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border: 1.5px dashed #62748b;
-  border-radius: 8px;
-  background: white;
-  color: #062a52;
-  font-weight: 700;
-  font-size: 12.5px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
 }
-.ct-pick-btn:hover {
-  border-color: #062a52;
-  background: #f0f7ff;
-  transform: translateY(-1px);
+.itw-label .badge {
+  background: #062a52;
+  color: white;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 800;
 }
-.ct-pick-icon {
-  font-size: 18px;
-  font-weight: 900;
-  line-height: 1;
+.itw-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 26px;
+}
+.itw-empty {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 12px;
+  padding: 2px 0;
 }
 
-/* TAG CHIPS (used in form display + listing badges) */
+/* Tag chip (universal — used in widget, brief, listings) */
 .tag-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 9px;
-  border-radius: 12px;
-  font-size: 11px;
+  gap: 3px;
+  padding: 3px 10px;
+  border-radius: 13px;
+  font-size: 11.5px;
   font-weight: 800;
   border: 1.5px solid;
-  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: all 0.12s;
+  user-select: none;
+  line-height: 1.2;
   vertical-align: middle;
   white-space: nowrap;
 }
-.tag-chip-remove {
-  background: rgba(255,255,255,0.6);
+.tag-chip:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.12); }
+.tag-chip.is-available { opacity: 0.55; }
+.tag-chip.is-available:hover { opacity: 1; }
+.tag-chip.is-readonly { cursor: default; }
+.tag-chip.is-readonly:hover { transform: none; box-shadow: none; }
+.tag-chip-x {
+  background: rgba(0,0,0,0.12);
   border: none;
-  width: 16px;
-  height: 16px;
+  width: 15px; height: 15px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 900;
   cursor: pointer;
   color: inherit;
   padding: 0;
-  margin-left: 3px;
+  margin-left: 2px;
   line-height: 1;
 }
-.tag-chip-remove:hover {
-  background: rgba(0,0,0,0.15);
-}
+.tag-chip-x:hover { background: rgba(0,0,0,0.3); }
+.tag-chip-star { font-size: 9px; opacity: 0.85; }
 
 /* COLOR VARIANTS (8 colors) */
 .tag-chip-red    { background: #fee2e2; color: #7f1d1d; border-color: #ef4444; }
@@ -4914,191 +4925,87 @@ body.view-mobile .notices-matrix-tiles .notices-matrix-tile .nmt-key {
 .tag-chip-pink   { background: #fce7f3; color: #831843; border-color: #ec4899; }
 .tag-chip-gray   { background: #f1f5f9; color: #334155; border-color: #94a3b8; }
 
-/* TAG PICKER MODAL */
-.tp-section {
-  margin-bottom: 18px;
+/* New tag row */
+.itw-new {
+  background: #fffbf0;
 }
-.tp-section-title {
-  font-size: 12px;
-  font-weight: 800;
-  color: #062a52;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
+.itw-new-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: nowrap;
   margin-bottom: 8px;
 }
-.tp-tags-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-height: 280px;
-  overflow-y: auto;
-  padding: 4px;
-  background: #f8fafc;
-  border-radius: 8px;
-  min-height: 50px;
-}
-.tp-tag-option {
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-  transition: all 0.15s;
-  opacity: 0.85;
-}
-.tp-tag-option:hover {
-  transform: translateY(-1px);
-  opacity: 1;
-}
-.tp-tag-option.is-selected {
-  outline: 2px solid #062a52;
-  outline-offset: 2px;
-  opacity: 1;
-  transform: translateY(-1px);
-}
-
-.tp-section-create {
-  background: #fffbf0;
-  border: 1px solid #f5b942;
-  border-radius: 10px;
-  padding: 14px;
-}
-.tp-create-row {
-  margin-bottom: 12px;
-}
-.tp-name-input {
-  width: 100%;
-  font-weight: 700;
-}
-.tp-color-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.tp-color-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #475569;
-}
-.tp-color-palette {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.tp-color-swatch {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-  padding: 0;
-}
-.tp-color-swatch:hover {
-  transform: scale(1.1);
-}
-.tp-color-swatch.is-selected {
-  border-color: #062a52;
-  box-shadow: 0 2px 8px rgba(6,42,82,0.3);
-  transform: scale(1.15);
-}
-.tp-color-red    { background: #ef4444; }
-.tp-color-gold   { background: #d99c1d; }
-.tp-color-blue   { background: #3b82f6; }
-.tp-color-green  { background: #22c55e; }
-.tp-color-purple { background: #a855f7; }
-.tp-color-orange { background: #f97316; }
-.tp-color-pink   { background: #ec4899; }
-.tp-color-gray   { background: #94a3b8; }
-
-.tp-create-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-.tp-error {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background: #fee2e2;
-  border: 1px solid #ef4444;
-  border-radius: 6px;
-  color: #7f1d1d;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-/* End Custom Tags + Picker CSS */
-
-/* ════════════════════════════════════════════════════════════
-   EXPANSION-CARD TAGS (quick toggle chips + More button)
-   ════════════════════════════════════════════════════════════ */
-.ioc-exp-custom-tags {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 10px 12px;
-  background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
-  border: 1px solid #c9d4e3;
-  border-radius: 8px;
-  margin-top: 8px;
-}
-.ioc-exp-custom-tags .ieq-label {
-  font-size: 11.5px;
-  font-weight: 800;
-  color: #062a52;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  margin-top: 4px;
-}
-.exp-tag-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+.itw-new-input {
   flex: 1;
-}
-.exp-tag-chip {
-  cursor: pointer;
-  user-select: none;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1.5px solid #f5b942;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  background: white;
+  outline: none;
   font-family: inherit;
-  transition: all 0.15s;
+  color: #062a52;
 }
-.exp-tag-chip.is-off {
-  opacity: 0.55;
-  background: white;
-}
-.exp-tag-chip.is-off:hover {
-  opacity: 1;
-  transform: translateY(-1px);
-}
-.exp-tag-chip.is-applied {
-  opacity: 1;
+.itw-new-input:focus { border-color: #062a52; box-shadow: 0 0 0 2px rgba(6,42,82,0.1); }
+.itw-add-btn {
+  background: linear-gradient(135deg, #062a52 0%, #093358 100%);
+  color: white;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 12.5px;
   font-weight: 800;
-  box-shadow: 0 2px 4px rgba(6,42,82,0.15);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.exp-tag-chip.is-applied:hover {
-  transform: translateY(-1px);
-}
-.exp-tag-more-btn {
-  display: inline-flex;
+.itw-add-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(6,42,82,0.3); }
+.itw-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Inline color swatches row */
+.itw-color-row {
+  display: flex;
+  gap: 7px;
   align-items: center;
-  gap: 3px;
-  padding: 3px 10px;
-  border-radius: 12px;
-  background: white;
-  border: 1.5px dashed #94a3b8;
-  color: #475569;
+  flex-wrap: wrap;
+}
+.itw-color-label {
   font-size: 11px;
   font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 2px;
+}
+.itw-sw {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
   cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
+  padding: 0;
+  transition: all 0.12s;
+  flex-shrink: 0;
 }
-.exp-tag-more-btn:hover {
-  border-color: #062a52;
-  color: #062a52;
-  background: #f0f7ff;
+.itw-sw:hover { transform: scale(1.12); }
+.itw-sw.is-active { 
+  border-color: #062a52; 
+  box-shadow: 0 0 0 2px rgba(6,42,82,0.2);
+  transform: scale(1.1);
 }
-/* End expansion tag chips */
+.itw-sw-red    { background: #ef4444; }
+.itw-sw-blue   { background: #3b82f6; }
+.itw-sw-green  { background: #22c55e; }
+.itw-sw-purple { background: #a855f7; }
+.itw-sw-orange { background: #f97316; }
+.itw-sw-gold   { background: #d99c1d; }
+.itw-sw-pink   { background: #ec4899; }
+.itw-sw-gray   { background: #94a3b8; }
+
+/* End Custom Tags Inline Widget CSS */
 
 /* ════════════════════════════════════════════════════════════
    COURT BOX — Inline list rendering (drill-down without tab jump)
@@ -7060,89 +6967,7 @@ body.view-mobile .pir-mega-btn {
 
 /* End Mega Toggle CSS */
 
-/* ════════════════════════════════════════════════════════════
-   VIP CATEGORY TAGS (in entry form)
-   ════════════════════════════════════════════════════════════ */
-
-.vip-tags-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px 12px;
-  background: #f5f8fc;
-  border: 1.5px solid #c9d4e3;
-  border-radius: 8px;
-  min-height: 44px;
-  align-items: center;
-}
-
-.vip-tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-
-.vip-tag-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 14px;
-  background: white;
-  border: 2px solid #c9d4e3;
-  font-size: 12px;
-  font-weight: 700;
-  color: #062a52;
-  cursor: pointer;
-  transition: all 0.15s;
-  user-select: none;
-}
-
-.vip-tag-chip:hover {
-  border-color: #062a52;
-  background: #eef4fa;
-}
-
-.vip-tag-chip.is-selected {
-  background: #062a52;
-  color: white;
-  border-color: #062a52;
-}
-
-.vip-tag-chip.is-selected::before {
-  content: '✓ ';
-  font-weight: 900;
-}
-
-/* Custom color styles per category (uses inline style override) */
-.vip-tag-chip[data-vip-label="IAS"].is-selected { background: #1e40af; border-color: #1e40af; }
-.vip-tag-chip[data-vip-label="IPS"].is-selected { background: #dc2626; border-color: #dc2626; }
-.vip-tag-chip[data-vip-label="IFS"].is-selected { background: #059669; border-color: #059669; }
-.vip-tag-chip[data-vip-label="Politician BJP"].is-selected { background: #f97316; border-color: #f97316; }
-.vip-tag-chip[data-vip-label="Politician INC"].is-selected { background: #0284c7; border-color: #0284c7; }
-
-.vip-add-btn {
-  background: white;
-  color: #062a52;
-  border: 2px dashed #c9d4e3;
-  padding: 5px 12px;
-  border-radius: 14px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-}
-
-.vip-add-btn:hover {
-  border-color: #f5b942;
-  background: #fff8e8;
-  color: #7a4509;
-}
-
-/* End VIP Tags CSS */
+/* End VIP Tags CSS — REMOVED (merged into Custom Tags system) */
 
 /* ════════════════════════════════════════════════════════════
    MOBILE UNIFORM YEAR FILTER DROPDOWNS (all 7 heads)
@@ -10096,26 +9921,26 @@ body.role-staff header { margin-top: 30px; }
     <div id="io-master-list"><div class="empty-state"><h3>कोई member नहीं — पहला member जोड़ें</h3></div></div>
   </section>
 
-  <!-- OFFICERS — VIP/Sensitive cases filter view -->
+  <!-- OFFICERS — Tag-based NOC search view -->
   <section id="officers" class="section">
     <div class="section-header">
       <div>
         <h2>🔍 NOC Search</h2>
-        <div class="desc">VIP / संवेदनशील category के against जो enquiries हैं उनका filter view</div>
+        <div class="desc">Tag-based filter — किसी tag के against जो enquiries हैं उनका filter view</div>
       </div>
     </div>
     
     <div class="officers-filters">
       <div class="of-filter-group">
-        <label class="of-filter-label">🏷 VIP / Sensitive Category</label>
+        <label class="of-filter-label">🏷 Tag से filter करें (एक से अधिक चुन सकते)</label>
         <div class="of-vip-chips" id="of-vip-chips">
-          <!-- Chips rendered by JS -->
+          <!-- Tag chips rendered by JS -->
         </div>
       </div>
       
       <div class="of-filter-group of-filter-row">
         <div class="of-input-wrap">
-          <label class="of-filter-label">🔎 Search by name (officer / politician)</label>
+          <label class="of-filter-label">🔎 Search by name (officer / politician / complainant)</label>
           <input type="text" class="search-input" id="of-name-search" placeholder="Type a name..." oninput="renderOfficersView()" autocomplete="off">
         </div>
         <div class="of-input-wrap">
@@ -10138,7 +9963,7 @@ body.role-staff header { margin-top: 30px; }
         <span>0 results</span>
       </div>
       <div id="officers-results-list">
-        <div class="empty-state"><h3>Filter select karen</h3><p>VIP category ya naam type karke filter shuru karen</p></div>
+        <div class="empty-state"><h3>Filter select karen</h3><p>Upar se tag chunें ya naam type karें</p></div>
       </div>
     </div>
   </section>
@@ -10648,29 +10473,7 @@ body.role-staff header { margin-top: 30px; }
   </div>
 </div>
 
-<!-- ============ VIP CATEGORY ADD MODAL ============ -->
-<div class="modal-overlay" id="vipAddModal" style="z-index: 9800;">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header">
-      <div>
-        <div class="modal-eyebrow">🏛 VIP CATEGORY</div>
-        <div class="modal-title">नई Category जोड़ें</div>
-      </div>
-      <button class="close-btn" onclick="closeModal('vipAddModal')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Category Name <span class="req">*</span></label>
-        <input type="text" class="form-input" id="vip-new-label" placeholder="e.g. Industrialist, Retired IAS" maxlength="50">
-        <div style="font-size:11px;color:#7a8aa1;margin-top:4px;">यह category future me dropdown me available rahegi</div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal('vipAddModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveVipNewCategory()">Save</button>
-    </div>
-  </div>
-</div>
+<!-- VIP CATEGORY ADD MODAL — REMOVED (replaced by Custom Tags picker) -->
 
 <!-- ============ MOBILE "MORE" CHOICE MODAL ============ -->
 <div class="modal-overlay" id="mobileMoreModal">
@@ -10745,53 +10548,7 @@ body.role-staff header { margin-top: 30px; }
 </div>
 
 <!-- ============ MODALS ============ -->
-<!-- ============ TAG PICKER MODAL ============ -->
-<div class="modal-overlay" id="tagPickerModal">
-  <div class="modal" style="max-width:540px;">
-    <div class="modal-header" style="background:linear-gradient(135deg, #062a52 0%, #093358 100%);">
-      <div class="modal-title" style="color:white;">🏷️ Tags Manage</div>
-      <button class="close-btn" onclick="closeTagPicker()" style="color:white;">×</button>
-    </div>
-    <div class="modal-body">
-      <!-- Existing tags grid (pre-defined + custom) -->
-      <div class="tp-section">
-        <div class="tp-section-title">मौजूदा Tags चुनें (एक से अधिक चुन सकते):</div>
-        <div class="tp-tags-grid" id="tp-tags-grid">
-          <!-- Filled dynamically -->
-        </div>
-      </div>
-      
-      <!-- Create new tag -->
-      <div class="tp-section tp-section-create">
-        <div class="tp-section-title">या नया Tag बनायें:</div>
-        <div class="tp-create-row">
-          <input type="text" class="form-input tp-name-input" id="tp-new-name" placeholder="नया tag का नाम (e.g. 'बैतुल batch', 'जुलाई-25')" maxlength="40">
-        </div>
-        <div class="tp-color-row">
-          <span class="tp-color-label">Color चुनें:</span>
-          <div class="tp-color-palette" id="tp-color-palette">
-            <button type="button" class="tp-color-swatch tp-color-red" data-color="red" onclick="selectTagColor('red')" title="Red"></button>
-            <button type="button" class="tp-color-swatch tp-color-gold" data-color="gold" onclick="selectTagColor('gold')" title="Gold"></button>
-            <button type="button" class="tp-color-swatch tp-color-blue" data-color="blue" onclick="selectTagColor('blue')" title="Blue"></button>
-            <button type="button" class="tp-color-swatch tp-color-green" data-color="green" onclick="selectTagColor('green')" title="Green"></button>
-            <button type="button" class="tp-color-swatch tp-color-purple" data-color="purple" onclick="selectTagColor('purple')" title="Purple"></button>
-            <button type="button" class="tp-color-swatch tp-color-orange" data-color="orange" onclick="selectTagColor('orange')" title="Orange"></button>
-            <button type="button" class="tp-color-swatch tp-color-pink" data-color="pink" onclick="selectTagColor('pink')" title="Pink"></button>
-            <button type="button" class="tp-color-swatch tp-color-gray" data-color="gray" onclick="selectTagColor('gray')" title="Gray"></button>
-          </div>
-        </div>
-        <div class="tp-create-actions">
-          <button type="button" class="btn btn-primary" onclick="createAndAddTag()">+ बनायें और जोड़ें</button>
-        </div>
-        <div class="tp-error" id="tp-error" style="display:none;"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn" onclick="closeTagPicker()">Close</button>
-      <button type="button" class="btn btn-primary" onclick="applyTagPicker()">✓ Apply</button>
-    </div>
-  </div>
-</div>
+<!-- Tag Picker Modal REMOVED — replaced by inline tags widget -->
 
 <div class="modal-overlay" id="entryModal"><div class="modal">
   <div class="modal-header">
@@ -10875,21 +10632,15 @@ body.role-staff header { margin-top: 30px; }
     </div>
     <!-- ============ END SUPERVISION TAGS ============ -->
     
-    <!-- ============ CUSTOM TAGS ============ -->
+    <!-- ============ CUSTOM TAGS (Inline Widget) ============ -->
     <div class="form-group full custom-tags-section">
       <div class="ct-heading">
         <span class="ct-icon">🏷️</span>
         <span class="ct-title">Tags</span>
-        <span class="ct-hint">— prakaran ko categorize karें (URGENT, VIP, etc.)</span>
+        <span class="ct-hint">— प्रकरण को categorize करें</span>
       </div>
-      <div class="ct-tags-display" id="ef-tags-display">
-        <!-- Selected tag chips render here -->
-      </div>
-      <div class="ct-actions">
-        <button type="button" class="ct-pick-btn" onclick="openTagPicker('entry')">
-          <span class="ct-pick-icon">+</span>
-          <span>Tag जोड़ें / Add Tag</span>
-        </button>
+      <div class="itw" id="ef-tags-widget" data-kind="entry">
+        <!-- Inline widget rendered here by renderTagsWidget() -->
       </div>
     </div>
     <!-- ============ END CUSTOM TAGS ============ -->
@@ -11179,21 +10930,15 @@ body.role-staff header { margin-top: 30px; }
     </div>
     <!-- ============ END SUPERVISION TAGS ============ -->
     
-    <!-- ============ CUSTOM TAGS (court) ============ -->
+    <!-- ============ CUSTOM TAGS (court, Inline Widget) ============ -->
     <div class="form-group full custom-tags-section">
       <div class="ct-heading">
         <span class="ct-icon">🏷️</span>
         <span class="ct-title">Tags</span>
-        <span class="ct-hint">— case ko categorize karें</span>
+        <span class="ct-hint">— case को categorize करें</span>
       </div>
-      <div class="ct-tags-display" id="cf-tags-display">
-        <!-- Selected tag chips render here -->
-      </div>
-      <div class="ct-actions">
-        <button type="button" class="ct-pick-btn" onclick="openTagPicker('court')">
-          <span class="ct-pick-icon">+</span>
-          <span>Tag जोड़ें / Add Tag</span>
-        </button>
+      <div class="itw" id="cf-tags-widget" data-kind="court">
+        <!-- Inline widget rendered here -->
       </div>
     </div>
     <!-- ============ END CUSTOM TAGS ============ -->
@@ -18855,31 +18600,39 @@ function setHeadYearFilter(type, year) {
 // Render Total Cases tab — combined view across 6 enquiry heads
 // ============ OFFICERS TAB (VIP / Sensitive Filter View) ============
 // State: selected VIP categories (multi-select)
+// officersVipSelected now holds TAG IDs (not VIP labels) — tag-based filtering
 var officersVipSelected = [];
 
 function renderOfficersVipChips() {
   var wrap = document.getElementById('of-vip-chips');
   if (!wrap) return;
-  var cats = state.vipMaster || [];
-  if (!cats.length) {
-    wrap.innerHTML = '<span style="color:#7a8aa1;font-size:12px;">No VIP categories defined yet</span>';
+  var tags = state.tags || [];
+  if (!tags.length) {
+    wrap.innerHTML = '<span style="color:#7a8aa1;font-size:12px;">No tags loaded — please reload</span>';
     return;
   }
-  wrap.innerHTML = cats.map(function(c){
-    var isSel = officersVipSelected.indexOf(c.label) > -1;
-    return '<span class="vip-tag-chip' + (isSel ? ' is-selected' : '') + 
-      '" data-vip-label="' + escapeHtml(c.label) + 
-      '" onclick="toggleOfficersVipChip(this)">' + 
-      escapeHtml(c.label) + '</span>';
+  // Sort: system tags first, then alphabetic
+  var sortedTags = tags.slice().sort(function(a, b){
+    if (a.is_system !== b.is_system) return a.is_system ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  wrap.innerHTML = sortedTags.map(function(t){
+    var isSel = officersVipSelected.indexOf(t.id) > -1;
+    return '<span class="tag-chip tag-chip-' + (t.color || 'gray') + 
+      (isSel ? ' is-selected' : '') +
+      '" data-tag-id="' + escapeHtml(t.id) + 
+      '" style="cursor:pointer;user-select:none;' + (isSel ? 'outline:2px solid #062a52;outline-offset:2px;' : 'opacity:0.7;') + '"' +
+      ' onclick="toggleOfficersVipChip(this)">' + 
+      (isSel ? '✓ ' : '') + escapeHtml(t.name) + '</span>';
   }).join('');
 }
 
 function toggleOfficersVipChip(chipEl) {
-  var label = chipEl.getAttribute('data-vip-label');
-  var idx = officersVipSelected.indexOf(label);
+  var tagId = chipEl.getAttribute('data-tag-id');
+  var idx = officersVipSelected.indexOf(tagId);
   if (idx > -1) officersVipSelected.splice(idx, 1);
-  else officersVipSelected.push(label);
-  chipEl.classList.toggle('is-selected');
+  else officersVipSelected.push(tagId);
+  renderOfficersVipChips();  // Re-render for visual update
   renderOfficersView();
 }
 
@@ -18901,18 +18654,18 @@ function renderOfficersView() {
     });
   });
   
-  // Filter by VIP categories
+  // Filter by TAGS (officersVipSelected now holds tag IDs)
   var filtered = allCases.filter(function(item){
     var r = item.rec;
-    // VIP filter: case must have at least 1 of selected VIP categories
+    // Tag filter: case must have at least 1 of selected tag IDs
     if (officersVipSelected.length > 0) {
-      var caseVips = Array.isArray(r.vip_categories) ? r.vip_categories : [];
-      var hasMatch = caseVips.some(function(v){ return officersVipSelected.indexOf(v) > -1; });
+      var caseTags = Array.isArray(r.tag_ids) ? r.tag_ids : [];
+      var hasMatch = caseTags.some(function(tid){ return officersVipSelected.indexOf(tid) > -1; });
       if (!hasMatch) return false;
     }
-    // Name filter: search in complainant + non_complainant
+    // Name filter: search in complainant + non_complainant + io_name + brief
     if (nameSearch) {
-      var hay = ((r.complainant || '') + ' ' + (r.non_complainant || '')).toLowerCase();
+      var hay = ((r.complainant || '') + ' ' + (r.non_complainant || '') + ' ' + (r.io_name || '') + ' ' + (r.brief || '')).toLowerCase();
       if (hay.indexOf(nameSearch) < 0) return false;
     }
     return true;
@@ -18924,7 +18677,7 @@ function renderOfficersView() {
   // If no filter active and no results, show prompt
   if (officersVipSelected.length === 0 && !nameSearch && !typeFilter) {
     summaryEl.innerHTML = '<span>Select filters to begin</span>';
-    resultsEl.innerHTML = '<div class="empty-state"><h3>Filter select karen</h3><p>VIP category chip dabaayen ya naam type karen</p></div>';
+    resultsEl.innerHTML = '<div class="empty-state"><h3>Filter select karen</h3><p>Upar se tag chunें ya naam type karें</p></div>';
     return;
   }
   
@@ -18944,22 +18697,20 @@ function renderOfficersView() {
     return;
   }
   
-  // Render result cards
+  // Render result cards (tag chips instead of VIP)
   resultsEl.innerHTML = filtered.slice(0, 200).map(function(item){
     var r = item.rec;
     var t = item.type;
     var caseLabel = formatEntryNo(t, r.no, r.entry_year);
-    var vipBadges = '';
-    if (Array.isArray(r.vip_categories) && r.vip_categories.length) {
-      vipBadges = r.vip_categories.map(function(v){
-        return '<span class="vip-tag-chip is-selected" data-vip-label="' + escapeHtml(v) + '" style="font-size:10px;padding:2px 8px;">' + escapeHtml(v) + '</span>';
-      }).join(' ');
+    var tagBadges = '';
+    if (Array.isArray(r.tag_ids) && r.tag_ids.length && typeof renderTagChipsFromIds === 'function') {
+      tagBadges = renderTagChipsFromIds(r.tag_ids, false);
     }
     return '<div class="of-result-card" onclick="navOpenFromOfficers(\'' + t + '\',\'' + r.id + '\')">' +
       '<div class="of-rc-head">' +
         '<span class="of-rc-no">' + escapeHtml(caseLabel) + '</span>' +
         '<span class="of-rc-type-badge">' + escapeHtml(ENQ_LABELS[t] || t) + '</span>' +
-        vipBadges +
+        tagBadges +
       '</div>' +
       '<div class="of-rc-meta">' +
         (r.complainant ? '<div><strong>Complainant:</strong> ' + escapeHtml(r.complainant) + '</div>' : '') +
@@ -19523,94 +19274,14 @@ async function executeBulkImport() {
   }
 }
 
-// ============ VIP CATEGORY TAGS HELPERS ============
-// Render the chips inside form (called by openEntryModal)
-function renderVipTags(selectedLabels) {
-  var listEl = document.getElementById('ef-vip-tags-list');
-  if (!listEl) return;
-  selectedLabels = Array.isArray(selectedLabels) ? selectedLabels : [];
-  var allCats = state.vipMaster || [];
-  if (!allCats.length) {
-    listEl.innerHTML = '<span style="color:#7a8aa1;font-size:12px;">No categories yet — tap "+ Add new"</span>';
-    return;
-  }
-  listEl.innerHTML = allCats.map(function(c){
-    var isSelected = selectedLabels.indexOf(c.label) > -1;
-    return '<span class="vip-tag-chip' + (isSelected ? ' is-selected' : '') + 
-      '" data-vip-label="' + escapeHtml(c.label) + '" onclick="toggleVipChip(this)">' +
-      escapeHtml(c.label) +
-    '</span>';
-  }).join('');
-}
-
-// Toggle chip selected state on tap
-function toggleVipChip(chipEl) {
-  chipEl.classList.toggle('is-selected');
-  syncVipHiddenField();
-}
-
-// Update hidden input with comma-separated selected labels
-function syncVipHiddenField() {
-  var selected = getSelectedVipCategories();
-  document.getElementById('ef-vip-categories').value = selected.join(',');
-}
-
-// Returns array of currently selected VIP labels
-function getSelectedVipCategories() {
-  var chips = document.querySelectorAll('#ef-vip-tags-list .vip-tag-chip.is-selected');
-  var out = [];
-  chips.forEach(function(c){ out.push(c.getAttribute('data-vip-label')); });
-  return out;
-}
-
-// Open the "Add new VIP category" modal
-function openVipAddModal() {
-  document.getElementById('vip-new-label').value = '';
-  document.getElementById('vipAddModal').classList.add('active');
-  setTimeout(function(){ document.getElementById('vip-new-label').focus(); }, 100);
-}
-
-// Save new VIP category to vip_categories_master + refresh chips
-async function saveVipNewCategory() {
-  var labelEl = document.getElementById('vip-new-label');
-  var label = (labelEl.value || '').trim();
-  if (!label) { toast('Category name required', true); return; }
-  if (label.length > 50) { toast('Max 50 characters', true); return; }
-  // Duplicate check
-  var existing = (state.vipMaster || []).find(function(c){ 
-    return c.label.toLowerCase() === label.toLowerCase(); 
-  });
-  if (existing) { toast('"' + label + '" already exists', true); return; }
-  try {
-    // Compute next sort_order
-    var maxOrder = 0;
-    (state.vipMaster || []).forEach(function(c){
-      if (c.sort_order && c.sort_order > maxOrder) maxOrder = c.sort_order;
-    });
-    var newCat = {
-      label: label,
-      color: '#062a52',
-      sort_order: maxOrder + 1,
-      is_active: true
-    };
-    var r = await supa.from('vip_categories_master').insert(newCat).select();
-    if (r.error) throw r.error;
-    // Add to local state
-    if (r.data && r.data.length) {
-      state.vipMaster.push(r.data[0]);
-    } else {
-      state.vipMaster.push(newCat);
-    }
-    state.vipMaster.sort(function(a, b){ return (a.sort_order || 0) - (b.sort_order || 0); });
-    // Re-render chips (keep current selections + auto-select new one)
-    var currentSelected = getSelectedVipCategories();
-    currentSelected.push(label);
-    renderVipTags(currentSelected);
-    syncVipHiddenField();
-    closeModal('vipAddModal');
-    toast('✓ "' + label + '" added');
-  } catch(e) { showError('Add VIP category', e); }
-}
+// ============ VIP HELPERS — STUBS (VIP system removed; tags system replaces it) ============
+// These stubs prevent errors in saveEntry which still references getSelectedVipCategories
+function getSelectedVipCategories() { return []; }
+function renderVipTags() { /* no-op */ }
+function syncVipHiddenField() { /* no-op */ }
+function toggleVipChip() { /* no-op */ }
+function openVipAddModal() { /* no-op — replaced by Custom Tags picker */ }
+async function saveVipNewCategory() { /* no-op */ }
 
 // ============ Helpers: Open Case Timeline from modals ============
 function openTimelineFromEntryModal() {
@@ -19666,11 +19337,8 @@ function openEntryModal(type, id) {
   ncompLoad(entry.non_complainant || '');
   document.getElementById('ef-status').value = entry.case_status || 'Active';
   document.getElementById('ef-brief').value = entry.brief || '';
-  // NEW: IO assigned date + VIP categories
+  // NEW: IO assigned date (VIP categories removed; tags handle this now)
   document.getElementById('ef-io-assigned-date').value = entry.io_assigned_date || '';
-  var vipSel = Array.isArray(entry.vip_categories) ? entry.vip_categories.slice() : [];
-  document.getElementById('ef-vip-categories').value = vipSel.join(',');
-  renderVipTags(vipSel);
   // NEW: जाँच विश्लेषण fields
   document.getElementById('ef-main-allegations').value = entry.main_allegations || '';
   document.getElementById('ef-enquiry-points').value = entry.enquiry_points || '';
@@ -19918,7 +19586,7 @@ async function saveEntry() {
     brief: document.getElementById('ef-brief').value || null,
     // NEW fields
     io_assigned_date: document.getElementById('ef-io-assigned-date').value || null,
-    vip_categories: getSelectedVipCategories(),
+    // vip_categories: REMOVED (replaced by tag_ids — see Custom Tags below)
     // जाँच विश्लेषण (Detailed Analysis fields)
     main_allegations: document.getElementById('ef-main-allegations').value || null,
     enquiry_points: document.getElementById('ef-enquiry-points').value || null,
@@ -22379,412 +22047,285 @@ async function quickToggleTagCourt(id, which) {
   }
 }
 
-// ─── Expansion-card Tags block (system chips quick toggle + "+ More" full picker) ───
-// caller passes ('entry', type, rec) for enquiries or ('court', null, c) for courts
-function buildExpansionTagsBlock(kind, type, rec) {
-  if (!rec) return '';
-  var currentIds = Array.isArray(rec.tag_ids) ? rec.tag_ids : [];
-  var systemTags = (state.tags || []).filter(function(t){ return t.is_system; });
-  // Sort: applied first, then alphabetical
-  systemTags.sort(function(a, b){
-    var aOn = currentIds.indexOf(a.id) >= 0 ? 0 : 1;
-    var bOn = currentIds.indexOf(b.id) >= 0 ? 0 : 1;
-    if (aOn !== bOn) return aOn - bOn;
-    return a.name.localeCompare(b.name);
-  });
-  
-  // ALSO show any custom (non-system) tags that are CURRENTLY applied (so user sees them inline)
-  var customTagsApplied = (state.tags || []).filter(function(t){ 
-    return !t.is_system && currentIds.indexOf(t.id) >= 0; 
-  });
-  
-  var allChipTags = systemTags.concat(customTagsApplied);
-  
-  var typeArg = type ? "'" + type + "'" : 'null';
-  var idArg = "'" + rec.id + "'";
-  
-  var chipsHTML = allChipTags.map(function(t){
-    var on = currentIds.indexOf(t.id) >= 0;
-    return '<button type="button" class="exp-tag-chip tag-chip tag-chip-' + (t.color || 'gray') + (on ? ' is-applied' : ' is-off') + '" ' +
-      'onclick="event.stopPropagation();quickToggleCustomTag(\'' + kind + '\',' + typeArg + ',' + idArg + ',\'' + t.id + '\')" ' +
-      'title="' + escapeHtml(t.name) + (on ? ' (applied — tap to remove)' : ' (tap to apply)') + '">' +
-      (on ? '✓ ' : '') + escapeHtml(t.name) +
-    '</button>';
-  }).join('');
-  
-  return '<div class="ioc-exp-custom-tags">' +
-    '<div class="ieq-label">🏷️ Tags:</div>' +
-    '<div class="exp-tag-chips">' +
-      chipsHTML +
-      '<button type="button" class="exp-tag-more-btn" onclick="event.stopPropagation();openExpansionTagPicker(\'' + kind + '\',' + typeArg + ',' + idArg + ')" title="More tags / create new">' +
-        '<span style="font-size:14px;font-weight:900;">+</span> More' +
-      '</button>' +
-    '</div>' +
-  '</div>';
-}
+// ============================================================
+// ============ CUSTOM TAGS — INLINE WIDGET SYSTEM ============
+// Replaces the old tag picker modal + ef-tags-display approach.
+// Same widget code is used in form (entry/court) and brief expand.
+// All state is held in record.tag_ids (UUID array) — single source of truth.
+// ============================================================
 
-// Quick toggle a custom/system tag from expansion card (no form open)
-async function quickToggleCustomTag(kind, type, id, tagId) {
-  var rec;
-  if (kind === 'entry') {
-    rec = (state.enquiries[type] || []).find(function(x){ return x.id === id; });
-  } else {
-    rec = state.courts.find(function(x){ return x.id === id; });
-  }
-  if (!rec) return;
-  
-  var currentIds = Array.isArray(rec.tag_ids) ? rec.tag_ids.slice() : [];
-  var idx = currentIds.indexOf(tagId);
-  var added;
-  if (idx >= 0) {
-    currentIds.splice(idx, 1);
-    added = false;
-  } else {
-    currentIds.push(tagId);
-    added = true;
-  }
-  
-  // Update DB
-  try {
-    var table = kind === 'entry' ? 'enquiries' : 'court_cases';
-    var resp = await supa.from(table).update({ 
-      tag_ids: currentIds,
-      updated_at: new Date().toISOString()
-    }).eq('id', id);
-    if (resp.error) throw resp.error;
-    
-    rec.tag_ids = currentIds;
-    
-    // Re-render expansion card
-    if (kind === 'entry') {
-      var card = document.getElementById('enq-exp-' + id);
-      if (card) card.querySelector('td').innerHTML = buildEnquiryExpandCard(type, rec);
-    } else {
-      var card = document.getElementById('crt-exp-' + id);
-      if (card) card.querySelector('td').innerHTML = buildCourtExpandCard(rec);
-    }
-    
-    var tag = getTagById(tagId);
-    var tname = tag ? tag.name : 'Tag';
-    toast(added ? ('🏷️ ' + tname + ' applied ✓') : ('🏷️ ' + tname + ' removed'));
-  } catch(e) {
-    console.error('Custom tag toggle failed:', e);
-    toast('Tag update failed: ' + (e.message || e), true);
-  }
-}
+var ITW_COLORS = ['red','blue','green','purple','orange','gold','pink','gray'];
 
-// Open full tag picker from expansion card
-function openExpansionTagPicker(kind, type, id) {
-  var rec;
-  if (kind === 'entry') {
-    rec = (state.enquiries[type] || []).find(function(x){ return x.id === id; });
-  } else {
-    rec = state.courts.find(function(x){ return x.id === id; });
-  }
-  if (!rec) return;
-  
-  window._tagPickerCtx = {
-    type: 'expansion',
-    expKind: kind,
-    expType: type,
-    expId: id,
-    selectedTagIds: Array.isArray(rec.tag_ids) ? rec.tag_ids.slice() : [],
-    newColor: 'gray'
-  };
-  
-  document.getElementById('tp-new-name').value = '';
-  document.getElementById('tp-error').style.display = 'none';
-  document.querySelectorAll('.tp-color-swatch').forEach(function(s){ s.classList.remove('is-selected'); });
-  var graySwatch = document.querySelector('.tp-color-swatch[data-color="gray"]');
-  if (graySwatch) graySwatch.classList.add('is-selected');
-  
-  renderTagPickerGrid();
-  document.getElementById('tagPickerModal').classList.add('active');
-}
-
-function renderSupTagBadges(r) {
-  if (!r) return '';
-  var html = '';
-  if (r.is_dg_eow_task) {
-    html += '<span class="sup-tag-badge sup-tag-badge-dg" title="DG EOW Direction/Task' + (r.sp_dg_note ? ': '+r.sp_dg_note.replace(/"/g,'&quot;').slice(0,80) : '') + '">🏛 DG EOW</span>';
-  }
-  if (r.is_sp_imp && !r.is_dg_eow_task) {
-    // Only show SP badge if NOT DG (DG implies SP, no duplication)
-    html += '<span class="sup-tag-badge sup-tag-badge-sp" title="SP IMP' + (r.sp_dg_note ? ': '+r.sp_dg_note.replace(/"/g,'&quot;').slice(0,80) : '') + '">★ IMP</span>';
-  }
-  // ALSO show custom tag chips
-  if (typeof renderTagChipsFromIds === 'function') {
-    html += renderTagChipsFromIds(r.tag_ids, false);
-  }
-  return html;
-}
-
-// ============ CUSTOM TAGS SYSTEM ============
-// Module-level state for tag picker
-window._tagPickerCtx = { type: null, selectedTagIds: [], newColor: 'gray' };
+// Cached "new color" per widget container (uses dataset.newColor)
+// Cached "applied IDs" per widget container (uses dataset.appliedIds JSON)
 
 function getTagById(id) {
   return (state.tags || []).find(function(t){ return t.id === id; });
 }
 
-function renderTagChipsFromIds(tagIds, withRemove, removeCallback) {
-  if (!tagIds || !tagIds.length) return '';
+// Render a single chip — used in widgets, brief, listings
+function renderTagChip(tag, options) {
+  if (!tag) return '';
+  options = options || {};
+  var cls = 'tag-chip tag-chip-' + (tag.color || 'gray');
+  if (options.isAvailable) cls += ' is-available';
+  if (options.isReadonly) cls += ' is-readonly';
+  var star = tag.is_system ? '<span class="tag-chip-star">⭐</span>' : '';
+  var attrs = '';
+  if (options.dataAction) attrs += ' data-action="' + options.dataAction + '"';
+  if (tag.id) attrs += ' data-tag-id="' + escapeHtml(tag.id) + '"';
+  var xBtn = options.withRemove 
+    ? '<button class="tag-chip-x" data-action="remove" data-tag-id="' + escapeHtml(tag.id) + '" title="Remove">×</button>'
+    : '';
+  return '<span class="' + cls + '"' + attrs + '>' + star + escapeHtml(tag.name) + xBtn + '</span>';
+}
+
+// Render multiple chips from IDs (used in listings, expansion cards, search results)
+function renderTagChipsFromIds(tagIds, withRemove) {
+  if (!Array.isArray(tagIds) || !tagIds.length) return '';
   return tagIds.map(function(id){
-    var tag = getTagById(id);
-    if (!tag) return '';
-    var removeBtn = '';
-    if (withRemove && removeCallback) {
-      removeBtn = '<button type="button" class="tag-chip-remove" onclick="event.stopPropagation();' + removeCallback + '(\'' + id + '\')" title="Remove tag">×</button>';
-    }
-    return '<span class="tag-chip tag-chip-' + (tag.color || 'gray') + '" title="' + escapeHtml(tag.name) + '">' + escapeHtml(tag.name) + removeBtn + '</span>';
+    var t = getTagById(id);
+    if (!t) return '';
+    return renderTagChip(t, { isReadonly: !withRemove, withRemove: !!withRemove });
   }).join('');
 }
 
-// Open tag picker modal
-function openTagPicker(type) {
-  // type: 'entry' or 'court'
-  window._tagPickerCtx.type = type;
+/**
+ * Render the universal inline tags widget into a container.
+ * @param containerId - DOM ID of the .itw container
+ * @param appliedIds - array of currently-applied tag UUIDs
+ * @param onChange - async fn(newIds) called when user adds/removes/creates
+ */
+function renderTagsWidget(containerId, appliedIds, onChange) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
   
-  // Get current tag_ids from form
-  var currentTagIds = [];
-  if (type === 'entry') {
-    var displayEl = document.getElementById('ef-tags-display');
-    if (displayEl && displayEl._tagIds) {
-      currentTagIds = displayEl._tagIds.slice();
-    }
-  } else if (type === 'court') {
-    var displayEl = document.getElementById('cf-tags-display');
-    if (displayEl && displayEl._tagIds) {
-      currentTagIds = displayEl._tagIds.slice();
-    }
+  // Persist applied IDs on container so other code (saveEntry, saveCourt) can read them
+  container.dataset.appliedIds = JSON.stringify(appliedIds || []);
+  
+  var inputId = containerId + '-new-name';
+  var swRowId = containerId + '-sw-row';
+  var addBtnId = containerId + '-add-btn';
+  
+  if (!container.dataset.newColor) container.dataset.newColor = 'gray';
+  var newColor = container.dataset.newColor;
+  
+  var allTags = state.tags || [];
+  var applied = (appliedIds || []).map(function(id){ return getTagById(id); }).filter(Boolean);
+  var available = allTags.filter(function(t){ return (appliedIds || []).indexOf(t.id) < 0; });
+  
+  // Sort available: system first, then alphabetical
+  available.sort(function(a,b){
+    if (a.is_system !== b.is_system) return a.is_system ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  
+  var html = '';
+  
+  // ─── Section 1: Applied chips ───
+  html += '<div class="itw-section">';
+  html += '<div class="itw-label">🏷️ लगाए गए <span class="badge">' + applied.length + '</span></div>';
+  html += '<div class="itw-chips-wrap">';
+  if (applied.length === 0) {
+    html += '<span class="itw-empty">कोई tag नहीं — नीचे से चुनें</span>';
+  } else {
+    html += applied.map(function(t){
+      return renderTagChip(t, { withRemove: true });
+    }).join('');
   }
-  window._tagPickerCtx.selectedTagIds = currentTagIds;
+  html += '</div></div>';
   
-  // Reset new tag form
-  document.getElementById('tp-new-name').value = '';
-  document.getElementById('tp-error').style.display = 'none';
-  window._tagPickerCtx.newColor = 'gray';
-  document.querySelectorAll('.tp-color-swatch').forEach(function(s){ s.classList.remove('is-selected'); });
-  var graySwatch = document.querySelector('.tp-color-swatch[data-color="gray"]');
-  if (graySwatch) graySwatch.classList.add('is-selected');
-  
-  // Render existing tags
-  renderTagPickerGrid();
-  
-  document.getElementById('tagPickerModal').classList.add('active');
-}
-
-function closeTagPicker() {
-  document.getElementById('tagPickerModal').classList.remove('active');
-}
-
-function renderTagPickerGrid() {
-  var grid = document.getElementById('tp-tags-grid');
-  if (!grid) return;
-  var tags = state.tags || [];
-  if (!tags.length) {
-    grid.innerHTML = '<div style="padding:12px;font-size:12px;color:#94a3b8;font-style:italic;">— कोई tag नहीं — neeche se naya बनायें —</div>';
-    return;
+  // ─── Section 2: Available chips ───
+  html += '<div class="itw-section">';
+  html += '<div class="itw-label">➕ उपलब्ध (tap to add) <span class="badge">' + available.length + '</span></div>';
+  html += '<div class="itw-chips-wrap">';
+  if (available.length === 0) {
+    html += '<span class="itw-empty">सब tags applied हैं</span>';
+  } else {
+    html += available.map(function(t){
+      return renderTagChip(t, { isAvailable: true, dataAction: 'add' });
+    }).join('');
   }
-  var selectedIds = window._tagPickerCtx.selectedTagIds || [];
-  grid.innerHTML = tags.map(function(t){
-    var isSel = selectedIds.indexOf(t.id) >= 0;
-    return '<span class="tag-chip tag-chip-' + (t.color || 'gray') + ' tp-tag-option' + (isSel ? ' is-selected' : '') + '" onclick="toggleTagPickerSelection(\'' + t.id + '\')">' +
-      escapeHtml(t.name) +
-      (t.is_system ? ' ⭐' : '') +
-    '</span>';
-  }).join('');
-}
-
-function toggleTagPickerSelection(tagId) {
-  var sel = window._tagPickerCtx.selectedTagIds;
-  var idx = sel.indexOf(tagId);
-  if (idx >= 0) sel.splice(idx, 1);
-  else sel.push(tagId);
-  renderTagPickerGrid();
-}
-
-function selectTagColor(color) {
-  window._tagPickerCtx.newColor = color;
-  document.querySelectorAll('.tp-color-swatch').forEach(function(s){ s.classList.remove('is-selected'); });
-  var sw = document.querySelector('.tp-color-swatch[data-color="' + color + '"]');
-  if (sw) sw.classList.add('is-selected');
-}
-
-async function createAndAddTag() {
-  var nameInput = document.getElementById('tp-new-name');
-  var name = nameInput.value.trim();
-  var errEl = document.getElementById('tp-error');
-  errEl.style.display = 'none';
+  html += '</div></div>';
   
-  if (!name) {
-    errEl.textContent = '⚠ Tag का नाम ज़रूरी है';
-    errEl.style.display = '';
-    return;
-  }
-  if (name.length > 40) {
-    errEl.textContent = '⚠ Tag का नाम 40 अक्षरों से कम होना चाहिए';
-    errEl.style.display = '';
-    return;
+  // ─── Section 3: New tag row + inline color swatches ───
+  html += '<div class="itw-section itw-new">';
+  html += '<div class="itw-label">✨ नया Tag बनाएं</div>';
+  html += '<div class="itw-new-row">';
+  html += '<input type="text" class="itw-new-input" id="' + inputId + '" placeholder="Tag का नाम..." maxlength="30">';
+  html += '<button type="button" class="itw-add-btn" id="' + addBtnId + '">+ Add</button>';
+  html += '</div>';
+  html += '<div class="itw-color-row" id="' + swRowId + '">';
+  html += '<span class="itw-color-label">Color:</span>';
+  ITW_COLORS.forEach(function(c){
+    html += '<button type="button" class="itw-sw itw-sw-' + c + (c === newColor ? ' is-active' : '') + '" data-color="' + c + '" title="' + c + '"></button>';
+  });
+  html += '</div>';
+  html += '</div>';
+  
+  container.innerHTML = html;
+  
+  // ─── Wire up event listeners ───
+  
+  // Tag add/remove
+  container.querySelectorAll('[data-action]').forEach(function(el){
+    el.addEventListener('click', async function(e){
+      e.stopPropagation();
+      var action = el.getAttribute('data-action');
+      var tagId = el.getAttribute('data-tag-id');
+      var currentIds = JSON.parse(container.dataset.appliedIds || '[]');
+      var newIds;
+      if (action === 'add') {
+        newIds = currentIds.concat([tagId]);
+      } else { // remove
+        newIds = currentIds.filter(function(id){ return id !== tagId; });
+      }
+      if (onChange) await onChange(newIds);
+    });
+  });
+  
+  // Color swatches (inline)
+  var swRow = document.getElementById(swRowId);
+  if (swRow) {
+    swRow.querySelectorAll('.itw-sw').forEach(function(sw){
+      sw.addEventListener('click', function(e){
+        e.stopPropagation();
+        var color = sw.getAttribute('data-color');
+        container.dataset.newColor = color;
+        swRow.querySelectorAll('.itw-sw').forEach(function(s){ s.classList.remove('is-active'); });
+        sw.classList.add('is-active');
+      });
+    });
   }
   
-  // Duplicate check (case-insensitive)
-  var nameLower = name.toLowerCase();
-  var existing = (state.tags || []).find(function(t){ return t.name.toLowerCase() === nameLower; });
-  if (existing) {
-    errEl.textContent = '⚠ यह tag पहले से मौजूद है: "' + existing.name + '"';
-    errEl.style.display = '';
-    // Auto-select existing tag instead
-    if (window._tagPickerCtx.selectedTagIds.indexOf(existing.id) < 0) {
-      window._tagPickerCtx.selectedTagIds.push(existing.id);
-      renderTagPickerGrid();
-    }
-    return;
-  }
+  // Add new tag
+  var input = document.getElementById(inputId);
+  var addBtn = document.getElementById(addBtnId);
   
-  var color = window._tagPickerCtx.newColor || 'gray';
-  
-  // INSERT into DB
-  try {
-    var resp = await supa.from('tags').insert({
-      name: name,
-      color: color,
-      is_system: false
-    }).select().single();
-    if (resp.error) throw resp.error;
+  var tryAdd = async function() {
+    var name = (input.value || '').trim();
+    if (!name) { toast('Name required', true); return; }
     
-    var newTag = resp.data;
-    // Add to state
-    state.tags.push(newTag);
-    // Auto-select
-    window._tagPickerCtx.selectedTagIds.push(newTag.id);
-    // Re-render grid
-    renderTagPickerGrid();
-    // Clear input
-    nameInput.value = '';
-    toast('🏷️ Tag बनाया: ' + newTag.name);
-  } catch(e) {
-    console.error('Tag insert failed:', e);
-    errEl.textContent = 'Tag save failed: ' + (e.message || e);
-    errEl.style.display = '';
-  }
-}
-
-async function applyTagPicker() {
-  var ctx = window._tagPickerCtx;
-  if (!ctx.type) return;
-  
-  var selectedIds = ctx.selectedTagIds.slice();
-  
-  // EXPANSION MODE — apply directly to record (DB + state + re-render)
-  if (ctx.type === 'expansion') {
-    var rec;
-    if (ctx.expKind === 'entry') {
-      rec = (state.enquiries[ctx.expType] || []).find(function(x){ return x.id === ctx.expId; });
-    } else {
-      rec = state.courts.find(function(x){ return x.id === ctx.expId; });
+    // Duplicate check (case-insensitive)
+    var exists = (state.tags || []).find(function(t){ return t.name.toLowerCase() === name.toLowerCase(); });
+    var currentIds = JSON.parse(container.dataset.appliedIds || '[]');
+    if (exists) {
+      if (currentIds.indexOf(exists.id) < 0) {
+        if (onChange) await onChange(currentIds.concat([exists.id]));
+        toast('"' + exists.name + '" already exists — added');
+      } else {
+        toast('"' + exists.name + '" already applied', true);
+      }
+      input.value = '';
+      return;
     }
-    if (!rec) { closeTagPicker(); return; }
     
+    addBtn.disabled = true;
     try {
-      var table = ctx.expKind === 'entry' ? 'enquiries' : 'court_cases';
-      var resp = await supa.from(table).update({ 
-        tag_ids: selectedIds,
-        updated_at: new Date().toISOString()
-      }).eq('id', ctx.expId);
+      var color = container.dataset.newColor || 'gray';
+      var resp = await supa.from('tags').insert({
+        name: name, color: color, is_system: false
+      }).select().single();
       if (resp.error) throw resp.error;
       
-      rec.tag_ids = selectedIds;
+      state.tags.push(resp.data);
+      input.value = '';
       
-      // Re-render expansion card
-      if (ctx.expKind === 'entry') {
-        var card = document.getElementById('enq-exp-' + ctx.expId);
-        if (card) card.querySelector('td').innerHTML = buildEnquiryExpandCard(ctx.expType, rec);
-      } else {
-        var card = document.getElementById('crt-exp-' + ctx.expId);
-        if (card) card.querySelector('td').innerHTML = buildCourtExpandCard(rec);
-      }
-      
-      toast('🏷️ Tags updated ✓');
+      if (onChange) await onChange(currentIds.concat([resp.data.id]));
+      toast('✓ "' + name + '" बनाया + applied');
     } catch(e) {
-      console.error('Tag apply failed:', e);
-      toast('Tag update failed: ' + (e.message || e), true);
+      toast('Failed: ' + (e.message || e), true);
+    } finally {
+      addBtn.disabled = false;
     }
-    closeTagPicker();
-    return;
-  }
+  };
   
-  // FORM MODE — just stage on display element (saved when form is submitted)
-  var displayId = ctx.type === 'entry' ? 'ef-tags-display' : 'cf-tags-display';
-  var displayEl = document.getElementById(displayId);
-  if (!displayEl) { closeTagPicker(); return; }
-  
-  displayEl._tagIds = selectedIds;
-  var removeCallback = ctx.type === 'entry' ? 'removeEntryTag' : 'removeCourtTag';
-  displayEl.innerHTML = renderTagChipsFromIds(selectedIds, true, removeCallback);
-  
-  closeTagPicker();
+  if (addBtn) addBtn.addEventListener('click', tryAdd);
+  if (input) input.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') { e.preventDefault(); tryAdd(); }
+  });
 }
 
-function removeEntryTag(tagId) {
-  var displayEl = document.getElementById('ef-tags-display');
-  if (!displayEl) return;
-  var ids = (displayEl._tagIds || []).filter(function(id){ return id !== tagId; });
-  displayEl._tagIds = ids;
-  displayEl.innerHTML = renderTagChipsFromIds(ids, true, 'removeEntryTag');
+// ─── Form integration: entry form widget ───
+function renderEntryTagsWidget(appliedIds) {
+  renderTagsWidget('ef-tags-widget', appliedIds || [], async function(newIds){
+    renderEntryTagsWidget(newIds);  // Re-render on change
+  });
 }
 
-function removeCourtTag(tagId) {
-  var displayEl = document.getElementById('cf-tags-display');
-  if (!displayEl) return;
-  var ids = (displayEl._tagIds || []).filter(function(id){ return id !== tagId; });
-  displayEl._tagIds = ids;
-  displayEl.innerHTML = renderTagChipsFromIds(ids, true, 'removeCourtTag');
+// ─── Form integration: court form widget ───
+function renderCourtTagsWidget(appliedIds) {
+  renderTagsWidget('cf-tags-widget', appliedIds || [], async function(newIds){
+    renderCourtTagsWidget(newIds);
+  });
 }
 
-// Reset tags UI when opening blank form
-function resetEntryTagsCustomUI() {
-  var el = document.getElementById('ef-tags-display');
-  if (el) { el._tagIds = []; el.innerHTML = ''; }
-}
-function resetCourtTagsCustomUI() {
-  var el = document.getElementById('cf-tags-display');
-  if (el) { el._tagIds = []; el.innerHTML = ''; }
-}
-
-// Load existing tags into form
-function loadEntryCustomTags(entry) {
-  resetEntryTagsCustomUI();
-  if (!entry) return;
-  var ids = entry.tag_ids || [];
-  if (!Array.isArray(ids)) ids = [];
-  var el = document.getElementById('ef-tags-display');
-  if (el) {
-    el._tagIds = ids.slice();
-    el.innerHTML = renderTagChipsFromIds(ids, true, 'removeEntryTag');
-  }
-}
-function loadCourtCustomTags(c) {
-  resetCourtTagsCustomUI();
-  if (!c) return;
-  var ids = c.tag_ids || [];
-  if (!Array.isArray(ids)) ids = [];
-  var el = document.getElementById('cf-tags-display');
-  if (el) {
-    el._tagIds = ids.slice();
-    el.innerHTML = renderTagChipsFromIds(ids, true, 'removeCourtTag');
-  }
-}
-
-// Get current tag_ids from form (called by saveEntry/saveCourt)
+// ─── Read applied IDs from form widget (called by saveEntry/saveCourt) ───
 function getEntryCurrentTagIds() {
-  var el = document.getElementById('ef-tags-display');
-  return (el && el._tagIds) ? el._tagIds.slice() : [];
+  var el = document.getElementById('ef-tags-widget');
+  if (!el) return [];
+  try { return JSON.parse(el.dataset.appliedIds || '[]'); } catch(e) { return []; }
 }
 function getCourtCurrentTagIds() {
-  var el = document.getElementById('cf-tags-display');
-  return (el && el._tagIds) ? el._tagIds.slice() : [];
+  var el = document.getElementById('cf-tags-widget');
+  if (!el) return [];
+  try { return JSON.parse(el.dataset.appliedIds || '[]'); } catch(e) { return []; }
 }
+
+// ─── Load existing tags into form widget (called by openEntryModal/openCourtModal) ───
+function loadEntryCustomTags(entry) {
+  var ids = (entry && Array.isArray(entry.tag_ids)) ? entry.tag_ids.slice() : [];
+  renderEntryTagsWidget(ids);
+}
+function loadCourtCustomTags(c) {
+  var ids = (c && Array.isArray(c.tag_ids)) ? c.tag_ids.slice() : [];
+  renderCourtTagsWidget(ids);
+}
+
+// ─── Reset on form New (called by reset/openEntryModal for new record) ───
+function resetEntryTagsCustomUI() { renderEntryTagsWidget([]); }
+function resetCourtTagsCustomUI() { renderCourtTagsWidget([]); }
+
+// ─── Brief expand: inline widget for direct-edit (no form re-open) ───
+// Used inside expansion cards. Saves directly to DB on every change.
+function buildExpansionTagsBlock(kind, type, rec) {
+  if (!rec) return '';
+  var widgetId = 'exp-tags-' + (rec.id || 'new');
+  // Build container HTML — content rendered after card is in DOM (setTimeout)
+  setTimeout(function(){
+    var ids = Array.isArray(rec.tag_ids) ? rec.tag_ids.slice() : [];
+    renderTagsWidget(widgetId, ids, async function(newIds){
+      // Save directly to DB
+      try {
+        var table = (kind === 'court') ? 'court_cases' : 'enquiries';
+        var resp = await supa.from(table).update({ 
+          tag_ids: newIds, 
+          updated_at: new Date().toISOString() 
+        }).eq('id', rec.id);
+        if (resp.error) throw resp.error;
+        rec.tag_ids = newIds;
+        renderTagsWidget(widgetId, newIds, arguments.callee);
+      } catch(e) {
+        toast('Save failed: ' + (e.message || e), true);
+      }
+    });
+  }, 50);
+  return '<div class="itw exp-itw" id="' + widgetId + '" style="margin-top:8px;"></div>';
+}
+
+// ─── Stubs for any leftover references ───
+function openTagPicker() { /* removed — inline widget */ }
+function closeTagPicker() { /* removed */ }
+function applyTagPicker() { /* removed */ }
+function renderTagPickerGrid() { /* removed */ }
+function toggleTagPickerSelection() { /* removed */ }
+function selectTagColor() { /* removed */ }
+function createAndAddTag() { /* removed */ }
+function openExpansionTagPicker() { /* removed — direct inline edit */ }
+function quickToggleCustomTag() { /* removed */ }
+function removeEntryTag() { /* removed — handled by inline widget */ }
+function removeCourtTag() { /* removed */ }
+
 
 // Navigate from DG EOW box → prakaran section → scroll to row → expand brief (NOT form)
 function navToTaggedEnquiry(type, id) {
