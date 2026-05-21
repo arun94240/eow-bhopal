@@ -8986,7 +8986,7 @@ body.role-staff header { margin-top: 30px; }
       
       <!-- DG EOW SECTION -->
       <div class="ov-section collapsed" id="dgeow-summary-wrap">
-        <div class="ov-section-header" onclick="toggleDgEowSection()">
+        <div class="ov-section-header" onclick="toggleDgEowSection(event)">
           <div class="ov-section-titles">
             <div class="sup-title-row dgeow-title-row">
               <span class="sup-mini-cal" id="dgeow-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -9023,22 +9023,22 @@ body.role-staff header { margin-top: 30px; }
             <div class="dgeow-heads-row" id="dgeow-heads-row">
               <div class="dgeow-heads-row-label">By Head:</div>
               <div class="dgeow-heads-tiles" onclick="event.stopPropagation();">
-                <div class="dgeow-head-tile" onclick="navDgEowHead('complaints')">
+                <div class="dgeow-head-tile" onclick="event.stopPropagation();navDgEowHead('complaints',event)">
                   <span class="dght-key">C</span><span class="dght-num" id="dgeow-head-complaints">0</span>
                 </div>
-                <div class="dgeow-head-tile" onclick="navDgEowHead('rcomplaints')">
+                <div class="dgeow-head-tile" onclick="event.stopPropagation();navDgEowHead('rcomplaints',event)">
                   <span class="dght-key">RC</span><span class="dght-num" id="dgeow-head-rcomplaints">0</span>
                 </div>
-                <div class="dgeow-head-tile" onclick="navDgEowHead('rcs')">
+                <div class="dgeow-head-tile" onclick="event.stopPropagation();navDgEowHead('rcs',event)">
                   <span class="dght-key">RCs</span><span class="dght-num" id="dgeow-head-rcs">0</span>
                 </div>
-                <div class="dgeow-head-tile" onclick="navDgEowHead('pes')">
+                <div class="dgeow-head-tile" onclick="event.stopPropagation();navDgEowHead('pes',event)">
                   <span class="dght-key">PE</span><span class="dght-num" id="dgeow-head-pes">0</span>
                 </div>
-                <div class="dgeow-head-tile" onclick="navDgEowHead('strs')">
+                <div class="dgeow-head-tile" onclick="event.stopPropagation();navDgEowHead('strs',event)">
                   <span class="dght-key">STR</span><span class="dght-num" id="dgeow-head-strs">0</span>
                 </div>
-                <div class="dgeow-head-tile" onclick="navDgEowHead('sutra')">
+                <div class="dgeow-head-tile" onclick="event.stopPropagation();navDgEowHead('sutra',event)">
                   <span class="dght-key">Sut</span><span class="dght-num" id="dgeow-head-sutra">0</span>
                 </div>
               </div>
@@ -9185,7 +9185,7 @@ body.role-staff header { margin-top: 30px; }
       
       <!-- MY SUPERVISION SECTION (NEW) -->
       <div class="ov-section collapsed" id="supervision-summary-wrap">
-        <div class="ov-section-header" onclick="toggleSupervisionSection()">
+        <div class="ov-section-header" onclick="toggleSupervisionSection(event)">
           <div class="ov-section-titles">
             <div class="sup-title-row">
               <span class="sup-mini-cal" id="sup-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -9270,7 +9270,7 @@ body.role-staff header { margin-top: 30px; }
       
       <!-- DAILY UPDATES FEED SECTION -->
       <div class="ov-section collapsed" id="feed-summary-wrap">
-        <div class="ov-section-header" onclick="toggleFeedSection()">
+        <div class="ov-section-header" onclick="toggleFeedSection(event)">
           <div class="ov-section-titles">
             <div class="sup-title-row">
               <span class="sup-mini-cal" id="feed-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -9362,7 +9362,7 @@ body.role-staff header { margin-top: 30px; }
       
       <!-- COURT CASES SECTION (tier-wise breakdown) -->
       <div class="ov-section collapsed" id="court-summary-wrap">
-        <div class="ov-section-header" onclick="toggleCourtSummarySection()">
+        <div class="ov-section-header" onclick="toggleCourtSummarySection(event)">
           <div class="ov-section-titles">
             <div class="sup-title-row">
               <span class="sup-mini-cal" id="court-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -9397,7 +9397,7 @@ body.role-staff header { margin-top: 30px; }
       
       <!-- NOTICE / SUMMONS / WARRANTS SECTION -->
       <div class="ov-section collapsed" id="notices-summary-wrap">
-        <div class="ov-section-header" onclick="toggleNoticesSection()">
+        <div class="ov-section-header" onclick="toggleNoticesSection(event)">
           <div class="ov-section-titles">
             <div class="sup-title-row">
               <span class="sup-mini-cal" id="notices-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -15126,7 +15126,8 @@ function toggleYearCards() {
 }
 
 // Toggle Supervision section (default: expanded — important for SP)
-function toggleSupervisionSection() {
+function toggleSupervisionSection(evt) {
+  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
   var wrap = document.getElementById('supervision-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -15707,7 +15708,16 @@ function renderAttendanceList(filterMode) {
 }
 
 // ============ DG EOW SECTION ============
-function toggleDgEowSection() {
+function toggleDgEowSection(evt) {
+  // DEFENSIVE GUARD: if click originated from counter stack or heads matrix, IGNORE
+  // (matrix/counter ka apna logic hai — box toggle se INDEPENDENT)
+  if (evt && evt.target) {
+    if (evt.target.closest('.hdr-counter-stack') ||
+        evt.target.closest('.dgeow-heads-row') ||
+        evt.target.closest('.dgeow-hdr-actions')) {
+      return; // Skip box toggle — let matrix/counter handler do its job
+    }
+  }
   var wrap = document.getElementById('dgeow-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -16551,7 +16561,8 @@ function navLeavesCounter() {
 }
 
 // ============ COURT CASES DASHBOARD SECTION ============
-function toggleCourtSummarySection() {
+function toggleCourtSummarySection(evt) {
+  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
   var wrap = document.getElementById('court-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -16705,7 +16716,8 @@ function navToCourtBriefFromBox(courtId) {
 }
 
 // ============ NOTICE / SUMMONS / WARRANTS DASHBOARD SECTION ============
-function toggleNoticesSection() {
+function toggleNoticesSection(evt) {
+  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
   var wrap = document.getElementById('notices-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -17265,7 +17277,8 @@ function toggleIOCards() {
 }
 
 // Toggle Daily Updates Feed section (default: expanded)
-function toggleFeedSection() {
+function toggleFeedSection(evt) {
+  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
   var wrap = document.getElementById('feed-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
