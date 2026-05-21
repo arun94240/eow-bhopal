@@ -15127,7 +15127,7 @@ function toggleYearCards() {
 
 // Toggle Supervision section (default: expanded — important for SP)
 function toggleSupervisionSection(evt) {
-  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
+  if (window._matrixClickActive) return;
   var wrap = document.getElementById('supervision-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -15709,19 +15709,11 @@ function renderAttendanceList(filterMode) {
 
 // ============ DG EOW SECTION ============
 function toggleDgEowSection(evt) {
-  // DEFENSIVE GUARD: if click originated from counter stack or heads matrix, IGNORE
-  // (matrix/counter ka apna logic hai — box toggle se INDEPENDENT)
-  if (evt && evt.target) {
-    if (evt.target.closest('.hdr-counter-stack') ||
-        evt.target.closest('.dgeow-heads-row') ||
-        evt.target.closest('.dgeow-hdr-actions')) {
-      return; // Skip box toggle — let matrix/counter handler do its job
-    }
-  }
+  // GUARD: matrix/counter click set this flag — skip box toggle
+  if (window._matrixClickActive) return;
   var wrap = document.getElementById('dgeow-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
-  // When opening, render the directives list with current filter
   if (!wrap.classList.contains('collapsed')) {
     if (typeof renderDgDirectivesList === 'function') renderDgDirectivesList();
   }
@@ -16562,7 +16554,7 @@ function navLeavesCounter() {
 
 // ============ COURT CASES DASHBOARD SECTION ============
 function toggleCourtSummarySection(evt) {
-  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
+  if (window._matrixClickActive) return;
   var wrap = document.getElementById('court-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -16717,7 +16709,7 @@ function navToCourtBriefFromBox(courtId) {
 
 // ============ NOTICE / SUMMONS / WARRANTS DASHBOARD SECTION ============
 function toggleNoticesSection(evt) {
-  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
+  if (window._matrixClickActive) return;
   var wrap = document.getElementById('notices-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -17278,7 +17270,7 @@ function toggleIOCards() {
 
 // Toggle Daily Updates Feed section (default: expanded)
 function toggleFeedSection(evt) {
-  if (evt && evt.target && evt.target.closest('.hdr-counter-stack')) return;
+  if (window._matrixClickActive) return;
   var wrap = document.getElementById('feed-summary-wrap');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
@@ -24587,6 +24579,33 @@ if ('serviceWorker' in navigator) {
       .catch(function(err) { console.warn('[PWA] SW registration failed:', err); });
   });
 }
+</script>
+
+<!-- ROBUST EVENT GUARD: block tile/counter clicks from triggering box header toggle -->
+<script>
+(function(){
+  // Strategy: mark window._matrixClickActive = true when matrix/counter clicked.
+  // Toggle functions check this flag and skip if set.
+  // Flag clears after a tick.
+  window._matrixClickActive = false;
+  
+  document.addEventListener('click', function(e){
+    var target = e.target;
+    if (!target || !target.closest) return;
+    
+    var matrixEl = target.closest('.dgeow-head-tile') ||
+                   target.closest('.hdr-counter') ||
+                   target.closest('.dgeow-hdr-actions') ||
+                   target.closest('.dgeow-hdr-sub-btn') ||
+                   target.closest('.dgeow-hdr-add-btn-red');
+    if (!matrixEl) return;
+    
+    // Set flag — toggle functions will see this and skip
+    window._matrixClickActive = true;
+    // Clear after current event tick
+    setTimeout(function(){ window._matrixClickActive = false; }, 0);
+  }, true); // capture phase = runs BEFORE element onclick (and bubble)
+})();
 </script>
 </body>
 </html>
