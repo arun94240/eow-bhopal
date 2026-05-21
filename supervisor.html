@@ -5029,6 +5029,78 @@ body.view-mobile .notices-matrix-tiles .notices-matrix-tile .nmt-key {
 /* End Custom Tags + Picker CSS */
 
 /* ════════════════════════════════════════════════════════════
+   EXPANSION-CARD TAGS (quick toggle chips + More button)
+   ════════════════════════════════════════════════════════════ */
+.ioc-exp-custom-tags {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
+  border: 1px solid #c9d4e3;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+.ioc-exp-custom-tags .ieq-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #062a52;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+.exp-tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  flex: 1;
+}
+.exp-tag-chip {
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.exp-tag-chip.is-off {
+  opacity: 0.55;
+  background: white;
+}
+.exp-tag-chip.is-off:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+.exp-tag-chip.is-applied {
+  opacity: 1;
+  font-weight: 800;
+  box-shadow: 0 2px 4px rgba(6,42,82,0.15);
+}
+.exp-tag-chip.is-applied:hover {
+  transform: translateY(-1px);
+}
+.exp-tag-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: white;
+  border: 1.5px dashed #94a3b8;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.exp-tag-more-btn:hover {
+  border-color: #062a52;
+  color: #062a52;
+  background: #f0f7ff;
+}
+/* End expansion tag chips */
+
+/* ════════════════════════════════════════════════════════════
    COURT BOX — Inline list rendering (drill-down without tab jump)
    ════════════════════════════════════════════════════════════ */
 .court-box-list-header {
@@ -10757,14 +10829,8 @@ body.role-staff header { margin-top: 30px; }
       <div id="ef-io-history" class="ef-io-history"></div>
     </div>
     <div class="form-group"><label class="form-label">IO को प्रकरण मिलने का दिनांक</label><input type="date" class="form-input" id="ef-io-assigned-date"></div>
-    <div class="form-group full">
-      <label class="form-label">VIP / संवेदनशील Tag <span style="color:#7a8aa1;font-weight:500;font-size:11.5px;">(optional)</span></label>
-      <div class="vip-tags-wrap" id="ef-vip-tags-wrap">
-        <div class="vip-tags-list" id="ef-vip-tags-list">
-          <!-- Filled by JS -->
-        </div>
-        <button type="button" class="vip-add-btn" onclick="openVipAddModal()" title="नई category जोड़ें">+ Add new</button>
-      </div>
+    <div class="form-group full" style="display:none;">
+      <!-- VIP / संवेदनशील field merged into Custom Tags section below. Hidden input preserved for backwards compat (saveEntry may still reference). -->
       <input type="hidden" id="ef-vip-categories">
     </div>
     <div class="form-group"><label class="form-label">Complainant's Name</label><input type="text" class="form-input" id="ef-comp"></div>
@@ -13570,6 +13636,52 @@ function ssGetUniqueValues(type) {
   };
 }
 
+// Build a tag-suggestion group for ssOnInput dropdown
+// q = current query lowercased; type = head (complaints/court/etc) — used for filter target
+function ssBuildTagGroup(type, q) {
+  var allTags = state.tags || [];
+  if (!allTags.length) return '';
+  
+  // Filter tags by query (match on name) — if no query, show top system tags
+  var matched;
+  if (q && q.length > 0) {
+    matched = allTags.filter(function(t){ return t.name.toLowerCase().indexOf(q) > -1; });
+  } else {
+    // No query — show system tags first
+    matched = allTags.filter(function(t){ return t.is_system; });
+  }
+  
+  matched = matched.slice(0, 8);
+  if (!matched.length) return '';
+  
+  // Count usage per tag for this head's data (informational, optional)
+  var html = '<div class="ss-group"><div class="ss-group-title">🏷️ Tags</div>';
+  matched.forEach(function(t){
+    var count = ssCountTagUsage(type, t.id);
+    var countTxt = count > 0 ? ' <span style="color:#94a3b8;font-size:11px;font-weight:600;">(' + count + ')</span>' : '';
+    html += '<div class="ss-item" onclick="ssAddChip(\'' + type + '\',\'tag\',\'' + t.id + '\',\'' + escapeHtml(t.name).replace(/'/g, "\\'") + '\')">' +
+      '<span class="ss-item-icon">🏷️</span>' +
+      '<span class="ss-item-label"><span class="tag-chip tag-chip-' + (t.color || 'gray') + '" style="margin-right:6px;font-size:10px;padding:1px 7px;">' + escapeHtml(t.name) + '</span>' + countTxt + '</span>' +
+    '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// Count how many rows in this head's listing have given tag
+function ssCountTagUsage(type, tagId) {
+  if (type === 'court') {
+    return (state.courts || []).filter(function(c){
+      return Array.isArray(c.tag_ids) && c.tag_ids.indexOf(tagId) >= 0;
+    }).length;
+  } else if (state.enquiries && state.enquiries[type]) {
+    return state.enquiries[type].filter(function(r){
+      return Array.isArray(r.tag_ids) && r.tag_ids.indexOf(tagId) >= 0;
+    }).length;
+  }
+  return 0;
+}
+
 function ssOnInput(type) {
   var inp = document.getElementById('ss-' + type + '-input');
   var box = document.getElementById('ss-' + type + '-suggestions');
@@ -13608,6 +13720,8 @@ function ssOnInput(type) {
     html += group('Petitioner', pet, 'petitioner', '🧑');
     html += group('Respondent', resp, 'respondent', '🧑‍⚖️');
     html += group('I/C Officer', ic, 'ic', '👤');
+    // Tag suggestions
+    html += ssBuildTagGroup(type, q);
     anyMatches = typeNo.length || cnr.length || pet.length || resp.length || ic.length;
   } else if (type === 'leaves') {
     var off = match(data.officer, 8);
@@ -13627,6 +13741,8 @@ function ssOnInput(type) {
     html += group('IO', ioMatches, 'io', '👤');
     html += group('Complainant', compMatches, 'complainant', '🧑');
     html += group('Non-Complainant', nonMatches, 'nonComplainant', '🧑‍⚖️');
+    // Tag suggestions
+    html += ssBuildTagGroup(type, q);
     anyMatches = noMatches.length || ioMatches.length || compMatches.length || nonMatches.length;
   }
 
@@ -13653,16 +13769,21 @@ function ssOutsideClick(e) {
   document.removeEventListener('click', ssOutsideClick);
 }
 
-function ssAddChip(type, kind, value) {
+function ssAddChip(type, kind, value, displayName) {
   if (!ssFilters[type]) ssFilters[type] = [];
   var exists = ssFilters[type].some(function(f){ return f.kind === kind && f.value === value; });
   if (!exists) {
     var labels = {
       no: 'Case No', io: 'IO', complainant: 'Complainant', nonComplainant: 'Non-Complainant', text: 'Text',
       typeNo: 'Type/No', cnr: 'CNR', petitioner: 'Petitioner', respondent: 'Respondent', ic: 'I/C Officer',
-      officer: 'Officer', leaveType: 'Type', cause: 'Cause'
+      officer: 'Officer', leaveType: 'Type', cause: 'Cause', tag: 'Tag'
     };
-    ssFilters[type].push({ kind: kind, value: value, label: labels[kind] || kind });
+    var chip = { kind: kind, value: value, label: labels[kind] || kind };
+    // For tag chips, store display name separately (since value is UUID)
+    if (kind === 'tag' && displayName) {
+      chip.displayName = displayName;
+    }
+    ssFilters[type].push(chip);
   }
   var inp = document.getElementById('ss-' + type + '-input');
   var box = document.getElementById('ss-' + type + '-suggestions');
@@ -13695,13 +13816,23 @@ function ssRenderChips(type) {
   var icons = {
     no: '🆔', io: '👤', complainant: '🧑', nonComplainant: '🧑‍⚖️', text: '🔍',
     typeNo: '🆔', cnr: '#️⃣', petitioner: '🧑', respondent: '🧑‍⚖️', ic: '👤',
-    officer: '👤', leaveType: '🏷', cause: '📝'
+    officer: '👤', leaveType: '🏷', cause: '📝', tag: '🏷️'
   };
   el.innerHTML = ssFilters[type].map(function(f, i){
     var icon = icons[f.kind] || '•';
+    // For tag filters: show name (not UUID) + colored chip style
+    var displayValue;
+    if (f.kind === 'tag') {
+      var tag = (typeof getTagById === 'function') ? getTagById(f.value) : null;
+      var tname = (f.displayName || (tag && tag.name) || f.value);
+      var tcolor = tag ? (tag.color || 'gray') : 'gray';
+      displayValue = '<span class="tag-chip tag-chip-' + tcolor + '" style="font-size:10px;padding:1px 7px;margin-right:2px;">' + escapeHtml(tname) + '</span>';
+    } else {
+      displayValue = escapeHtml(f.value);
+    }
     return '<span class="smart-chip">' +
       '<span class="smart-chip-icon">' + icon + '</span>' +
-      escapeHtml(f.value) +
+      displayValue +
       '<button type="button" class="smart-chip-remove" onclick="ssRemoveChip(\'' + type + '\',' + i + ')" title="Remove filter">×</button>' +
     '</span>';
   }).join('');
@@ -13727,6 +13858,10 @@ function ssMatchesRow(type, r) {
       var ncompList = ncompParse(r.non_complainant);
       return ncompList.indexOf(f.value) > -1;
     }
+    if (f.kind === 'tag') {
+      var tagIds = Array.isArray(r.tag_ids) ? r.tag_ids : [];
+      return tagIds.indexOf(f.value) >= 0;  // f.value = tag UUID
+    }
     if (f.kind === 'text') {
       var hay = [noLabel, r.io_name, r.complainant, r.non_complainant, r.brief, rowYear].filter(Boolean).join(' ').toLowerCase();
       return hay.indexOf(f.value.toLowerCase()) > -1;
@@ -13746,6 +13881,10 @@ function ssMatchesCourt(c) {
     if (f.kind === 'petitioner') return c.petitioner === f.value;
     if (f.kind === 'respondent') return c.respondent === f.value;
     if (f.kind === 'ic') return c.incharge_officer === f.value;
+    if (f.kind === 'tag') {
+      var tagIds = Array.isArray(c.tag_ids) ? c.tag_ids : [];
+      return tagIds.indexOf(f.value) >= 0;
+    }
     if (f.kind === 'text') {
       var hay = [typeNo, c.cnr_no, c.petitioner, c.respondent, c.incharge_officer, c.apraadh_kramank].filter(Boolean).join(' ').toLowerCase();
       return hay.indexOf(f.value.toLowerCase()) > -1;
@@ -13991,6 +14130,8 @@ function buildEnquiryExpandCard(type, r) {
         '</button>' +
       '</div>' +
     '</div>' +
+    // CUSTOM TAGS — system tags as quick toggle chips + "+ More" for full picker
+    buildExpansionTagsBlock('entry', type, r) +
     '<div class="ioc-exp-actions">' +
       '<button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\'' + type + '\',\'' + r.id + '\')">✎ Open / Edit Form</button>' +
       '<button type="button" class="btn btn-sm ioc-exp-timeline-btn" onclick="event.stopPropagation();showCasePragatiTimeline(\'' + type + '\',\'' + r.id + '\')">📊 Case Timeline</button>' +
@@ -14073,6 +14214,8 @@ function buildCourtExpandCard(c) {
         '</button>' +
       '</div>' +
     '</div>' +
+    // CUSTOM TAGS — system tags as quick toggle chips + "+ More" for full picker
+    buildExpansionTagsBlock('court', null, c) +
     '<div class="ioc-exp-actions">' +
       '<button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\'' + c.id + '\')">✎ Open / Edit Form</button>' +
       '<button type="button" class="btn btn-sm ioc-exp-timeline-btn" onclick="event.stopPropagation();showCasePragatiTimeline(\'court\',\'' + c.id + '\')">📊 Case Timeline</button>' +
@@ -22236,6 +22379,129 @@ async function quickToggleTagCourt(id, which) {
   }
 }
 
+// ─── Expansion-card Tags block (system chips quick toggle + "+ More" full picker) ───
+// caller passes ('entry', type, rec) for enquiries or ('court', null, c) for courts
+function buildExpansionTagsBlock(kind, type, rec) {
+  if (!rec) return '';
+  var currentIds = Array.isArray(rec.tag_ids) ? rec.tag_ids : [];
+  var systemTags = (state.tags || []).filter(function(t){ return t.is_system; });
+  // Sort: applied first, then alphabetical
+  systemTags.sort(function(a, b){
+    var aOn = currentIds.indexOf(a.id) >= 0 ? 0 : 1;
+    var bOn = currentIds.indexOf(b.id) >= 0 ? 0 : 1;
+    if (aOn !== bOn) return aOn - bOn;
+    return a.name.localeCompare(b.name);
+  });
+  
+  // ALSO show any custom (non-system) tags that are CURRENTLY applied (so user sees them inline)
+  var customTagsApplied = (state.tags || []).filter(function(t){ 
+    return !t.is_system && currentIds.indexOf(t.id) >= 0; 
+  });
+  
+  var allChipTags = systemTags.concat(customTagsApplied);
+  
+  var typeArg = type ? "'" + type + "'" : 'null';
+  var idArg = "'" + rec.id + "'";
+  
+  var chipsHTML = allChipTags.map(function(t){
+    var on = currentIds.indexOf(t.id) >= 0;
+    return '<button type="button" class="exp-tag-chip tag-chip tag-chip-' + (t.color || 'gray') + (on ? ' is-applied' : ' is-off') + '" ' +
+      'onclick="event.stopPropagation();quickToggleCustomTag(\'' + kind + '\',' + typeArg + ',' + idArg + ',\'' + t.id + '\')" ' +
+      'title="' + escapeHtml(t.name) + (on ? ' (applied — tap to remove)' : ' (tap to apply)') + '">' +
+      (on ? '✓ ' : '') + escapeHtml(t.name) +
+    '</button>';
+  }).join('');
+  
+  return '<div class="ioc-exp-custom-tags">' +
+    '<div class="ieq-label">🏷️ Tags:</div>' +
+    '<div class="exp-tag-chips">' +
+      chipsHTML +
+      '<button type="button" class="exp-tag-more-btn" onclick="event.stopPropagation();openExpansionTagPicker(\'' + kind + '\',' + typeArg + ',' + idArg + ')" title="More tags / create new">' +
+        '<span style="font-size:14px;font-weight:900;">+</span> More' +
+      '</button>' +
+    '</div>' +
+  '</div>';
+}
+
+// Quick toggle a custom/system tag from expansion card (no form open)
+async function quickToggleCustomTag(kind, type, id, tagId) {
+  var rec;
+  if (kind === 'entry') {
+    rec = (state.enquiries[type] || []).find(function(x){ return x.id === id; });
+  } else {
+    rec = state.courts.find(function(x){ return x.id === id; });
+  }
+  if (!rec) return;
+  
+  var currentIds = Array.isArray(rec.tag_ids) ? rec.tag_ids.slice() : [];
+  var idx = currentIds.indexOf(tagId);
+  var added;
+  if (idx >= 0) {
+    currentIds.splice(idx, 1);
+    added = false;
+  } else {
+    currentIds.push(tagId);
+    added = true;
+  }
+  
+  // Update DB
+  try {
+    var table = kind === 'entry' ? 'enquiries' : 'court_cases';
+    var resp = await supa.from(table).update({ 
+      tag_ids: currentIds,
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+    if (resp.error) throw resp.error;
+    
+    rec.tag_ids = currentIds;
+    
+    // Re-render expansion card
+    if (kind === 'entry') {
+      var card = document.getElementById('enq-exp-' + id);
+      if (card) card.querySelector('td').innerHTML = buildEnquiryExpandCard(type, rec);
+    } else {
+      var card = document.getElementById('crt-exp-' + id);
+      if (card) card.querySelector('td').innerHTML = buildCourtExpandCard(rec);
+    }
+    
+    var tag = getTagById(tagId);
+    var tname = tag ? tag.name : 'Tag';
+    toast(added ? ('🏷️ ' + tname + ' applied ✓') : ('🏷️ ' + tname + ' removed'));
+  } catch(e) {
+    console.error('Custom tag toggle failed:', e);
+    toast('Tag update failed: ' + (e.message || e), true);
+  }
+}
+
+// Open full tag picker from expansion card
+function openExpansionTagPicker(kind, type, id) {
+  var rec;
+  if (kind === 'entry') {
+    rec = (state.enquiries[type] || []).find(function(x){ return x.id === id; });
+  } else {
+    rec = state.courts.find(function(x){ return x.id === id; });
+  }
+  if (!rec) return;
+  
+  window._tagPickerCtx = {
+    type: 'expansion',
+    expKind: kind,
+    expType: type,
+    expId: id,
+    selectedTagIds: Array.isArray(rec.tag_ids) ? rec.tag_ids.slice() : [],
+    newColor: 'gray'
+  };
+  
+  document.getElementById('tp-new-name').value = '';
+  document.getElementById('tp-error').style.display = 'none';
+  document.querySelectorAll('.tp-color-swatch').forEach(function(s){ s.classList.remove('is-selected'); });
+  var graySwatch = document.querySelector('.tp-color-swatch[data-color="gray"]');
+  if (graySwatch) graySwatch.classList.add('is-selected');
+  
+  renderTagPickerGrid();
+  document.getElementById('tagPickerModal').classList.add('active');
+}
+
 function renderSupTagBadges(r) {
   if (!r) return '';
   var html = '';
@@ -22404,16 +22670,55 @@ async function createAndAddTag() {
   }
 }
 
-function applyTagPicker() {
+async function applyTagPicker() {
   var ctx = window._tagPickerCtx;
   if (!ctx.type) return;
   
   var selectedIds = ctx.selectedTagIds.slice();
+  
+  // EXPANSION MODE — apply directly to record (DB + state + re-render)
+  if (ctx.type === 'expansion') {
+    var rec;
+    if (ctx.expKind === 'entry') {
+      rec = (state.enquiries[ctx.expType] || []).find(function(x){ return x.id === ctx.expId; });
+    } else {
+      rec = state.courts.find(function(x){ return x.id === ctx.expId; });
+    }
+    if (!rec) { closeTagPicker(); return; }
+    
+    try {
+      var table = ctx.expKind === 'entry' ? 'enquiries' : 'court_cases';
+      var resp = await supa.from(table).update({ 
+        tag_ids: selectedIds,
+        updated_at: new Date().toISOString()
+      }).eq('id', ctx.expId);
+      if (resp.error) throw resp.error;
+      
+      rec.tag_ids = selectedIds;
+      
+      // Re-render expansion card
+      if (ctx.expKind === 'entry') {
+        var card = document.getElementById('enq-exp-' + ctx.expId);
+        if (card) card.querySelector('td').innerHTML = buildEnquiryExpandCard(ctx.expType, rec);
+      } else {
+        var card = document.getElementById('crt-exp-' + ctx.expId);
+        if (card) card.querySelector('td').innerHTML = buildCourtExpandCard(rec);
+      }
+      
+      toast('🏷️ Tags updated ✓');
+    } catch(e) {
+      console.error('Tag apply failed:', e);
+      toast('Tag update failed: ' + (e.message || e), true);
+    }
+    closeTagPicker();
+    return;
+  }
+  
+  // FORM MODE — just stage on display element (saved when form is submitted)
   var displayId = ctx.type === 'entry' ? 'ef-tags-display' : 'cf-tags-display';
   var displayEl = document.getElementById(displayId);
-  if (!displayEl) return;
+  if (!displayEl) { closeTagPicker(); return; }
   
-  // Store on the element + render chips
   displayEl._tagIds = selectedIds;
   var removeCallback = ctx.type === 'entry' ? 'removeEntryTag' : 'removeCourtTag';
   displayEl.innerHTML = renderTagChipsFromIds(selectedIds, true, removeCallback);
