@@ -16468,7 +16468,36 @@ function navSupervisionCounter(category) {
   if (!wrap) return;
   // Expand if collapsed
   wrap.classList.remove('collapsed');
-  // Scroll to the relevant group after a brief delay (let expand animate)
+  
+  // Find clicked counter
+  var counterIdMap = {
+    'total': 'sup-cnt-total',
+    'aaj': 'sup-cnt-aaj',
+    'overdue': 'sup-cnt-overdue'
+  };
+  var counterId = counterIdMap[category];
+  var clicked = counterId ? document.getElementById(counterId) : null;
+  var counter = clicked ? clicked.closest('.hdr-counter') : null;
+  var wasActive = counter && counter.classList.contains('is-active');
+  
+  // Clear all active states first
+  var counterStack = document.getElementById('supervision-counter-stack');
+  if (counterStack) {
+    counterStack.querySelectorAll('.hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
+  }
+  
+  if (wasActive) {
+    // Same counter re-tapped → CLEAR filter (scroll to top of content)
+    setTimeout(function(){
+      var el = document.getElementById('supervision-content');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+    return;
+  }
+  
+  if (counter) counter.classList.add('is-active');
+  
+  // Scroll to the relevant group
   setTimeout(function(){
     var targetSelector;
     if (category === 'overdue') targetSelector = '.sup-group-overdue';
