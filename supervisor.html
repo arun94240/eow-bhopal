@@ -4807,6 +4807,228 @@ body.view-mobile .notices-matrix-tiles .notices-matrix-tile .nmt-key {
 /* End Notices Matrices CSS */
 
 /* ════════════════════════════════════════════════════════════
+   CUSTOM TAGS — entry/court form section + picker modal
+   ════════════════════════════════════════════════════════════ */
+
+.custom-tags-section {
+  border: 2px dashed #c9d4e3;
+  border-radius: 10px;
+  padding: 14px;
+  background: #f8fbff;
+  margin-top: 10px;
+}
+.ct-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.ct-icon { font-size: 18px; }
+.ct-title { font-size: 14px; font-weight: 800; color: #062a52; }
+.ct-hint { font-size: 11px; color: #64748b; font-style: italic; }
+.ct-tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 0;
+}
+.ct-tags-display:empty::before {
+  content: 'कोई tag नहीं — neeche "Tag जोड़ें" बटन से जोड़ें';
+  font-size: 11.5px;
+  font-style: italic;
+  color: #94a3b8;
+}
+.ct-actions {
+  margin-top: 8px;
+}
+.ct-pick-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1.5px dashed #62748b;
+  border-radius: 8px;
+  background: white;
+  color: #062a52;
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.ct-pick-btn:hover {
+  border-color: #062a52;
+  background: #f0f7ff;
+  transform: translateY(-1px);
+}
+.ct-pick-icon {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* TAG CHIPS (used in form display + listing badges) */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  border: 1.5px solid;
+  letter-spacing: 0.2px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.tag-chip-remove {
+  background: rgba(255,255,255,0.6);
+  border: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  margin-left: 3px;
+  line-height: 1;
+}
+.tag-chip-remove:hover {
+  background: rgba(0,0,0,0.15);
+}
+
+/* COLOR VARIANTS (8 colors) */
+.tag-chip-red    { background: #fee2e2; color: #7f1d1d; border-color: #ef4444; }
+.tag-chip-gold   { background: #fff8e8; color: #7a4509; border-color: #d99c1d; }
+.tag-chip-blue   { background: #dbeafe; color: #1e40af; border-color: #3b82f6; }
+.tag-chip-green  { background: #dcfce7; color: #14532d; border-color: #22c55e; }
+.tag-chip-purple { background: #f3e8ff; color: #581c87; border-color: #a855f7; }
+.tag-chip-orange { background: #ffedd5; color: #7c2d12; border-color: #f97316; }
+.tag-chip-pink   { background: #fce7f3; color: #831843; border-color: #ec4899; }
+.tag-chip-gray   { background: #f1f5f9; color: #334155; border-color: #94a3b8; }
+
+/* TAG PICKER MODAL */
+.tp-section {
+  margin-bottom: 18px;
+}
+.tp-section-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #062a52;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+.tp-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 4px;
+  background: #f8fafc;
+  border-radius: 8px;
+  min-height: 50px;
+}
+.tp-tag-option {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: all 0.15s;
+  opacity: 0.85;
+}
+.tp-tag-option:hover {
+  transform: translateY(-1px);
+  opacity: 1;
+}
+.tp-tag-option.is-selected {
+  outline: 2px solid #062a52;
+  outline-offset: 2px;
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.tp-section-create {
+  background: #fffbf0;
+  border: 1px solid #f5b942;
+  border-radius: 10px;
+  padding: 14px;
+}
+.tp-create-row {
+  margin-bottom: 12px;
+}
+.tp-name-input {
+  width: 100%;
+  font-weight: 700;
+}
+.tp-color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.tp-color-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+.tp-color-palette {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tp-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+.tp-color-swatch:hover {
+  transform: scale(1.1);
+}
+.tp-color-swatch.is-selected {
+  border-color: #062a52;
+  box-shadow: 0 2px 8px rgba(6,42,82,0.3);
+  transform: scale(1.15);
+}
+.tp-color-red    { background: #ef4444; }
+.tp-color-gold   { background: #d99c1d; }
+.tp-color-blue   { background: #3b82f6; }
+.tp-color-green  { background: #22c55e; }
+.tp-color-purple { background: #a855f7; }
+.tp-color-orange { background: #f97316; }
+.tp-color-pink   { background: #ec4899; }
+.tp-color-gray   { background: #94a3b8; }
+
+.tp-create-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.tp-error {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #7f1d1d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* End Custom Tags + Picker CSS */
+
+/* ════════════════════════════════════════════════════════════
    COURT BOX — Inline list rendering (drill-down without tab jump)
    ════════════════════════════════════════════════════════════ */
 .court-box-list-header {
@@ -10451,6 +10673,54 @@ body.role-staff header { margin-top: 30px; }
 </div>
 
 <!-- ============ MODALS ============ -->
+<!-- ============ TAG PICKER MODAL ============ -->
+<div class="modal-overlay" id="tagPickerModal">
+  <div class="modal" style="max-width:540px;">
+    <div class="modal-header" style="background:linear-gradient(135deg, #062a52 0%, #093358 100%);">
+      <div class="modal-title" style="color:white;">🏷️ Tags Manage</div>
+      <button class="close-btn" onclick="closeTagPicker()" style="color:white;">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Existing tags grid (pre-defined + custom) -->
+      <div class="tp-section">
+        <div class="tp-section-title">मौजूदा Tags चुनें (एक से अधिक चुन सकते):</div>
+        <div class="tp-tags-grid" id="tp-tags-grid">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+      
+      <!-- Create new tag -->
+      <div class="tp-section tp-section-create">
+        <div class="tp-section-title">या नया Tag बनायें:</div>
+        <div class="tp-create-row">
+          <input type="text" class="form-input tp-name-input" id="tp-new-name" placeholder="नया tag का नाम (e.g. 'बैतुल batch', 'जुलाई-25')" maxlength="40">
+        </div>
+        <div class="tp-color-row">
+          <span class="tp-color-label">Color चुनें:</span>
+          <div class="tp-color-palette" id="tp-color-palette">
+            <button type="button" class="tp-color-swatch tp-color-red" data-color="red" onclick="selectTagColor('red')" title="Red"></button>
+            <button type="button" class="tp-color-swatch tp-color-gold" data-color="gold" onclick="selectTagColor('gold')" title="Gold"></button>
+            <button type="button" class="tp-color-swatch tp-color-blue" data-color="blue" onclick="selectTagColor('blue')" title="Blue"></button>
+            <button type="button" class="tp-color-swatch tp-color-green" data-color="green" onclick="selectTagColor('green')" title="Green"></button>
+            <button type="button" class="tp-color-swatch tp-color-purple" data-color="purple" onclick="selectTagColor('purple')" title="Purple"></button>
+            <button type="button" class="tp-color-swatch tp-color-orange" data-color="orange" onclick="selectTagColor('orange')" title="Orange"></button>
+            <button type="button" class="tp-color-swatch tp-color-pink" data-color="pink" onclick="selectTagColor('pink')" title="Pink"></button>
+            <button type="button" class="tp-color-swatch tp-color-gray" data-color="gray" onclick="selectTagColor('gray')" title="Gray"></button>
+          </div>
+        </div>
+        <div class="tp-create-actions">
+          <button type="button" class="btn btn-primary" onclick="createAndAddTag()">+ बनायें और जोड़ें</button>
+        </div>
+        <div class="tp-error" id="tp-error" style="display:none;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn" onclick="closeTagPicker()">Close</button>
+      <button type="button" class="btn btn-primary" onclick="applyTagPicker()">✓ Apply</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="entryModal"><div class="modal">
   <div class="modal-header">
     <div><div class="modal-eyebrow" id="entry-eyebrow">New Entry</div><div class="modal-title" id="entry-title">—</div></div>
@@ -10538,6 +10808,25 @@ body.role-staff header { margin-top: 30px; }
       </div>
     </div>
     <!-- ============ END SUPERVISION TAGS ============ -->
+    
+    <!-- ============ CUSTOM TAGS ============ -->
+    <div class="form-group full custom-tags-section">
+      <div class="ct-heading">
+        <span class="ct-icon">🏷️</span>
+        <span class="ct-title">Tags</span>
+        <span class="ct-hint">— prakaran ko categorize karें (URGENT, VIP, etc.)</span>
+      </div>
+      <div class="ct-tags-display" id="ef-tags-display">
+        <!-- Selected tag chips render here -->
+      </div>
+      <div class="ct-actions">
+        <button type="button" class="ct-pick-btn" onclick="openTagPicker('entry')">
+          <span class="ct-pick-icon">+</span>
+          <span>Tag जोड़ें / Add Tag</span>
+        </button>
+      </div>
+    </div>
+    <!-- ============ END CUSTOM TAGS ============ -->
     
     <!-- ============ जाँच विश्लेषण SECTION (Detailed Analysis) ============ -->
     <div class="form-group full vishleshhan-section">
@@ -10823,6 +11112,25 @@ body.role-staff header { margin-top: 30px; }
       </div>
     </div>
     <!-- ============ END SUPERVISION TAGS ============ -->
+    
+    <!-- ============ CUSTOM TAGS (court) ============ -->
+    <div class="form-group full custom-tags-section">
+      <div class="ct-heading">
+        <span class="ct-icon">🏷️</span>
+        <span class="ct-title">Tags</span>
+        <span class="ct-hint">— case ko categorize karें</span>
+      </div>
+      <div class="ct-tags-display" id="cf-tags-display">
+        <!-- Selected tag chips render here -->
+      </div>
+      <div class="ct-actions">
+        <button type="button" class="ct-pick-btn" onclick="openTagPicker('court')">
+          <span class="ct-pick-icon">+</span>
+          <span>Tag जोड़ें / Add Tag</span>
+        </button>
+      </div>
+    </div>
+    <!-- ============ END CUSTOM TAGS ============ -->
 
     <!-- ===== ATTACHMENTS ===== -->
     <div class="form-group full">
@@ -12108,7 +12416,7 @@ function isAdmin() { return currentUser && currentUser.role === 'admin'; }
 var state = {
   enquiries: { complaints: [], rcomplaints: [], rcs: [], pes: [], strs: [], sutra: [] },
   courts: [], leaves: [], pendingApprovals: [], rejectedLeaves: [], cancelledLeaves: [], allLeaveApps: [],
-  ioMaster: [], ioUpdates: [], directives: [], courtsMaster: [], vipMaster: [], notices: [], dgDirectives: [], attendance: [], ioTransferHistory: []
+  ioMaster: [], ioUpdates: [], directives: [], courtsMaster: [], vipMaster: [], notices: [], dgDirectives: [], attendance: [], ioTransferHistory: [], tags: []
 };
 var editing = { type: null, id: null };
 var editingCourt = null, editingLeave = null, editingIO = null;
@@ -14870,6 +15178,12 @@ async function loadAllFromCloud() {
       var dgRes = await supa.from('dg_directives').select('*').order('created_at', { ascending: false });
       state.dgDirectives = (dgRes && !dgRes.error) ? (dgRes.data || []) : [];
     } catch(e) { state.dgDirectives = []; }
+    
+    // Tags - safe load (run migration-tags-system.sql)
+    try {
+      var tagsRes = await supa.from('tags').select('*').order('is_system', { ascending: false }).order('name');
+      state.tags = (tagsRes && !tagsRes.error) ? (tagsRes.data || []) : [];
+    } catch(e) { state.tags = []; }
     
     // Attendance - safe load (run migration-attendance.sql)
     try {
@@ -19223,6 +19537,8 @@ function openEntryModal(type, id) {
   document.getElementById('ef-enquiry-direction').value = entry.enquiry_direction || '';
   // Load supervision tags
   if (typeof loadEntryTagsFromRecord === 'function') loadEntryTagsFromRecord(entry);
+  // Load custom tags
+  if (typeof loadEntryCustomTags === 'function') loadEntryCustomTags(entry);
   pendingFiles = (entry.attachments || []).slice();
   pendingLinks = (entry.links || []).slice();
   renderAttachList('ef-attach-list', pendingFiles);
@@ -19471,7 +19787,9 @@ async function saveEntry() {
     // SUPERVISION TAGS
     is_dg_eow_task: !!document.getElementById('ef-tag-dg').checked,
     is_sp_imp: !!document.getElementById('ef-tag-sp').checked,
-    sp_dg_note: document.getElementById('ef-tag-note').value || null
+    sp_dg_note: document.getElementById('ef-tag-note').value || null,
+    // CUSTOM TAGS (jsonb array of tag UUIDs)
+    tag_ids: (typeof getEntryCurrentTagIds === 'function') ? getEntryCurrentTagIds() : []
   };
   
   // ===== BUG FIX: resolve io_id from io_name (was never set → orphan FK) =====
@@ -19946,6 +20264,8 @@ function openCourtModal(id) {
   document.getElementById('cf-notes').value = c.notes || '';
   // Load supervision tags
   if (typeof loadCourtTagsFromRecord === 'function') loadCourtTagsFromRecord(c);
+  // Load custom tags
+  if (typeof loadCourtCustomTags === 'function') loadCourtCustomTags(c);
   
   // Related enquiry — auto-detect linked vs manual mode
   document.getElementById('cf-link-type').value = c.related_to_type || '';
@@ -20519,6 +20839,8 @@ async function saveCourt() {
     is_dg_eow_task: !!document.getElementById('cf-tag-dg').checked,
     is_sp_imp: !!document.getElementById('cf-tag-sp').checked,
     sp_dg_note: document.getElementById('cf-tag-note').value || null,
+    // CUSTOM TAGS (jsonb array of tag UUIDs)
+    tag_ids: (typeof getCourtCurrentTagIds === 'function') ? getCourtCurrentTagIds() : [],
     updated_at: new Date().toISOString()
   };
   // Store SP EOW special flag in notes prefix or separate field if needed
@@ -21924,7 +22246,239 @@ function renderSupTagBadges(r) {
     // Only show SP badge if NOT DG (DG implies SP, no duplication)
     html += '<span class="sup-tag-badge sup-tag-badge-sp" title="SP IMP' + (r.sp_dg_note ? ': '+r.sp_dg_note.replace(/"/g,'&quot;').slice(0,80) : '') + '">★ IMP</span>';
   }
+  // ALSO show custom tag chips
+  if (typeof renderTagChipsFromIds === 'function') {
+    html += renderTagChipsFromIds(r.tag_ids, false);
+  }
   return html;
+}
+
+// ============ CUSTOM TAGS SYSTEM ============
+// Module-level state for tag picker
+window._tagPickerCtx = { type: null, selectedTagIds: [], newColor: 'gray' };
+
+function getTagById(id) {
+  return (state.tags || []).find(function(t){ return t.id === id; });
+}
+
+function renderTagChipsFromIds(tagIds, withRemove, removeCallback) {
+  if (!tagIds || !tagIds.length) return '';
+  return tagIds.map(function(id){
+    var tag = getTagById(id);
+    if (!tag) return '';
+    var removeBtn = '';
+    if (withRemove && removeCallback) {
+      removeBtn = '<button type="button" class="tag-chip-remove" onclick="event.stopPropagation();' + removeCallback + '(\'' + id + '\')" title="Remove tag">×</button>';
+    }
+    return '<span class="tag-chip tag-chip-' + (tag.color || 'gray') + '" title="' + escapeHtml(tag.name) + '">' + escapeHtml(tag.name) + removeBtn + '</span>';
+  }).join('');
+}
+
+// Open tag picker modal
+function openTagPicker(type) {
+  // type: 'entry' or 'court'
+  window._tagPickerCtx.type = type;
+  
+  // Get current tag_ids from form
+  var currentTagIds = [];
+  if (type === 'entry') {
+    var displayEl = document.getElementById('ef-tags-display');
+    if (displayEl && displayEl._tagIds) {
+      currentTagIds = displayEl._tagIds.slice();
+    }
+  } else if (type === 'court') {
+    var displayEl = document.getElementById('cf-tags-display');
+    if (displayEl && displayEl._tagIds) {
+      currentTagIds = displayEl._tagIds.slice();
+    }
+  }
+  window._tagPickerCtx.selectedTagIds = currentTagIds;
+  
+  // Reset new tag form
+  document.getElementById('tp-new-name').value = '';
+  document.getElementById('tp-error').style.display = 'none';
+  window._tagPickerCtx.newColor = 'gray';
+  document.querySelectorAll('.tp-color-swatch').forEach(function(s){ s.classList.remove('is-selected'); });
+  var graySwatch = document.querySelector('.tp-color-swatch[data-color="gray"]');
+  if (graySwatch) graySwatch.classList.add('is-selected');
+  
+  // Render existing tags
+  renderTagPickerGrid();
+  
+  document.getElementById('tagPickerModal').classList.add('active');
+}
+
+function closeTagPicker() {
+  document.getElementById('tagPickerModal').classList.remove('active');
+}
+
+function renderTagPickerGrid() {
+  var grid = document.getElementById('tp-tags-grid');
+  if (!grid) return;
+  var tags = state.tags || [];
+  if (!tags.length) {
+    grid.innerHTML = '<div style="padding:12px;font-size:12px;color:#94a3b8;font-style:italic;">— कोई tag नहीं — neeche se naya बनायें —</div>';
+    return;
+  }
+  var selectedIds = window._tagPickerCtx.selectedTagIds || [];
+  grid.innerHTML = tags.map(function(t){
+    var isSel = selectedIds.indexOf(t.id) >= 0;
+    return '<span class="tag-chip tag-chip-' + (t.color || 'gray') + ' tp-tag-option' + (isSel ? ' is-selected' : '') + '" onclick="toggleTagPickerSelection(\'' + t.id + '\')">' +
+      escapeHtml(t.name) +
+      (t.is_system ? ' ⭐' : '') +
+    '</span>';
+  }).join('');
+}
+
+function toggleTagPickerSelection(tagId) {
+  var sel = window._tagPickerCtx.selectedTagIds;
+  var idx = sel.indexOf(tagId);
+  if (idx >= 0) sel.splice(idx, 1);
+  else sel.push(tagId);
+  renderTagPickerGrid();
+}
+
+function selectTagColor(color) {
+  window._tagPickerCtx.newColor = color;
+  document.querySelectorAll('.tp-color-swatch').forEach(function(s){ s.classList.remove('is-selected'); });
+  var sw = document.querySelector('.tp-color-swatch[data-color="' + color + '"]');
+  if (sw) sw.classList.add('is-selected');
+}
+
+async function createAndAddTag() {
+  var nameInput = document.getElementById('tp-new-name');
+  var name = nameInput.value.trim();
+  var errEl = document.getElementById('tp-error');
+  errEl.style.display = 'none';
+  
+  if (!name) {
+    errEl.textContent = '⚠ Tag का नाम ज़रूरी है';
+    errEl.style.display = '';
+    return;
+  }
+  if (name.length > 40) {
+    errEl.textContent = '⚠ Tag का नाम 40 अक्षरों से कम होना चाहिए';
+    errEl.style.display = '';
+    return;
+  }
+  
+  // Duplicate check (case-insensitive)
+  var nameLower = name.toLowerCase();
+  var existing = (state.tags || []).find(function(t){ return t.name.toLowerCase() === nameLower; });
+  if (existing) {
+    errEl.textContent = '⚠ यह tag पहले से मौजूद है: "' + existing.name + '"';
+    errEl.style.display = '';
+    // Auto-select existing tag instead
+    if (window._tagPickerCtx.selectedTagIds.indexOf(existing.id) < 0) {
+      window._tagPickerCtx.selectedTagIds.push(existing.id);
+      renderTagPickerGrid();
+    }
+    return;
+  }
+  
+  var color = window._tagPickerCtx.newColor || 'gray';
+  
+  // INSERT into DB
+  try {
+    var resp = await supa.from('tags').insert({
+      name: name,
+      color: color,
+      is_system: false
+    }).select().single();
+    if (resp.error) throw resp.error;
+    
+    var newTag = resp.data;
+    // Add to state
+    state.tags.push(newTag);
+    // Auto-select
+    window._tagPickerCtx.selectedTagIds.push(newTag.id);
+    // Re-render grid
+    renderTagPickerGrid();
+    // Clear input
+    nameInput.value = '';
+    toast('🏷️ Tag बनाया: ' + newTag.name);
+  } catch(e) {
+    console.error('Tag insert failed:', e);
+    errEl.textContent = 'Tag save failed: ' + (e.message || e);
+    errEl.style.display = '';
+  }
+}
+
+function applyTagPicker() {
+  var ctx = window._tagPickerCtx;
+  if (!ctx.type) return;
+  
+  var selectedIds = ctx.selectedTagIds.slice();
+  var displayId = ctx.type === 'entry' ? 'ef-tags-display' : 'cf-tags-display';
+  var displayEl = document.getElementById(displayId);
+  if (!displayEl) return;
+  
+  // Store on the element + render chips
+  displayEl._tagIds = selectedIds;
+  var removeCallback = ctx.type === 'entry' ? 'removeEntryTag' : 'removeCourtTag';
+  displayEl.innerHTML = renderTagChipsFromIds(selectedIds, true, removeCallback);
+  
+  closeTagPicker();
+}
+
+function removeEntryTag(tagId) {
+  var displayEl = document.getElementById('ef-tags-display');
+  if (!displayEl) return;
+  var ids = (displayEl._tagIds || []).filter(function(id){ return id !== tagId; });
+  displayEl._tagIds = ids;
+  displayEl.innerHTML = renderTagChipsFromIds(ids, true, 'removeEntryTag');
+}
+
+function removeCourtTag(tagId) {
+  var displayEl = document.getElementById('cf-tags-display');
+  if (!displayEl) return;
+  var ids = (displayEl._tagIds || []).filter(function(id){ return id !== tagId; });
+  displayEl._tagIds = ids;
+  displayEl.innerHTML = renderTagChipsFromIds(ids, true, 'removeCourtTag');
+}
+
+// Reset tags UI when opening blank form
+function resetEntryTagsCustomUI() {
+  var el = document.getElementById('ef-tags-display');
+  if (el) { el._tagIds = []; el.innerHTML = ''; }
+}
+function resetCourtTagsCustomUI() {
+  var el = document.getElementById('cf-tags-display');
+  if (el) { el._tagIds = []; el.innerHTML = ''; }
+}
+
+// Load existing tags into form
+function loadEntryCustomTags(entry) {
+  resetEntryTagsCustomUI();
+  if (!entry) return;
+  var ids = entry.tag_ids || [];
+  if (!Array.isArray(ids)) ids = [];
+  var el = document.getElementById('ef-tags-display');
+  if (el) {
+    el._tagIds = ids.slice();
+    el.innerHTML = renderTagChipsFromIds(ids, true, 'removeEntryTag');
+  }
+}
+function loadCourtCustomTags(c) {
+  resetCourtTagsCustomUI();
+  if (!c) return;
+  var ids = c.tag_ids || [];
+  if (!Array.isArray(ids)) ids = [];
+  var el = document.getElementById('cf-tags-display');
+  if (el) {
+    el._tagIds = ids.slice();
+    el.innerHTML = renderTagChipsFromIds(ids, true, 'removeCourtTag');
+  }
+}
+
+// Get current tag_ids from form (called by saveEntry/saveCourt)
+function getEntryCurrentTagIds() {
+  var el = document.getElementById('ef-tags-display');
+  return (el && el._tagIds) ? el._tagIds.slice() : [];
+}
+function getCourtCurrentTagIds() {
+  var el = document.getElementById('cf-tags-display');
+  return (el && el._tagIds) ? el._tagIds.slice() : [];
 }
 
 // Navigate from DG EOW box → prakaran section → scroll to row → expand brief (NOT form)
