@@ -4698,6 +4698,115 @@ body.view-mobile .dgeow-heads-row-label {
 /* End Active State CSS */
 
 /* ════════════════════════════════════════════════════════════
+   NOTICES — IO-wise + PA-wise matrices in header
+   ════════════════════════════════════════════════════════════ */
+.notices-matrix-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fffbf0 0%, #fff5d6 100%);
+  border: 1px solid #f5b942;
+  border-radius: 8px;
+}
+.notices-matrix-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #062a52;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  min-width: 90px;
+}
+.notices-matrix-tiles {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.notices-matrix-tiles .notices-matrix-tile {
+  flex: 0 0 auto;
+  min-width: 58px;
+  background: white;
+  border: 1.5px solid #f5b942;
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.notices-matrix-tiles .notices-matrix-tile:hover {
+  border-color: #d99c1d;
+  background: #fffbf0;
+  transform: translateY(-1px);
+}
+.notices-matrix-tiles .notices-matrix-tile.has-data {
+  border-color: #d99c1d;
+}
+.notices-matrix-tiles .notices-matrix-tile.is-active {
+  outline: 2px solid #062a52;
+  outline-offset: 2px;
+  background: linear-gradient(135deg, #f5b942 0%, #e8a82e 100%);
+  transform: translateY(-1px);
+}
+.notices-matrix-tiles .notices-matrix-tile .nmt-key {
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.2px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+.notices-matrix-tiles .notices-matrix-tile .nmt-num {
+  font-size: 15px;
+  font-weight: 900;
+  color: #062a52;
+  line-height: 1;
+}
+.notices-matrix-tiles .notices-matrix-tile.has-data .nmt-num,
+.notices-matrix-tiles .notices-matrix-tile.is-active .nmt-num,
+.notices-matrix-tiles .notices-matrix-tile.is-active .nmt-key {
+  color: #062a52;
+}
+.notices-matrix-empty {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 4px 8px;
+}
+
+/* Mobile adjustments */
+body.view-mobile .notices-matrix-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px 10px;
+}
+body.view-mobile .notices-matrix-label {
+  min-width: 0;
+  text-align: left;
+}
+body.view-mobile .notices-matrix-tiles {
+  gap: 4px;
+}
+body.view-mobile .notices-matrix-tiles .notices-matrix-tile {
+  min-width: 48px;
+  padding: 5px 6px;
+}
+body.view-mobile .notices-matrix-tiles .notices-matrix-tile .nmt-key {
+  max-width: 60px;
+  font-size: 9.5px;
+}
+/* End Notices Matrices CSS */
+
+/* ════════════════════════════════════════════════════════════
    COURT BOX — Inline list rendering (drill-down without tab jump)
    ════════════════════════════════════════════════════════════ */
 .court-box-list-header {
@@ -9418,6 +9527,20 @@ body.role-staff header { margin-top: 30px; }
                 <span class="hcc-icon">❌</span>
                 <span class="hcc-label">Adam-Tameel</span>
                 <span class="hcc-num" id="notices-cnt-adam">0</span>
+              </div>
+            </div>
+            <!-- IO-WISE MATRIX (issuer — kis IO ne jaari kiya) -->
+            <div class="notices-matrix-row" id="notices-io-matrix-row">
+              <div class="notices-matrix-label">By IO (जारी):</div>
+              <div class="notices-matrix-tiles" id="notices-io-matrix-tiles">
+                <!-- Filled dynamically by refreshNoticesIoMatrix() -->
+              </div>
+            </div>
+            <!-- PA-WISE MATRIX (recipient — kise tameeli hetu) -->
+            <div class="notices-matrix-row" id="notices-pa-matrix-row">
+              <div class="notices-matrix-label">By PA (तामीली):</div>
+              <div class="notices-matrix-tiles" id="notices-pa-matrix-tiles">
+                <!-- Filled dynamically by refreshNoticesPaMatrix() -->
               </div>
             </div>
           </div>
@@ -16731,6 +16854,155 @@ function refreshNoticesCounters() {
   if (pEl) pEl.textContent = pending;
   if (tEl) tEl.textContent = tameel;
   if (aEl) aEl.textContent = adam;
+  
+  // ALSO refresh IO + PA matrices
+  if (typeof refreshNoticesIoMatrix === 'function') refreshNoticesIoMatrix();
+  if (typeof refreshNoticesPaMatrix === 'function') refreshNoticesPaMatrix();
+}
+
+// IO-wise matrix (top 6 IOs by notice count)
+function refreshNoticesIoMatrix() {
+  var container = document.getElementById('notices-io-matrix-tiles');
+  if (!container) return;
+  
+  var byIo = {};
+  (state.notices || []).forEach(function(n){
+    var io = n.io_name;
+    if (!io) return;
+    // Strip rank prefix for compact display (DSP / SI / TI / etc)
+    var shortName = io.replace(/^(DSP|SI|TI|Inspector|ASP|SP|ASI|HC|Const|Constable)\s+/i, '');
+    if (!byIo[io]) byIo[io] = { fullName: io, shortName: shortName, total: 0 };
+    byIo[io].total++;
+  });
+  
+  var ioArr = Object.keys(byIo).map(function(k){ return byIo[k]; });
+  if (!ioArr.length) {
+    container.innerHTML = '<span class="notices-matrix-empty">— कोई IO entry नहीं —</span>';
+    return;
+  }
+  
+  // Sort by total desc, take top 6
+  ioArr.sort(function(a, b){ return b.total - a.total; });
+  var topIos = ioArr.slice(0, 6);
+  
+  container.innerHTML = topIos.map(function(io){
+    return '<div class="notices-matrix-tile has-data" ' +
+      'onclick="event.stopPropagation();navNoticesByIo(\'' + escapeHtml(io.fullName).replace(/'/g, "\\'") + '\',event)" ' +
+      'title="' + escapeHtml(io.fullName) + ' — ' + io.total + ' notices">' +
+      '<span class="nmt-key">' + escapeHtml(io.shortName.slice(0, 12)) + '</span>' +
+      '<span class="nmt-num">' + io.total + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// PA-wise matrix (recipients — kise tameeli hetu)
+function refreshNoticesPaMatrix() {
+  var container = document.getElementById('notices-pa-matrix-tiles');
+  if (!container) return;
+  
+  var byPa = {};
+  (state.notices || []).forEach(function(n){
+    var pa = n.assigned_to;
+    if (!pa) return;  // unassigned — skip
+    if (!byPa[pa]) byPa[pa] = { name: pa, total: 0, pending: 0 };
+    byPa[pa].total++;
+    if (n.tameel_result !== 'Tameel' && n.tameel_result !== 'Adam-Tameel') {
+      byPa[pa].pending++;
+    }
+  });
+  
+  var paArr = Object.keys(byPa).map(function(k){ return byPa[k]; });
+  if (!paArr.length) {
+    container.innerHTML = '<span class="notices-matrix-empty">— कोई assigned नहीं —</span>';
+    return;
+  }
+  
+  paArr.sort(function(a, b){ return b.total - a.total; });
+  
+  container.innerHTML = paArr.map(function(pa){
+    return '<div class="notices-matrix-tile has-data" ' +
+      'onclick="event.stopPropagation();navNoticesByPa(\'' + escapeHtml(pa.name).replace(/'/g, "\\'") + '\',event)" ' +
+      'title="' + escapeHtml(pa.name) + ' — ' + pa.total + ' assigned (' + pa.pending + ' pending)">' +
+      '<span class="nmt-key">' + escapeHtml(pa.name.slice(0, 12)) + '</span>' +
+      '<span class="nmt-num">' + pa.total + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// Navigate to filtered list by IO (issuer)
+function navNoticesByIo(ioName, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  
+  var wrap = document.getElementById('notices-summary-wrap');
+  var wasCollapsed = wrap && wrap.classList.contains('collapsed');
+  
+  // Find clicked tile
+  var allTiles = document.querySelectorAll('#notices-io-matrix-tiles .notices-matrix-tile');
+  var clickedTile = null;
+  allTiles.forEach(function(t){
+    if (t.title && t.title.indexOf(ioName) === 0) clickedTile = t;
+  });
+  var wasActive = clickedTile && clickedTile.classList.contains('is-active');
+  
+  // Clear all active states (both IO + PA matrices + counters)
+  document.querySelectorAll('#notices-io-matrix-tiles .notices-matrix-tile, #notices-pa-matrix-tiles .notices-matrix-tile').forEach(function(t){ t.classList.remove('is-active'); });
+  document.querySelectorAll('#notices-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
+  
+  if (wasCollapsed && !wasActive) {
+    if (wrap) wrap.classList.remove('collapsed');
+  }
+  
+  if (wasActive) {
+    renderNoticesTable();
+    return;
+  }
+  
+  if (clickedTile) clickedTile.classList.add('is-active');
+  renderNoticesTable(null, { type: 'io', value: ioName });
+  
+  if (wasCollapsed) {
+    setTimeout(function(){
+      var el = document.getElementById('notices-content');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 120);
+  }
+}
+
+// Navigate to filtered list by PA (recipient)
+function navNoticesByPa(paName, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  
+  var wrap = document.getElementById('notices-summary-wrap');
+  var wasCollapsed = wrap && wrap.classList.contains('collapsed');
+  
+  var allTiles = document.querySelectorAll('#notices-pa-matrix-tiles .notices-matrix-tile');
+  var clickedTile = null;
+  allTiles.forEach(function(t){
+    if (t.title && t.title.indexOf(paName) === 0) clickedTile = t;
+  });
+  var wasActive = clickedTile && clickedTile.classList.contains('is-active');
+  
+  document.querySelectorAll('#notices-io-matrix-tiles .notices-matrix-tile, #notices-pa-matrix-tiles .notices-matrix-tile').forEach(function(t){ t.classList.remove('is-active'); });
+  document.querySelectorAll('#notices-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
+  
+  if (wasCollapsed && !wasActive) {
+    if (wrap) wrap.classList.remove('collapsed');
+  }
+  
+  if (wasActive) {
+    renderNoticesTable();
+    return;
+  }
+  
+  if (clickedTile) clickedTile.classList.add('is-active');
+  renderNoticesTable(null, { staff: paName });
+  
+  if (wasCollapsed) {
+    setTimeout(function(){
+      var el = document.getElementById('notices-content');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 120);
+  }
 }
 
 function navNoticesCounter(which, evt) {
@@ -16843,9 +17115,14 @@ function renderNoticesTable(filterStatus, staffFilter) {
   else if (filterStatus === 'tameel') rows = rows.filter(function(n){ return n.tameel_result === 'Tameel'; });
   else if (filterStatus === 'adam') rows = rows.filter(function(n){ return n.tameel_result === 'Adam-Tameel'; });
   
-  // Staff-specific filter (from staff card badge click)
+  // Staff-specific filter (from staff card badge click) OR IO/PA filter (from matrices)
   var staffNote = '';
-  if (staffFilter && staffFilter.staff) {
+  if (staffFilter && staffFilter.type === 'io' && staffFilter.value) {
+    // IO-wise filter (issuer)
+    rows = rows.filter(function(n){ return n.io_name === staffFilter.value; });
+    staffNote = '<div class="notice-filter-note">📌 जारी कर्ता: <strong>' + escapeHtml(staffFilter.value) + 
+      '</strong> — ' + rows.length + ' notices · <button onclick="renderNoticesTable()" class="notice-clear-filter">सभी दिखाएं ✕</button></div>';
+  } else if (staffFilter && staffFilter.staff) {
     rows = rows.filter(function(n){ return n.assigned_to === staffFilter.staff; });
     if (staffFilter.cat === 'tameel') rows = rows.filter(function(n){ return n.tameel_result === 'Tameel'; });
     else if (staffFilter.cat === 'adam') rows = rows.filter(function(n){ return n.tameel_result === 'Adam-Tameel'; });
@@ -16853,8 +17130,8 @@ function renderNoticesTable(filterStatus, staffFilter) {
     var catLbl = staffFilter.cat === 'tameel' ? 'तामील' : 
                  (staffFilter.cat === 'adam' ? 'अदम-तामील' : 
                  (staffFilter.cat === 'lambit' ? 'लंबित' : 'सभी'));
-    staffNote = '<div class="notice-filter-note">📌 ' + escapeHtml(staffFilter.staff) + 
-      ' — ' + catLbl + ' (' + rows.length + ') · <button onclick="renderNoticesTable()" class="notice-clear-filter">सभी दिखाएं ✕</button></div>';
+    staffNote = '<div class="notice-filter-note">📌 तामीली: <strong>' + escapeHtml(staffFilter.staff) + 
+      '</strong> — ' + catLbl + ' (' + rows.length + ') · <button onclick="renderNoticesTable()" class="notice-clear-filter">सभी दिखाएं ✕</button></div>';
   }
   
   var filterLabel = filterStatus === 'pending' ? 'लंबित' : 
@@ -24597,7 +24874,8 @@ if ('serviceWorker' in navigator) {
                    target.closest('.hdr-counter') ||
                    target.closest('.dgeow-hdr-actions') ||
                    target.closest('.dgeow-hdr-sub-btn') ||
-                   target.closest('.dgeow-hdr-add-btn-red');
+                   target.closest('.dgeow-hdr-add-btn-red') ||
+                   target.closest('.notices-matrix-tile');
     if (!matrixEl) return;
     
     // Set flag — toggle functions will see this and skip
