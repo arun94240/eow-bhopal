@@ -9003,17 +9003,17 @@ body.role-staff header { margin-top: 30px; }
             </div>
             <!-- Counter stack (existing 3 tiles: Tasks/Comp/Aaj) — UNIFORM with My Supervision (yellow/amber/red) -->
             <div class="hdr-counter-stack" id="dgeow-counter-stack">
-              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navDgEow('tasks')">
+              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navDgEow('tasks',event)">
                 <span class="hcc-icon">📋</span>
                 <span class="hcc-label">Tasks/Todos</span>
                 <span class="hcc-num" id="dgeow-cnt-tasks">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navDgEow('complaints')">
+              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navDgEow('complaints',event)">
                 <span class="hcc-icon">📁</span>
                 <span class="hcc-label">Complaints/RCs</span>
                 <span class="hcc-num" id="dgeow-cnt-complaints">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navDgEow('today')">
+              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navDgEow('today',event)">
                 <span class="hcc-icon">📌</span>
                 <span class="hcc-label">Aaj</span>
                 <span class="hcc-num" id="dgeow-cnt-today">0</span>
@@ -9192,17 +9192,17 @@ body.role-staff header { margin-top: 30px; }
               <div class="ov-section-title">🎯 My Supervision</div>
             </div>
             <div class="hdr-counter-stack" id="supervision-counter-stack">
-              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navSupervisionCounter('total')">
+              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navSupervisionCounter('total',event)">
                 <span class="hcc-icon">📋</span>
                 <span class="hcc-label">Total</span>
                 <span class="hcc-num" id="sup-cnt-total">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navSupervisionCounter('aaj')">
+              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navSupervisionCounter('aaj',event)">
                 <span class="hcc-icon">⚡</span>
                 <span class="hcc-label">Aaj</span>
                 <span class="hcc-num" id="sup-cnt-aaj">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navSupervisionCounter('overdue')">
+              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navSupervisionCounter('overdue',event)">
                 <span class="hcc-icon">🔴</span>
                 <span class="hcc-label">Overdue</span>
                 <span class="hcc-num" id="sup-cnt-overdue">0</span>
@@ -9369,17 +9369,17 @@ body.role-staff header { margin-top: 30px; }
               <div class="ov-section-title">⚖️ Court Cases</div>
             </div>
             <div class="hdr-counter-stack" id="court-counter-stack">
-              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navCourtTier('supreme')">
+              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navCourtTier('supreme',event)">
                 <span class="hcc-icon">⚖️</span>
                 <span class="hcc-label">Supreme Court</span>
                 <span class="hcc-num" id="court-cnt-supreme">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navCourtTier('high')">
+              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navCourtTier('high',event)">
                 <span class="hcc-icon">🏛️</span>
                 <span class="hcc-label">High Court</span>
                 <span class="hcc-num" id="court-cnt-high">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navCourtTier('district')">
+              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navCourtTier('district',event)">
                 <span class="hcc-icon">🏢</span>
                 <span class="hcc-label">District Court</span>
                 <span class="hcc-num" id="court-cnt-district">0</span>
@@ -9404,17 +9404,17 @@ body.role-staff header { margin-top: 30px; }
               <div class="ov-section-title">📜 Notice - Summons - Warrants</div>
             </div>
             <div class="hdr-counter-stack" id="notices-counter-stack">
-              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navNoticesCounter('pending')">
+              <div class="hdr-counter hdr-counter-aaj" onclick="event.stopPropagation();navNoticesCounter('pending',event)">
                 <span class="hcc-icon">⏳</span>
                 <span class="hcc-label">Pending</span>
                 <span class="hcc-num" id="notices-cnt-pending">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navNoticesCounter('tameel')">
+              <div class="hdr-counter hdr-counter-total" onclick="event.stopPropagation();navNoticesCounter('tameel',event)">
                 <span class="hcc-icon">✅</span>
                 <span class="hcc-label">Tameel</span>
                 <span class="hcc-num" id="notices-cnt-tameel">0</span>
               </div>
-              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navNoticesCounter('adam')">
+              <div class="hdr-counter hdr-counter-overdue" onclick="event.stopPropagation();navNoticesCounter('adam',event)">
                 <span class="hcc-icon">❌</span>
                 <span class="hcc-label">Adam-Tameel</span>
                 <span class="hcc-num" id="notices-cnt-adam">0</span>
@@ -15773,35 +15773,43 @@ function refreshDgEowCounters() {
 }
 
 // Navigate to head-filtered DG EOW list
-function navDgEowHead(headKey) {
+function navDgEowHead(headKey, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  
   var wrap = document.getElementById('dgeow-summary-wrap');
-  if (wrap) wrap.classList.remove('collapsed');
+  var wasCollapsed = wrap && wrap.classList.contains('collapsed');
+  
   // Find clicked tile
   var clicked = document.querySelector('.dgeow-head-tile [id="dgeow-head-' + headKey + '"]');
   var tile = clicked ? clicked.closest('.dgeow-head-tile') : null;
   var wasActive = tile && tile.classList.contains('is-active');
   
-  // Clear all active states
+  // Clear all active states (counters AND head tiles)
   document.querySelectorAll('.dgeow-head-tile').forEach(function(t){ t.classList.remove('is-active'); });
   document.querySelectorAll('#dgeow-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
   
+  // AUTO-EXPAND only if collapsed AND applying new filter (not re-tap clear)
+  if (wasCollapsed && !wasActive) {
+    if (wrap) wrap.classList.remove('collapsed');
+  }
+  
   if (wasActive) {
-    // Same tile re-tapped → CLEAR filter (show all)
+    // Same tile re-tapped → CLEAR filter only (box state UNCHANGED)
     renderDgDirectivesList();
+    return;
+  }
+  
+  // Apply new filter
+  if (tile) tile.classList.add('is-active');
+  renderDgDirectivesList('head:' + headKey);
+  
+  // Smooth scroll only if just expanded
+  if (wasCollapsed) {
     setTimeout(function(){
       var el = document.getElementById('dgeow-list');
       if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 120);
-    return;
   }
-  
-  // Apply filter (new tile or first tap)
-  if (tile) tile.classList.add('is-active');
-  renderDgDirectivesList('head:' + headKey);
-  setTimeout(function(){
-    var el = document.getElementById('dgeow-list');
-    if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 120);
 }
 
 // Subscribe modal — reuse existing supervision subscribe pattern but for DG EOW
@@ -15844,9 +15852,11 @@ function openDgEowSubscribeModal() {
   document.body.appendChild(modal);
 }
 
-function navDgEow(which) {
+function navDgEow(which, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  
   var wrap = document.getElementById('dgeow-summary-wrap');
-  if (wrap) wrap.classList.remove('collapsed');
+  var wasCollapsed = wrap && wrap.classList.contains('collapsed');
   
   // Find clicked counter
   var counterId = which === 'tasks' ? 'dgeow-cnt-tasks' :
@@ -15856,26 +15866,30 @@ function navDgEow(which) {
   var counter = clicked ? clicked.closest('.hdr-counter') : null;
   var wasActive = counter && counter.classList.contains('is-active');
   
-  // Clear all active states (counters AND head tiles — only one filter at a time)
+  // Clear all active states (counters + head tiles — only one filter at a time)
   document.querySelectorAll('#dgeow-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
   document.querySelectorAll('.dgeow-head-tile').forEach(function(t){ t.classList.remove('is-active'); });
   
+  // AUTO-EXPAND only if collapsed AND applying new filter (not re-tap clear)
+  if (wasCollapsed && !wasActive) {
+    if (wrap) wrap.classList.remove('collapsed');
+  }
+  
   if (wasActive) {
-    // Same counter re-tapped → CLEAR filter
+    // Same counter re-tapped → CLEAR filter only (box state UNCHANGED)
     renderDgDirectivesList();
-    setTimeout(function(){
-      var el = document.getElementById('dgeow-list');
-      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 120);
     return;
   }
   
   if (counter) counter.classList.add('is-active');
   renderDgDirectivesList(which);  // 'tasks' | 'complaints' | 'today'
-  setTimeout(function(){
-    var el = document.getElementById('dgeow-list');
-    if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 120);
+  
+  if (wasCollapsed) {
+    setTimeout(function(){
+      var el = document.getElementById('dgeow-list');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 120);
+  }
 }
 
 // ============ DG DIRECTIVE FORM ============
@@ -16463,11 +16477,12 @@ function exportDgDirectiveICS(id) {
 }
 
 // Counter card click → expand section + scroll to relevant group
-function navSupervisionCounter(category) {
+function navSupervisionCounter(category, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  
   var wrap = document.getElementById('supervision-summary-wrap');
   if (!wrap) return;
-  // Expand if collapsed
-  wrap.classList.remove('collapsed');
+  var wasCollapsed = wrap.classList.contains('collapsed');
   
   // Find clicked counter
   var counterIdMap = {
@@ -16486,28 +16501,31 @@ function navSupervisionCounter(category) {
     counterStack.querySelectorAll('.hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
   }
   
+  // AUTO-EXPAND only if collapsed AND applying new filter (not re-tap clear)
+  if (wasCollapsed && !wasActive) {
+    wrap.classList.remove('collapsed');
+  }
+  
   if (wasActive) {
-    // Same counter re-tapped → CLEAR filter (scroll to top of content)
-    setTimeout(function(){
-      var el = document.getElementById('supervision-content');
-      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
+    // Same counter re-tapped → just clear visual (box state UNCHANGED)
     return;
   }
   
   if (counter) counter.classList.add('is-active');
   
-  // Scroll to the relevant group
-  setTimeout(function(){
-    var targetSelector;
-    if (category === 'overdue') targetSelector = '.sup-group-overdue';
-    else if (category === 'aaj') targetSelector = '.sup-group-today';
-    else targetSelector = '#supervision-content';  // total → top of content
-    var el = document.querySelector(targetSelector) || document.getElementById('supervision-content');
-    if (el && el.scrollIntoView) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }, 120);
+  // Scroll to the relevant group ONLY when just expanded
+  if (wasCollapsed) {
+    setTimeout(function(){
+      var targetSelector;
+      if (category === 'overdue') targetSelector = '.sup-group-overdue';
+      else if (category === 'aaj') targetSelector = '.sup-group-today';
+      else targetSelector = '#supervision-content';
+      var el = document.querySelector(targetSelector) || document.getElementById('supervision-content');
+      if (el && el.scrollIntoView) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 120);
+  }
 }
 
 // Daily Updates counter click → expand + scroll
@@ -16562,11 +16580,11 @@ function refreshCourtSummaryCounters() {
   if (dEl) dEl.textContent = counts.district;
 }
 
-// Tier card click → render INLINE list (NO tab jump — stays on Home)
-// Tap-tap toggle: same tier re-tapped → clear filter (show all)
-function navCourtTier(tier) {
+function navCourtTier(tier, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  
   var wrap = document.getElementById('court-summary-wrap');
-  if (wrap) wrap.classList.remove('collapsed');
+  var wasCollapsed = wrap && wrap.classList.contains('collapsed');
   
   // Find clicked counter
   var counterId = 'court-cnt-' + tier;
@@ -16577,22 +16595,26 @@ function navCourtTier(tier) {
   // Clear all active states
   document.querySelectorAll('#court-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
   
+  // AUTO-EXPAND only if collapsed AND applying new filter
+  if (wasCollapsed && !wasActive) {
+    if (wrap) wrap.classList.remove('collapsed');
+  }
+  
   if (wasActive) {
-    // Same tier re-tapped → clear filter (show all)
+    // Same tier re-tapped → show all (box state UNCHANGED)
     renderCourtBoxInlineList('all');
-    setTimeout(function(){
-      var content = document.getElementById('court-summary-content');
-      if (content && content.scrollIntoView) content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
     return;
   }
   
   if (counter) counter.classList.add('is-active');
   renderCourtBoxInlineList(tier);
-  setTimeout(function(){
-    var content = document.getElementById('court-summary-content');
-    if (content && content.scrollIntoView) content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 100);
+  
+  if (wasCollapsed) {
+    setTimeout(function(){
+      var content = document.getElementById('court-summary-content');
+      if (content && content.scrollIntoView) content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }
 }
 
 // Render court list INLINE inside the Home box (no section switch)
@@ -16707,15 +16729,50 @@ function refreshNoticesCounters() {
   if (aEl) aEl.textContent = adam;
 }
 
-function navNoticesCounter(which) {
+function navNoticesCounter(which, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  
   var wrap = document.getElementById('notices-summary-wrap');
   if (!wrap) return;
-  wrap.classList.remove('collapsed');
+  var wasCollapsed = wrap.classList.contains('collapsed');
+  
+  // Find clicked counter
+  var counterIdMap = {
+    'pending': 'notices-cnt-pending',
+    'tameel': 'notices-cnt-tameel',
+    'adam': 'notices-cnt-adam'
+  };
+  var counterId = counterIdMap[which];
+  var clicked = counterId ? document.getElementById(counterId) : null;
+  var counter = clicked ? clicked.closest('.hdr-counter') : null;
+  var wasActive = counter && counter.classList.contains('is-active');
+  
+  // Clear all active states
+  var counterStack = document.getElementById('notices-counter-stack');
+  if (counterStack) {
+    counterStack.querySelectorAll('.hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
+  }
+  
+  // AUTO-EXPAND only if collapsed AND applying new filter
+  if (wasCollapsed && !wasActive) {
+    wrap.classList.remove('collapsed');
+  }
+  
+  if (wasActive) {
+    // Same counter re-tapped → show all (box state UNCHANGED)
+    renderNoticesTable();
+    return;
+  }
+  
+  if (counter) counter.classList.add('is-active');
   renderNoticesTable(which);
-  setTimeout(function(){
-    var el = document.getElementById('notices-content');
-    if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 120);
+  
+  if (wasCollapsed) {
+    setTimeout(function(){
+      var el = document.getElementById('notices-content');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 120);
+  }
 }
 
 // Render notices table with SP/staff entry columns
