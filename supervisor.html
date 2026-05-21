@@ -4680,6 +4680,24 @@ body.view-mobile .dgeow-heads-row-label {
 /* End DG EOW Header restructure */
 
 /* ════════════════════════════════════════════════════════════
+   ACTIVE STATE — for tap-tap toggle indicators
+   ════════════════════════════════════════════════════════════ */
+/* When counter is active (filter currently applied), show ring */
+.hdr-counter.is-active {
+  outline: 3px solid #062a52;
+  outline-offset: 2px;
+  transform: translateY(-1px) scale(1.02);
+}
+/* When heads matrix tile is active */
+.dgeow-heads-tiles .dgeow-head-tile.is-active {
+  outline: 2px solid #062a52;
+  outline-offset: 2px;
+  background: linear-gradient(135deg, #f5b942 0%, #e8a82e 100%);
+  transform: translateY(-1px);
+}
+/* End Active State CSS */
+
+/* ════════════════════════════════════════════════════════════
    COURT BOX — Inline list rendering (drill-down without tab jump)
    ════════════════════════════════════════════════════════════ */
 .court-box-list-header {
@@ -15758,13 +15776,27 @@ function refreshDgEowCounters() {
 function navDgEowHead(headKey) {
   var wrap = document.getElementById('dgeow-summary-wrap');
   if (wrap) wrap.classList.remove('collapsed');
-  // Mark active tile
-  document.querySelectorAll('.dgeow-head-tile').forEach(function(t){ t.classList.remove('is-active'); });
+  // Find clicked tile
   var clicked = document.querySelector('.dgeow-head-tile [id="dgeow-head-' + headKey + '"]');
-  if (clicked) {
-    var tile = clicked.closest('.dgeow-head-tile');
-    if (tile) tile.classList.add('is-active');
+  var tile = clicked ? clicked.closest('.dgeow-head-tile') : null;
+  var wasActive = tile && tile.classList.contains('is-active');
+  
+  // Clear all active states
+  document.querySelectorAll('.dgeow-head-tile').forEach(function(t){ t.classList.remove('is-active'); });
+  document.querySelectorAll('#dgeow-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
+  
+  if (wasActive) {
+    // Same tile re-tapped → CLEAR filter (show all)
+    renderDgDirectivesList();
+    setTimeout(function(){
+      var el = document.getElementById('dgeow-list');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 120);
+    return;
   }
+  
+  // Apply filter (new tile or first tap)
+  if (tile) tile.classList.add('is-active');
   renderDgDirectivesList('head:' + headKey);
   setTimeout(function(){
     var el = document.getElementById('dgeow-list');
@@ -15815,6 +15847,30 @@ function openDgEowSubscribeModal() {
 function navDgEow(which) {
   var wrap = document.getElementById('dgeow-summary-wrap');
   if (wrap) wrap.classList.remove('collapsed');
+  
+  // Find clicked counter
+  var counterId = which === 'tasks' ? 'dgeow-cnt-tasks' :
+                  which === 'complaints' ? 'dgeow-cnt-complaints' :
+                  which === 'today' ? 'dgeow-cnt-today' : null;
+  var clicked = counterId ? document.getElementById(counterId) : null;
+  var counter = clicked ? clicked.closest('.hdr-counter') : null;
+  var wasActive = counter && counter.classList.contains('is-active');
+  
+  // Clear all active states (counters AND head tiles — only one filter at a time)
+  document.querySelectorAll('#dgeow-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
+  document.querySelectorAll('.dgeow-head-tile').forEach(function(t){ t.classList.remove('is-active'); });
+  
+  if (wasActive) {
+    // Same counter re-tapped → CLEAR filter
+    renderDgDirectivesList();
+    setTimeout(function(){
+      var el = document.getElementById('dgeow-list');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 120);
+    return;
+  }
+  
+  if (counter) counter.classList.add('is-active');
   renderDgDirectivesList(which);  // 'tasks' | 'complaints' | 'today'
   setTimeout(function(){
     var el = document.getElementById('dgeow-list');
@@ -16478,11 +16534,32 @@ function refreshCourtSummaryCounters() {
 }
 
 // Tier card click → render INLINE list (NO tab jump — stays on Home)
+// Tap-tap toggle: same tier re-tapped → clear filter (show all)
 function navCourtTier(tier) {
   var wrap = document.getElementById('court-summary-wrap');
   if (wrap) wrap.classList.remove('collapsed');
+  
+  // Find clicked counter
+  var counterId = 'court-cnt-' + tier;
+  var clicked = document.getElementById(counterId);
+  var counter = clicked ? clicked.closest('.hdr-counter') : null;
+  var wasActive = counter && counter.classList.contains('is-active');
+  
+  // Clear all active states
+  document.querySelectorAll('#court-counter-stack .hdr-counter').forEach(function(c){ c.classList.remove('is-active'); });
+  
+  if (wasActive) {
+    // Same tier re-tapped → clear filter (show all)
+    renderCourtBoxInlineList('all');
+    setTimeout(function(){
+      var content = document.getElementById('court-summary-content');
+      if (content && content.scrollIntoView) content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+    return;
+  }
+  
+  if (counter) counter.classList.add('is-active');
   renderCourtBoxInlineList(tier);
-  // Smooth scroll to body content (only if not visible)
   setTimeout(function(){
     var content = document.getElementById('court-summary-content');
     if (content && content.scrollIntoView) content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
