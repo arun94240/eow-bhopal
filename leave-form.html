@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EOW Bhopal — Leave Application</title>
+
+<!-- PWA: Manifest + Theme + Apple Touch Icon -->
+<link rel="manifest" href="/avkash-manifest.json">
+<meta name="theme-color" content="#062a52">
+<link rel="apple-touch-icon" href="/icons/avkash-apple-touch.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="अवकाश">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #eef4fa;
+  --primary: #062a52;        /* navy from supervisor */
+  --primary-dark: #051f3d;
+  --primary-soft: #e6eef8;
+  --golden: #f5b942;         /* golden accent */
+  --golden-dark: #e8a82e;
+  --good: #1e6b3e;
+  --good-soft: #d6ecdf;
+  --danger: #a62a23;
+  --ink: #0f1729;
+  --ink-soft: #3e4a63;
+  --ink-faint: #7783a0;
+  --line: #c9d4e3;
+  --line-soft: #dde6f0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; padding: 20px 14px; }
+.hindi { font-family: 'Tiro Devanagari Hindi', 'Inter', sans-serif; }
+.container { max-width: 580px; margin: 0 auto; }
+
+.header { background: var(--primary); color: white; padding: 22px 24px; border-radius: 12px 12px 0 0; text-align: center; }
+.header .crest-mark { width: 50px; height: 50px; background: var(--golden); color: var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; margin-bottom: 10px; border: 2px solid white; letter-spacing: 0.05em; }
+.header h1 { font-size: 19px; font-weight: 700; margin-bottom: 4px; color: white; }
+.header p { font-size: 12px; opacity: 0.95; letter-spacing: 0.05em; text-transform: uppercase; color: white; }
+
+.form-card { background: white; border-radius: 0 0 12px 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.form-title { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.form-subtitle { font-size: 13px; color: var(--ink-soft); margin-bottom: 22px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.form-label .req { color: var(--danger); }
+.form-label .optional { color: var(--ink-faint); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 4px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 11px 13px; border: 1px solid var(--line); background: white; font-family: inherit; font-size: 15px; color: var(--ink); border-radius: 6px; }
+.form-input[readonly] { background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+.btn-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--golden) 0%, var(--golden-dark) 100%); color: var(--primary); border: 2px solid var(--primary); border-radius: 6px; font-family: inherit; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; margin-top: 10px; transition: all 0.15s; box-shadow: 0 3px 10px rgba(245,185,66,0.35); }
+.btn-submit:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(245,185,66,0.45); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { background: #b0b8c4; color: white; border-color: #94a0b0; cursor: not-allowed; box-shadow: none; transform: none; }
+
+.success-screen { display: none; text-align: center; padding: 60px 20px; }
+.success-screen.visible { display: block; }
+.success-icon { width: 80px; height: 80px; background: var(--good-soft); color: var(--good); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 18px; }
+.success-screen h2 { font-size: 22px; color: var(--ink); margin-bottom: 8px; }
+.success-screen p { font-size: 14px; color: var(--ink-soft); margin-bottom: 24px; }
+.btn-again { display: inline-block; padding: 11px 24px; background: linear-gradient(135deg, var(--golden) 0%, var(--golden-dark) 100%); color: var(--primary); border: 2px solid var(--primary); border-radius: 6px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(245,185,66,0.35); }
+
+.error-msg { background: #f5d4d1; border: 1px solid var(--danger); color: var(--danger); padding: 10px 14px; border-radius: 5px; font-size: 13px; margin-top: 12px; display: none; }
+.error-msg.visible { display: block; }
+
+.loading { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--primary-soft); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.config-card { background: white; padding: 24px; border-radius: 12px; margin: 40px auto; max-width: 460px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.config-card h2 { color: var(--primary); margin-bottom: 6px; font-size: 18px; }
+.config-card p { color: var(--ink-soft); font-size: 13px; margin-bottom: 16px; }
+.config-card label { font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; display: block; margin-bottom: 6px; margin-top: 12px; }
+.config-card input { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 5px; font-family: monospace; font-size: 11px; }
+.config-card button { width: 100%; padding: 11px; background: linear-gradient(135deg, var(--golden) 0%, var(--golden-dark) 100%); color: var(--primary); border: 2px solid var(--primary); border-radius: 5px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+
+.footer-note { text-align: center; font-size: 11px; color: var(--ink-faint); margin-top: 18px; padding: 12px; }
+
+/* PIN Gate */
+.pin-gate {
+  background: linear-gradient(135deg, #fff8e8 0%, #ffe9b3 100%);
+  border: 2px solid #f5b942;
+  border-radius: 8px; padding: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 8px rgba(245,185,66,0.2);
+}
+.pin-gate.verified {
+  background: linear-gradient(135deg, #d6ecdf 0%, #b8e0c8 100%);
+  border-color: var(--good);
+}
+.pin-input-row { display: flex; gap: 8px; margin-top: 6px; }
+.pin-input {
+  flex: 1; max-width: 150px;
+  font-size: 22px !important; text-align: center;
+  letter-spacing: 10px !important;
+  font-weight: 700 !important;
+  font-family: 'Courier New', monospace !important;
+  color: var(--primary-dark) !important;
+  border: 2px solid var(--primary) !important;
+}
+.pin-input:focus {
+  border-color: #f5b942 !important;
+  box-shadow: 0 0 0 3px rgba(245,185,66,0.3) !important;
+}
+.pin-verify-btn {
+  background: var(--primary); color: white; border: none;
+  padding: 10px 18px; font-family: inherit; font-size: 13px;
+  font-weight: 600; border-radius: 5px; cursor: pointer;
+}
+.pin-verify-btn:hover { background: var(--primary-dark); }
+.pin-status { margin-top: 8px; font-size: 12px; font-weight: 700; min-height: 16px; }
+.pin-status.success { color: var(--good); }
+.pin-status.error { color: var(--danger); }
+.pin-status.locked { color: var(--danger); background: #fee; padding: 6px 10px; border-radius: 4px; }
+.pin-help { font-size: 10px; color: var(--ink-faint); margin-top: 6px; font-style: italic; }
+
+/* Attachments */
+.btn-attach {
+  background: white; color: var(--primary);
+  border: 1.5px dashed var(--primary);
+  padding: 10px 14px; border-radius: 6px;
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; width: 100%;
+}
+.btn-attach:hover { background: var(--primary-soft); }
+.lf-attach-item {
+  display: flex; align-items: center; gap: 8px;
+  background: #f5f8fc; padding: 6px 10px; border-radius: 5px;
+  margin-bottom: 4px; font-size: 12px; color: var(--primary-dark);
+}
+.lf-attach-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.lf-attach-item-remove {
+  background: var(--danger); color: white; border: none;
+  padding: 2px 8px; border-radius: 3px; cursor: pointer;
+  font-size: 11px; font-weight: 700;
+}
+
+/* Status banner */
+.lf-banner {
+  padding: 14px 16px; border-radius: 8px;
+  margin-bottom: 18px; border: 2px solid;
+}
+.lf-banner.pending {
+  background: #fff8e8; border-color: #f5b942;
+  color: #5a4019;
+}
+.lf-banner-title { font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+.lf-banner-detail { font-size: 12px; line-height: 1.5; }
+.lf-banner-actions { margin-top: 10px; display: flex; gap: 8px; }
+.lf-banner-btn {
+  padding: 6px 12px; border-radius: 4px;
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  cursor: pointer; border: none;
+}
+.lf-banner-btn.cancel { background: var(--danger); color: white; }
+.lf-banner-btn.dismiss { background: white; color: var(--ink-soft); border: 1px solid var(--line); }
+
+/* History mode (no pending — showing only past decisions) */
+.lf-banner.history {
+  background: #f5f8fc; border-color: var(--primary);
+  color: var(--primary-dark);
+}
+
+/* History items list */
+.lf-history-title {
+  font-weight: 700; font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-top: 12px; margin-bottom: 8px;
+  color: var(--ink-soft); border-top: 1px dashed var(--line); padding-top: 10px;
+}
+.lf-banner.history .lf-history-title { border-top: none; padding-top: 0; margin-top: 0; }
+.lf-history-list { display: flex; flex-direction: column; gap: 6px; }
+.lf-history-item {
+  background: white; padding: 8px 12px; border-radius: 5px;
+  border-left: 3px solid; font-size: 12px;
+}
+.lf-h-approved { border-left-color: var(--good); }
+.lf-h-rejected { border-left-color: var(--danger); }
+.lf-h-cancelled { border-left-color: #90a4ae; }
+.lf-history-head { color: var(--ink); }
+.lf-history-date { font-size: 10px; color: var(--ink-faint); font-weight: 400; }
+.lf-history-remark {
+  font-size: 11px; color: var(--ink-soft); margin-top: 4px;
+  font-style: italic; padding-left: 4px;
+}
+
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+/* 📅 Day Type radio options */
+.lf-daytype-group { margin-bottom: 18px; }
+.lf-daytype-options { display: flex; flex-direction: column; gap: 8px; }
+.lf-daytype-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 13px; border: 1.5px solid var(--line);
+  border-radius: 7px; cursor: pointer; background: white;
+  transition: all 0.15s;
+}
+.lf-daytype-opt:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: 0 0 0 2px rgba(6,42,82,0.1);
+}
+.lf-daytype-opt input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+.lf-daytype-label { font-weight: 700; font-size: 14px; color: var(--ink); }
+.lf-daytype-hint { font-size: 12px; color: var(--ink-faint); }
+.lf-days-hint { font-weight: 400; font-size: 11px; color: var(--accent-dark, #d99c1d); margin-left: 6px; text-transform: none; letter-spacing: 0; }
+
+/* 📋 Form 3 (Medical Certificate) uploader */
+.lf-form3-help {
+  font-size: 12px; color: var(--ink-soft); line-height: 1.5;
+  background: #fff8e8; border: 1px solid var(--golden);
+  border-radius: 6px; padding: 10px 12px; margin-bottom: 10px;
+}
+.lf-form3-uploader { display: flex; flex-direction: column; gap: 8px; }
+.lf-form3-status { font-size: 12px; color: var(--ink-soft); word-break: break-word; }
+.lf-form3-status a { color: #0a58c2; font-weight: 600; }
+.lf-form3-remove {
+  background: var(--danger); color: white; border: none;
+  padding: 2px 8px; border-radius: 3px; cursor: pointer;
+  font-size: 11px; font-weight: 700; margin-left: 4px;
+}
+</style>
+</head>
+<body>
+
+<div id="configScreen" class="config-card" style="display:none;">
+  <h2>Setup Required</h2>
+  <p>Enter Supabase credentials</p>
+  <label>Supabase URL</label>
+  <input type="text" id="cfg-url" placeholder="https://xxx.supabase.co">
+  <label>Anon Key</label>
+  <input type="text" id="cfg-key" placeholder="eyJhbGc...">
+  <button onclick="saveConfig()">Connect</button>
+</div>
+
+<div id="mainApp" style="display:none;">
+  <div class="container">
+
+    <div class="header">
+      <div class="crest-mark">EOW</div>
+      <h1>EOW Office Bhopal</h1>
+      <p>Leave Application</p>
+    </div>
+
+    <div class="form-card">
+
+      <div id="formScreen">
+        <div class="form-title hindi">अवकाश आवेदन</div>
+        <div class="form-subtitle">Submit your leave request — it will go to SP for approval.</div>
+
+        <!-- Application Status banner (shown if user has pending application) -->
+        <div id="lf-status-banner" style="display:none;"></div>
+
+        <div class="form-group">
+          <label class="form-label">Name <span class="req">*</span></label>
+          <select class="form-select" id="lf-name" onchange="lfNameChange()">
+            <option value="">— चुनें —</option>
+          </select>
+        </div>
+
+        <!-- PIN Gate -->
+        <div class="form-group pin-gate" id="lf-pin-gate" style="display:none;">
+          <label class="form-label">🔐 4-digit PIN <span class="req">*</span></label>
+          <div class="pin-input-row">
+            <input type="password" class="form-input pin-input" id="lf-pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="● ● ● ●" onkeyup="lfPinKeyup(event)">
+            <button type="button" class="pin-verify-btn" onclick="lfVerifyPin()">Verify ✓</button>
+          </div>
+          <div class="pin-status" id="lf-pin-status"></div>
+          <div class="pin-help">SP कार्यालय से प्राप्त 4-digit PIN डालें। PIN याद नहीं? — SP से पूछें।</div>
+        </div>
+
+        <!-- All other fields hidden until PIN verified -->
+        <div id="lf-fields-locked" style="display:none;">
+
+        <!-- Type of Leave — matches dashboard (11 types) -->
+        <div class="form-group">
+          <label class="form-label">Type of Leave <span class="req">*</span></label>
+          <select class="form-select" id="lf-type" onchange="lfTypeChange()">
+            <option value="">— Select —</option>
+            <option value="CL">CL — Casual Leave</option>
+            <option value="EL">EL — Earned Leave</option>
+            <option value="SL">SL — Sick Leave</option>
+            <option value="ML">ML — Medical Leave</option>
+            <option value="PL">PL — Paternity Leave</option>
+            <option value="MAT">MAT — Maternity Leave</option>
+            <option value="CCL">CCL — Child Care Leave</option>
+            <option value="STL">STL — Study Leave</option>
+            <option value="HPL">HPL — Half Pay Leave</option>
+            <option value="CompOff">Comp Off / Compensatory</option>
+            <option value="LWP">LWP — Leave Without Pay</option>
+          </select>
+        </div>
+
+        <!-- Day Type Radio: Full Day / Half Day FN / Half Day AN -->
+        <div class="form-group lf-daytype-group">
+          <label class="form-label">📅 Day Type <span class="req">*</span></label>
+          <div class="lf-daytype-options">
+            <label class="lf-daytype-opt">
+              <input type="radio" name="lf-daytype" value="full" id="lf-daytype-full" checked onchange="lfDayTypeChange()">
+              <span class="lf-daytype-label">Full Day</span>
+              <span class="lf-daytype-hint">— पूरा दिन</span>
+            </label>
+            <label class="lf-daytype-opt">
+              <input type="radio" name="lf-daytype" value="half-fn" id="lf-daytype-half-fn" onchange="lfDayTypeChange()">
+              <span class="lf-daytype-label">Half Day (FN)</span>
+              <span class="lf-daytype-hint">— Forenoon · पूर्वाह्न</span>
+            </label>
+            <label class="lf-daytype-opt">
+              <input type="radio" name="lf-daytype" value="half-an" id="lf-daytype-half-an" onchange="lfDayTypeChange()">
+              <span class="lf-daytype-label">Half Day (AN)</span>
+              <span class="lf-daytype-hint">— Afternoon · अपराह्न</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="form-label">From <span class="req">*</span></label>
+            <input type="date" class="form-input" id="lf-from" onchange="lfAutoCalcDays()">
+          </div>
+          <div>
+            <label class="form-label">To <span class="req">*</span></label>
+            <input type="date" class="form-input" id="lf-to" onchange="lfAutoCalcDays()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Days <span class="req">*</span><span class="lf-days-hint" id="lf-days-hint"></span></label>
+          <input type="number" class="form-input" id="lf-days" min="0.5" step="0.5" readonly>
+        </div>
+
+        <!-- Cause — matches dashboard (27 options) -->
+        <div class="form-group">
+          <label class="form-label">Cause <span class="req">*</span></label>
+          <select class="form-select" id="lf-cause" onchange="lfCauseChange()">
+            <option value="">— Select —</option>
+            <!-- Most common medical/personal -->
+            <option>तबियत ठीक नहीं होने के कारण</option>
+            <option>स्वास्थ्य / Medical</option>
+            <option>डॉक्टर से परामर्श / Doctor consultation</option>
+            <option>शल्य चिकित्सा / Surgery</option>
+            <option>हॉस्पिटल में भर्ती / Hospitalization</option>
+            <option>आवश्यक कार्य होने के कारण</option>
+            <option>व्यक्तिगत कार्य / Personal work</option>
+            <option>पारिवारिक कार्य / Family matter</option>
+            <option>परिवार में बीमारी / Family member illness</option>
+            <option>बच्चों की देखभाल / Child care</option>
+            <!-- Family / Special events -->
+            <option>विवाह समारोह / Marriage in family</option>
+            <option>स्वयं का विवाह / Own marriage</option>
+            <option>बच्चों का जन्म / Childbirth</option>
+            <option>बच्चों की परीक्षा / Children's exams</option>
+            <option>बच्चों के स्कूल में admission / School admission</option>
+            <option>बच्चों के parents-teacher meeting</option>
+            <option>अंत्येष्टि / Bereavement</option>
+            <option>तेरहवीं / श्राद्ध कर्म</option>
+            <option>धार्मिक यात्रा / Religious visit</option>
+            <option>यात्रा / Travel</option>
+            <option>घर में मरम्मत कार्य / Home repair</option>
+            <option>गृह प्रवेश / Griha Pravesh</option>
+            <option>संपत्ति / न्यायालय कार्य / Property / Court work</option>
+            <!-- Official -->
+            <option>प्रशिक्षण / Training (official)</option>
+            <option>विभागीय परीक्षा / Departmental exam</option>
+            <option>चुनाव ड्यूटी / Election duty (compensatory)</option>
+            <!-- Other -->
+            <option>अन्य / Other</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="lf-cause-other-wrap" style="display:none;">
+          <label class="form-label">Specify Other Cause</label>
+          <input type="text" class="form-input" id="lf-cause-other">
+        </div>
+
+        <!-- Form 3 upload — appears ONLY when Medical Leave (ML) selected -->
+        <div class="form-group" id="lf-form3-wrap" style="display:none;">
+          <label class="form-label">📋 Form 3 (Medical Certificate) <span class="req">*</span></label>
+          <div class="lf-form3-help">
+            Medical Leave के लिए <strong>Form 3</strong> (prescribed medical certificate) attach करना mandatory hai.
+            Scan/photo upload karein — PDF, JPG, PNG accepted (max 10 MB).
+          </div>
+          <div class="lf-form3-uploader">
+            <input type="file" id="lf-form3-file" accept=".pdf,.jpg,.jpeg,.png" onchange="lfForm3FileSelected(event)" style="display:none;">
+            <button type="button" class="btn-attach" id="lf-form3-pick-btn" onclick="document.getElementById('lf-form3-file').click()">📎 Choose File</button>
+            <div id="lf-form3-status" class="lf-form3-status"></div>
+          </div>
+          <input type="hidden" id="lf-form3-url">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Address during leave <span class="optional">(optional)</span></label>
+          <input type="text" class="form-input" id="lf-address" placeholder="Where you'll be...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contact Number <span class="optional">(optional)</span></label>
+          <input type="tel" class="form-input" id="lf-contact" placeholder="10 digits">
+        </div>
+
+        <!-- Document Attachment (general — optional) -->
+        <div class="form-group">
+          <label class="form-label">📎 Other Documents <span class="optional">(optional)</span></label>
+          <input type="file" id="lf-file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="lfHandleFiles(event)" style="display:none;">
+          <button type="button" class="btn-attach" onclick="document.getElementById('lf-file-input').click()">📎 Add Documents</button>
+          <div id="lf-attach-list" style="margin-top:8px;"></div>
+        </div>
+
+        <button class="btn-submit" id="submit-btn" onclick="submitLeave()">Submit Application</button>
+
+        </div><!-- /lf-fields-locked -->
+
+        <div class="error-msg" id="errorMsg"></div>
+      </div>
+
+      <div class="success-screen" id="successScreen">
+        <div class="success-icon">✓</div>
+        <h2>आवेदन जमा हो गया</h2>
+        <p>Your application has been submitted to SP for approval. You will be informed of the decision.</p>
+        <button class="btn-again" onclick="resetForm()">Submit Another</button>
+      </div>
+
+    </div>
+
+    <div class="footer-note">For Officers and Staff · EOW Bhopal</div>
+
+  </div>
+</div>
+
+<script>
+var supa = null;
+// Hardcoded Supabase credentials (anon key is public-safe)
+var SUPABASE_URL = 'https://hwfdeqlqavakyakugyqq.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZmRlcWxxYXZha3lha3VneXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczODE0MzksImV4cCI6MjA5Mjk1NzQzOX0.QPp6vuVl_LqNZ-2GYMNx5m56L7XSWe0A7IiFcmoHeSw';
+
+// Legacy override support
+var savedUrl = localStorage.getItem('eow_supa_url');
+var savedKey = localStorage.getItem('eow_supa_key');
+if (savedUrl && savedKey && savedUrl.indexOf('supabase.co') > -1 && savedKey.indexOf('eyJ') === 0) {
+  SUPABASE_URL = savedUrl;
+  SUPABASE_KEY = savedKey;
+}
+
+function saveConfig() {
+  var url = document.getElementById('cfg-url').value.trim();
+  var key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Both fields required'); return; }
+  localStorage.setItem('eow_supa_url', url);
+  localStorage.setItem('eow_supa_key', key);
+  location.reload();
+}
+
+// Skip config screen — go directly to app
+document.getElementById('mainApp').style.display = 'block';
+supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ═══ TEST MODE — when opened with ?test=1, entries save as is_test=true ═══
+var IS_TEST_MODE = (new URLSearchParams(window.location.search).get('test') === '1');
+if (IS_TEST_MODE) {
+  try {
+    var _tb = document.createElement('div');
+    _tb.className = 'test-mode-banner';
+    _tb.innerHTML = '🧪 TEST MODE — yeh entries TEST mark hongi (real data mein nahi aayengi). SP ke "Links & Forms → Test Entries" mein dikhengi aur delete ho sakti hain.';
+    _tb.style.cssText = 'position:sticky;top:0;z-index:9999;background:#dc2626;color:#fff;padding:10px 14px;font-size:12.5px;font-weight:700;text-align:center;line-height:1.4;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
+    document.body.insertBefore(_tb, document.body.firstChild);
+    document.title = '🧪 TEST — ' + document.title;
+  } catch(e){}
+}
+
+function escapeHtml(s) { if (s == null) return ''; return String(s).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function showError(msg) { var e = document.getElementById('errorMsg'); e.textContent = msg; e.classList.add('visible'); setTimeout(function(){ e.classList.remove('visible'); }, 4000); }
+
+// All officers (id + name + rank)
+var allOfficers = [];
+// PIN-verified officer id (per session)
+var pinVerifiedOfficerId = null;
+// Pending attachment files (before upload)
+var lfPendingAttachments = [];
+
+async function loadOfficers() {
+  try {
+    var r = await supa.from('io_master').select('id, name, rank').eq('status', 'Active').order('name');
+    allOfficers = r.data || [];
+    var sel = document.getElementById('lf-name');
+    var html = '<option value="">— चुनें —</option>';
+    // Sort: by rank order then by name
+    var rankOrder = { 'DSP':1,'TI':2,'SI':3,'INSP':2,'ASI':4,'HC':5,'Const':6,'DPO':7,'PA':8,'Steno':9,'Peon':10 };
+    allOfficers.sort(function(a, b){
+      var ra = rankOrder[a.rank] || 99, rb = rankOrder[b.rank] || 99;
+      if (ra !== rb) return ra - rb;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+    allOfficers.forEach(function(o){
+      var label = (o.rank ? o.rank + ' ' : '') + o.name;
+      html += '<option value="' + escapeHtml(o.id) + '">' + escapeHtml(label) + '</option>';
+    });
+    sel.innerHTML = html;
+  } catch(e) {
+    showError('Connection error: ' + (e.message || ''));
+  }
+}
+
+// SHA-256 hashing for PIN verification
+async function sha256Hex(text) {
+  if (window.crypto && window.crypto.subtle) {
+    var enc = new TextEncoder().encode(text);
+    var buf = await window.crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf))
+      .map(function(b){ return b.toString(16).padStart(2, '0'); })
+      .join('');
+  }
+  return null;
+}
+
+// Triggered when officer is selected
+async function lfNameChange() {
+  var officerId = document.getElementById('lf-name').value;
+  var pinGate = document.getElementById('lf-pin-gate');
+  var fields = document.getElementById('lf-fields-locked');
+  var pinInput = document.getElementById('lf-pin');
+  var pinStatus = document.getElementById('lf-pin-status');
+  
+  pinInput.value = '';
+  pinStatus.textContent = '';
+  pinStatus.className = 'pin-status';
+  pinGate.classList.remove('verified');
+  
+  // Hide status banner
+  document.getElementById('lf-status-banner').style.display = 'none';
+  
+  if (!officerId) {
+    pinGate.style.display = 'none';
+    fields.style.display = 'none';
+    pinVerifiedOfficerId = null;
+    return;
+  }
+  
+  // Already verified same officer? — show fields directly
+  if (pinVerifiedOfficerId === officerId) {
+    pinGate.style.display = 'none';
+    fields.style.display = 'block';
+    await checkPendingApplication(officerId);
+    return;
+  }
+  
+  // Show PIN gate
+  pinVerifiedOfficerId = null;
+  pinGate.style.display = 'block';
+  fields.style.display = 'none';
+  setTimeout(function(){ pinInput.focus(); }, 100);
+}
+
+function lfPinKeyup(e) {
+  var inp = document.getElementById('lf-pin');
+  inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 4);
+  if (e.key === 'Enter' && inp.value.length === 4) {
+    lfVerifyPin();
+  } else if (inp.value.length === 4 && e.key !== 'Backspace') {
+    setTimeout(lfVerifyPin, 200);
+  }
+}
+
+async function lfVerifyPin() {
+  var officerId = document.getElementById('lf-name').value;
+  var pin = document.getElementById('lf-pin').value.trim();
+  var pinStatus = document.getElementById('lf-pin-status');
+  var pinGate = document.getElementById('lf-pin-gate');
+  var fields = document.getElementById('lf-fields-locked');
+  
+  if (!officerId) {
+    pinStatus.textContent = '⚠ पहले Name चुनें'; pinStatus.className = 'pin-status error'; return;
+  }
+  if (pin.length !== 4) {
+    pinStatus.textContent = '⚠ PIN 4 digits का होना चाहिए'; pinStatus.className = 'pin-status error'; return;
+  }
+  
+  pinStatus.textContent = 'Verifying...';
+  pinStatus.className = 'pin-status';
+  
+  try {
+    // Lockout check
+    var lockRes = await supa.from('io_pin_attempts').select('failed_count, locked_until').eq('io_id', officerId).maybeSingle();
+    var attempts = (lockRes && lockRes.data) ? lockRes.data : null;
+    if (attempts && attempts.locked_until) {
+      var lockedUntil = new Date(attempts.locked_until);
+      if (lockedUntil > new Date()) {
+        var minsLeft = Math.ceil((lockedUntil - new Date()) / 60000);
+        pinStatus.innerHTML = '🔒 Account locked. ' + minsLeft + ' मिनट बाद try करें।';
+        pinStatus.className = 'pin-status locked';
+        return;
+      }
+    }
+    
+    var enteredHash = await sha256Hex(pin);
+    if (!enteredHash) {
+      pinStatus.textContent = '❌ Browser SHA-256 not supported';
+      pinStatus.className = 'pin-status error'; return;
+    }
+    
+    var ioRes = await supa.from('io_master').select('pin_hash, name, rank').eq('id', officerId).single();
+    if (ioRes.error || !ioRes.data) {
+      pinStatus.textContent = '❌ Record not found'; pinStatus.className = 'pin-status error'; return;
+    }
+    if (!ioRes.data.pin_hash) {
+      pinStatus.innerHTML = '⚠ इस officer का PIN setup नहीं है। SP से contact करें।';
+      pinStatus.className = 'pin-status error'; return;
+    }
+    
+    if (enteredHash === ioRes.data.pin_hash) {
+      // ✓ SUCCESS
+      pinVerifiedOfficerId = officerId;
+      pinStatus.innerHTML = '✓ Verified — ' + (ioRes.data.rank ? ioRes.data.rank + ' ' : '') + ioRes.data.name;
+      pinStatus.className = 'pin-status success';
+      pinGate.classList.add('verified');
+      
+      // Reset failed attempts
+      await supa.from('io_pin_attempts').upsert({
+        io_id: officerId, failed_count: 0, locked_until: null, last_attempt: new Date().toISOString()
+      }).then(function(){});
+      
+      // Show form fields after delay
+      setTimeout(async function(){
+        pinGate.style.display = 'none';
+        fields.style.display = 'block';
+        // Check if officer has pending application
+        await checkPendingApplication(officerId);
+      }, 800);
+    } else {
+      // ❌ WRONG
+      var newCount = ((attempts && attempts.failed_count) || 0) + 1;
+      var lockUntil = newCount >= 3 ? new Date(Date.now() + 5 * 60 * 1000).toISOString() : null;
+      await supa.from('io_pin_attempts').upsert({
+        io_id: officerId, failed_count: newCount, locked_until: lockUntil, last_attempt: new Date().toISOString()
+      }).then(function(){});
+      
+      if (lockUntil) {
+        pinStatus.innerHTML = '🔒 3 गलत attempts. 5 मिनट के लिए locked।';
+        pinStatus.className = 'pin-status locked';
+      } else {
+        pinStatus.innerHTML = '❌ गलत PIN. ' + (3 - newCount) + ' attempt(s) बचे हैं।';
+        pinStatus.className = 'pin-status error';
+      }
+      document.getElementById('lf-pin').value = '';
+      document.getElementById('lf-pin').focus();
+    }
+  } catch (err) {
+    pinStatus.textContent = '❌ Verification failed: ' + (err.message || 'try again');
+    pinStatus.className = 'pin-status error';
+  }
+}
+
+// Check if this officer has an existing pending application + show recent decision history
+async function checkPendingApplication(officerId) {
+  try {
+    // Fetch last 4 applications by this officer
+    var r = await supa.from('leave_applications')
+      .select('id, leave_type, days, from_date, to_date, cause, submitted_at, status, decided_at, decision_remarks, cancelled_at, cancelled_reason')
+      .eq('officer_id', officerId)
+      .order('submitted_at', { ascending: false })
+      .limit(4);
+    
+    if (!r.data || r.data.length === 0) return;
+    
+    var pending = r.data.find(function(a){ return a.status === 'pending'; });
+    var recent = r.data.filter(function(a){ return a.status !== 'pending'; }).slice(0, 3);
+    
+    var bannerHTML = '';
+    
+    // Show pending application (with cancel option)
+    if (pending) {
+      bannerHTML += '<div class="lf-banner-title">⏳ आपकी एक application pending है (SP approval का इंतज़ार)</div>' +
+        '<div class="lf-banner-detail">' +
+        '<strong>' + escapeHtml(pending.leave_type) + '</strong> · ' + pending.days + ' दिन · ' +
+        new Date(pending.from_date).toLocaleDateString('en-IN') + ' से ' +
+        new Date(pending.to_date).toLocaleDateString('en-IN') + '<br>' +
+        '<em>Cause: ' + escapeHtml(pending.cause||'') + '</em>' +
+        '</div>' +
+        '<div class="lf-banner-actions">' +
+        '<button class="lf-banner-btn cancel" onclick="cancelApplication(\'' + pending.id + '\')">❌ Cancel This Application</button>' +
+        '<button class="lf-banner-btn dismiss" onclick="document.getElementById(\'lf-status-banner\').style.display=\'none\';">Dismiss</button>' +
+        '</div>';
+    }
+    
+    // Show recent decisions history (read-only)
+    if (recent.length > 0) {
+      bannerHTML += '<div class="lf-history-title">📋 आपकी पिछली ' + recent.length + ' applications:</div>';
+      bannerHTML += '<div class="lf-history-list">';
+      recent.forEach(function(a){
+        var statusEmoji = a.status === 'approved' ? '✅' : (a.status === 'rejected' ? '❌' : '🚫');
+        var statusLabel = a.status === 'approved' ? 'APPROVED' : (a.status === 'rejected' ? 'REJECTED' : 'CANCELLED');
+        var statusClass = a.status === 'approved' ? 'lf-h-approved' : (a.status === 'rejected' ? 'lf-h-rejected' : 'lf-h-cancelled');
+        var dateStr = a.decided_at ? new Date(a.decided_at).toLocaleDateString('en-IN') : (a.cancelled_at ? new Date(a.cancelled_at).toLocaleDateString('en-IN') : '');
+        var remarks = a.status === 'rejected' ? a.decision_remarks : (a.status === 'cancelled' ? a.cancelled_reason : a.decision_remarks);
+        bannerHTML += '<div class="lf-history-item ' + statusClass + '">' +
+          '<div class="lf-history-head">' + statusEmoji + ' <strong>' + statusLabel + '</strong> · ' +
+          escapeHtml(a.leave_type) + ' ' + a.days + 'd · ' +
+          new Date(a.from_date).toLocaleDateString('en-IN') + '→' + new Date(a.to_date).toLocaleDateString('en-IN') +
+          ' <span class="lf-history-date">(' + dateStr + ')</span></div>' +
+          (remarks ? '<div class="lf-history-remark">📝 ' + escapeHtml(remarks) + '</div>' : '') +
+          '</div>';
+      });
+      bannerHTML += '</div>';
+    }
+    
+    if (bannerHTML) {
+      var banner = document.getElementById('lf-status-banner');
+      banner.className = pending ? 'lf-banner pending' : 'lf-banner history';
+      banner.innerHTML = bannerHTML;
+      banner.style.display = 'block';
+    }
+  } catch(e) { /* silent */ }
+}
+
+async function cancelApplication(appId) {
+  var reason = prompt('Cancellation का कारण? (optional)') || '';
+  if (!confirm('क्या आप sure हैं कि यह application cancel करना चाहते हैं?')) return;
+  try {
+    var r = await supa.from('leave_applications').update({
+      status: 'cancelled',
+      cancelled_at: new Date().toISOString(),
+      cancelled_reason: reason
+    }).eq('id', appId);
+    if (r.error) throw r.error;
+    document.getElementById('lf-status-banner').style.display = 'none';
+    alert('✓ Application cancelled.');
+  } catch(e) {
+    alert('Cancel failed: ' + (e.message || 'try again'));
+  }
+}
+
+// File attachment handling
+function lfHandleFiles(event) {
+  var files = Array.from(event.target.files || []);
+  files.forEach(function(file){
+    if (file.size > 10 * 1024 * 1024) { // 10 MB limit
+      showError(file.name + ': size 10 MB से अधिक है, skip किया'); return;
+    }
+    lfPendingAttachments.push({ file: file, name: file.name, type: file.type });
+  });
+  event.target.value = '';  // reset for re-upload of same file
+  lfRenderAttachments();
+}
+
+function lfRenderAttachments() {
+  var list = document.getElementById('lf-attach-list');
+  list.innerHTML = lfPendingAttachments.map(function(a, idx){
+    return '<div class="lf-attach-item">' +
+      '<span>📎</span>' +
+      '<span class="lf-attach-item-name">' + escapeHtml(a.name) + '</span>' +
+      '<button class="lf-attach-item-remove" onclick="lfRemoveAttachment(' + idx + ')">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function lfRemoveAttachment(idx) {
+  lfPendingAttachments.splice(idx, 1);
+  lfRenderAttachments();
+}
+
+async function lfUploadAttachments() {
+  if (!lfPendingAttachments.length) return [];
+  var uploaded = [];
+  for (var i = 0; i < lfPendingAttachments.length; i++) {
+    var att = lfPendingAttachments[i];
+    var path = 'leaves/' + Date.now() + '_' + i + '_' + att.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    var r = await supa.storage.from('io-attachments').upload(path, att.file, {
+      cacheControl: '3600', upsert: false
+    });
+    if (r.error) throw r.error;
+    var urlRes = supa.storage.from('io-attachments').getPublicUrl(path);
+    uploaded.push({
+      name: att.name,
+      type: att.type,
+      url: urlRes.data.publicUrl,
+      storagePath: path
+    });
+  }
+  return uploaded;
+}
+
+// 📅 Show/hide Form 3 upload based on Leave Type (Medical = ML)
+function lfTypeChange() {
+  var type = document.getElementById('lf-type').value;
+  var wrap = document.getElementById('lf-form3-wrap');
+  if (wrap) wrap.style.display = (type === 'ML') ? '' : 'none';
+}
+
+// 📅 Day Type radio change — Full Day / Half Day FN / Half Day AN
+function lfDayTypeChange() {
+  var checked = document.querySelector('input[name="lf-daytype"]:checked');
+  if (!checked) return;
+  var dayType = checked.value;  // 'full' | 'half-fn' | 'half-an'
+  var fromEl = document.getElementById('lf-from');
+  var toEl = document.getElementById('lf-to');
+  var hintEl = document.getElementById('lf-days-hint');
+
+  if (dayType === 'half-fn' || dayType === 'half-an') {
+    // Half day → To must equal From; if From set, copy to To
+    if (fromEl && fromEl.value && toEl) toEl.value = fromEl.value;
+    if (hintEl) hintEl.textContent = ' (half-day = 0.5)';
+  } else {
+    if (hintEl) hintEl.textContent = '';
+  }
+  lfAutoCalcDays();
+}
+
+// Auto-calculate days based on date range + day-type (matches dashboard logic)
+function lfAutoCalcDays() {
+  var checked = document.querySelector('input[name="lf-daytype"]:checked');
+  var dayType = checked ? checked.value : 'full';
+  var fromVal = (document.getElementById('lf-from') || {}).value;
+  var toVal = (document.getElementById('lf-to') || {}).value;
+  var daysEl = document.getElementById('lf-days');
+  if (!daysEl) return;
+
+  if (dayType === 'half-fn' || dayType === 'half-an') {
+    // Half day always = 0.5; force To = From
+    if (fromVal) {
+      var toEl = document.getElementById('lf-to');
+      if (toEl && toEl.value !== fromVal) toEl.value = fromVal;
+      daysEl.value = '0.5';
+    } else {
+      daysEl.value = '';
+    }
+    return;
+  }
+
+  // Full day → inclusive date diff
+  if (fromVal && toVal) {
+    var f = new Date(fromVal);
+    var t = new Date(toVal);
+    if (isNaN(f.getTime()) || isNaN(t.getTime()) || t < f) { daysEl.value = ''; return; }
+    var diff = Math.round((t - f) / 86400000) + 1;  // inclusive
+    daysEl.value = String(diff);
+  } else if (fromVal && !toVal) {
+    daysEl.value = '1';
+  } else {
+    daysEl.value = '';
+  }
+}
+
+// Handle Form 3 file selection — upload to Supabase Storage (attachments bucket, matches dashboard)
+async function lfForm3FileSelected(evt) {
+  var file = evt.target.files && evt.target.files[0];
+  if (!file) return;
+
+  if (file.size > 10 * 1024 * 1024) {
+    showError('❌ File 10 MB se bada hai. Smaller file choose karein.');
+    evt.target.value = '';
+    return;
+  }
+  var validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+  if (validTypes.indexOf(file.type) < 0) {
+    showError('❌ Sirf PDF, JPG, PNG files allowed hain.');
+    evt.target.value = '';
+    return;
+  }
+
+  var statusEl = document.getElementById('lf-form3-status');
+  var pickBtn = document.getElementById('lf-form3-pick-btn');
+  if (statusEl) statusEl.innerHTML = '⏳ Uploading ' + escapeHtml(file.name) + ' ...';
+  if (pickBtn) pickBtn.disabled = true;
+
+  try {
+    var officerSel = document.getElementById('lf-name');
+    var officerName = (officerSel.options[officerSel.selectedIndex].text || 'unknown').replace(/[^a-zA-Z0-9]+/g, '_');
+    var ext = file.name.split('.').pop().toLowerCase();
+    var ts = Date.now();
+    var path = 'leave-form3/' + officerName + '_' + ts + '.' + ext;
+
+    var up = await supa.storage.from('attachments').upload(path, file, { cacheControl: '3600', upsert: false });
+    if (up.error) throw up.error;
+
+    var urlRes = supa.storage.from('attachments').getPublicUrl(path);
+    var publicUrl = urlRes.data.publicUrl;
+
+    document.getElementById('lf-form3-url').value = publicUrl;
+    if (statusEl) statusEl.innerHTML = '✅ <a href="' + publicUrl + '" target="_blank">' + escapeHtml(file.name) + '</a> uploaded · <button type="button" class="lf-form3-remove" onclick="lfForm3Remove()">Remove ✕</button>';
+  } catch (ex) {
+    if (statusEl) statusEl.innerHTML = '❌ Upload failed: ' + escapeHtml(ex.message || String(ex));
+  } finally {
+    if (pickBtn) pickBtn.disabled = false;
+  }
+}
+
+function lfForm3Remove() {
+  document.getElementById('lf-form3-url').value = '';
+  document.getElementById('lf-form3-file').value = '';
+  var statusEl = document.getElementById('lf-form3-status');
+  if (statusEl) statusEl.innerHTML = '';
+}
+
+function lfCauseChange() {
+  var v = document.getElementById('lf-cause').value;
+  document.getElementById('lf-cause-other-wrap').style.display = (v === 'अन्य / Other') ? '' : 'none';
+}
+
+async function submitLeave() {
+  var officerId = document.getElementById('lf-name').value;
+  var officerSel = document.getElementById('lf-name');
+  var officerLabel = officerSel.options[officerSel.selectedIndex].text;
+  var type = document.getElementById('lf-type').value;
+  var from = document.getElementById('lf-from').value;
+  var to = document.getElementById('lf-to').value;
+  var cause = document.getElementById('lf-cause').value;
+  var days = document.getElementById('lf-days').value;
+  var checkedRadio = document.querySelector('input[name="lf-daytype"]:checked');
+  var dayType = checkedRadio ? checkedRadio.value : 'full';
+
+  if (!officerId || !type || !from || !to || !cause || !days) {
+    showError('कृपया सभी आवश्यक fields भरें'); return;
+  }
+  if (cause === 'अन्य / Other' && !document.getElementById('lf-cause-other').value.trim()) {
+    showError('कृपया Other cause specify करें'); return;
+  }
+
+  // Medical Leave (ML) → Form 3 mandatory
+  var form3Url = (document.getElementById('lf-form3-url') || {}).value || '';
+  if (type === 'ML' && !form3Url) {
+    showError('❌ Medical Leave के लिए Form 3 upload करना mandatory hai');
+    var wrap = document.getElementById('lf-form3-wrap');
+    if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> Submitting...';
+
+  try {
+    // Upload general attachments if any
+    var uploaded = [];
+    if (lfPendingAttachments.length > 0) {
+      btn.innerHTML = '<span class="loading"></span> Uploading files...';
+      uploaded = await lfUploadAttachments();
+      btn.innerHTML = '<span class="loading"></span> Saving...';
+    }
+
+    // Build attachments JSON — array of general docs + form3_url key (matches dashboard merge pattern)
+    var attachmentsObj = {};
+    if (uploaded.length) attachmentsObj.files = uploaded;
+    if (form3Url) attachmentsObj.form3_url = form3Url;
+
+    var r = await supa.from('leave_applications').insert({
+      officer_name: officerLabel,
+      officer_id: officerId,
+      leave_type: type,
+      days: parseFloat(days),       // supports 0.5 half-day
+      day_type: dayType,            // 'full' | 'half-fn' | 'half-an'
+      from_date: from,
+      to_date: to,
+      cause: cause,
+      cause_other: document.getElementById('lf-cause-other').value || null,
+      address: document.getElementById('lf-address').value || null,
+      contact: document.getElementById('lf-contact').value || null,
+      attachments: Object.keys(attachmentsObj).length ? attachmentsObj : null,
+      status: 'pending',            // IO applies → awaits SP approval
+      is_test: IS_TEST_MODE
+    });
+    if (r.error) throw r.error;
+    document.getElementById('formScreen').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Application';
+    showError('Submit failed: ' + (e.message || 'try again'));
+  }
+}
+
+function resetForm() {
+  document.getElementById('successScreen').classList.remove('visible');
+  document.getElementById('formScreen').style.display = 'block';
+  // Keep name + PIN verified state — clear other fields (per pragati pattern)
+  ['lf-type','lf-from','lf-to','lf-cause','lf-cause-other','lf-address','lf-contact'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('lf-days').value = '';
+  // Reset day-type to full
+  var fullRadio = document.getElementById('lf-daytype-full');
+  if (fullRadio) fullRadio.checked = true;
+  var hintEl = document.getElementById('lf-days-hint');
+  if (hintEl) hintEl.textContent = '';
+  document.getElementById('lf-cause-other-wrap').style.display = 'none';
+  // Reset Form 3
+  if (document.getElementById('lf-form3-wrap')) document.getElementById('lf-form3-wrap').style.display = 'none';
+  lfForm3Remove();
+  lfPendingAttachments = [];
+  lfRenderAttachments();
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('submit-btn').innerHTML = 'Submit Application';
+}
+
+if (supa) loadOfficers();
+</script>
+
+<!-- PWA: Register Avkash service worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/avkash-sw.js', { scope: '/leave-form.html' })
+      .then(function(reg) { console.log('[Avkash PWA] Service worker registered'); })
+      .catch(function(err) { console.warn('[Avkash PWA] SW registration failed:', err); });
+  });
+}
+</script>
+</body>
+</html>
