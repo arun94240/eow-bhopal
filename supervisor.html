@@ -15164,10 +15164,10 @@ body.view-mobile .cao-matrix-tile .caom-num {
 #mydaily-box .mydd-tp-empty{ font-size:12.5px; color:#94a3b8; padding:10px 4px; text-align:center; }
 body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px; flex-wrap:wrap; justify-content:flex-end; }
 #mydaily-box .mydd-add:hover{ filter:brightness(1.08); }
-#mydaily-box .mydd-tiles{ display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; align-items:flex-start; }
+#mydaily-box .mydd-tiles{ display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; align-items:stretch; }
 #mydaily-box .mydd-tile{ width:250px; min-height:66px; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:12px; cursor:pointer; color:#fff; border:1.5px solid rgba(255,255,255,0.22); box-shadow:0 3px 8px rgba(0,0,0,0.18); transition:transform .15s, box-shadow .15s; }
 /* DG EOW tile — vertical: heading on top, two sub-headings always below (with counts) */
-#mydaily-box .mydd-dg-tile{ flex-direction:column; align-items:stretch; gap:8px; cursor:default; }
+#mydaily-box .mydd-dg-tile{ flex-direction:column; align-items:stretch; gap:8px; cursor:default; min-height:318px; }
 #mydaily-box .mydd-dg-tile:hover{ transform:none; box-shadow:0 3px 8px rgba(0,0,0,0.18); }
 #mydaily-box .mydd-dg-toprow{ display:flex; align-items:center; gap:11px; }
 #mydaily-box .mydd-dg-toprow .mydd-tlabel{ flex:1; }
@@ -22425,6 +22425,21 @@ body.role-staff header { margin-top: 30px; }
               <span class="mydd-dg-subnum" id="mydd-mt-review-count">0</span>
               <span class="mydd-dg-subcaret" id="mydd-mt-review-caret">▾</span>
             </div>
+            <div class="mydd-dg-subrow" onclick="event.stopPropagation();mtQuickToggle('notice');">
+              <span class="mydd-dg-sublabel">📨 Notice-Summons-Warrants</span>
+              <span class="mydd-dg-subnum" id="mydd-mt-notice-count">0</span>
+              <span class="mydd-dg-subcaret" id="mydd-mt-notice-caret">▾</span>
+            </div>
+            <div class="mydd-dg-subrow" onclick="event.stopPropagation();mtQuickToggle('pragati');">
+              <span class="mydd-dg-sublabel">📈 Pragati Prativedan</span>
+              <span class="mydd-dg-subnum" id="mydd-mt-pragati-count">0</span>
+              <span class="mydd-dg-subcaret" id="mydd-mt-pragati-caret">▾</span>
+            </div>
+            <div class="mydd-dg-subrow" onclick="event.stopPropagation();mtQuickToggle('settings');">
+              <span class="mydd-dg-sublabel">⚙️ Settings &amp; Reports</span>
+              <span class="mydd-dg-subnum mydd-nav-arrow">›</span>
+              <span class="mydd-dg-subcaret" id="mydd-mt-settings-caret">▾</span>
+            </div>
           </div>
           <div class="mydd-tile mydd-tile-dg mydd-dg-tile">
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mddTileToggle('dg');">
@@ -22569,12 +22584,22 @@ body.role-staff header { margin-top: 30px; }
             <div class="mydd-sub-list" id="mydd-mt-office-list"></div>
           </div>
           <div class="mydd-listsec" id="mydd-mtsec-reftasks" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">📎 Reference Tasks</span></div>
+            <div class="mydd-listsec-head"><span class="mydd-listsec-title">📎 Reference Tasks</span><button class="mydd-sub-add" onclick="event.stopPropagation();mddTaskFormOpen('mydd-addhost-mtref');" title="नया Reference Task">＋ Add Reference Task</button></div>
+            <div class="mddq-host" id="mydd-addhost-mtref"></div>
             <div class="mydd-sub-list" id="mydd-mt-ref-list"></div>
           </div>
           <div class="mydd-listsec" id="mydd-mtsec-review" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">⭐ प्रकरण समीक्षा (due + overdue)</span></div>
+            <div class="mydd-listsec-head"><span class="mydd-listsec-title">⭐ प्रकरण समीक्षा (due + overdue)</span><button class="mydd-sub-add" onclick="event.stopPropagation();mddReviewAddPicker();" title="नई समीक्षा दर्ज करें">＋ Add समीक्षा</button></div>
+            <div class="mddq-host" id="mydd-addhost-review"></div>
             <div class="mydd-sub-list" id="mydd-mt-review-list"></div>
+          </div>
+          <div class="mydd-listsec" id="mydd-mtsec-settings" style="display:none;">
+            <div class="mydd-listsec-head"><span class="mydd-listsec-title">⚙️ Settings &amp; Reports</span></div>
+            <div class="mydd-sub-list" id="mydd-mt-settings-list">
+              <div class="mydd-item"><div class="mydd-item-head" onclick="event.stopPropagation();settingsNav('search');"><span class="mydd-item-title">📊 Reports &amp; Search</span><span class="mydd-item-meta">›</span></div></div>
+              <div class="mydd-item"><div class="mydd-item-head" onclick="event.stopPropagation();settingsNav('addestab');"><span class="mydd-item-title">🏢 Add Establishment</span><span class="mydd-item-meta">›</span></div></div>
+              <div class="mydd-item"><div class="mydd-item-head" onclick="event.stopPropagation();settingsNav('bytypes');"><span class="mydd-item-title">📋 Reports by Types</span><span class="mydd-item-meta">›</span></div></div>
+            </div>
           </div>
         </div>
         <!-- References dynamic @name lists (sections built at render) -->
@@ -32049,6 +32074,65 @@ function mtUpdateCounts() {
   setN('mydd-mt-ref-count', rf);
   setN('mydd-mt-review-count', rvc);
   setN('mydd-cnt-mytask', dgc + ofc + rf + rvc); // total of all sub-headings
+  // quick-link sub-rows + tile heading counts
+  var ntc = 0; try { ntc = (typeof _noticeBucket === 'function') ? _noticeBucket('issued').length : 0; } catch(e) {}
+  var prg = 0; try { prg = (typeof _pragatiBucket === 'function') ? _pragatiBucket('30d').length : 0; } catch(e) {}
+  setN('mydd-mt-notice-count', ntc);
+  setN('mydd-mt-pragati-count', prg);
+  setN('mydd-cnt-notice', ntc);
+  setN('mydd-cnt-pragati', prg);
+}
+// quick-links on My Tasks tile → open that feature's inline panel (tap-tap)
+function mtQuickToggle(which) {
+  if (which === 'notice') {
+    mddTileToggle('notice');
+    var np = document.getElementById('mydd-notice-panel');
+    var nc = document.getElementById('mydd-mt-notice-caret'); if (nc && np) nc.textContent = (np.style.display === 'block') ? '▴' : '▾';
+    return;
+  }
+  if (which === 'pragati') {
+    mddTileToggle('pragati');
+    var pp = document.getElementById('mydd-pragati-panel');
+    var pc = document.getElementById('mydd-mt-pragati-caret'); if (pc && pp) pc.textContent = (pp.style.display === 'block') ? '▴' : '▾';
+    return;
+  }
+  if (which === 'settings') {
+    var sec = document.getElementById('mydd-mtsec-settings');
+    var panel = document.getElementById('mydd-mt-panel');
+    if (!sec || !panel) return;
+    var open = (sec.style.display === 'none' || !sec.style.display);
+    sec.style.display = open ? 'block' : 'none';
+    var sc = document.getElementById('mydd-mt-settings-caret'); if (sc) sc.textContent = open ? '▴' : '▾';
+    var anyOpen = Array.prototype.some.call(panel.querySelectorAll('.mydd-listsec'), function(e){ return e.style.display && e.style.display !== 'none'; });
+    panel.style.display = anyOpen ? 'block' : 'none';
+    return;
+  }
+}
+// ＋ Add समीक्षा — inline picker of due/overdue cases → opens review modal
+function mddReviewAddPicker() {
+  var host = document.getElementById('mydd-addhost-review'); if (!host) return;
+  if (host.getAttribute('data-open') === '1') { host.innerHTML = ''; host.setAttribute('data-open', ''); return; }
+  var rows = (typeof reviewGatherCases === 'function') ? reviewGatherCases() : [];
+  if (!rows.length) { if (typeof toast === 'function') toast('कोई due / overdue समीक्षा प्रकरण नहीं', true); return; }
+  _mddCloseAllTaskForms();
+  host.setAttribute('data-open', '1');
+  host.innerHTML =
+    '<div class="mddq-form">' +
+      '<label class="mddq-lbl" style="width:100%;">⭐ प्रकरण चुनें' +
+        '<select id="mddq-rev-case" class="mddq-inp" style="margin-top:5px;">' +
+          rows.map(function(r){ return '<option value="' + r.type + '|' + r.id + '">' + _mddEsc(_reviewCaseDisplay(r.raw, r.type)) + ' — ' + _mddEsc(r.raw.io_name || '—') + (r.status === 'overdue' ? ' (Overdue)' : ' (Due)') + '</option>'; }).join('') +
+        '</select></label>' +
+      '<div class="mddq-btns">' +
+        '<button class="mddq-save" onclick="event.stopPropagation();mddReviewAddGo();">⭐ समीक्षा खोलें</button>' +
+        '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'mydd-addhost-review\');">Cancel</button>' +
+      '</div>' +
+    '</div>';
+  try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+}
+function mddReviewAddGo() {
+  var v = ((document.getElementById('mddq-rev-case') || {}).value || '').split('|');
+  mddTaskFormClose('mydd-addhost-review');
+  if (v.length === 2 && typeof openReviewModal === 'function') openReviewModal(v[0], v[1]);
 }
 function mtToggleSub(which) {
   var map = {
@@ -32427,7 +32511,8 @@ function mddTileToggle(tile) {
     { sec:'mydd-mtsec-dgtasks',  caret:'mydd-mt-dg-caret',     render:function(){ mtRender('dgtasks'); } },
     { sec:'mydd-mtsec-office',   caret:'mydd-mt-office-caret', render:function(){ mtRender('office'); } },
     { sec:'mydd-mtsec-reftasks', caret:'mydd-mt-ref-caret',    render:function(){ mtRender('reftasks'); } },
-    { sec:'mydd-mtsec-review',   caret:'mydd-mt-review-caret', render:function(){ mtRender('review'); } }
+    { sec:'mydd-mtsec-review',   caret:'mydd-mt-review-caret', render:function(){ mtRender('review'); } },
+    { sec:'mydd-mtsec-settings', caret:'mydd-mt-settings-caret', render:null }
   ]);
   if (tile === 'notice') return _mddToggleAll('mydd-notice-panel', 'mydd-notice-topcaret', [
     { sec:'mydd-ntcsec-issued',   caret:'mydd-ntc-issued-caret',   render:function(){ noticeRender('issued'); } },
