@@ -15245,6 +15245,9 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mtx-kind.k-td{ background:#dcfce7; color:#15803d; }
 #mydaily-box .mtx-addbar{ display:flex; justify-content:flex-end; gap:6px; margin-top:7px; }
 #mydaily-box .mydd-sub-add.mtx-dark{ background:#062a52; color:#fff; border:none; }
+/* CAO strip relocated into Settings & Reports box — flows as a normal box */
+#reports-summary-wrap .cao-strip{ position:static; transform:none; margin-top:10px; display:flex; flex-wrap:wrap; z-index:1; }
+#reports-summary-wrap .cao-strip-tiles{ flex-wrap:wrap; }
 body.view-mobile #mydaily-box .mydd-tile{ width:100%; }
 #mydaily-box .mydd-tile-dg.mydd-tile-open{ outline:2px solid #f5b942; outline-offset:1px; }
 /* DG tap-tap panel — To-Dos + Discussions/Notes (inline) */
@@ -21788,7 +21791,7 @@ body.role-staff header { margin-top: 30px; }
   <!-- No "Add" button (search is discovery, not creation)         -->
   <!-- ════════════════════════════════════════════════════════════ -->
   <div class="ov-section collapsed" id="search-summary-wrap">
-    <div class="ov-section-header search-header-with-cao" onclick="toggleSearchSection(event)">
+    <div class="ov-section-header" onclick="toggleSearchSection(event)">
       <div class="ov-section-titles">
         <div class="sup-title-row dgeow-title-row">
           <span class="sup-mini-cal" id="search-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -21799,55 +21802,10 @@ body.role-staff header { margin-top: 30px; }
       </div>
       
       <!-- ✨ CAO MATRIX — absolutely positioned right side, vertically centered -->
-      <div class="cao-strip" onclick="event.stopPropagation();">
-        <div class="cao-strip-label">
-          <span class="cao-strip-icon">👮</span>
-          <span class="cao-strip-title">Cases Against Officers</span>
-          <span class="cao-strip-total" id="sb-cao-cnt-total">0</span>
-        </div>
-        <div class="cao-strip-tiles">
-          <button type="button" class="cao-chip cao-chip-ias" data-tag-name="IAS" onclick="event.stopPropagation();navCaoByTag('IAS',event)" title="IAS">
-            <span class="cao-chip-key">IAS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-IAS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-ips" data-tag-name="IPS" onclick="event.stopPropagation();navCaoByTag('IPS',event)" title="IPS">
-            <span class="cao-chip-key">IPS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-IPS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-ifs" data-tag-name="IFS" onclick="event.stopPropagation();navCaoByTag('IFS',event)" title="IFS">
-            <span class="cao-chip-key">IFS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-IFS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-sas" data-tag-name="SAS" onclick="event.stopPropagation();navCaoByTag('SAS',event)" title="SAS">
-            <span class="cao-chip-key">SAS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-SAS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-sps" data-tag-name="SPS" onclick="event.stopPropagation();navCaoByTag('SPS',event)" title="SPS">
-            <span class="cao-chip-key">SPS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-SPS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-bjp" data-tag-name="Politician BJP" onclick="event.stopPropagation();navCaoByTag('Politician BJP',event)" title="Politician BJP">
-            <span class="cao-chip-key">BJP</span>
-            <span class="cao-chip-num" id="sb-cao-tile-BJP">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-inc" data-tag-name="Politician INC" onclick="event.stopPropagation();navCaoByTag('Politician INC',event)" title="Politician INC">
-            <span class="cao-chip-key">INC</span>
-            <span class="cao-chip-num" id="sb-cao-tile-INC">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-oth" data-tag-name="__OTHER_POLITICIAN__" onclick="event.stopPropagation();navCaoByTag('__OTHER_POLITICIAN__',event)" title="Other Politician">
-            <span class="cao-chip-key">Oth</span>
-            <span class="cao-chip-num" id="sb-cao-tile-OTHER">0</span>
-          </button>
-        </div>
-      </div>
       
       <div class="ov-section-toggle">▼</div>
     </div>
     
-    <!-- ✨ INLINE CAO PANEL — slides down right under the chip strip
-         when any CAO chip is tapped. Stays outside collapsible body
-         so it's always reachable regardless of section state. -->
-    <div id="cao-inline-panel" class="cao-inline-panel" style="display:none;"></div>
     
     <div class="ov-section-body">
       <div id="search-content" class="search-content">
@@ -23928,12 +23886,57 @@ body.role-staff header { margin-top: 30px; }
                 <span class="hcc-num">＋</span>
               </div>
             </div>
+      <div class="cao-strip" onclick="event.stopPropagation();">
+        <div class="cao-strip-label">
+          <span class="cao-strip-icon">👮</span>
+          <span class="cao-strip-title">Cases Against Officers</span>
+          <span class="cao-strip-total" id="sb-cao-cnt-total">0</span>
+        </div>
+        <div class="cao-strip-tiles">
+          <button type="button" class="cao-chip cao-chip-ias" data-tag-name="IAS" onclick="event.stopPropagation();navCaoByTag('IAS',event)" title="IAS">
+            <span class="cao-chip-key">IAS</span>
+            <span class="cao-chip-num" id="sb-cao-tile-IAS">0</span>
+          </button>
+          <button type="button" class="cao-chip cao-chip-ips" data-tag-name="IPS" onclick="event.stopPropagation();navCaoByTag('IPS',event)" title="IPS">
+            <span class="cao-chip-key">IPS</span>
+            <span class="cao-chip-num" id="sb-cao-tile-IPS">0</span>
+          </button>
+          <button type="button" class="cao-chip cao-chip-ifs" data-tag-name="IFS" onclick="event.stopPropagation();navCaoByTag('IFS',event)" title="IFS">
+            <span class="cao-chip-key">IFS</span>
+            <span class="cao-chip-num" id="sb-cao-tile-IFS">0</span>
+          </button>
+          <button type="button" class="cao-chip cao-chip-sas" data-tag-name="SAS" onclick="event.stopPropagation();navCaoByTag('SAS',event)" title="SAS">
+            <span class="cao-chip-key">SAS</span>
+            <span class="cao-chip-num" id="sb-cao-tile-SAS">0</span>
+          </button>
+          <button type="button" class="cao-chip cao-chip-sps" data-tag-name="SPS" onclick="event.stopPropagation();navCaoByTag('SPS',event)" title="SPS">
+            <span class="cao-chip-key">SPS</span>
+            <span class="cao-chip-num" id="sb-cao-tile-SPS">0</span>
+          </button>
+          <button type="button" class="cao-chip cao-chip-bjp" data-tag-name="Politician BJP" onclick="event.stopPropagation();navCaoByTag('Politician BJP',event)" title="Politician BJP">
+            <span class="cao-chip-key">BJP</span>
+            <span class="cao-chip-num" id="sb-cao-tile-BJP">0</span>
+          </button>
+          <button type="button" class="cao-chip cao-chip-inc" data-tag-name="Politician INC" onclick="event.stopPropagation();navCaoByTag('Politician INC',event)" title="Politician INC">
+            <span class="cao-chip-key">INC</span>
+            <span class="cao-chip-num" id="sb-cao-tile-INC">0</span>
+          </button>
+          <button type="button" class="cao-chip cao-chip-oth" data-tag-name="__OTHER_POLITICIAN__" onclick="event.stopPropagation();navCaoByTag('__OTHER_POLITICIAN__',event)" title="Other Politician">
+            <span class="cao-chip-key">Oth</span>
+            <span class="cao-chip-num" id="sb-cao-tile-OTHER">0</span>
+          </button>
+        </div>
+      </div>
           </div>
           <div class="ov-section-actions">
             <button class="dgeow-hdr-add-btn-red" onclick="event.stopPropagation();openReportBuilderInline()" title="Custom report builder">⚙ Custom</button>
             <div class="ov-section-toggle">▼</div>
           </div>
         </div>
+    <!-- ✨ INLINE CAO PANEL — slides down right under the chip strip
+         when any CAO chip is tapped. Stays outside collapsible body
+         so it's always reachable regardless of section state. -->
+    <div id="cao-inline-panel" class="cao-inline-panel" style="display:none;"></div>
         <div class="ov-section-body">
           <div id="reports-home-content" class="reports-home-content">
             <div class="reph-info" id="reports-home-info">
@@ -32161,7 +32164,6 @@ function mddRefTaskFormOpen(preTid) {
   var host = _mtxEl('mtx-addhost-task'); if (!host) return;
   if (host.getAttribute('data-open') === '1') { mddTaskFormClose('mtx-addhost-task'); return; }
   var names = _mtxNameTags();
-  if (!names.length) { if (typeof toast === 'function') toast('पहले कोई @name tag बनाएँ (किसी प्रकरण पर Reference + @name tag लगाएँ)', true); return; }
   _mddCloseAllTaskForms();
   host.setAttribute('data-open', '1');
   var today = new Date().toISOString().slice(0, 10);
@@ -32172,6 +32174,10 @@ function mddRefTaskFormOpen(preTid) {
           '<option value="">— @name चुनें —</option>' +
           names.map(function(t){ return '<option value="' + t.id + '"' + (preTid === t.id ? ' selected' : '') + '>' + _mddEsc(_nameTagClean(t.name || '')) + '</option>'; }).join('') +
         '</select></label>' +
+      '<div class="mddq-row2">' +
+        '<input type="text" id="mddq-newname" class="mddq-inp" placeholder="＋ नया @name बनाएँ (e.g. @Gupta)">' +
+        '<button class="mddq-cancel" style="flex:0 0 auto;" onclick="event.stopPropagation();mddRefNameCreate();">बनाएँ</button>' +
+      '</div>' +
       '<input type="text" id="mddq-title" class="mddq-inp" placeholder="Reference task title...">' +
       '<textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="Detail (optional)..."></textarea>' +
       '<div class="mddq-row2">' +
@@ -32184,6 +32190,31 @@ function mddRefTaskFormOpen(preTid) {
       '</div>' +
     '</div>';
   try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+}
+async function mddRefNameCreate() {
+  var inp = document.getElementById('mddq-newname'); if (!inp) return;
+  var v = (inp.value || '').trim();
+  if (!v) { if (typeof toast === 'function') toast('नया @name लिखें', true); return; }
+  if (v.charAt(0) !== '@') v = '@' + v;
+  var clean = _nameTagClean(v).toLowerCase();
+  var dup = _mtxNameTags().find(function(t){ return _nameTagClean(t.name || '').toLowerCase() === clean; });
+  var sel = document.getElementById('mddq-ref-name');
+  if (dup) { if (sel) sel.value = dup.id; inp.value = ''; if (typeof toast === 'function') toast('"' + _nameTagClean(dup.name) + '" पहले से है — select कर दिया'); return; }
+  try {
+    var r = await supa.from('tags').insert({ name: v, color: 'gray', is_system: false }).select().single();
+    if (r.error) throw r.error;
+    if (!state.tags) state.tags = [];
+    state.tags.push(r.data);
+    if (sel) {
+      var opt = document.createElement('option');
+      opt.value = r.data.id; opt.textContent = _nameTagClean(r.data.name || v);
+      sel.appendChild(opt); sel.value = r.data.id;
+    }
+    inp.value = '';
+    if (typeof toast === 'function') toast('✓ "' + _nameTagClean(v) + '" @name बना — selected');
+  } catch(e) {
+    if (typeof toast === 'function') toast('Tag बनाना विफल: ' + (e.message || e), true);
+  }
 }
 async function mddRefTaskSave() {
   var tid = ((document.getElementById('mddq-ref-name') || {}).value || '');
