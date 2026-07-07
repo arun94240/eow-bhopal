@@ -22429,6 +22429,7 @@ body.role-staff header { margin-top: 30px; }
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('dg');">🏛 DG निर्देश</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('task');">📝 To-Do / Task</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('disc');">💬 Discussion Note</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('ref');">📎 Reference Task</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('review');">⭐ समीक्षा</div>
               </div>
             </div>
@@ -22462,119 +22463,6 @@ body.role-staff header { margin-top: 30px; }
             <div class="mtx-list" id="mtx-list-td"></div>
             <div class="mtx-subttl" id="mtx-name-title" style="display:none;">References — @name</div>
             <div id="mtx-name-rows"></div>
-          </div>
-          <div class="mydd-tile mydd-tile-notice mydd-dg-tile">
-            <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mddTileToggle('notice');">
-              <span class="mydd-tcal"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
-              <div class="mydd-tlabel">Notice-Summons-Warrants</div>
-              <span class="mydd-tnum" id="mydd-cnt-notice">0</span>
-              <span class="mydd-dg-subcaret mydd-top-caret" id="mydd-notice-topcaret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();noticeToggleSub('issued');">
-              <span class="mydd-dg-sublabel">📤 IOs द्वारा जारी</span>
-              <span class="mydd-dg-subnum" id="mydd-ntc-issued-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-ntc-issued-caret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();noticeToggleSub('taameeli');">
-              <span class="mydd-dg-sublabel">⏳ तामीली हेतु</span>
-              <span class="mydd-dg-subnum" id="mydd-ntc-taameeli-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-ntc-taameeli-caret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();noticeToggleSub('served');">
-              <span class="mydd-dg-sublabel">✅ तामील</span>
-              <span class="mydd-dg-subnum" id="mydd-ntc-served-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-ntc-served-caret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();noticeToggleSub('adam');">
-              <span class="mydd-dg-sublabel">❌ अदम-तामील</span>
-              <span class="mydd-dg-subnum" id="mydd-ntc-adam-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-ntc-adam-caret">▾</span>
-            </div>
-          </div>
-          <div class="mydd-tile mydd-tile-pragati mydd-dg-tile">
-            <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mddTileToggle('pragati');">
-              <span class="mydd-tcal"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
-              <div class="mydd-tlabel">Pragati Prativedan</div>
-              <span class="mydd-tnum" id="mydd-cnt-pragati">0</span>
-              <span class="mydd-dg-subcaret mydd-top-caret" id="mydd-pragati-topcaret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();pragatiToggleSub('today');">
-              <span class="mydd-dg-sublabel">📅 आज</span>
-              <span class="mydd-dg-subnum" id="mydd-prg-today-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-prg-today-caret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();pragatiToggleSub('yesterday');">
-              <span class="mydd-dg-sublabel">🕐 कल</span>
-              <span class="mydd-dg-subnum" id="mydd-prg-yesterday-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-prg-yesterday-caret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();pragatiToggleSub('7d');">
-              <span class="mydd-dg-sublabel">📆 7 दिन</span>
-              <span class="mydd-dg-subnum" id="mydd-prg-7d-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-prg-7d-caret">▾</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();pragatiToggleSub('30d');">
-              <span class="mydd-dg-sublabel">🗓 30 दिन</span>
-              <span class="mydd-dg-subnum" id="mydd-prg-30d-count">0</span>
-              <span class="mydd-dg-subcaret" id="mydd-prg-30d-caret">▾</span>
-            </div>
-          </div>
-          <div class="mydd-tile mydd-tile-settings mydd-dg-tile">
-            <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();settingsNav('home');">
-              <span class="mydd-tcal"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
-              <div class="mydd-tlabel">Settings &amp; Reports</div>
-              <span class="mydd-dg-subcaret mydd-top-caret">›</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();settingsNav('search');">
-              <span class="mydd-dg-sublabel">📊 Reports &amp; Search</span>
-              <span class="mydd-dg-subnum mydd-nav-arrow">›</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();settingsNav('addestab');">
-              <span class="mydd-dg-sublabel">🏢 Add Establishment</span>
-              <span class="mydd-dg-subnum mydd-nav-arrow">›</span>
-            </div>
-            <div class="mydd-dg-subrow" onclick="event.stopPropagation();settingsNav('bytypes');">
-              <span class="mydd-dg-sublabel">📋 Reports by Types</span>
-              <span class="mydd-dg-subnum mydd-nav-arrow">›</span>
-            </div>
-          </div>
-        </div>
-        <!-- Notice-Summons-Warrants lists (4 buckets, mirrors Notice box) -->
-        <div id="mydd-notice-panel" class="mydd-panel" style="display:none;">
-          <div class="mydd-listsec" id="mydd-ntcsec-issued" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">📤 IOs द्वारा जारी</span><button class="mydd-sub-add" onclick="event.stopPropagation();(typeof openNoticeModal==='function')&&openNoticeModal();" title="नया notice (SP/PA)">＋ Add</button></div>
-            <div class="mydd-sub-list" id="mydd-ntc-issued-list"></div>
-          </div>
-          <div class="mydd-listsec" id="mydd-ntcsec-taameeli" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">⏳ तामीली हेतु</span></div>
-            <div class="mydd-sub-list" id="mydd-ntc-taameeli-list"></div>
-          </div>
-          <div class="mydd-listsec" id="mydd-ntcsec-served" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">✅ तामील</span></div>
-            <div class="mydd-sub-list" id="mydd-ntc-served-list"></div>
-          </div>
-          <div class="mydd-listsec" id="mydd-ntcsec-adam" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">❌ अदम-तामील</span></div>
-            <div class="mydd-sub-list" id="mydd-ntc-adam-list"></div>
-          </div>
-        </div>
-        <!-- Pragati Prativedan lists (time windows: आज / कल / 7 दिन / 30 दिन) -->
-        <div id="mydd-pragati-panel" class="mydd-panel" style="display:none;">
-          <div class="mydd-listsec" id="mydd-prgsec-today" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">📅 आज के प्रगति प्रतिवेदन</span><button class="mydd-sub-add" onclick="event.stopPropagation();mddPragatiAdd();" title="नया प्रगति प्रतिवेदन">＋ Add प्रगति</button></div>
-            <div class="mydd-sub-list" id="mydd-prg-today-list"></div>
-          </div>
-          <div class="mydd-listsec" id="mydd-prgsec-yesterday" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">🕐 कल के प्रगति प्रतिवेदन</span></div>
-            <div class="mydd-sub-list" id="mydd-prg-yesterday-list"></div>
-          </div>
-          <div class="mydd-listsec" id="mydd-prgsec-7d" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">📆 पिछले 7 दिन</span></div>
-            <div class="mydd-sub-list" id="mydd-prg-7d-list"></div>
-          </div>
-          <div class="mydd-listsec" id="mydd-prgsec-30d" style="display:none;">
-            <div class="mydd-listsec-head"><span class="mydd-listsec-title">🗓 पिछले 30 दिन</span></div>
-            <div class="mydd-sub-list" id="mydd-prg-30d-list"></div>
           </div>
         </div>
       </div>
@@ -32246,6 +32134,7 @@ function mtxAddPick(which) {
   var m = _mtxEl('mtx-add-menu'); if (m) m.style.display = 'none';
   if (which === 'dg') { try { if (typeof openDgDirectiveForm === 'function') openDgDirectiveForm(); } catch(e) {} return; }
   if (which === 'task') return mddTaskFormOpen('mtx-addhost-task');
+  if (which === 'ref') return mddTaskFormOpen('mtx-addhost-task');
   if (which === 'disc') return mddDiscInlineAdd();
   if (which === 'review') return mddReviewAddPicker();
 }
