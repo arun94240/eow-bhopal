@@ -15200,6 +15200,7 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mddq-save{ background:#16a34a; color:#fff; border:none; border-radius:7px; padding:7px 16px; font-weight:800; font-size:12.5px; cursor:pointer; }
 #mydaily-box .mddq-save:hover{ background:#15803d; }
 #mydaily-box .mddq-cancel{ background:#e2e8f0; color:#334155; border:none; border-radius:7px; padding:7px 14px; font-weight:700; font-size:12.5px; cursor:pointer; }
+#mydaily-box .mddq-or{ font-size:11px; font-weight:800; color:#64748b; text-align:center; letter-spacing:.03em; margin:2px 0; }
 #mydaily-box .mydd-dg-subcaret{ font-size:11px; color:#fff; opacity:0.9; }
 #mydaily-box .mydd-listsec{ background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.18); border-radius:11px; overflow:hidden; }
 #mydaily-box .mydd-listsec-head{ display:flex; align-items:center; gap:10px; padding:9px 14px; }
@@ -31928,26 +31929,60 @@ function mtQuickToggle(which) {
     return;
   }
 }
-// ＋ Add समीक्षा — inline picker of due/overdue cases → opens review modal
+// ── shared: fill a case-number select for a given case type (same inline pattern everywhere) ──
+function _mddFillCaseSelect(selId, type) {
+  var sel = document.getElementById(selId); if (!sel) return;
+  var arr = ((state.enquiries && state.enquiries[type]) || []).slice();
+  arr.sort(function(a,b){
+    var ya = String(a.entry_year||''), yb = String(b.entry_year||'');
+    if (ya !== yb) return yb.localeCompare(ya);
+    return (parseInt(b.no,10)||0) - (parseInt(a.no,10)||0);
+  });
+  sel.innerHTML = '<option value="">— number चुनें —</option>' + arr.map(function(c){
+    return '<option value="' + c.id + '">' + _mddEsc(_reviewCaseDisplay(c, type)) + (c.io_name ? (' — ' + _mddEsc(c.io_name)) : '') + '</option>';
+  }).join('');
+}
+function _mddTypeOptionsHTML() {
+  return ['complaints','rcomplaints','rcs','pes','strs','sutra'].map(function(tp){
+    return '<option value="' + tp + '">' + (_reviewTypeLabels[tp] || tp) + '</option>';
+  }).join('');
+}
+// ＋ Add समीक्षा — due/overdue quick-pick + नई समीक्षा (type → number)
 function mddReviewAddPicker() {
   var host = document.getElementById('mydd-addhost-review'); if (!host) return;
   if (host.getAttribute('data-open') === '1') { host.innerHTML = ''; host.setAttribute('data-open', ''); return; }
   var rows = (typeof reviewGatherCases === 'function') ? reviewGatherCases() : [];
-  if (!rows.length) { if (typeof toast === 'function') toast('कोई due / overdue समीक्षा प्रकरण नहीं', true); return; }
   _mddCloseAllTaskForms();
   host.setAttribute('data-open', '1');
-  host.innerHTML =
-    '<div class="mddq-form">' +
-      '<label class="mddq-lbl" style="width:100%;">⭐ प्रकरण चुनें' +
+  var dueHTML = rows.length
+    ? '<label class="mddq-lbl" style="width:100%;">⭐ Due / Overdue से चुनें' +
         '<select id="mddq-rev-case" class="mddq-inp" style="margin-top:5px;">' +
           rows.map(function(r){ return '<option value="' + r.type + '|' + r.id + '">' + _mddEsc(_reviewCaseDisplay(r.raw, r.type)) + ' — ' + _mddEsc(r.raw.io_name || '—') + (r.status === 'overdue' ? ' (Overdue)' : ' (Due)') + '</option>'; }).join('') +
         '</select></label>' +
+      '<div class="mddq-btns"><button class="mddq-save" onclick="event.stopPropagation();mddReviewAddGo();">⭐ समीक्षा खोलें</button></div>' +
+      '<div class="mddq-or">— अथवा — नई समीक्षा (कोई भी प्रकरण) —</div>'
+    : '<div class="mddq-or">नई समीक्षा — प्रकरण चुनें</div>';
+  host.innerHTML =
+    '<div class="mddq-form">' + dueHTML +
+      '<div class="mddq-row2">' +
+        '<select id="mddq-rev-type" class="mddq-inp mddq-sm" onchange="_mddFillCaseSelect(\'mddq-rev-num\', this.value);">' +
+          '<option value="">— Type चुनें —</option>' + _mddTypeOptionsHTML() +
+        '</select>' +
+        '<select id="mddq-rev-num" class="mddq-inp mddq-sm"><option value="">— number चुनें —</option></select>' +
+      '</div>' +
       '<div class="mddq-btns">' +
-        '<button class="mddq-save" onclick="event.stopPropagation();mddReviewAddGo();">⭐ समीक्षा खोलें</button>' +
+        '<button class="mddq-save" onclick="event.stopPropagation();mddReviewAddGo2();">⭐ समीक्षा खोलें</button>' +
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'mydd-addhost-review\');">Cancel</button>' +
       '</div>' +
     '</div>';
   try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+}
+function mddReviewAddGo2() {
+  var tp = ((document.getElementById('mddq-rev-type') || {}).value || '');
+  var id = ((document.getElementById('mddq-rev-num') || {}).value || '');
+  if (!tp || !id) { if (typeof toast === 'function') toast('Type और number दोनों चुनें', true); return; }
+  mddTaskFormClose('mydd-addhost-review');
+  if (typeof openReviewModal === 'function') openReviewModal(tp, id);
 }
 function mddReviewAddGo() {
   var v = ((document.getElementById('mddq-rev-case') || {}).value || '').split('|');
@@ -32180,6 +32215,13 @@ function mddRefTaskFormOpen(preTid) {
       '</div>' +
       '<input type="text" id="mddq-title" class="mddq-inp" placeholder="Reference task title...">' +
       '<textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="Detail (optional)..."></textarea>' +
+      '<div class="mddq-or">प्रकरण से जोड़ें (optional) — type → number</div>' +
+      '<div class="mddq-row2">' +
+        '<select id="mddq-ref-ctype" class="mddq-inp mddq-sm" onchange="_mddFillCaseSelect(\'mddq-ref-cnum\', this.value);">' +
+          '<option value="">— Type चुनें —</option>' + _mddTypeOptionsHTML() +
+        '</select>' +
+        '<select id="mddq-ref-cnum" class="mddq-inp mddq-sm"><option value="">— number चुनें —</option></select>' +
+      '</div>' +
       '<div class="mddq-row2">' +
         '<label class="mddq-lbl">📅 <input type="date" id="mddq-date" class="mddq-inp mddq-sm" value="' + today + '"></label>' +
         '<label class="mddq-lbl">⚑ <select id="mddq-priority" class="mddq-inp mddq-sm"><option>Normal</option><option>High</option><option>Low</option></select></label>' +
@@ -32226,10 +32268,17 @@ async function mddRefTaskSave() {
   var priority = (document.getElementById('mddq-priority') || {}).value || 'Normal';
   var tagIds = [tid];
   try { var rt = (typeof getTagByName === 'function') ? getTagByName('Reference') : null; if (rt && rt.id) tagIds.push(rt.id); } catch(e) {}
+  var cType = ((document.getElementById('mddq-ref-ctype') || {}).value || '') || null;
+  var cId = ((document.getElementById('mddq-ref-cnum') || {}).value || '') || null;
+  var cDisp = null;
+  if (cType && cId) {
+    var cObj = ((state.enquiries && state.enquiries[cType]) || []).find(function(x){ return String(x.id) === String(cId); });
+    if (cObj) cDisp = _reviewCaseDisplay(cObj, cType);
+  } else { cType = null; cId = null; }
   var payload = {
     task_title: title, task_detail: detail || null, deadline: null, priority: priority,
     reminder_at: null, updated_at: new Date().toISOString(),
-    case_type: null, case_id: null, case_display: null,
+    case_type: cType, case_id: cId, case_display: cDisp,
     task_date: date, status: 'Pending', tag_ids: tagIds
   };
   try {
