@@ -22163,7 +22163,7 @@ body.role-staff header { margin-top: 30px; }
                   <div class="cmd-metric-icon" id="cc-cal-leave"></div>
                   <div class="cmd-metric-body">
                     <div class="cmd-metric-label">अवकाश पर</div>
-                    <div class="cmd-metric-num" id="cc-cnt-leave">0</div>
+                    <div class="cmd-metric-num" id="ov-cnt-leave">0</div>
                   </div>
                 </div>
                 <div class="cmd-chips"></div>
@@ -22174,7 +22174,7 @@ body.role-staff header { margin-top: 30px; }
                   <div class="cmd-metric-icon" id="cc-cal-notice"></div>
                   <div class="cmd-metric-body">
                     <div class="cmd-metric-label">Notice लंबित</div>
-                    <div class="cmd-metric-num" id="cc-cnt-notice">0</div>
+                    <div class="cmd-metric-num" id="ov-cnt-notice">0</div>
                   </div>
                 </div>
                 <div class="cmd-chips"></div>
@@ -31859,6 +31859,7 @@ function renderMyDailyBox() {
   if (typeof pragatiUpdateCounts === 'function') pragatiUpdateCounts(); // Pragati Prativedan counts
   if (typeof mtxRefresh === 'function') mtxRefresh(); // unified My Tasks master
   if (typeof hctUpdateCounts === 'function') hctUpdateCounts(); // Home compact tiles
+  if (typeof ovccRefreshCounts === 'function') ovccRefreshCounts(); // ovstats leave(current)+notice(taameeli)
 }
 
 // ── DG EOW Task's tile → tap-tap panel (To-Dos + Discussions/Notes) ──
@@ -33132,8 +33133,8 @@ function ovTileToggle(which, evt) {
   document.querySelectorAll('.ovstats-panel').forEach(function(p){ if (p.id !== 'ovstats-panel-cc') p.style.display = 'none'; });
   var help = document.getElementById('ovstats-help'); if (help) help.style.display = 'none';
   var meta = {
-    leave:   { icon: '🏖️', title: 'अवकाश (Staff on Leave)' },
-    notice:  { icon: '📜', title: 'IO द्वारा जारी Notices (कुल)' },
+    leave:   { icon: '🏖️', title: 'वर्तमान में अवकाश पर' },
+    notice:  { icon: '📜', title: 'IO द्वारा जारी लंबित Notices (तामील शेष) — कुल' },
     pending: { icon: '⏳', title: 'Pending Approvals (लंबित अवकाश आवेदन)' }
   }[which] || { icon: '📋', title: which };
   var ic = document.getElementById('ovcc-icon'); if (ic) ic.textContent = meta.icon;
@@ -33148,15 +33149,34 @@ function _ovccHighlight(which) {
     if (t) t.classList.toggle('ovstats-tile-open', s === which);
   });
 }
+function _ovLeaveCurrent() {
+  var today = new Date().toISOString().slice(0, 10);
+  return (state.leaves || []).filter(function(l){
+    if (!l.from_date || !l.to_date) return false;
+    var st = String(l.status || '').toLowerCase();
+    if (st === 'rejected' || st === 'cancelled' || st === 'canceled') return false;
+    return l.from_date <= today && l.to_date >= today;
+  }).sort(function(a,b){ return String(a.to_date||'').localeCompare(String(b.to_date||'')); });
+}
 function _ovccRows(which) {
   if (which === 'leave') {
-    return (state.leaves || []).slice().sort(function(a,b){ return String(b.from_date||'').localeCompare(String(a.from_date||'')); });
+    return _ovLeaveCurrent();
   }
   if (which === 'pending') {
     return (state.pendingApprovals || []).slice();
   }
-  // notice — total issued by IOs
-  return (state.notices || []).slice().sort(function(a,b){ return String(b.appearance_date||b.notice_date||'').localeCompare(String(a.appearance_date||a.notice_date||'')); });
+  // notice — केवल तामील-शेष (लंबित) — जो अभी तामील होना बाकी हैं
+  if (typeof _noticeBucket === 'function') return _noticeBucket('taameeli').slice();
+  return (state.notices || []).filter(function(n){ return !n.tameel_result && n.status !== 'Archived'; });
+}
+function ovccRefreshCounts() {
+  function setN(id, v){ var e = document.getElementById(id); if (e) e.textContent = v; }
+  setN('ov-cnt-leave', _ovLeaveCurrent().length);
+  var ntc = 0;
+  try { ntc = (typeof _noticeBucket === 'function') ? _noticeBucket('taameeli').length : (state.notices || []).filter(function(n){ return !n.tameel_result && n.status !== 'Archived'; }).length; } catch(e){}
+  setN('ov-cnt-notice', ntc);
+  // if panel currently open on leave/notice, refresh its list live
+  if (typeof _ovccActive !== 'undefined' && (_ovccActive === 'leave' || _ovccActive === 'notice') && typeof ovccRenderList === 'function') ovccRenderList(_ovccActive);
 }
 function ovccRenderList(which) {
   var el = document.getElementById('ovcc-list'); if (!el) return;
