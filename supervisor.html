@@ -15201,6 +15201,17 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mddq-save:hover{ background:#15803d; }
 #mydaily-box .mddq-cancel{ background:#e2e8f0; color:#334155; border:none; border-radius:7px; padding:7px 14px; font-weight:700; font-size:12.5px; cursor:pointer; }
 #mydaily-box .mddq-or{ font-size:11px; font-weight:800; color:#64748b; text-align:center; letter-spacing:.03em; margin:2px 0; }
+#mydaily-box .mtx-search{ display:flex; align-items:center; gap:8px; background:#fff; border-radius:10px; padding:7px 11px; margin-top:2px; }
+#mydaily-box .mtx-search-ic{ font-size:13px; }
+#mydaily-box .mtx-search-inp{ flex:1; border:none; outline:none; font-size:13px; color:#0f2238; background:transparent; font-family:inherit; }
+#mydaily-box .mtx-search-clr{ cursor:pointer; color:#94a3b8; font-weight:800; font-size:13px; }
+/* case keyword box in expand card */
+.ioc-kw-box{ background:#fffdf5; border:1px solid #f0e2b8; border-radius:9px; padding:8px 10px; margin:8px 0; }
+.ioc-kw-head{ font-size:11.5px; font-weight:800; color:#a16207; margin-bottom:5px; }
+.ioc-kw-hint{ font-weight:600; color:#b8a878; font-size:10.5px; }
+.ioc-kw-row{ display:flex; gap:7px; }
+.ioc-kw-input{ flex:1; border:1px solid #e2d9b0; border-radius:7px; padding:6px 9px; font-size:12.5px; color:#0f2238; font-family:inherit; }
+.ioc-kw-save{ background:#f5b942; color:#062a52; border:none; border-radius:7px; padding:6px 12px; font-weight:800; cursor:pointer; }
 /* Home compact tiles (Notice / Pragati / Settings) */
 .home-compact-tiles{ display:flex; flex-wrap:wrap; gap:12px; margin:14px 0 4px; }
 .hct-tile{ flex:1 1 220px; min-width:210px; display:flex; align-items:center; gap:10px; padding:13px 15px; border-radius:12px; cursor:pointer; color:#fff; border:1.5px solid rgba(255,255,255,0.25); box-shadow:0 3px 10px rgba(0,0,0,0.18); transition:transform .13s; }
@@ -22401,6 +22412,7 @@ body.role-staff header { margin-top: 30px; }
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('disc');">💬 Discussion Note</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('ref');">📎 Reference Task</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('review');">⭐ समीक्षा</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('keyword');">🏷 Keyword (प्रकरण में)</div>
               </div>
             </div>
             <div class="mddq-host" id="mtx-addhost-task"></div>
@@ -22413,6 +22425,12 @@ body.role-staff header { margin-top: 30px; }
               <span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span>
             </div>
             <div class="mtx-list" id="mtx-agenda-panel"></div>
+            <div class="mtx-search">
+              <span class="mtx-search-ic">🔍</span>
+              <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="keyword / number / नाम / IO खोजें..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
+              <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
+            </div>
+            <div class="mtx-list" id="mtx-search-results"></div>
             <div class="mydd-dg-subrow" onclick="event.stopPropagation();mtxToggle('dg');">
               <span class="mydd-dg-sublabel">🏛 DG EOW</span>
               <span class="mydd-dg-subnum" id="mtx-cnt-dg">0</span>
@@ -30233,6 +30251,14 @@ function buildEnquiryExpandCard(type, r) {
 
   // ============ 📋 REVIEW STRIP — प्रकरण समीक्षा ============
   var reviewStripHTML = _buildReviewStrip(type, r);
+  var _kwId = 'kw-' + type + '-' + r.id;
+  var keywordHTML = '<div class="ioc-kw-box">' +
+      '<div class="ioc-kw-head">🏷 Keywords / नोट <span class="ioc-kw-hint">(बोलचाल — जैसे "tribal related"; search में मिलेगा)</span></div>' +
+      '<div class="ioc-kw-row">' +
+        '<input type="text" class="ioc-kw-input" id="' + _kwId + '" value="' + escapeHtml(r.keywords || '') + '" placeholder="keyword जोड़ें..." onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEntryKeywords(\'' + type.replace(/'/g,"\\'") + '\',\'' + r.id.replace(/'/g,"\\'") + '\');}">' +
+        '<button class="ioc-kw-save" onclick="event.stopPropagation();saveEntryKeywords(\'' + type.replace(/'/g,"\\'") + '\',\'' + r.id.replace(/'/g,"\\'") + '\');">💾</button>' +
+      '</div>' +
+    '</div>';
 
   // ---- TOP 3 CHECKBOXES: DG EOW → SP IMP → मेरे निर्देश (inline, बिना Open/Edit) ----
   var topChecksHTML = '<div class="ioc-exp-checks" onclick="event.stopPropagation();">' +
@@ -30257,6 +30283,7 @@ function buildEnquiryExpandCard(type, r) {
     topChecksHTML +
     partiesHTML +
     '<div class="ioc-exp-fields">' + fields + '</div>' +
+    keywordHTML +
     reviewStripHTML +
     analysisHTML +
     linkedHTML +
@@ -30265,6 +30292,24 @@ function buildEnquiryExpandCard(type, r) {
     buildExpansionTagsBlock('entry', type, r) +
     actionsHTML +
   '</div>';
+}
+async function saveEntryKeywords(type, id) {
+  var inp = document.getElementById('kw-' + type + '-' + id); if (!inp) return;
+  var val = (inp.value || '').trim();
+  var rec = (state.enquiries[type] || []).find(function(x){ return String(x.id) === String(id); });
+  try {
+    var r = await supa.from('enquiries').update({ keywords: val || null }).eq('id', id).select().single();
+    if (r.error) throw r.error;
+    if (rec) rec.keywords = val || null;
+    if (typeof toast === 'function') toast('🏷 Keyword सेव हुआ ✓');
+  } catch(e) {
+    var msg = (e && e.message) ? e.message : String(e);
+    if (/keywords/i.test(msg) && /column|schema/i.test(msg)) {
+      if (typeof toast === 'function') toast('⚠ पहले SQL चलाएँ: ALTER TABLE enquiries ADD COLUMN keywords text;', true);
+    } else {
+      if (typeof toast === 'function') toast('सेव विफल: ' + msg, true);
+    }
+  }
 }
 
 function toggleEnquiryExpand(type, id) {
@@ -32217,6 +32262,82 @@ function mtxAddPick(which) {
   if (which === 'ref') return mddRefTaskFormOpen();
   if (which === 'disc') return mddDiscInlineAdd();
   if (which === 'review') return mddReviewAddPicker();
+  if (which === 'keyword') return mddKeywordAddOpen();
+}
+// ── Dashboard minimal search — keyword + number + complainant/IO across all enquiries ──
+function mtxSearch(q) {
+  var res = _mtxEl('mtx-search-results'); var clr = _mtxEl('mtx-search-clr');
+  q = (q || '').trim().toLowerCase();
+  if (clr) clr.style.display = q ? 'inline' : 'none';
+  if (!res) return;
+  if (!q) { res.style.display = 'none'; res.innerHTML = ''; return; }
+  var out = [];
+  ['complaints','rcomplaints','rcs','pes','strs','sutra'].forEach(function(tp){
+    ((state.enquiries && state.enquiries[tp]) || []).forEach(function(r){
+      var ok = (typeof matchEntry === 'function') ? matchEntry(r, q)
+        : ([r.no, r.complainant, r.io_name, r.keywords].filter(Boolean).join(' ').toLowerCase().indexOf(q) > -1);
+      if (ok) out.push({ tp: tp, r: r });
+    });
+  });
+  res.style.display = 'block';
+  if (!out.length) { res.innerHTML = '<div class="mydd-empty">कोई परिणाम नहीं</div>'; return; }
+  res.innerHTML = out.slice(0, 40).map(function(o){
+    var r = o.r;
+    var disp = _reviewCaseDisplay(r, o.tp);
+    var sub = [ r.complainant || '', r.io_name ? ('IO: ' + r.io_name) : '', r.keywords ? ('🏷 ' + r.keywords) : '' ].filter(Boolean).map(_mddEsc).join(' · ');
+    return '<div class="mydd-item"><div class="mydd-item-head" onclick="event.stopPropagation();mddOpenCase(\'' + o.tp + '\',\'' + r.id + '\');">' +
+      '<span class="mydd-item-title">' + _mddEsc(disp) + '</span>' + (sub ? '<span class="mydd-item-meta">' + sub + '</span>' : '') +
+    '</div></div>';
+  }).join('') + (out.length > 40 ? '<div class="mydd-empty">+ ' + (out.length - 40) + ' और…</div>' : '');
+}
+// ── ＋ Add → 🏷 Keyword: type → number → keyword, saves to that case ──
+function mddKeywordAddOpen() {
+  var host = _mtxEl('mtx-addhost-task'); if (!host) return;
+  if (host.getAttribute('data-open') === '1') { mddTaskFormClose('mtx-addhost-task'); return; }
+  _mddCloseAllTaskForms();
+  host.setAttribute('data-open', '1');
+  host.innerHTML =
+    '<div class="mddq-form">' +
+      '<div class="mddq-or">🏷 प्रकरण में keyword जोड़ें — type → number</div>' +
+      '<div class="mddq-row2">' +
+        '<select id="mddq-kw-type" class="mddq-inp mddq-sm" onchange="_mddFillCaseSelect(\'mddq-kw-num\', this.value);_mddKwLoad();">' +
+          '<option value="">— Type चुनें —</option>' + _mddTypeOptionsHTML() +
+        '</select>' +
+        '<select id="mddq-kw-num" class="mddq-inp mddq-sm" onchange="_mddKwLoad();"><option value="">— number चुनें —</option></select>' +
+      '</div>' +
+      '<input type="text" id="mddq-kw-val" class="mddq-inp" placeholder="keyword / नोट (जैसे: tribal related)">' +
+      '<div class="mddq-btns">' +
+        '<button class="mddq-save" onclick="event.stopPropagation();mddKeywordAddSave();">💾 Save</button>' +
+        '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'mtx-addhost-task\');">Cancel</button>' +
+      '</div>' +
+    '</div>';
+  try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+}
+function _mddKwLoad() {
+  var tp = ((document.getElementById('mddq-kw-type') || {}).value || '');
+  var id = ((document.getElementById('mddq-kw-num') || {}).value || '');
+  var box = document.getElementById('mddq-kw-val'); if (!box) return;
+  if (!tp || !id) return;
+  var c = ((state.enquiries && state.enquiries[tp]) || []).find(function(x){ return String(x.id) === String(id); });
+  if (c) box.value = c.keywords || '';
+}
+async function mddKeywordAddSave() {
+  var tp = ((document.getElementById('mddq-kw-type') || {}).value || '');
+  var id = ((document.getElementById('mddq-kw-num') || {}).value || '');
+  if (!tp || !id) { if (typeof toast === 'function') toast('Type और number चुनें', true); return; }
+  var val = ((document.getElementById('mddq-kw-val') || {}).value || '').trim();
+  var rec = ((state.enquiries && state.enquiries[tp]) || []).find(function(x){ return String(x.id) === String(id); });
+  try {
+    var r = await supa.from('enquiries').update({ keywords: val || null }).eq('id', id).select().single();
+    if (r.error) throw r.error;
+    if (rec) rec.keywords = val || null;
+    if (typeof toast === 'function') toast('🏷 Keyword सेव हुआ ✓');
+    mddTaskFormClose('mtx-addhost-task');
+  } catch(e) {
+    var msg = (e && e.message) ? e.message : String(e);
+    if (/keywords/i.test(msg) && /column|schema/i.test(msg)) { if (typeof toast === 'function') toast('⚠ पहले SQL चलाएँ: ALTER TABLE enquiries ADD COLUMN keywords text;', true); }
+    else if (typeof toast === 'function') toast('सेव विफल: ' + msg, true);
+  }
 }
 
 // ── Reference Task — @name tag MANDATORY, task then shows under that name line ──
@@ -44868,7 +44989,7 @@ function _searchFreetextRun(val) {
     (state.enquiries[h] || []).forEach(function(r){
       var hay = [
         (typeof formatEntryNo === 'function') ? formatEntryNo(h, r.no, r.entry_year) : (h + '-' + r.no),
-        r.complainant, r.brief, r.io_name, r.case_status, r.notes, r.entry_year
+        r.complainant, r.brief, r.io_name, r.case_status, r.notes, r.entry_year, r.keywords
       ].filter(function(x){ return x; }).join(' ').toLowerCase();
       if (hay.indexOf(q) >= 0) matches.push({ _isCourt: false, _type: h, _row: r });
     });
@@ -57479,7 +57600,7 @@ function matchEntry(r, q) {
     noWithYearSlash = String(r.no) + '/' + yr2;   // "354/12"
   }
   var fields = [
-    r.serial, r.no, r.complainant, r.non_complainant, r.brief, r.io_name,
+    r.serial, r.no, r.complainant, r.non_complainant, r.brief, r.io_name, r.keywords,
     formattedNo, noWithYear, noWithYearSlash
   ];
   return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
