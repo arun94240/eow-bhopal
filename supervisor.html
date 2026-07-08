@@ -15549,6 +15549,20 @@ body.view-mobile #mydaily-box .mydd-tile{ width:100%; }
   outline: 3px solid #c7d2fe !important;
   box-shadow: 0 8px 18px rgba(79,70,229,0.4);
 }
+/* Uniform reports tiles (Reports&Search / By Types / CAO) */
+.reports-uni-stack{ display:grid !important; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
+.reports-uni-stack .rep-pchip{ min-height:54px; display:flex; align-items:center; gap:10px; padding:13px 15px; border-radius:12px; }
+.reports-uni-stack .rep-pchip .hcc-icon{ font-size:17px; }
+.reports-uni-stack .rep-pchip .hcc-label{ flex:1; font-size:13px; font-weight:800; line-height:1.2; }
+.reports-uni-stack .rep-pchip .hcc-num{ font-size:13px; font-weight:900; }
+.rep-pchip-cao{ background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%) !important; border:1.5px solid rgba(255,255,255,0.25) !important; cursor:pointer; }
+.rep-pchip-cao .hcc-icon,.rep-pchip-cao .hcc-label,.rep-pchip-cao .hcc-num{ color:#fff !important; }
+.rep-pchip-cao:hover{ filter:brightness(1.06); }
+.rep-pchip-cao.is-active{ outline:3px solid #99f6e4 !important; box-shadow:0 8px 18px rgba(13,148,136,0.4); }
+.cao-strip-collapsible{ position:static !important; transform:none !important; margin-top:10px; display:flex; }
+.estab-addestab-sub .estab-addestab-btns{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.estab-addestab-sub .estab-addestab-btns button{ background:#059669; color:#fff; border:none; border-radius:8px; padding:8px 14px; font-weight:700; font-size:12.5px; cursor:pointer; }
+.estab-addestab-sub .estab-addestab-btns button:hover{ filter:brightness(1.07); }
 /* Add Establishment — green tile */
 .rep-pchip-addestab {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
@@ -23896,64 +23910,60 @@ body.role-staff header { margin-top: 30px; }
             </div>
             <div class="ov-section-sub">Quick presets + custom builder — preview / PDF export</div>
             <!-- Quick preset matrices (always visible) -->
-            <div class="hdr-counter-stack reports-counter-stack" id="reports-counter-stack">
+            <div class="hdr-counter-stack reports-counter-stack reports-uni-stack" id="reports-counter-stack">
               <div class="hdr-counter rep-pchip rep-pchip-estab" onclick="event.stopPropagation();reportsShowEstabReports(event)">
                 <span class="hcc-icon">📊</span>
-                <span class="hcc-label">Reports &amp; Search</span>
+                <span class="hcc-label">Reports &amp; Search — Leaves</span>
                 <span class="hcc-num" id="reports-cnt-estab">›</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-bytypes" onclick="event.stopPropagation();reportsShowByTypes(event)">
                 <span class="hcc-icon">📑</span>
-                <span class="hcc-label">Reports by Types</span>
+                <span class="hcc-label">Reports by Types — Inquiries</span>
                 <span class="hcc-num" id="reports-cnt-bytypes">›</span>
               </div>
-              <div class="hdr-counter rep-pchip rep-pchip-addestab" onclick="openEstabAddMenu(event)">
-                <span class="hcc-icon">➕</span>
-                <span class="hcc-label">Add Establishment</span>
-                <span class="hcc-num">＋</span>
+              <div class="hdr-counter rep-pchip rep-pchip-cao" onclick="event.stopPropagation();reportsToggleCao(event)">
+                <span class="hcc-icon">👮</span>
+                <span class="hcc-label">Cases Against Officers</span>
+                <span class="hcc-num" id="sb-cao-cnt-total">0</span>
               </div>
             </div>
-      <div class="cao-strip" onclick="event.stopPropagation();">
-        <div class="cao-strip-label">
-          <span class="cao-strip-icon">👮</span>
-          <span class="cao-strip-title">Cases Against Officers</span>
-          <span class="cao-strip-total" id="sb-cao-cnt-total">0</span>
-        </div>
-        <div class="cao-strip-tiles">
-          <button type="button" class="cao-chip cao-chip-ias" data-tag-name="IAS" onclick="event.stopPropagation();navCaoByTag('IAS',event)" title="IAS">
-            <span class="cao-chip-key">IAS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-IAS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-ips" data-tag-name="IPS" onclick="event.stopPropagation();navCaoByTag('IPS',event)" title="IPS">
-            <span class="cao-chip-key">IPS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-IPS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-ifs" data-tag-name="IFS" onclick="event.stopPropagation();navCaoByTag('IFS',event)" title="IFS">
-            <span class="cao-chip-key">IFS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-IFS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-sas" data-tag-name="SAS" onclick="event.stopPropagation();navCaoByTag('SAS',event)" title="SAS">
-            <span class="cao-chip-key">SAS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-SAS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-sps" data-tag-name="SPS" onclick="event.stopPropagation();navCaoByTag('SPS',event)" title="SPS">
-            <span class="cao-chip-key">SPS</span>
-            <span class="cao-chip-num" id="sb-cao-tile-SPS">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-bjp" data-tag-name="Politician BJP" onclick="event.stopPropagation();navCaoByTag('Politician BJP',event)" title="Politician BJP">
-            <span class="cao-chip-key">BJP</span>
-            <span class="cao-chip-num" id="sb-cao-tile-BJP">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-inc" data-tag-name="Politician INC" onclick="event.stopPropagation();navCaoByTag('Politician INC',event)" title="Politician INC">
-            <span class="cao-chip-key">INC</span>
-            <span class="cao-chip-num" id="sb-cao-tile-INC">0</span>
-          </button>
-          <button type="button" class="cao-chip cao-chip-oth" data-tag-name="__OTHER_POLITICIAN__" onclick="event.stopPropagation();navCaoByTag('__OTHER_POLITICIAN__',event)" title="Other Politician">
-            <span class="cao-chip-key">Oth</span>
-            <span class="cao-chip-num" id="sb-cao-tile-OTHER">0</span>
-          </button>
-        </div>
-      </div>
+            <!-- CAO chips — collapsible, tap the tile above -->
+            <div class="cao-strip cao-strip-collapsible" id="cao-chips-wrap" style="display:none;" onclick="event.stopPropagation();">
+                      <div class="cao-strip-tiles">
+                        <button type="button" class="cao-chip cao-chip-ias" data-tag-name="IAS" onclick="event.stopPropagation();navCaoByTag('IAS',event)" title="IAS">
+                          <span class="cao-chip-key">IAS</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-IAS">0</span>
+                        </button>
+                        <button type="button" class="cao-chip cao-chip-ips" data-tag-name="IPS" onclick="event.stopPropagation();navCaoByTag('IPS',event)" title="IPS">
+                          <span class="cao-chip-key">IPS</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-IPS">0</span>
+                        </button>
+                        <button type="button" class="cao-chip cao-chip-ifs" data-tag-name="IFS" onclick="event.stopPropagation();navCaoByTag('IFS',event)" title="IFS">
+                          <span class="cao-chip-key">IFS</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-IFS">0</span>
+                        </button>
+                        <button type="button" class="cao-chip cao-chip-sas" data-tag-name="SAS" onclick="event.stopPropagation();navCaoByTag('SAS',event)" title="SAS">
+                          <span class="cao-chip-key">SAS</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-SAS">0</span>
+                        </button>
+                        <button type="button" class="cao-chip cao-chip-sps" data-tag-name="SPS" onclick="event.stopPropagation();navCaoByTag('SPS',event)" title="SPS">
+                          <span class="cao-chip-key">SPS</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-SPS">0</span>
+                        </button>
+                        <button type="button" class="cao-chip cao-chip-bjp" data-tag-name="Politician BJP" onclick="event.stopPropagation();navCaoByTag('Politician BJP',event)" title="Politician BJP">
+                          <span class="cao-chip-key">BJP</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-BJP">0</span>
+                        </button>
+                        <button type="button" class="cao-chip cao-chip-inc" data-tag-name="Politician INC" onclick="event.stopPropagation();navCaoByTag('Politician INC',event)" title="Politician INC">
+                          <span class="cao-chip-key">INC</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-INC">0</span>
+                        </button>
+                        <button type="button" class="cao-chip cao-chip-oth" data-tag-name="__OTHER_POLITICIAN__" onclick="event.stopPropagation();navCaoByTag('__OTHER_POLITICIAN__',event)" title="Other Politician">
+                          <span class="cao-chip-key">Oth</span>
+                          <span class="cao-chip-num" id="sb-cao-tile-OTHER">0</span>
+                        </button>
+                      </div>
+            </div>
           </div>
           <div class="ov-section-actions">
             <button class="dgeow-hdr-add-btn-red" onclick="event.stopPropagation();openReportBuilderInline()" title="Custom report builder">⚙ Custom</button>
@@ -23976,12 +23986,21 @@ body.role-staff header { margin-top: 30px; }
             <div class="ovstats-panel" id="estab-panel-reports" style="display:none;">
               <div class="ovstats-panel-head">
                 <span class="ovstats-panel-icon">📊</span>
-                <span class="ovstats-panel-title">Reports & Search</span>
+                <span class="ovstats-panel-title">Reports & Search — Leaves</span>
                 <span class="ovstats-grand-total" id="estab-reports-summary">Quick reports + search</span>
                 <span class="ovstats-panel-sub">Quick cards + free-text search</span>
               </div>
               <div class="ovstats-panel-body">
-                
+
+                <!-- ➕ Add Establishment (moved here as top subheading) -->
+                <div class="estab-reports-section estab-addestab-sub">
+                  <div class="estab-reports-section-head">➕ Add Establishment</div>
+                  <div class="estab-addestab-btns">
+                    <button type="button" onclick="event.stopPropagation();estabAddMenuPick('staff')">👤 Add Member</button>
+                    <button type="button" onclick="event.stopPropagation();estabAddMenuPick('leave')">🏖️ Add / Modify Leave</button>
+                  </div>
+                </div>
+
                 <!-- Quick report cards -->
                 <div class="estab-reports-section">
                   <div class="estab-reports-section-head">⚡ Quick Reports</div>
@@ -24006,7 +24025,7 @@ body.role-staff header { margin-top: 30px; }
             <div class="ovstats-panel" id="reports-bytypes-panel" style="display:none;">
               <div class="ovstats-panel-head">
                 <span class="ovstats-panel-icon">📊</span>
-                <span class="ovstats-panel-title">Reports by Types</span>
+                <span class="ovstats-panel-title">Reports by Types — Inquiries</span>
                 <span class="ovstats-panel-sub">category-wise quick reports</span>
                 <button class="ovstats-open-full" onclick="event.stopPropagation();switchSection('report')">Full Builder →</button>
               </div>
@@ -33028,6 +33047,17 @@ function mddPragatiAdd() {
 }
 
 // ── Settings & Reports tile — navigates to Reports section + triggers the feature ──
+function reportsToggleCao(evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  var wrap = document.getElementById('reports-summary-wrap');
+  if (wrap && wrap.classList.contains('collapsed')) wrap.classList.remove('collapsed');
+  var chips = document.getElementById('cao-chips-wrap'); if (!chips) return;
+  var tile = document.querySelector('.rep-pchip-cao');
+  var open = chips.style.display === 'none';
+  chips.style.display = open ? 'flex' : 'none';
+  if (tile) tile.classList.toggle('is-active', open);
+  if (open && typeof refreshCaoMatrix === 'function') { try { refreshCaoMatrix(); } catch(e){} }
+}
 function settingsNav(which) {
   try {
     if (typeof switchSection === 'function') switchSection('report');
