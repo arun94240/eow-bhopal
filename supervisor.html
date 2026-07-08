@@ -3302,6 +3302,11 @@ body.view-mobile .cm-dy {
   letter-spacing: 0.03em;
 }
 
+.ycc-total-click{ cursor:pointer; transition:background .12s,transform .12s; }
+.ycc-total-click:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+.ycc-total-click.is-ifl-open{ outline:2px solid #f5b942; outline-offset:1px; }
+.ifl-toolbar{ display:flex; gap:7px; padding:8px 12px; border-bottom:1px solid #e2e8f0; flex-wrap:wrap; align-items:center; background:#f8fafc; }
+.ifl-card-fallback{ grid-column:1/-1; }
 .ycc-total {
   color: #062a52;
   font-size: 20px;
@@ -48467,9 +48472,10 @@ function renderIOCards() {
         '</button>';
       }
     });
+    var safeNameT = escapeHtml(p.name).replace(/'/g, "\\'");
     return '<div class="year-cal-card" title="' + escapeHtml(p.name) + ' — ' + p.d.total + ' cases">' +
       '<div class="ycc-strip ycc-strip-io">' + escapeHtml(p.name) + '</div>' +
-      '<div class="ycc-total">Total-' + p.d.total + '</div>' +
+      '<div class="ycc-total ycc-total-click" onclick="inlineNavIOTotal(\'' + safeNameT + '\',event)" title="पूरी सूची — tap for inline list">Total-' + p.d.total + '</div>' +
       (headBadges ? '<div class="ycc-heads">' + headBadges + '</div>' : '') +
     '</div>';
   }).join('');
@@ -56351,6 +56357,87 @@ function inlineNavIOHead(ioName, headType, evt) {
   var trigger = evt && evt.currentTarget ? evt.currentTarget : null;
   showInlineFilteredList('io', { ioName: ioName, headType: headType }, trigger);
 }
+
+// ── IO Total → inline list of ALL that IO's cases, Home-style (List/Cards + पुराने/नए) ──
+var _ioTotState = { ioName: null, view: 'list', sortAsc: true };
+function _ioTotGather(ioName) {
+  var out = [];
+  ['complaints','rcomplaints','rcs','pes','strs','sutra'].forEach(function(tp){
+    (state.enquiries[tp] || []).forEach(function(r){
+      if (r.io_name === ioName) out.push({ _isCourt: false, _type: tp, _row: r });
+    });
+  });
+  (state.courts || []).forEach(function(c){
+    if (c.incharge_officer === ioName) out.push({ _isCourt: true, _row: c });
+  });
+  return out;
+}
+function _ioTotSortKey(m) {
+  var r = m._row;
+  var y = parseInt(m._isCourt ? (r.filing_year || r.year || 0) : (r.entry_year || 0), 10) || 0;
+  var n = parseInt(m._isCourt ? (r.case_no || 0) : (r.no || 0), 10) || 0;
+  return y * 100000 + n;
+}
+function inlineNavIOTotal(ioName, evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  var trigger = evt && evt.currentTarget ? evt.currentTarget : null;
+  var key = 'iototal:' + ioName;
+  // tap-tap toggle
+  if (_iflCurrentKey === key) { closeInlineFilteredList(); return; }
+  closeInlineFilteredList();
+  var host = trigger ? (trigger.closest('.year-cal-card') || trigger.parentNode) : null;
+  if (!host || !host.parentNode) return;
+  _ioTotState = { ioName: ioName, view: (_ioTotState && _ioTotState.view) || 'list', sortAsc: true };
+  var panel = document.createElement('div');
+  panel.className = 'inline-filtered-list-panel';
+  panel.setAttribute('data-ifl-key', key);
+  panel.id = 'io-total-panel';
+  panel.innerHTML = _ioTotPanelHTML();
+  var grid = host.closest('.ov-cards-grid');
+  if (grid) { grid.appendChild(panel); host.classList.add('is-ifl-source'); }
+  else { host.parentNode.insertBefore(panel, host.nextSibling); }
+  if (trigger && trigger.classList) trigger.classList.add('is-ifl-open');
+  _iflCurrentKey = key;
+  setTimeout(function(){
+    try {
+      var pRect = panel.getBoundingClientRect(), vh = window.innerHeight;
+      if (pRect.bottom > vh - 20) { var tRect = (trigger||host).getBoundingClientRect(); window.scrollTo({ top: window.scrollY + tRect.top - 100, behavior: 'smooth' }); }
+    } catch(e){}
+  }, 60);
+}
+function _ioTotPanelHTML() {
+  var ioName = _ioTotState.ioName;
+  var matches = _ioTotGather(ioName);
+  matches.sort(function(a,b){ var ka=_ioTotSortKey(a), kb=_ioTotSortKey(b); return _ioTotState.sortAsc ? ka-kb : kb-ka; });
+  var header = '<div class="ifl-header">' +
+    '<div class="ifl-header-title"><span class="ifl-header-tag">👮 कुल</span><span class="ifl-header-name">' + escapeHtml(ioName) + '</span></div>' +
+    '<span class="ifl-header-count">' + matches.length + (matches.length === 1 ? ' case' : ' cases') + '</span>' +
+    '<button class="ifl-close-btn" onclick="event.stopPropagation();closeInlineFilteredList()" title="Close">✕</button>' +
+  '</div>';
+  var toolbar = '<div class="ifl-toolbar">' +
+    '<button type="button" class="enq-view-btn' + (_ioTotState.view === 'list' ? ' active' : '') + '" onclick="event.stopPropagation();iotSetView(\'list\')">📋 List</button>' +
+    '<button type="button" class="enq-view-btn' + (_ioTotState.view === 'cards' ? ' active' : '') + '" onclick="event.stopPropagation();iotSetView(\'cards\')">🃏 Cards</button>' +
+    '<button type="button" class="enq-sort-btn" onclick="event.stopPropagation();iotToggleSort()">' + (_ioTotState.sortAsc ? '↑ पुराने पहले' : '↓ नए पहले') + '</button>' +
+  '</div>';
+  var body;
+  if (!matches.length) { body = '<div class="ifl-body"><div class="ifl-empty">No matching cases</div></div>'; }
+  else if (_ioTotState.view === 'cards') {
+    body = '<div class="ifl-body"><div class="enq-cards-grid">' + matches.map(function(m){
+      if (!m._isCourt && typeof _buildEnquiryCard === 'function') return _buildEnquiryCard(m._type, m._row);
+      return '<div class="ifl-card-fallback">' + _iflBuildRow(m) + '</div>';
+    }).join('') + '</div></div>';
+  } else {
+    body = '<div class="ifl-body">' + matches.map(function(m){ return _iflBuildRow(m); }).join('') + '</div>';
+  }
+  return header + toolbar + body;
+}
+function _ioTotRerender() {
+  var p = document.getElementById('io-total-panel'); if (!p) return;
+  if (typeof closeInlineExpand === 'function') closeInlineExpand();
+  p.innerHTML = _ioTotPanelHTML();
+}
+function iotSetView(mode) { _ioTotState.view = mode; _ioTotRerender(); }
+function iotToggleSort() { _ioTotState.sortAsc = !_ioTotState.sortAsc; _ioTotRerender(); }
 
 // Hook: when an enquiry or court is saved (via edit form opened FROM inline panel),
 // we want to refresh the panel content. We'll let the existing save flows
