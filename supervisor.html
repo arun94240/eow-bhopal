@@ -126,6 +126,12 @@ main { max-width: 1500px; margin: 0 auto; padding: 24px 32px 60px; }
 .section-tab.active .count { background: rgba(0,0,0,0.4); color: white; }
 /* GLOBAL SEARCH */
 .global-search-wrap { margin-bottom: 22px; position: relative; background: white; padding: 18px 20px; border: 2px solid #94a3bb; border-radius: 10px; box-shadow: 0 3px 10px rgba(6,42,82,0.15); border-left: 5px solid #134d8a; }
+.usb-header{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.usb-header .sup-mini-cal{ flex:0 0 auto; }
+.usb-title{ font-size:18px; font-weight:800; color:#062a52; flex:1; }
+.usb-adv-toggle{ background:#eef2f7; color:#134d8a; border:1px solid #cbd5e1; border-radius:8px; font-size:12px; font-weight:700; padding:6px 12px; cursor:pointer; }
+.usb-adv-toggle:hover{ background:#e2e8f0; }
+#search-matrices-collapse{ margin-top:14px; border-top:1px dashed #cbd5e1; padding-top:14px; }
 .search-header { margin-bottom: 14px; }
 .search-heading { font-size: 17px; font-weight: 800; color: #062a52; margin-bottom: 4px; letter-spacing: 0.01em; }
 .search-subheading { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
@@ -21781,140 +21787,109 @@ body.role-staff header { margin-top: 30px; }
 <main>
 
   <!-- GLOBAL SEARCH -->
-  <div class="global-search-wrap">
-    <div class="search-header">
-      <h3 class="search-heading">🔍 Search Dashboard</h3>
-      <p class="search-subheading">कोई भी जानकारी खोजें — number, नाम, serial, या IO के नाम से filter करें</p>
+  <!-- 🔍 UNIFIED SEARCH BOX (merged: quick search + matrices) -->
+  <div class="global-search-wrap" id="unified-search-box">
+    <div class="usb-header">
+      <span class="sup-mini-cal" id="search-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
+      <div class="usb-title">🔍 Search</div>
+      <span class="dgeow-total-pill">DB: <strong id="search-cnt-total">0</strong></span>
+      <button type="button" class="usb-adv-toggle" id="usb-adv-toggle" onclick="toggleSearchMatrices(event)">▾ matrices</button>
     </div>
-
-    <div class="search-with-cao">
-      <!-- LEFT: Search controls (existing) -->
-      <div class="search-left">
-        <div class="search-controls">
-          <div class="global-search-box">
-            <span class="global-search-icon">🔎</span>
-            <input type="text" id="global-search" placeholder="कोई number, नाम, या serial खोजें..." oninput="performGlobalSearch()" autocomplete="off">
-            <button class="global-search-clear" onclick="clearGlobalSearch()" id="global-search-clear" style="display:none;">✕</button>
-          </div>
-
-          <div class="io-search-box">
-            <label class="io-search-label">👮 Search by IO</label>
-            <select class="io-search-select" id="io-search-select" onchange="performIOSearch()">
-              <option value="">— Select IO —</option>
-            </select>
-          </div>
-        </div>
+    <div class="search-controls">
+      <div class="global-search-box">
+        <span class="global-search-icon">🔎</span>
+        <input type="text" id="global-search" placeholder="कोई number, नाम, serial, keyword, या IO खोजें..." oninput="performGlobalSearch()" autocomplete="off">
+        <button class="global-search-clear" onclick="clearGlobalSearch()" id="global-search-clear" style="display:none;">✕</button>
       </div>
-      
-      <!-- NOTE: Bulky CAO panel removed from here — replaced by compact -->
-      <!-- inline matrix inside Search Status Strip header (see below).   -->
+      <div class="io-search-box">
+        <label class="io-search-label">👮 Search by IO</label>
+        <select class="io-search-select" id="io-search-select" onchange="performIOSearch()">
+          <option value="">— Select IO —</option>
+        </select>
+      </div>
     </div>
-
     <div id="global-search-results" class="global-search-results"></div>
-  </div>
-
-  <!-- ════════════════════════════════════════════════════════════ -->
-  <!-- 🔍 SEARCH BOX — discovery tool with 6 search matrices       -->
-  <!-- Free-text + By Type + By IO + By Year + By Tag + CAO        -->
-  <!-- No "Add" button (search is discovery, not creation)         -->
-  <!-- ════════════════════════════════════════════════════════════ -->
-  <div class="ov-section collapsed" id="search-summary-wrap">
-    <div class="ov-section-header" onclick="toggleSearchSection(event)">
-      <div class="ov-section-titles">
-        <div class="sup-title-row dgeow-title-row">
-          <span class="sup-mini-cal" id="search-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
-          <div class="ov-section-title">🔍 Search</div>
-          <span class="dgeow-total-pill">DB: <strong id="search-cnt-total">0</strong></span>
-        </div>
-        <div class="ov-section-sub">Khoj — 6 matrices: free-text, type, IO, year, tag, CAO</div>
-      </div>
-      
-      <!-- ✨ CAO MATRIX — absolutely positioned right side, vertically centered -->
-      
-      <div class="ov-section-toggle">▼</div>
-    </div>
+    <!-- matrices (collapsible, moved from old Search box) -->
+    <div id="search-matrices-collapse" style="display:none;">
+          <div id="search-content" class="search-content">
     
-    
-    <div class="ov-section-body">
-      <div id="search-content" class="search-content">
-
-        <!-- Matrix 1: Free-text search -->
-        <div class="search-matrix">
-          <div class="search-matrix-head">
-            <span class="search-matrix-icon">🔎</span>
-            <span class="search-matrix-title">Free-text Search</span>
-            <span class="search-matrix-sub">case no, complainant, brief, court, IO — kuch bhi</span>
-          </div>
-          <div class="search-matrix-body">
-            <div class="search-freetext-wrap">
-              <input type="search" id="search-freetext-input" class="search-freetext-input" 
-                     placeholder="🔎 Type to search across all data..." 
-                     oninput="searchFreetextDebounced(this.value)" autocomplete="off">
-              <button class="search-freetext-clear" id="search-freetext-clear" onclick="clearFreetextSearch()" style="display:none;">✕</button>
+            <!-- Matrix 1: Free-text search -->
+            <div class="search-matrix">
+              <div class="search-matrix-head">
+                <span class="search-matrix-icon">🔎</span>
+                <span class="search-matrix-title">Free-text Search</span>
+                <span class="search-matrix-sub">case no, complainant, brief, court, IO — kuch bhi</span>
+              </div>
+              <div class="search-matrix-body">
+                <div class="search-freetext-wrap">
+                  <input type="search" id="search-freetext-input" class="search-freetext-input" 
+                         placeholder="🔎 Type to search across all data..." 
+                         oninput="searchFreetextDebounced(this.value)" autocomplete="off">
+                  <button class="search-freetext-clear" id="search-freetext-clear" onclick="clearFreetextSearch()" style="display:none;">✕</button>
+                </div>
+                <div class="search-freetext-meta" id="search-freetext-meta" style="display:none;"></div>
+              </div>
             </div>
-            <div class="search-freetext-meta" id="search-freetext-meta" style="display:none;"></div>
+    
+            <!-- Matrix 2: Search by Type -->
+            <div class="search-matrix">
+              <div class="search-matrix-head">
+                <span class="search-matrix-icon">📁</span>
+                <span class="search-matrix-title">Search by Type</span>
+              </div>
+              <div class="search-matrix-body">
+                <div class="search-chips-grid" id="search-by-type-chips"></div>
+              </div>
+            </div>
+    
+            <!-- Matrix 3: Search by IO -->
+            <div class="search-matrix">
+              <div class="search-matrix-head">
+                <span class="search-matrix-icon">👮</span>
+                <span class="search-matrix-title">Search by IO</span>
+              </div>
+              <div class="search-matrix-body">
+                <div class="search-chips-grid" id="search-by-io-chips"></div>
+              </div>
+            </div>
+    
+            <!-- Matrix 4: Search by Year -->
+            <div class="search-matrix">
+              <div class="search-matrix-head">
+                <span class="search-matrix-icon">📅</span>
+                <span class="search-matrix-title">Search by Year</span>
+              </div>
+              <div class="search-matrix-body">
+                <div class="search-chips-grid" id="search-by-year-chips"></div>
+              </div>
+            </div>
+    
+            <!-- Matrix 5: Cases against Officers -->
+            <div class="search-matrix">
+              <div class="search-matrix-head">
+                <span class="search-matrix-icon">🛡️</span>
+                <span class="search-matrix-title">Cases against Officers (Supervision Tags)</span>
+              </div>
+              <div class="search-matrix-body">
+                <div class="search-chips-grid" id="search-by-cao-chips"></div>
+              </div>
+            </div>
+    
+            <!-- Matrix 6: Search by Tag -->
+            <div class="search-matrix">
+              <div class="search-matrix-head">
+                <span class="search-matrix-icon">🏷️</span>
+                <span class="search-matrix-title">Search by Tag</span>
+              </div>
+              <div class="search-matrix-body">
+                <div class="search-chips-grid" id="search-by-tag-chips"></div>
+              </div>
+            </div>
+    
+            <!-- Results panel area (inline filtered list pattern) -->
+            <div id="search-results-area"></div>
+    
           </div>
-        </div>
-
-        <!-- Matrix 2: Search by Type -->
-        <div class="search-matrix">
-          <div class="search-matrix-head">
-            <span class="search-matrix-icon">📁</span>
-            <span class="search-matrix-title">Search by Type</span>
-          </div>
-          <div class="search-matrix-body">
-            <div class="search-chips-grid" id="search-by-type-chips"></div>
-          </div>
-        </div>
-
-        <!-- Matrix 3: Search by IO -->
-        <div class="search-matrix">
-          <div class="search-matrix-head">
-            <span class="search-matrix-icon">👮</span>
-            <span class="search-matrix-title">Search by IO</span>
-          </div>
-          <div class="search-matrix-body">
-            <div class="search-chips-grid" id="search-by-io-chips"></div>
-          </div>
-        </div>
-
-        <!-- Matrix 4: Search by Year -->
-        <div class="search-matrix">
-          <div class="search-matrix-head">
-            <span class="search-matrix-icon">📅</span>
-            <span class="search-matrix-title">Search by Year</span>
-          </div>
-          <div class="search-matrix-body">
-            <div class="search-chips-grid" id="search-by-year-chips"></div>
-          </div>
-        </div>
-
-        <!-- Matrix 5: Cases against Officers -->
-        <div class="search-matrix">
-          <div class="search-matrix-head">
-            <span class="search-matrix-icon">🛡️</span>
-            <span class="search-matrix-title">Cases against Officers (Supervision Tags)</span>
-          </div>
-          <div class="search-matrix-body">
-            <div class="search-chips-grid" id="search-by-cao-chips"></div>
-          </div>
-        </div>
-
-        <!-- Matrix 6: Search by Tag -->
-        <div class="search-matrix">
-          <div class="search-matrix-head">
-            <span class="search-matrix-icon">🏷️</span>
-            <span class="search-matrix-title">Search by Tag</span>
-          </div>
-          <div class="search-matrix-body">
-            <div class="search-chips-grid" id="search-by-tag-chips"></div>
-          </div>
-        </div>
-
-        <!-- Results panel area (inline filtered list pattern) -->
-        <div id="search-results-area"></div>
-
-      </div>
     </div>
   </div>
 
@@ -31860,6 +31835,8 @@ function renderMyDailyBox() {
   if (typeof mtxRefresh === 'function') mtxRefresh(); // unified My Tasks master
   if (typeof hctUpdateCounts === 'function') hctUpdateCounts(); // Home compact tiles
   if (typeof ovccRefreshCounts === 'function') ovccRefreshCounts(); // ovstats leave(current)+notice(taameeli)
+  if (typeof refreshSearchMiniCal === 'function') refreshSearchMiniCal();
+  if (typeof refreshSearchTotal === 'function') refreshSearchTotal();
 }
 
 // ── DG EOW Task's tile → tap-tap panel (To-Dos + Discussions/Notes) ──
@@ -44596,15 +44573,17 @@ function _dupdBuildUpdateBrief(u, prakaran) {
 // ════════════════════════════════════════════════════════════════════
 
 function toggleSearchSection(evt) {
-  if (evt && evt.target && evt.target.closest && evt.target.closest('.hdr-counter')) return;
-  if (evt && evt.target && evt.target.closest && evt.target.closest('.dgeow-hdr-actions')) return;
-  var wrap = document.getElementById('search-summary-wrap');
-  if (!wrap) return;
-  wrap.classList.toggle('collapsed');
-  // Render matrices on first open
-  if (!wrap.classList.contains('collapsed')) {
-    renderSearchMatrices();
-  }
+  // Legacy no-op shell kept for safety; matrices now live in unified search box.
+  if (typeof toggleSearchMatrices === 'function') toggleSearchMatrices(evt);
+}
+function toggleSearchMatrices(evt) {
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  var box = document.getElementById('search-matrices-collapse'); if (!box) return;
+  var open = box.style.display === 'none';
+  box.style.display = open ? 'block' : 'none';
+  var btn = document.getElementById('usb-adv-toggle');
+  if (btn) btn.textContent = (open ? '▴ matrices' : '▾ matrices');
+  if (open && typeof renderSearchMatrices === 'function') renderSearchMatrices();
 }
 
 // Render all 5 chip matrices (Free-text is static input)
