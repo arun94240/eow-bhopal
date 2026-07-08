@@ -15439,6 +15439,54 @@ body.view-mobile #mydaily-box .mydd-tile{ width:100%; }
 }
 .pragati-counter-stack.pragati-stacked .pragati-pchip .hcc-num { margin-left: auto; }
 
+/* ═══ MINIMALISTIC REDESIGN — Notice + Pragati stat-chips (v77) ═══ */
+/* Notice: 4 uniform stat-chips (colored left bar, big number on top, label below) */
+#notices-counter-stack{
+  display:grid !important; grid-template-columns:repeat(auto-fit,minmax(138px,1fr)) !important;
+  flex-direction:unset !important; align-items:stretch !important; gap:9px !important;
+}
+#notices-counter-stack > .hdr-counter{
+  width:auto !important; max-width:none !important; min-width:0 !important; min-height:auto !important;
+  display:flex !important; flex-direction:column !important; align-items:flex-start !important; gap:2px !important;
+  background:#fff !important; border:1.5px solid #e6edf5 !important; border-radius:12px !important;
+  padding:11px 13px 11px 15px !important; box-shadow:0 1px 4px rgba(6,42,82,0.05) !important; cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+}
+#notices-counter-stack > .hdr-counter:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(6,42,82,0.11) !important; }
+#notices-counter-stack > .hdr-counter .hcc-icon{ display:none !important; }
+#notices-counter-stack > .hdr-counter .hcc-num{ order:-1; font-size:23px !important; font-weight:900 !important; line-height:1 !important; }
+#notices-counter-stack > .hdr-counter .hcc-label{ font-size:11.5px !important; font-weight:700 !important; color:#64748b !important; white-space:normal !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-total{ border-left:4px solid #3b82f6 !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-total .hcc-num{ color:#2563eb !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-aaj{ border-left:4px solid #f5b942 !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-aaj .hcc-num{ color:#b45309 !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-served{ border-left:4px solid #16a34a !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-served .hcc-num{ color:#15803d !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-overdue{ border-left:4px solid #dc2626 !important; }
+#notices-counter-stack > .hdr-counter.hdr-counter-overdue .hcc-num{ color:#b91c1c !important; }
+#notices-counter-stack > .hdr-counter.is-active{ border-color:#062a52 !important; background:#f8fafc !important; box-shadow:0 4px 12px rgba(6,42,82,0.14) !important; }
+/* Notice review matrix rows — lighter, compact */
+.notices-matrix-row{ background:#f8fafc; border:1px solid #eef2f7; border-radius:10px; padding:7px 10px; margin-top:8px; }
+.notices-matrix-label{ font-size:10.5px !important; font-weight:800 !important; color:#94a3b8 !important; }
+
+/* Pragati: period tiles as 4-col grid (big number on top, label below) */
+.pragati-counter-stack.pragati-stacked{ grid-template-columns:repeat(4,1fr) !important; max-width:none !important; gap:8px !important; }
+.pragati-counter-stack.pragati-stacked .pragati-pchip{
+  flex-direction:column !important; align-items:flex-start !important; gap:2px !important;
+  background:#fff !important; border:1.5px solid #e6edf5 !important; border-radius:12px !important;
+  padding:11px 13px !important; box-shadow:0 1px 4px rgba(6,42,82,0.05); transition:transform .12s, box-shadow .12s;
+}
+.pragati-counter-stack.pragati-stacked .pragati-pchip:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(6,42,82,0.11); }
+.pragati-counter-stack.pragati-stacked .pragati-pchip .hcc-icon{ display:none !important; }
+.pragati-counter-stack.pragati-stacked .pragati-pchip .hcc-num{ order:-1 !important; margin-left:0 !important; font-size:21px !important; font-weight:900 !important; line-height:1 !important; color:#062a52 !important; }
+.pragati-counter-stack.pragati-stacked .pragati-pchip .hcc-label{ font-size:11.5px !important; font-weight:800 !important; color:#64748b !important; }
+.pragati-counter-stack.pragati-stacked .pragati-pchip.is-active{ border-color:#062a52 !important; background:#f8fafc !important; box-shadow:0 4px 12px rgba(6,42,82,0.14) !important; }
+@media (max-width:560px){
+  .pragati-counter-stack.pragati-stacked{ grid-template-columns:repeat(2,1fr) !important; }
+  #notices-counter-stack{ grid-template-columns:repeat(2,1fr) !important; }
+}
+/* ═══ end minimalistic redesign ═══ */
+
 /* IO + date-range filter bar */
 .pragati-filter-bar {
   display: flex;
