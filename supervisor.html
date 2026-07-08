@@ -15201,6 +15201,17 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mddq-save:hover{ background:#15803d; }
 #mydaily-box .mddq-cancel{ background:#e2e8f0; color:#334155; border:none; border-radius:7px; padding:7px 14px; font-weight:700; font-size:12.5px; cursor:pointer; }
 #mydaily-box .mddq-or{ font-size:11px; font-weight:800; color:#64748b; text-align:center; letter-spacing:.03em; margin:2px 0; }
+/* Home compact tiles (Notice / Pragati / Settings) */
+.home-compact-tiles{ display:flex; flex-wrap:wrap; gap:12px; margin:14px 0 4px; }
+.hct-tile{ flex:1 1 220px; min-width:210px; display:flex; align-items:center; gap:10px; padding:13px 15px; border-radius:12px; cursor:pointer; color:#fff; border:1.5px solid rgba(255,255,255,0.25); box-shadow:0 3px 10px rgba(0,0,0,0.18); transition:transform .13s; }
+.hct-tile:hover{ transform:translateY(-2px); }
+.hct-notice{ background:linear-gradient(135deg,#0d9488,#0f766e); }
+.hct-prag{ background:linear-gradient(135deg,#16a34a,#15803d); }
+.hct-set{ background:linear-gradient(135deg,#475569,#334155); }
+.hct-tile .hct-lbl{ flex:1; font-size:13.5px; font-weight:800; }
+.hct-tile .hct-num{ background:#fff; color:#0d2c54; border-radius:999px; font-size:11px; font-weight:900; padding:2px 10px; }
+.hct-tile .hct-car{ font-size:11px; opacity:.9; }
+#home-compact-host > .ov-section{ margin-top:12px; }
 #mydaily-box .mydd-dg-subcaret{ font-size:11px; color:#fff; opacity:0.9; }
 #mydaily-box .mydd-listsec{ background:rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.18); border-radius:11px; overflow:hidden; }
 #mydaily-box .mydd-listsec-head{ display:flex; align-items:center; gap:10px; padding:9px 14px; }
@@ -22425,6 +22436,23 @@ body.role-staff header { margin-top: 30px; }
           </div>
         </div>
       </div>
+
+      <!-- HOME COMPACT TILES: Notice / Pragati / Settings (boxes relocated here at runtime) -->
+      <div class="home-compact-tiles" id="home-compact-tiles">
+        <div class="hct-tile hct-notice" onclick="event.stopPropagation();hctToggle('notices');">
+          <span>📨</span><span class="hct-lbl">Notice-Summons-Warrants</span>
+          <span class="hct-num" id="hct-cnt-notices">0</span><span class="hct-car" id="hct-car-notices">▾</span>
+        </div>
+        <div class="hct-tile hct-prag" onclick="event.stopPropagation();hctToggle('pragati');">
+          <span>📈</span><span class="hct-lbl">Pragati Prativedan</span>
+          <span class="hct-num" id="hct-cnt-pragati">0</span><span class="hct-car" id="hct-car-pragati">▾</span>
+        </div>
+        <div class="hct-tile hct-set" onclick="event.stopPropagation();hctToggle('reports');">
+          <span>⚙️</span><span class="hct-lbl">Settings &amp; Reports</span>
+          <span class="hct-num">›</span><span class="hct-car" id="hct-car-reports">▾</span>
+        </div>
+      </div>
+      <div id="home-compact-host"></div>
 
       <!-- DG EOW SECTION -->
       <div class="ov-section collapsed" id="dgeow-summary-wrap">
@@ -31780,6 +31808,7 @@ function renderMyDailyBox() {
   if (typeof noticeUpdateCounts === 'function') noticeUpdateCounts(); // Notice-Summons-Warrants counts
   if (typeof pragatiUpdateCounts === 'function') pragatiUpdateCounts(); // Pragati Prativedan counts
   if (typeof mtxRefresh === 'function') mtxRefresh(); // unified My Tasks master
+  if (typeof hctUpdateCounts === 'function') hctUpdateCounts(); // Home compact tiles
 }
 
 // ── DG EOW Task's tile → tap-tap panel (To-Dos + Discussions/Notes) ──
@@ -32905,6 +32934,51 @@ function settingsNav(which) {
       // 'home' → just land on the Reports section
     }, 170);
   } catch(e) {}
+}
+
+// ── Home compact tiles: relocate the 3 boxes under a compact strip; tap → inline expand ──
+var _hctReady = false;
+function _hctBox(which){
+  return document.getElementById(which === 'notices' ? 'notices-summary-wrap' : which === 'pragati' ? 'pragati-summary-wrap' : 'reports-summary-wrap');
+}
+function hctInit() {
+  if (_hctReady) return;
+  var host = document.getElementById('home-compact-host'); if (!host) return;
+  ['notices','pragati','reports'].forEach(function(w){
+    var box = _hctBox(w);
+    if (box && box.parentNode !== host) { host.appendChild(box); }
+    if (box) { box.classList.add('collapsed'); box.style.display = 'none'; }
+  });
+  _hctReady = true;
+}
+function hctToggle(which) {
+  hctInit();
+  var box = _hctBox(which); if (!box) return;
+  var isOpen = (box.style.display !== 'none') && !box.classList.contains('collapsed');
+  // close all first
+  ['notices','pragati','reports'].forEach(function(w){
+    var b = _hctBox(w); if (b) { b.style.display = 'none'; b.classList.add('collapsed'); }
+    var c = document.getElementById('hct-car-' + w); if (c) c.textContent = '▾';
+  });
+  if (!isOpen) {
+    box.style.display = 'block';
+    box.classList.remove('collapsed');
+    var car = document.getElementById('hct-car-' + which); if (car) car.textContent = '▴';
+    try {
+      if (which === 'notices') { if (typeof refreshNoticesCounters === 'function') refreshNoticesCounters(); if (typeof refreshNoticesIoMatrix === 'function') refreshNoticesIoMatrix(); }
+      else if (which === 'pragati' && typeof refreshPragatiBox === 'function') refreshPragatiBox();
+      else if (which === 'reports' && typeof renderSearchMatrices === 'function') renderSearchMatrices();
+    } catch(e){}
+    try { box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+  }
+}
+function hctUpdateCounts() {
+  hctInit();
+  function setN(id,v){ var e=document.getElementById(id); if (e) e.textContent = v; }
+  var nc = 0; try { nc = (typeof _noticeBucket === 'function') ? _noticeBucket('issued').length : ((state.notices||[]).filter(function(n){return n.status!=='Archived';}).length); } catch(e){}
+  var pc = (state.pragatiUpdates || []).length;
+  setN('hct-cnt-notices', nc);
+  setN('hct-cnt-pragati', pc);
 }
 
 // ════════════════════════════════════════════════════════════════
