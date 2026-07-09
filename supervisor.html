@@ -32346,12 +32346,10 @@ function mtxToggleAll() {
   Array.prototype.forEach.call(document.querySelectorAll('.mydd-master [id^="mtx-name-caret-"]'), function(c){ c.textContent = open ? '▴' : '▾'; });
 }
 function mtxToggleBox() {
-  var body = document.getElementById('mtx-body'); if (!body) return;
-  var open = body.style.display === 'none';
-  if (open) { body.style.display = ''; }
-  else { body.style.display = 'none'; if (typeof mtxCloseAll === 'function') mtxCloseAll(); }
-  var master = document.querySelector('.mydd-master');
-  if (master) master.classList.toggle('mtx-collapsed', !open);
+  // Header tap does NOT collapse the box. It only closes any open sub-lists
+  // (stops the old cascade-open). Rows stay visible; each opens independently.
+  var body = document.getElementById('mtx-body'); if (body) body.style.display = '';
+  if (typeof mtxCloseAll === 'function') mtxCloseAll();
 }
 function mtxCloseAll() {
   Array.prototype.forEach.call(document.querySelectorAll('.mydd-master .mtx-list'), function(l){ l.style.display = 'none'; });
