@@ -15213,6 +15213,10 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mddq-cancel{ background:#e2e8f0; color:#334155; border:none; border-radius:7px; padding:7px 14px; font-weight:700; font-size:12.5px; cursor:pointer; }
 #mydaily-box .mddq-or{ font-size:11px; font-weight:800; color:#64748b; text-align:center; letter-spacing:.03em; margin:2px 0; }
 #mydaily-box .mtx-search{ display:flex; align-items:center; gap:8px; background:#fff; border-radius:10px; padding:7px 11px; margin-top:2px; }
+#mydaily-box .mtx-search-top{ margin:0 0 10px 0 !important; padding:5px 9px !important; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(6,42,82,0.08); }
+#mydaily-box .mtx-search-top .mtx-search-inp{ font-size:12px; }
+#mydaily-box .mtx-search-top .mtx-ico{ width:22px; height:22px; font-size:12px; }
+#mydaily-box .mtx-list-top{ margin-bottom:8px; }
 #mydaily-box .mtx-search-ic{ font-size:13px; }
 #mydaily-box .mtx-search-inp{ flex:1; border:none; outline:none; font-size:13px; color:#0f2238; background:transparent; font-family:inherit; }
 #mydaily-box .mtx-search-clr{ cursor:pointer; color:#94a3b8; font-weight:800; font-size:13px; }
@@ -22471,6 +22475,12 @@ body.role-staff header { margin-top: 30px; }
         <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
         <div class="mydd-tiles">
           <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
+            <div class="mtx-search mtx-blk-keyword mtx-search-top">
+              <span class="mtx-ico mtx-ico-keyword">🔍</span>
+              <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="keyword / number / नाम / IO..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
+              <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
+            </div>
+            <div class="mtx-list mtx-list-top" id="mtx-search-results"></div>
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleAll();">
               <span class="mydd-tcal"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
               <div class="mydd-tlabel">📋 My Tasks</div>
@@ -22495,12 +22505,6 @@ body.role-staff header { margin-top: 30px; }
               <span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span>
             </div>
             <div class="mtx-list" id="mtx-agenda-panel"></div>
-            <div class="mtx-search mtx-blk-keyword">
-              <span class="mtx-ico mtx-ico-keyword">🔍</span>
-              <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="keyword / number / नाम / IO खोजें..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
-              <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
-            </div>
-            <div class="mtx-list" id="mtx-search-results"></div>
             <div class="mydd-dg-subrow mtx-blk-dg" onclick="event.stopPropagation();mtxToggle('dg');">
               <span class="mtx-ico mtx-ico-dg">🏛</span><span class="mydd-dg-sublabel">DG EOW</span>
               <span class="mydd-dg-subnum" id="mtx-cnt-dg">0</span>
