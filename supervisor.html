@@ -15213,10 +15213,11 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mddq-cancel{ background:#e2e8f0; color:#334155; border:none; border-radius:7px; padding:7px 14px; font-weight:700; font-size:12.5px; cursor:pointer; }
 #mydaily-box .mddq-or{ font-size:11px; font-weight:800; color:#64748b; text-align:center; letter-spacing:.03em; margin:2px 0; }
 #mydaily-box .mtx-search{ display:flex; align-items:center; gap:8px; background:#fff; border-radius:10px; padding:7px 11px; margin-top:2px; }
-#mydaily-box .mtx-search-top{ margin:0 0 10px 0 !important; padding:5px 9px !important; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(6,42,82,0.08); }
-#mydaily-box .mtx-search-top .mtx-search-inp{ font-size:12px; }
-#mydaily-box .mtx-search-top .mtx-ico{ width:22px; height:22px; font-size:12px; }
-#mydaily-box .mtx-list-top{ margin-bottom:8px; }
+#mydaily-box .mtx-search-inline{ flex:0 1 150px; min-width:96px; margin:0; padding:3px 7px !important; gap:5px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(6,42,82,0.08); }
+#mydaily-box .mtx-search-inline .mtx-search-inp{ font-size:11.5px; }
+#mydaily-box .mtx-search-inline .mtx-ico{ width:19px; height:19px; font-size:11px; }
+#mydaily-box .mtx-list-top{ margin:6px 0 8px; }
+@media (max-width:560px){ #mydaily-box .mtx-search-inline{ flex-basis:110px; } }
 #mydaily-box .mtx-search-ic{ font-size:13px; }
 #mydaily-box .mtx-search-inp{ flex:1; border:none; outline:none; font-size:13px; color:#0f2238; background:transparent; font-family:inherit; }
 #mydaily-box .mtx-search-clr{ cursor:pointer; color:#94a3b8; font-weight:800; font-size:13px; }
@@ -15265,6 +15266,7 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 /* Unified My Tasks master tile */
 #mydaily-box .mydd-master{ flex:1 1 100%; min-height:0; }
 #mydaily-box .mydd-master .mydd-dg-toprow{ position:relative; }
+#mydaily-box .mydd-master .mydd-dg-toprow{ flex-wrap:wrap; gap:7px; }
 #mydaily-box .mtx-add-btn{ background:#dc2626; color:#fff; border:none; border-radius:8px; font-size:12px; font-weight:800; padding:6px 12px; cursor:pointer; margin-left:6px; }
 #mydaily-box .mtx-add-menu{ position:absolute; top:38px; right:0; background:#fff; border:1px solid #cbd5e1; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.28); min-width:190px; overflow:hidden; z-index:30; }
 #mydaily-box .mtx-add-mi{ padding:10px 14px; font-size:13px; font-weight:700; color:#0d2c54; cursor:pointer; }
@@ -22475,16 +22477,15 @@ body.role-staff header { margin-top: 30px; }
         <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
         <div class="mydd-tiles">
           <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
-            <div class="mtx-search mtx-blk-keyword mtx-search-top">
-              <span class="mtx-ico mtx-ico-keyword">🔍</span>
-              <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="keyword / number / नाम / IO..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
-              <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
-            </div>
-            <div class="mtx-list mtx-list-top" id="mtx-search-results"></div>
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleAll();">
               <span class="mydd-tcal"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
               <div class="mydd-tlabel">📋 My Tasks</div>
               <span class="mydd-tnum" id="mydd-cnt-mytask">0</span>
+              <div class="mtx-search mtx-blk-keyword mtx-search-inline" onclick="event.stopPropagation();">
+                <span class="mtx-ico mtx-ico-keyword">🔍</span>
+                <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="खोजें..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
+                <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
+              </div>
               <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddMenu();">＋ Add</button>
               <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;">
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('dg');">🏛 DG निर्देश</div>
@@ -22495,6 +22496,7 @@ body.role-staff header { margin-top: 30px; }
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('keyword');">🏷 Keyword (प्रकरण में)</div>
               </div>
             </div>
+            <div class="mtx-list mtx-list-top" id="mtx-search-results"></div>
             <div class="mddq-host" id="mtx-addhost-task"></div>
             <div class="mddq-host" id="mydd-addhost-disc"></div>
             <div class="mddq-host" id="mydd-addhost-review"></div>
