@@ -15297,6 +15297,9 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mtx-ico-rv{ background:#eab308; }
 #mydaily-box .mtx-ico-td{ background:#16a34a; }
 #mydaily-box .mtx-ico-name{ background:#64748b; }
+#mydaily-box .mtx-ico-disc{ background:#0d9488; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-disc{ background:rgba(255,255,255,0.10); }
+#mydaily-box .mydd-dg-subrow.mtx-blk-disc:hover{ background:rgba(255,255,255,0.20); }
 #mydaily-box .mtx-kind{ font-size:10px; font-weight:800; border-radius:999px; padding:1px 7px; }
 #mydaily-box .mtx-kind.k-dg{ background:#ede9fe; color:#6d28d9; }
 #mydaily-box .mtx-kind.k-rv{ background:#fef3c7; color:#a16207; }
@@ -22477,7 +22480,7 @@ body.role-staff header { margin-top: 30px; }
         <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
         <div class="mydd-tiles">
           <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
-            <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleAll();">
+            <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleBox();">
               <span class="mydd-tcal"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
               <div class="mydd-tlabel">📋 My Tasks</div>
               <span class="mydd-tnum" id="mydd-cnt-mytask">0</span>
@@ -22488,11 +22491,11 @@ body.role-staff header { margin-top: 30px; }
               </div>
               <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddMenu();">＋ Add</button>
               <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;">
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('dg');">🏛 DG निर्देश</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('task');">📝 To-Do / Task</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('disc');">💬 Discussion Note</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('ref');">📎 Reference Task</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('review');">⭐ समीक्षा</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('dg');">🏛 DG EOW</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('review');">⭐ प्रकरण समीक्षा</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('task');">📝 To-Dos / Office</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('ref');">📎 References — @name</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('keyword');">🏷 Keyword (प्रकरण में)</div>
               </div>
             </div>
@@ -22500,6 +22503,7 @@ body.role-staff header { margin-top: 30px; }
             <div class="mddq-host" id="mtx-addhost-task"></div>
             <div class="mddq-host" id="mydd-addhost-disc"></div>
             <div class="mddq-host" id="mydd-addhost-review"></div>
+            <div id="mtx-body">
             <div class="mtx-agenda" onclick="event.stopPropagation();mtxAgendaToggle();">
               <span class="mtx-ico mtx-ico-agenda">⏰</span><span class="mtx-ag-lbl">Agenda</span>
               <span class="mtx-ag-chip">आज <b id="mtx-ag-today">0</b></span>
@@ -22507,6 +22511,12 @@ body.role-staff header { margin-top: 30px; }
               <span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span>
             </div>
             <div class="mtx-list" id="mtx-agenda-panel"></div>
+            <div class="mydd-dg-subrow mtx-blk-disc" onclick="event.stopPropagation();mtxToggle('disc');">
+              <span class="mtx-ico mtx-ico-disc">💬</span><span class="mydd-dg-sublabel">Discussion Note</span>
+              <span class="mydd-dg-subnum" id="mtx-cnt-disc">0</span>
+              <span class="mydd-dg-subcaret" id="mtx-caret-disc">▾</span>
+            </div>
+            <div class="mtx-list" id="mtx-list-disc"></div>
             <div class="mydd-dg-subrow mtx-blk-dg" onclick="event.stopPropagation();mtxToggle('dg');">
               <span class="mtx-ico mtx-ico-dg">🏛</span><span class="mydd-dg-sublabel">DG EOW</span>
               <span class="mydd-dg-subnum" id="mtx-cnt-dg">0</span>
@@ -22527,6 +22537,7 @@ body.role-staff header { margin-top: 30px; }
             <div class="mtx-list" id="mtx-list-td"></div>
             <div class="mtx-subttl" id="mtx-name-title" style="display:none;">References — @name</div>
             <div id="mtx-name-rows"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -32153,7 +32164,8 @@ function mtxRefresh() {
   // counts
   var dg = (state.dgDirectives || []).length;
   var rv = 0; try { rv = reviewGatherCases().length; } catch(e) {}
-  var td = (state.myOfficeTasks || []).length + (state.discussionNotes || []).length;
+  var td = (state.myOfficeTasks || []).length;
+  var disc = (state.discussionNotes || []).length;
   // @name groups (Reference tag + @name tag)
   var rows = []; try { rows = (typeof _refMonGatherTagged === 'function') ? (_refMonGatherTagged() || []) : []; } catch(e) {}
   var byTag = {};
@@ -32178,8 +32190,8 @@ function mtxRefresh() {
   });
   var nameTotal = tagIds.reduce(function(s,tid){ return s + byTag[tid].length; }, 0);
   function setN(id,v){ var e=_mtxEl(id); if (e) e.textContent = v; }
-  setN('mtx-cnt-dg', dg); setN('mtx-cnt-rv', rv); setN('mtx-cnt-td', td);
-  setN('mydd-cnt-mytask', dg + rv + td + nameTotal);
+  setN('mtx-cnt-dg', dg); setN('mtx-cnt-rv', rv); setN('mtx-cnt-td', td); setN('mtx-cnt-disc', disc);
+  setN('mydd-cnt-mytask', dg + rv + td + disc + nameTotal);
   // dynamic @name rows (preserve open lists)
   var host = _mtxEl('mtx-name-rows'); var title = _mtxEl('mtx-name-title');
   if (host) {
@@ -32264,24 +32276,29 @@ function mtxRenderList(which) {
     return;
   }
   if (which === 'td') {
-    var rows = (state.myOfficeTasks || []).map(function(t){ return { k:'task', o:t }; })
-      .concat((state.discussionNotes || []).map(function(d){ return { k:'disc', o:d }; }));
-    _mtRenderInto('mtx-list-td', rows, function(r){
-      if (r.k === 'task') { var t = r.o; return {
+    _mtRenderInto('mtx-list-td', (state.myOfficeTasks || []), function(t){
+      return {
         title: '📝 ' + _mddEsc(t.task_title || '(बिना शीर्षक)'),
         meta: [ t.task_date ? _mddDate(t.task_date) : '', t.priority || '', t.status || '' ].filter(Boolean).map(_mddEsc).join(' · '),
         brief: (t.task_detail ? '<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>' : '') + (t.case_display ? '<div class="mydd-brief-row"><b>प्रकरण:</b> ' + _mddEsc(t.case_display) + '</div>' : ''),
         oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openMtEdit===\'function\')&&openMtEdit(\'' + t.id + '\');">✎ Open / Edit</button>'
-      }; }
-      var d = r.o; return {
+      };
+    }, 'कोई To-Do नहीं');
+    var elt = _mtxEl('mtx-list-td');
+    if (elt) elt.innerHTML += '<div class="mtx-addbar"><button class="mydd-sub-add mtx-dark" onclick="event.stopPropagation();mtxAddPick(\'task\');">＋ Add To-Do</button></div>';
+    return;
+  }
+  if (which === 'disc') {
+    _mtRenderInto('mtx-list-disc', (state.discussionNotes || []), function(d){
+      return {
         title: '💬 ' + _mddEsc(d.title || d.note_text || '(note)'),
         meta: [ d.reminder_date ? _mddDate(d.reminder_date) : '', d.status || '' ].filter(Boolean).map(_mddEsc).join(' · '),
         brief: (d.note_text ? '<div class="mydd-brief-row">' + _mddEsc(d.note_text) + '</div>' : ''),
         oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof editDiscussionNote===\'function\')&&editDiscussionNote(\'' + d.id + '\');">✎ Open / Edit</button>'
       };
-    }, 'कोई To-Do / Discussion नहीं');
-    var elt = _mtxEl('mtx-list-td');
-    if (elt) elt.innerHTML += '<div class="mtx-addbar"><button class="mydd-sub-add mtx-dark" onclick="event.stopPropagation();mtxAddPick(\'task\');">＋ Add To-Do</button><button class="mydd-sub-add mtx-dark" onclick="event.stopPropagation();mtxAddPick(\'disc\');">＋ Discussion</button></div>';
+    }, 'कोई Discussion Note नहीं');
+    var eld2 = _mtxEl('mtx-list-disc');
+    if (eld2) eld2.innerHTML += '<div class="mtx-addbar"><button class="mydd-sub-add mtx-dark" onclick="event.stopPropagation();mtxAddPick(\'disc\');">＋ Discussion</button></div>';
     return;
   }
 }
@@ -32322,10 +32339,19 @@ function mtxToggleAll() {
     if (l.id === 'mtx-list-dg') mtxRenderList('dg');
     else if (l.id === 'mtx-list-rv') mtxRenderList('rv');
     else if (l.id === 'mtx-list-td') mtxRenderList('td');
+    else if (l.id === 'mtx-list-disc') mtxRenderList('disc');
     else if (l.id.indexOf('mtx-name-list-') === 0) mtxNameRender(l.id.replace('mtx-name-list-',''));
   });
-  ['dg','rv','td'].forEach(function(w){ var c=_mtxEl('mtx-caret-'+w); if (c) c.textContent = open ? '▴' : '▾'; });
+  ['dg','rv','td','disc'].forEach(function(w){ var c=_mtxEl('mtx-caret-'+w); if (c) c.textContent = open ? '▴' : '▾'; });
   Array.prototype.forEach.call(document.querySelectorAll('.mydd-master [id^="mtx-name-caret-"]'), function(c){ c.textContent = open ? '▴' : '▾'; });
+}
+function mtxToggleBox() {
+  var body = document.getElementById('mtx-body'); if (!body) return;
+  var open = body.style.display === 'none';
+  if (open) { body.style.display = ''; }
+  else { body.style.display = 'none'; if (typeof mtxCloseAll === 'function') mtxCloseAll(); }
+  var master = document.querySelector('.mydd-master');
+  if (master) master.classList.toggle('mtx-collapsed', !open);
 }
 function mtxCloseAll() {
   Array.prototype.forEach.call(document.querySelectorAll('.mydd-master .mtx-list'), function(l){ l.style.display = 'none'; });
