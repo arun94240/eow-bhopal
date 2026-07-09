@@ -15273,16 +15273,24 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mtx-list{ display:none; background:#fff; border-radius:11px; padding:8px 10px; color:#0f2238; }
 #mydaily-box .mtx-subttl{ font-size:10.5px; font-weight:800; letter-spacing:.08em; color:rgba(255,255,255,0.65); margin-top:3px; text-transform:uppercase; }
 #mydaily-box .mtx-name-row{ background:rgba(255,255,255,0.07); border:1px dashed rgba(255,255,255,0.32); }
-/* ── My Daily Dashboard — block accent colors (Option A: Tinted) ── */
-#mydaily-box .mtx-search.mtx-blk-keyword{ background:#eff6ff !important; border-left:3px solid #38bdf8 !important; }
-#mydaily-box .mydd-dg-subrow.mtx-blk-dg{ background:rgba(167,139,250,0.17) !important; border-left:3px solid #a78bfa; }
-#mydaily-box .mydd-dg-subrow.mtx-blk-dg:hover{ background:rgba(167,139,250,0.28) !important; }
-#mydaily-box .mydd-dg-subrow.mtx-blk-review{ background:rgba(251,191,36,0.16) !important; border-left:3px solid #fbbf24; }
-#mydaily-box .mydd-dg-subrow.mtx-blk-review:hover{ background:rgba(251,191,36,0.27) !important; }
-#mydaily-box .mydd-dg-subrow.mtx-blk-td{ background:rgba(74,222,128,0.16) !important; border-left:3px solid #4ade80; }
-#mydaily-box .mydd-dg-subrow.mtx-blk-td:hover{ background:rgba(74,222,128,0.27) !important; }
-#mydaily-box .mtx-agenda{ border-left:3px solid #f5b942; }
-#mydaily-box .mtx-name-row{ border-left:3px solid #94a3b8 !important; }
+/* ── My Daily Dashboard — Option C (Minimal): uniform navy rows, colored icon-chips ── */
+#mydaily-box .mtx-search.mtx-blk-keyword{ background:#fff !important; border-left:0 !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-dg,
+#mydaily-box .mydd-dg-subrow.mtx-blk-review,
+#mydaily-box .mydd-dg-subrow.mtx-blk-td{ background:rgba(255,255,255,0.10) !important; border-left:0 !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-dg:hover,
+#mydaily-box .mydd-dg-subrow.mtx-blk-review:hover,
+#mydaily-box .mydd-dg-subrow.mtx-blk-td:hover{ background:rgba(255,255,255,0.20) !important; }
+#mydaily-box .mtx-agenda{ border-left:0; }
+#mydaily-box .mtx-name-row{ border-left:0 !important; }
+/* colored icon-chips */
+#mydaily-box .mtx-ico{ width:27px; height:27px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:14px; flex:0 0 auto; line-height:1; }
+#mydaily-box .mtx-ico-agenda{ background:#f59e0b; }
+#mydaily-box .mtx-ico-keyword{ background:#0ea5e9; }
+#mydaily-box .mtx-ico-dg{ background:#7c3aed; }
+#mydaily-box .mtx-ico-rv{ background:#eab308; }
+#mydaily-box .mtx-ico-td{ background:#16a34a; }
+#mydaily-box .mtx-ico-name{ background:#64748b; }
 #mydaily-box .mtx-kind{ font-size:10px; font-weight:800; border-radius:999px; padding:1px 7px; }
 #mydaily-box .mtx-kind.k-dg{ background:#ede9fe; color:#6d28d9; }
 #mydaily-box .mtx-kind.k-rv{ background:#fef3c7; color:#a16207; }
@@ -22481,32 +22489,32 @@ body.role-staff header { margin-top: 30px; }
             <div class="mddq-host" id="mydd-addhost-disc"></div>
             <div class="mddq-host" id="mydd-addhost-review"></div>
             <div class="mtx-agenda" onclick="event.stopPropagation();mtxAgendaToggle();">
-              <span>⏰</span><span class="mtx-ag-lbl">Agenda</span>
+              <span class="mtx-ico mtx-ico-agenda">⏰</span><span class="mtx-ag-lbl">Agenda</span>
               <span class="mtx-ag-chip">आज <b id="mtx-ag-today">0</b></span>
               <span class="mtx-ag-chip">सप्ताह <b id="mtx-ag-week">0</b></span>
               <span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span>
             </div>
             <div class="mtx-list" id="mtx-agenda-panel"></div>
             <div class="mtx-search mtx-blk-keyword">
-              <span class="mtx-search-ic">🔍</span>
+              <span class="mtx-ico mtx-ico-keyword">🔍</span>
               <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="keyword / number / नाम / IO खोजें..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
               <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
             </div>
             <div class="mtx-list" id="mtx-search-results"></div>
             <div class="mydd-dg-subrow mtx-blk-dg" onclick="event.stopPropagation();mtxToggle('dg');">
-              <span class="mydd-dg-sublabel">🏛 DG EOW</span>
+              <span class="mtx-ico mtx-ico-dg">🏛</span><span class="mydd-dg-sublabel">DG EOW</span>
               <span class="mydd-dg-subnum" id="mtx-cnt-dg">0</span>
               <span class="mydd-dg-subcaret" id="mtx-caret-dg">▾</span>
             </div>
             <div class="mtx-list" id="mtx-list-dg"></div>
             <div class="mydd-dg-subrow mtx-blk-review" onclick="event.stopPropagation();mtxToggle('rv');">
-              <span class="mydd-dg-sublabel">⭐ प्रकरण समीक्षा</span>
+              <span class="mtx-ico mtx-ico-rv">⭐</span><span class="mydd-dg-sublabel">प्रकरण समीक्षा</span>
               <span class="mydd-dg-subnum" id="mtx-cnt-rv">0</span>
               <span class="mydd-dg-subcaret" id="mtx-caret-rv">▾</span>
             </div>
             <div class="mtx-list" id="mtx-list-rv"></div>
             <div class="mydd-dg-subrow mtx-blk-td" onclick="event.stopPropagation();mtxToggle('td');">
-              <span class="mydd-dg-sublabel">📝 To-Dos / Office</span>
+              <span class="mtx-ico mtx-ico-td">📝</span><span class="mydd-dg-sublabel">To-Dos / Office</span>
               <span class="mydd-dg-subnum" id="mtx-cnt-td">0</span>
               <span class="mydd-dg-subcaret" id="mtx-caret-td">▾</span>
             </div>
@@ -32175,7 +32183,7 @@ function mtxRefresh() {
       var tag=(state.tags||[]).find(function(t){return t.id===tid;});
       var nm=_nameTagClean((tag&&tag.name)||'');
       return '<div class="mydd-dg-subrow mtx-name-row" onclick="event.stopPropagation();mtxNameToggle(\'' + tid + '\');">' +
-          '<span class="mydd-dg-sublabel">👤 ' + _mddEsc(nm) + '</span>' +
+          '<span class="mtx-ico mtx-ico-name">👤</span><span class="mydd-dg-sublabel">' + _mddEsc(nm) + '</span>' +
           '<span class="mydd-dg-subnum">' + byTag[tid].length + '</span>' +
           '<span class="mydd-dg-subcaret" id="mtx-name-caret-' + tid + '">▾</span>' +
         '</div>' +
