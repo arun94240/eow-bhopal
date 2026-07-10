@@ -9064,6 +9064,29 @@ body.view-mobile .cao-matrix-tile .caom-num {
   #estab-tile-row { grid-template-columns: 1fr 1fr !important; }
 }
 
+/* Attendance at-a-glance chart */
+.att-chart{ background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(6,42,82,0.06); }
+.att-chart-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.att-chart-title{ font-size:15px; font-weight:900; color:#062a52; }
+.att-chart-date{ font-size:11.5px; font-weight:700; color:#64748b; }
+.att-chart-total{ margin-left:auto; background:#f1f5f9; color:#062a52; border-radius:999px; font-size:11.5px; font-weight:800; padding:3px 11px; }
+.att-chart-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:9px; }
+.att-chart-card{ border:1.5px solid; border-radius:12px; padding:11px 12px; text-align:center; }
+.att-cc-num{ font-size:26px; font-weight:900; line-height:1; }
+.att-cc-lbl{ font-size:11px; font-weight:700; color:#475569; margin-top:5px; }
+.att-chart-bar{ display:flex; height:16px; border-radius:9px; overflow:hidden; margin:13px 0 8px; background:#eef2f7; }
+.att-chart-bar>div{ height:100%; }
+.att-chart-legend{ font-size:12px; color:#475569; }
+/* smooth inline open for Overview-Stats panels */
+@keyframes ovPanelIn{ from{ opacity:0; transform:translateY(-9px); } to{ opacity:1; transform:translateY(0); } }
+.ovstats-panel.ovp-anim{ animation:ovPanelIn .28s cubic-bezier(.22,.61,.36,1); }
+/* Approve / Reject inline buttons in pending list */
+.ovcc-appr-row{ display:flex; gap:7px; flex-wrap:wrap; margin-top:8px; }
+.ovcc-appr-btn{ border:none; border-radius:8px; font-size:12px; font-weight:800; padding:7px 13px; cursor:pointer; }
+.ovcc-appr-yes{ background:#16a34a; color:#fff; }
+.ovcc-appr-yes:hover{ background:#15803d; }
+.ovcc-appr-no{ background:#dc2626; color:#fff; }
+.ovcc-appr-no:hover{ background:#b91c1c; }
 /* ─── Pending Approvals panel ─── */
 .estab-pending-card {
   display: flex;
@@ -33252,6 +33275,7 @@ function ovTileToggle(which, evt) {
   var tt = document.getElementById('ovcc-title'); if (tt) tt.textContent = meta.title;
   ovccRenderList(which);
   panel.style.display = 'block';
+  panel.classList.remove('ovp-anim'); void panel.offsetWidth; panel.classList.add('ovp-anim');
   _ovccHighlight(which);
 }
 function _ovccHighlight(which) {
@@ -33289,6 +33313,16 @@ function ovccRefreshCounts() {
   // if panel currently open on leave/notice, refresh its list live
   if (typeof _ovccActive !== 'undefined' && (_ovccActive === 'leave' || _ovccActive === 'notice') && typeof ovccRenderList === 'function') ovccRenderList(_ovccActive);
 }
+async function ovccApprove(id){
+  if (typeof estabQuickApprove === 'function') {
+    await estabQuickApprove(id);
+    if (typeof _ovccActive !== 'undefined' && _ovccActive === 'pending' && typeof ovccRenderList === 'function') ovccRenderList('pending');
+    if (typeof ovccRefreshCounts === 'function') ovccRefreshCounts();
+  }
+}
+function ovccReject(id){
+  if (typeof estabOpenApproval === 'function') estabOpenApproval(id, true);   // modal खुलेगा — कारण लिखकर Reject
+}
 function ovccRenderList(which) {
   var el = document.getElementById('ovcc-list'); if (!el) return;
   var rows = _ovccRows(which);
@@ -33312,7 +33346,13 @@ function ovccRenderList(which) {
       meta = [ r.leave_type || '', r.from_date ? (_mddDate(r.from_date) + ' → ' + _mddDate(r.to_date)) : '', (r.days != null ? r.days + ' days' : ''), (r.status || '') ].filter(Boolean).map(_mddEsc).join(' · ');
       brief = (r.cause ? '<div class="mydd-brief-row">📝 ' + _mddEsc(r.cause) + '</div>' : '') +
         '<div class="mydd-brief-row">📅 ' + _mddEsc(_mddDate(r.from_date)) + ' → ' + _mddEsc(_mddDate(r.to_date)) + (r.days != null ? ' (' + _mddEsc(r.days) + ' days)' : '') + '</div>';
-      oe = '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openLeaveModal===\'function\')&&openLeaveModal(\'' + r.id + '\');">✎ Open / Edit</button>';
+      oe = (which === 'pending')
+        ? ('<div class="ovcc-appr-row">' +
+             '<button class="ovcc-appr-btn ovcc-appr-yes" onclick="event.stopPropagation();ovccApprove(\'' + r.id + '\');">✅ Approve</button>' +
+             '<button class="ovcc-appr-btn ovcc-appr-no" onclick="event.stopPropagation();ovccReject(\'' + r.id + '\');">❌ Reject</button>' +
+             '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openLeaveModal===\'function\')&&openLeaveModal(\'' + r.id + '\');">✎ Open</button>' +
+           '</div>')
+        : '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openLeaveModal===\'function\')&&openLeaveModal(\'' + r.id + '\');">✎ Open / Edit</button>';
     }
     return '<div class="mydd-item">' +
       '<div class="mydd-item-head" onclick="event.stopPropagation();mddRowToggle(this);">' +
@@ -37310,7 +37350,7 @@ function ovstatsNavTile(tile, evt) {
   if (helpEl) helpEl.style.display = 'none';
   
   var panel = document.getElementById('ovstats-panel-' + tile);
-  if (panel) panel.style.display = 'block';
+  if (panel) { panel.style.display = 'block'; panel.classList.remove('ovp-anim'); void panel.offsetWidth; panel.classList.add('ovp-anim'); }
   
   // Trigger appropriate render AFTER panel is visible
   if (tile === 'year' && typeof renderYearCards === 'function') renderYearCards();
@@ -37348,6 +37388,53 @@ function ovstatsNavTile(tile, evt) {
 // Pattern: call estab's render fn, then clone its DOM into our host div.
 // ═══════════════════════════════════════════════════════════════════
 
+function ovstatsAttendanceChart(ymd) {
+  ymd = ymd || new Date().toISOString().slice(0,10);
+  var dayRows = (state.attendance || []).filter(function(a){ return a.att_date === ymd; });
+  var byStaff = {}; dayRows.forEach(function(a){ if (a.staff_id) byStaff[a.staff_id] = a; });
+  // approved leaves covering this day
+  var onLeaveIds = {};
+  (state.leaves || []).forEach(function(l){
+    var st = String(l.status||'').toLowerCase();
+    if (st !== 'approved') return;
+    if (l.from_date && l.to_date && l.from_date <= ymd && l.to_date >= ymd && l.officer_id) onLeaveIds[l.officer_id] = true;
+  });
+  var present=0, out=0, leave=0, absent=0, total=0;
+  (state.ioMaster || []).forEach(function(s){
+    total++;
+    var a = byStaff[s.id];
+    if (a && a.check_in_time && a.check_out_time) out++;
+    else if (a && a.check_in_time) present++;
+    else if (onLeaveIds[s.id]) leave++;
+    else absent++;
+  });
+  var marked = present + out;
+  function pct(n){ return total ? (n/total*100).toFixed(1) : 0; }
+  var d = new Date(ymd); var dLabel = isNaN(d.getTime()) ? ymd : d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  var cards = [
+    { n: present, l: 'Present (कार्यालय में)', c:'#16a34a', bg:'#dcfce7', ic:'🟢' },
+    { n: out,     l: 'Checked-Out (जा चुके)',  c:'#2563eb', bg:'#dbeafe', ic:'🔵' },
+    { n: leave,   l: 'On Leave (अवकाश)',        c:'#b45309', bg:'#fef3c7', ic:'🏖️' },
+    { n: absent,  l: 'Absent (नहीं आए)',        c:'#dc2626', bg:'#fee2e2', ic:'🔴' }
+  ];
+  var seg = [ {v:present,c:'#16a34a'}, {v:out,c:'#2563eb'}, {v:leave,c:'#f59e0b'}, {v:absent,c:'#dc2626'} ];
+  var bar = seg.filter(function(s){return s.v>0;}).map(function(s){
+    return '<div style="width:'+pct(s.v)+'%;background:'+s.c+';"></div>';
+  }).join('');
+  var html = '<div class="att-chart">' +
+    '<div class="att-chart-top"><span class="att-chart-title">📊 उपस्थिति — एक नज़र में</span>' +
+      '<span class="att-chart-date">'+dLabel+'</span>' +
+      '<span class="att-chart-total">कुल स्टाफ़: '+total+'</span></div>' +
+    '<div class="att-chart-cards">' +
+      cards.map(function(k){ return '<div class="att-chart-card" style="background:'+k.bg+';border-color:'+k.c+';">' +
+        '<div class="att-cc-num" style="color:'+k.c+';">'+k.n+'</div>' +
+        '<div class="att-cc-lbl">'+k.ic+' '+k.l+'</div></div>'; }).join('') +
+    '</div>' +
+    '<div class="att-chart-bar">'+bar+'</div>' +
+    '<div class="att-chart-legend"><b>'+marked+'</b>/'+total+' ने उपस्थिति दर्ज की · <b style="color:#16a34a;">'+present+'</b> अभी कार्यालय में · <b style="color:#dc2626;">'+absent+'</b> अनुपस्थित</div>' +
+  '</div>';
+  return html;
+}
 function ovstatsRenderAttendance() {
   var host = document.getElementById('ovstats-host-attendance');
   if (!host) return;
@@ -37362,7 +37449,8 @@ function ovstatsRenderAttendance() {
       var estabBody = estabPanel.querySelector('.ovstats-panel-body') || estabPanel;
       // Clone innerHTML — replicates UI but with same IDs (which is acceptable since
       // estab panel is hidden when ovstats panel is visible)
-      host.innerHTML = '<div class="ovstats-mirror-note">📌 Mirroring Establishment box · <button type="button" class="ovstats-mirror-link" onclick="event.stopPropagation();ovstatsJumpToEstab(\'attendance\')">Open in Establishment →</button></div>' +
+      host.innerHTML = ovstatsAttendanceChart() +
+                       '<div class="ovstats-mirror-note">📌 विस्तृत सूची (Establishment) · <button type="button" class="ovstats-mirror-link" onclick="event.stopPropagation();ovstatsJumpToEstab(\'attendance\')">Open in Establishment →</button></div>' +
                        estabBody.innerHTML;
     } else {
       host.innerHTML = '<div class="ovstats-mirror-loading">No attendance data available</div>';
