@@ -469,6 +469,8 @@ document.getElementById('pin-input').addEventListener('keydown', function(e){
   if (e.key === 'Enter') doLogin();
 });
 document.getElementById('pin-input').focus();
+// ?pin=XXXX → personal one-tap link: prefill + auto-login
+(function(){ try{ var p=new URLSearchParams(location.search).get('pin'); if(p && /^\d{4}$/.test(p)){ document.getElementById('pin-input').value=p; doLogin(); } }catch(e){} })();
 </script>
 </body>
 </html>
