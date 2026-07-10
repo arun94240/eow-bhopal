@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>उपस्थिति — Personal Links & QR</title>
+<meta name="theme-color" content="#062a52">
+<style>
+  :root{ --navy:#062a52; --gold:#f5b942; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:-apple-system,'Segoe UI',Roboto,sans-serif; background:#eef2f7; color:#0f2238; }
+  header{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; padding:16px 18px; }
+  header h1{ margin:0; font-size:17px; }
+  header p{ margin:4px 0 0; font-size:12px; opacity:.85; }
+  .bar{ max-width:900px; margin:14px auto; padding:0 14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .bar button{ background:var(--navy); color:#fff; border:none; border-radius:9px; padding:9px 15px; font-size:13px; font-weight:700; cursor:pointer; }
+  .bar button.gold{ background:var(--gold); color:var(--navy); }
+  .bar .info{ font-size:12px; color:#475569; }
+  .grid{ max-width:900px; margin:0 auto 40px; padding:0 14px; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+  .card{ background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px rgba(6,42,82,0.06); }
+  .card .nm{ font-size:15px; font-weight:800; color:var(--navy); }
+  .card .rk{ font-size:11.5px; color:#64748b; margin:2px 0 10px; }
+  .card canvas,.card img{ width:150px; height:150px; }
+  .card .lnk{ font-size:10px; color:#2563eb; word-break:break-all; margin-top:8px; }
+  .card .row{ display:flex; gap:6px; justify-content:center; margin-top:9px; }
+  .card .row button{ font-size:11px; border:1px solid #cbd5e1; background:#f8fafc; border-radius:7px; padding:5px 10px; cursor:pointer; font-weight:700; }
+  .warn{ max-width:900px; margin:0 auto 12px; padding:10px 14px; background:#fef3c7; border:1px solid #fde68a; border-radius:10px; font-size:12px; color:#92400e; }
+  .empty{ text-align:center; color:#64748b; padding:40px; }
+  @media print{ .bar,.warn,header p,.card .row{ display:none; } .card{ break-inside:avoid; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏢 उपस्थिति — Personal Links & QR</h1>
+  <p>हर कर्मचारी का निजी one-tap link व QR — छपवाकर/निजी रूप से बाँटें। यह पृष्ठ सार्वजनिक न करें (सभी PIN यहाँ दिखते हैं)।</p>
+</header>
+
+<div class="warn">⚠️ इस पृष्ठ में सभी के PIN निहित हैं। इसे WhatsApp group में साझा न करें — केवल छपवाकर या हर व्यक्ति का अपना कार्ड निजी रूप से भेजें।</div>
+
+<div class="bar">
+  <button class="gold" onclick="loadStaff()">🔄 सूची लोड करें</button>
+  <button onclick="window.print()">🖨️ सब प्रिंट करें</button>
+  <span class="info" id="info">“सूची लोड करें” दबाएँ।</span>
+</div>
+
+<div class="grid" id="grid"><div class="empty">“🔄 सूची लोड करें” दबाएँ — सभी कर्मचारी यहाँ आ जाएँगे।</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script>
+  var SUPABASE_URL = 'https://hwfdeqlqavakyakugyqq.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3ZmRlcWxxYXZha3lha3VneXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczODE0MzksImV4cCI6MjA5Mjk1NzQzOX0.QPp6vuVl_LqNZ-2GYMNx5m56L7XSWe0A7IiFcmoHeSw';
+  var FORM_BASE = location.origin + location.pathname.replace(/[^\/]+$/, '') + 'attendance-form.html';
+  var supa;
+  try { supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e){}
+
+  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  async function loadStaff(){
+    var info = document.getElementById('info');
+    var grid = document.getElementById('grid');
+    info.textContent = 'लोड हो रहा है…';
+    grid.innerHTML = '<div class="empty">लोड हो रहा है…</div>';
+    try {
+      var res = await supa.from('io_master').select('id,name,rank,pin').order('rank').order('name');
+      if (res.error) throw res.error;
+      var rows = (res.data || []).filter(function(r){ return r.pin && /^\d{4}$/.test(String(r.pin)); });
+      var noPin = (res.data || []).filter(function(r){ return !r.pin || !/^\d{4}$/.test(String(r.pin)); });
+      if (!rows.length){ grid.innerHTML = '<div class="empty">किसी का 4-अंकीय PIN सेट नहीं मिला। पहले PIN सेट करें।</div>'; info.textContent=''; return; }
+      grid.innerHTML = '';
+      rows.forEach(function(r){
+        var link = FORM_BASE + '?pin=' + encodeURIComponent(r.pin);
+        var card = document.createElement('div'); card.className='card';
+        card.innerHTML =
+          '<div class="nm">'+esc(r.name)+'</div>'+
+          '<div class="rk">'+esc(r.rank||'')+'</div>'+
+          '<canvas class="qr"></canvas>'+
+          '<div class="lnk">'+esc(link)+'</div>'+
+          '<div class="row">'+
+            '<button>📋 Link कॉपी</button>'+
+            '<button>💬 WhatsApp</button>'+
+          '</div>';
+        grid.appendChild(card);
+        try { new QRious({ element: card.querySelector('canvas'), value: link, size: 300, level:'M' }); } catch(e){}
+        var btns = card.querySelectorAll('.row button');
+        btns[0].onclick = function(){ navigator.clipboard && navigator.clipboard.writeText(link); btns[0].textContent='✓ कॉपी'; setTimeout(function(){btns[0].textContent='📋 Link कॉपी';},1500); };
+        btns[1].onclick = function(){ window.open('https://wa.me/?text='+encodeURIComponent('आपकी उपस्थिति हेतु निजी लिंक: '+link+'  (इसे किसी और को न भेजें)'),'_blank'); };
+      });
+      info.textContent = rows.length + ' कर्मचारी लोड हुए' + (noPin.length ? '  ·  ⚠️ '+noPin.length+' का PIN सेट नहीं (नीचे नहीं दिखे)' : '');
+      if (noPin.length){
+        var w=document.createElement('div'); w.className='warn';
+        w.innerHTML = '⚠️ इनका PIN सेट नहीं (link नहीं बना): ' + noPin.map(function(x){return esc(x.name);}).join(', ');
+        grid.parentNode.insertBefore(w, grid);
+      }
+    } catch(e){
+      grid.innerHTML = '<div class="empty">त्रुटि: '+esc(e.message||e)+'<br>(इंटरनेट/की जाँचें)</div>';
+      info.textContent='';
+    }
+  }
+</script>
+</body>
+</html>
