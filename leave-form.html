@@ -291,6 +291,7 @@ body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-sy
             <option value="CCL">CCL — Child Care Leave</option>
             <option value="STL">STL — Study Leave</option>
             <option value="HPL">HPL — Half Pay Leave</option>
+            <option value="SPL">SPL — Special Leave / विशेष अवकाश</option>
             <option value="CompOff">Comp Off / Compensatory</option>
             <option value="LWP">LWP — Leave Without Pay</option>
           </select>
@@ -930,7 +931,7 @@ async function submitLeave() {
     if (uploaded.length) attachmentsObj.files = uploaded;
     if (form3Url) attachmentsObj.form3_url = form3Url;
 
-    var r = await supa.from('leave_applications').insert({
+    var payload = {
       officer_name: officerLabel,
       officer_id: officerId,
       leave_type: type,
@@ -945,14 +946,28 @@ async function submitLeave() {
       attachments: Object.keys(attachmentsObj).length ? attachmentsObj : null,
       status: 'pending',            // IO applies → awaits SP approval
       is_test: IS_TEST_MODE
-    });
-    if (r.error) throw r.error;
+    };
+    var r = await supa.from('leave_applications').insert(payload);
+    if (r.error) {
+      // Fallback: some optional columns may not exist in this table — retry with core columns only.
+      var msg1 = (r.error.message || '') + ' ' + (r.error.details || '') + ' ' + (r.error.hint || '');
+      if (/column|schema cache|does not exist/i.test(msg1)) {
+        var core = { officer_name: officerLabel, officer_id: officerId, leave_type: type,
+          days: parseFloat(days), from_date: from, to_date: to, cause: cause, status: 'pending' };
+        var r2 = await supa.from('leave_applications').insert(core);
+        if (r2.error) throw r2.error;
+      } else {
+        throw r.error;
+      }
+    }
     document.getElementById('formScreen').style.display = 'none';
     document.getElementById('successScreen').classList.add('visible');
   } catch(e) {
     btn.disabled = false;
     btn.innerHTML = 'Submit Application';
-    showError('Submit failed: ' + (e.message || 'try again'));
+    var em = (e && (e.message || e.error_description || e.hint)) ? (e.message || e.error_description) : 'try again';
+    if (e && e.hint) em += ' — ' + e.hint;
+    showError('Submit failed: ' + em);
   }
 }
 
