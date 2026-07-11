@@ -32151,17 +32151,56 @@ function mddReviewAddPicker() {
         '</select>' +
         '<select id="mddq-rev-num" class="mddq-inp mddq-sm"><option value="">— number चुनें —</option></select>' +
       '</div>' +
+      '<div class="mddq-reminder-box">' +
+        '<span class="mddq-rem-lbl">इस प्रकरण की समीक्षा —</span>' +
+        '<div class="mddq-row2">' +
+          '<select id="mddq-rev-mode" class="mddq-inp mddq-sm" onchange="var d=document.getElementById(\'mddq-rev-date\');if(d)d.style.display=(this.value===\'later\'?\'\':\'none\');">' +
+            '<option value="now">✍️ अभी लिखना चाहते हैं</option>' +
+            '<option value="later">📅 बाद में करना है — तारीख़ तय करें</option>' +
+          '</select>' +
+          '<input type="date" id="mddq-rev-date" class="mddq-inp mddq-sm" style="display:none;">' +
+        '</div>' +
+      '</div>' +
       '<div class="mddq-btns">' +
-        '<button class="mddq-save" onclick="event.stopPropagation();mddReviewAddGo2();">⭐ समीक्षा खोलें</button>' +
+        '<button class="mddq-save" onclick="event.stopPropagation();mddReviewAddGo2();">✓ आगे बढ़ें</button>' +
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'mydd-addhost-review\');">Cancel</button>' +
       '</div>' +
     '</div>';
   try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
-function mddReviewAddGo2() {
+async function mddReviewAddGo2() {
   var tp = ((document.getElementById('mddq-rev-type') || {}).value || '');
   var id = ((document.getElementById('mddq-rev-num') || {}).value || '');
   if (!tp || !id) { if (typeof toast === 'function') toast('Type और number दोनों चुनें', true); return; }
+  var mode = ((document.getElementById('mddq-rev-mode') || {}).value || 'now');
+  if (mode === 'later') {
+    var date = ((document.getElementById('mddq-rev-date') || {}).value || '');
+    if (!date) { if (typeof toast === 'function') toast('समीक्षा की तारीख़ चुनें', true); return; }
+    var cobj = ((state.enquiries && state.enquiries[tp]) || []).find(function(x){ return x.id === id; });
+    var disp = cobj ? ((typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(cobj, tp) : (cobj.no || '')) : 'प्रकरण';
+    var payload = {
+      task_title: '⭐ प्रकरण समीक्षा — ' + disp,
+      task_detail: 'नियत तिथि को इस प्रकरण की समीक्षा करनी है।',
+      remarks: null, priority: 'High', status: 'Pending',
+      task_date: date, deadline: date,
+      reminder_at: _mddCombineReminder(date, '09:00'),
+      case_type: tp, case_id: id, case_display: disp,
+      updated_at: new Date().toISOString()
+    };
+    try {
+      var r = await supa.from('my_office_tasks').insert(payload).select().single();
+      if (r.error) throw r.error;
+      if (!state.myOfficeTasks) state.myOfficeTasks = [];
+      state.myOfficeTasks.unshift(r.data);
+      if (typeof toast === 'function') toast('समीक्षा ' + _mddDate(date) + ' को reminder में सेट ✓');
+      mddTaskFormClose('mydd-addhost-review');
+      if (typeof renderMyDailyBox === 'function') renderMyDailyBox();
+    } catch(e) {
+      if (typeof toast === 'function') toast('Save विफल: ' + (e.message || e), true);
+    }
+    return;
+  }
+  // अभी लिखें
   mddTaskFormClose('mydd-addhost-review');
   if (typeof openReviewModal === 'function') openReviewModal(tp, id);
 }
@@ -32924,7 +32963,11 @@ function _mddReminderItems() {
 function _mddCalendarItems() {
   var out = [];
   (state.myOfficeTasks || []).forEach(function(t){
-    var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), open: "openMtEdit('" + t.id + "')" });
+    if (t.reminder_at) {
+      out.push({ date: String(t.reminder_at).slice(0,10), ico:'⏰', lbl: (t.task_title || '(task)') + (t.remarks ? ' — ' + t.remarks : ''), open: "mddTaskEditInline('" + t.id + "')" });
+    } else {
+      var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), open: "mddTaskEditInline('" + t.id + "')" });
+    }
   });
   (state.dgDirectives || []).forEach(function(d){
     if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), open: "editDgDirective('" + d.id + "')" });
@@ -32973,7 +33016,7 @@ function mddToggleReminder() {
   if (cp) { cp.style.display = 'none'; var cpill = document.getElementById('mydd-pill-calendar'); if (cpill) cpill.classList.remove('active'); }
   p.style.display = open ? 'block' : 'none';
   var pill = document.getElementById('mydd-pill-reminder'); if (pill) pill.classList.toggle('active', open);
-  if (open) _mddRenderAgenda(p, '⏰ आगामी Reminders', _mddReminderItems(), null);
+  if (open) _mddRenderAgenda(p, '⏰ Reminders व आगामी (Agenda)', _mtxAgendaItems(), 30);
 }
 function mddToggleCalendar() {
   var p = document.getElementById('mydd-calendar-panel'); var rp = document.getElementById('mydd-reminder-panel');
@@ -32982,7 +33025,7 @@ function mddToggleCalendar() {
   if (rp) { rp.style.display = 'none'; var rpill = document.getElementById('mydd-pill-reminder'); if (rpill) rpill.classList.remove('active'); }
   p.style.display = open ? 'block' : 'none';
   var pill = document.getElementById('mydd-pill-calendar'); if (pill) pill.classList.toggle('active', open);
-  if (open) _mddRenderAgenda(p, '📅 Calendar — आगामी 30 दिन', _mddCalendarItems(), 30);
+  if (open) _mddRenderAgenda(p, '📅 Calendar — आगामी 30 दिन', _mtxAgendaItems(), 30);
 }
 
 // ── Tile heading tap → open/close the COMPLETE list (all sections) of that tile ──
