@@ -9081,6 +9081,21 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .mln-row:hover{ background:rgba(255,255,255,0.16); }
 .mln-row-main{ display:block; font-size:12px; font-weight:700; color:#fff; }
 .mln-row-sub{ display:block; font-size:10.5px; color:#cbd5e1; margin-top:1px; }
+.mydd-live-box{ margin-top:12px; padding:0; overflow:hidden; }
+.mydd-live-head{ display:flex; align-items:center; gap:8px; padding:11px 14px; background:linear-gradient(160deg,#062a52,#0a3a6e); cursor:pointer; }
+.mydd-live-title{ font-size:14px; font-weight:900; color:#fff; }
+.mydd-live-caret{ margin-left:auto; color:#cbd5e1; font-size:13px; }
+#mydd-live-body{ padding:12px 12px 4px; }
+.mpf-periods{ display:flex; gap:6px; margin-top:10px; }
+.mpf-per{ flex:1; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:10px; padding:8px 4px; text-align:center; cursor:pointer; transition:.12s; }
+.mpf-per:hover{ background:#e6edf5; }
+.mpf-per.is-open{ background:#062a52; border-color:#062a52; }
+.mpf-per .n{ font-size:19px; font-weight:900; color:#062a52; line-height:1; }
+.mpf-per .l{ font-size:10px; font-weight:800; color:#475569; margin-top:3px; }
+.mpf-per.is-open .n, .mpf-per.is-open .l{ color:#f5b942; }
+.mpf-go{ background:#062a52; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:800; padding:4px 10px; cursor:pointer; }
+.mpf-detail{ margin-top:10px; border-top:1px solid #eef2f7; padding-top:8px; }
+.mpf-detail-h{ font-size:11.5px; font-weight:900; color:#062a52; margin-bottom:5px; }
 /* Pragati feed */
 .mpf-feed{ background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:11px 13px; box-shadow:0 2px 8px rgba(6,42,82,0.06); }
 .mpf-top{ display:flex; align-items:center; gap:7px; }
@@ -22570,8 +22585,6 @@ body.role-staff header { margin-top: 30px; }
               </div>
             </div>
             <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
-            <div id="mydd-notice-strip" class="mydd-att-strip-host"></div>
-            <div id="mydd-pragati-feed" class="mydd-att-strip-host"></div>
             <div class="mtx-list mtx-list-top" id="mtx-search-results"></div>
             <div class="mddq-host" id="mtx-addhost-task"></div>
             <div class="mddq-host" id="mydd-addhost-disc"></div>
@@ -22614,6 +22627,18 @@ body.role-staff header { margin-top: 30px; }
             <div id="mtx-io-rows"></div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="mydd-box mydd-live-box" id="mydd-live-box">
+        <div class="mydd-live-head" onclick="event.stopPropagation();mddLiveToggle();">
+          <span class="mas-dot"></span>
+          <span class="mydd-live-title">⚡ Live — प्रगति व Summons / Warrants</span>
+          <span class="mydd-live-caret" id="mydd-live-caret">▴</span>
+        </div>
+        <div id="mydd-live-body">
+          <div id="mydd-pragati-feed" class="mydd-att-strip-host"></div>
+          <div id="mydd-notice-strip" class="mydd-att-strip-host"></div>
         </div>
       </div>
 
@@ -32111,59 +32136,104 @@ function mddNoticeApplyFilter(){
 }
 function mddNoticeClearFilter(){ _mddNoticeFilt = { io:'', from:'', to:'' }; mddRenderNoticeStrip(); }
 
-// ══════════ LIVE: प्रगति प्रतिवेदन (activity feed) ══════════
+// ══════════ LIVE: प्रगति प्रतिवेदन (period tiles + collapsible detail) ══════════
 var _mddPragatiFilt = { io:'', from:'', to:'' };
-function _mddPragatiFiltered(){
-  var list = (state.ioUpdates || []).slice();
-  list = list.filter(function(u){
-    if (_mddPragatiFilt.io && u.io_name !== _mddPragatiFilt.io) return false;
-    if ((_mddPragatiFilt.from || _mddPragatiFilt.to) && !_mddInRange(u.update_date || u.created_at, _mddPragatiFilt.from, _mddPragatiFilt.to)) return false;
-    return true;
+var _mddPragatiView = null;   // null | 'today' | 'yesterday' | '7d' | '30d' | 'custom'
+function _mddPragatiPeriodYMDs(){
+  var today = new Date(); today.setHours(0,0,0,0);
+  return {
+    today: _mddYMD(today),
+    yesterday: _mddYMD(new Date(today.getTime() - 86400000)),
+    d7: _mddYMD(new Date(today.getTime() - 6*86400000)),
+    d30: _mddYMD(new Date(today.getTime() - 29*86400000))
+  };
+}
+function _mddPragatiByIo(){
+  return (state.ioUpdates || []).filter(function(u){ return !_mddPragatiFilt.io || u.io_name === _mddPragatiFilt.io; });
+}
+function _mddPragatiPeriodList(which){
+  var P = _mddPragatiPeriodYMDs();
+  var arr = _mddPragatiByIo().filter(function(u){
+    var d = String(u.update_date || u.created_at || '').slice(0,10);
+    if (which === 'today') return d === P.today;
+    if (which === 'yesterday') return d === P.yesterday;
+    if (which === '7d') return d >= P.d7 && d <= P.today;
+    if (which === '30d') return d >= P.d30 && d <= P.today;
+    if (which === 'custom') return _mddInRange(d, _mddPragatiFilt.from, _mddPragatiFilt.to);
+    return false;
   });
-  list.sort(function(a,b){ return new Date(b.update_date||b.created_at||0) - new Date(a.update_date||a.created_at||0); });
-  return list;
+  arr.sort(function(a,b){ return new Date(b.update_date||b.created_at||0) - new Date(a.update_date||a.created_at||0); });
+  return arr;
+}
+function _mddPragatiItemHTML(u){
+  var prak = (typeof _cmdFormatUpdatePrakaran === 'function') ? _cmdFormatUpdatePrakaran(u) : (u.case_display || '');
+  var act = (u.action_taken || u.note || '—');
+  var main = (prak ? prak + ' — ' : '') + act;
+  var rel = _mddRelTime(u.created_at || u.update_date);
+  var fresh = (rel === 'अभी-अभी');
+  return '<div class="mpf-item">' +
+    '<span class="mpf-av">' + _mddEsc(_mddInitials(u.io_name)) + '</span>' +
+    '<div class="mpf-body"><div class="mpf-main">' + _mddEsc(main.slice(0,90)) + '</div>' +
+      '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div></div>' +
+  '</div>';
 }
 function mddRenderPragatiFeed(){
   var host = document.getElementById('mydd-pragati-feed'); if (!host) return;
-  var list = _mddPragatiFiltered();
-  var todayY = new Date().toISOString().slice(0,10);
-  var todayCount = (state.ioUpdates||[]).filter(function(u){ return String(u.update_date||'').slice(0,10)===todayY; }).length;
-  var items = list.slice(0, 12).map(function(u){
-    var prak = (typeof _cmdFormatUpdatePrakaran === 'function') ? _cmdFormatUpdatePrakaran(u) : (u.case_display || '');
-    var act = (u.action_taken || u.note || '—');
-    var main = (prak ? prak + ' — ' : '') + act;
-    var rel = _mddRelTime(u.created_at || u.update_date);
-    var fresh = (rel === 'अभी-अभी');
-    return '<div class="mpf-item">' +
-      '<span class="mpf-av">' + _mddEsc(_mddInitials(u.io_name)) + '</span>' +
-      '<div class="mpf-body"><div class="mpf-main">' + _mddEsc(main.slice(0,90)) + '</div>' +
-        '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div></div>' +
-    '</div>';
-  }).join('');
+  var cToday = _mddPragatiPeriodList('today').length;
+  var cY = _mddPragatiPeriodList('yesterday').length;
+  var c7 = _mddPragatiPeriodList('7d').length;
+  var c30 = _mddPragatiPeriodList('30d').length;
+  function act(k){ return _mddPragatiView===k ? ' is-open' : ''; }
+  var hasFilt = _mddPragatiFilt.io || _mddPragatiFilt.from || _mddPragatiFilt.to;
+  // detail list (collapsible — only when a view is active)
+  var detailHTML = '';
+  if (_mddPragatiView) {
+    var arr = _mddPragatiPeriodList(_mddPragatiView);
+    var labelMap = { today:'आज', yesterday:'कल', '7d':'पिछले 7 दिन', '30d':'पिछले 30 दिन', custom:'चयनित अवधि' };
+    detailHTML = '<div class="mpf-detail hct-anim"><div class="mpf-detail-h">' + (labelMap[_mddPragatiView]||'') + ' — ' + arr.length + ' प्रगति</div>' +
+      (arr.length ? arr.slice(0,40).map(_mddPragatiItemHTML).join('') : '<div class="mydd-empty">कोई प्रगति नहीं</div>') + '</div>';
+  }
   host.innerHTML =
     '<div class="mpf-feed">' +
       '<div class="mpf-top">' +
-        '<span class="mas-dot"></span><span class="mpf-ttl">📈 प्रगति — ताज़ा</span><span class="mpf-cnt">आज ' + todayCount + '</span>' +
-        '<button class="mpf-add" onclick="event.stopPropagation();(typeof openPragatiInlineForm===\'function\')&&openPragatiInlineForm();">＋ प्रगति</button>' +
+        '<span class="mas-dot"></span><span class="mpf-ttl">📈 प्रगति प्रतिवेदन — Live</span>' +
+        '<button class="mpf-add" onclick="event.stopPropagation();(typeof openPragatiInlineForm===\'function\')&&openPragatiInlineForm();">＋ प्रगति जोड़ें</button>' +
       '</div>' +
       '<div class="mln-filt light" onclick="event.stopPropagation();">' +
         '<span class="mln-fl">🔎</span>' +
         '<select id="mpf-io" class="mln-inp" onchange="mddPragatiApplyFilter();">' + _mddIoFilterOptions(_mddPragatiFilt.io) + '</select>' +
-        '<input type="date" id="mpf-from" class="mln-inp" value="' + _mddPragatiFilt.from + '" onchange="mddPragatiApplyFilter();">' +
+        '<input type="date" id="mpf-from" class="mln-inp" value="' + _mddPragatiFilt.from + '" onchange="mddPragatiSetCustom();">' +
         '<span class="mln-dash">—</span>' +
-        '<input type="date" id="mpf-to" class="mln-inp" value="' + _mddPragatiFilt.to + '" onchange="mddPragatiApplyFilter();">' +
-        (_mddPragatiFilt.io||_mddPragatiFilt.from||_mddPragatiFilt.to ? '<button class="mln-clr dark" onclick="event.stopPropagation();mddPragatiClearFilter();">✕</button>' : '') +
+        '<input type="date" id="mpf-to" class="mln-inp" value="' + _mddPragatiFilt.to + '" onchange="mddPragatiSetCustom();">' +
+        '<button class="mpf-go" onclick="event.stopPropagation();mddPragatiSetCustom(true);">देखें</button>' +
+        (hasFilt ? '<button class="mln-clr dark" onclick="event.stopPropagation();mddPragatiClearFilter();">✕</button>' : '') +
       '</div>' +
-      '<div class="mpf-list">' + (items || '<div class="mydd-empty">कोई प्रगति नहीं</div>') + '</div>' +
+      '<div class="mpf-periods">' +
+        '<div class="mpf-per' + act('today') + '" onclick="event.stopPropagation();mddPragatiPeriod(\'today\');"><div class="n">' + cToday + '</div><div class="l">आज ▾</div></div>' +
+        '<div class="mpf-per' + act('yesterday') + '" onclick="event.stopPropagation();mddPragatiPeriod(\'yesterday\');"><div class="n">' + cY + '</div><div class="l">कल ▾</div></div>' +
+        '<div class="mpf-per' + act('7d') + '" onclick="event.stopPropagation();mddPragatiPeriod(\'7d\');"><div class="n">' + c7 + '</div><div class="l">7 दिन ▾</div></div>' +
+        '<div class="mpf-per' + act('30d') + '" onclick="event.stopPropagation();mddPragatiPeriod(\'30d\');"><div class="n">' + c30 + '</div><div class="l">30 दिन ▾</div></div>' +
+      '</div>' +
+      detailHTML +
     '</div>';
 }
+function mddPragatiPeriod(which){ _mddPragatiView = (_mddPragatiView===which) ? null : which; mddRenderPragatiFeed(); }
 function mddPragatiApplyFilter(){
   _mddPragatiFilt.io = (document.getElementById('mpf-io')||{}).value || '';
-  _mddPragatiFilt.from = (document.getElementById('mpf-from')||{}).value || '';
-  _mddPragatiFilt.to = (document.getElementById('mpf-to')||{}).value || '';
   mddRenderPragatiFeed();
 }
-function mddPragatiClearFilter(){ _mddPragatiFilt = { io:'', from:'', to:'' }; mddRenderPragatiFeed(); }
+function mddPragatiSetCustom(show){
+  _mddPragatiFilt.from = (document.getElementById('mpf-from')||{}).value || '';
+  _mddPragatiFilt.to = (document.getElementById('mpf-to')||{}).value || '';
+  if (show && (_mddPragatiFilt.from || _mddPragatiFilt.to)) _mddPragatiView = 'custom';
+  mddRenderPragatiFeed();
+}
+function mddPragatiClearFilter(){ _mddPragatiFilt = { io:'', from:'', to:'' }; if (_mddPragatiView==='custom') _mddPragatiView=null; mddRenderPragatiFeed(); }
+function mddLiveToggle(){
+  var b = document.getElementById('mydd-live-body'); var c = document.getElementById('mydd-live-caret');
+  if (!b) return; var open = (b.style.display==='none');
+  b.style.display = open ? 'block' : 'none'; if (c) c.textContent = open ? '▴' : '▾';
+}
 
 function mddRenderAttStrip(){
   var host = document.getElementById('mydd-att-strip'); if (!host) return;
