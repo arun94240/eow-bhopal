@@ -9066,6 +9066,34 @@ body.view-mobile .cao-matrix-tile .caom-num {
   #estab-tile-row { grid-template-columns: 1fr 1fr !important; }
 }
 
+.mln-strip .mln-add, .mpf-add{ margin-left:auto; background:#dc2626; color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:800; padding:4px 10px; cursor:pointer; }
+.mpf-add{ background:#f5b942; color:#062a52; }
+.mln-filt{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-top:9px; padding:7px; border-radius:8px; background:rgba(255,255,255,0.10); }
+.mln-filt.light{ background:#f8fafc; border:1px dashed #cbd5e1; }
+.mln-fl{ font-size:12px; }
+.mln-inp{ border:none; border-radius:6px; padding:4px 7px; font-size:11px; background:#fff; color:#0f2238; min-width:0; }
+.mln-inp#mln-io, .mln-inp#mpf-io{ max-width:130px; }
+.mln-dash{ color:#cbd5e1; font-size:11px; }
+.mln-filt.light .mln-dash{ color:#94a3b8; }
+.mln-clr{ background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:800; padding:3px 8px; cursor:pointer; }
+.mln-clr.dark{ background:#e2e8f0; color:#334155; }
+.mln-row{ padding:7px 9px; border-radius:8px; background:rgba(255,255,255,0.08); margin-top:5px; cursor:pointer; }
+.mln-row:hover{ background:rgba(255,255,255,0.16); }
+.mln-row-main{ display:block; font-size:12px; font-weight:700; color:#fff; }
+.mln-row-sub{ display:block; font-size:10.5px; color:#cbd5e1; margin-top:1px; }
+/* Pragati feed */
+.mpf-feed{ background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:11px 13px; box-shadow:0 2px 8px rgba(6,42,82,0.06); }
+.mpf-top{ display:flex; align-items:center; gap:7px; }
+.mpf-ttl{ font-size:13px; font-weight:900; color:#062a52; }
+.mpf-cnt{ background:#f1f5f9; color:#062a52; border-radius:999px; font-size:10px; font-weight:800; padding:2px 8px; }
+.mpf-list{ margin-top:9px; }
+.mpf-item{ display:flex; gap:9px; padding:7px 0; border-bottom:1px solid #f1f5f9; }
+.mpf-item:last-child{ border-bottom:none; }
+.mpf-av{ width:28px; height:28px; border-radius:7px; background:#062a52; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex:0 0 auto; }
+.mpf-body{ flex:1; min-width:0; }
+.mpf-main{ font-size:12px; font-weight:700; color:#0f2238; }
+.mpf-sub{ font-size:10.5px; color:#64748b; margin-top:1px; }
+.mpf-fresh{ color:#16a34a; font-weight:800; }
 /* Attendance at-a-glance chart */
 .att-chart{ background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(6,42,82,0.06); }
 .att-chart-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
@@ -22542,6 +22570,8 @@ body.role-staff header { margin-top: 30px; }
               </div>
             </div>
             <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
+            <div id="mydd-notice-strip" class="mydd-att-strip-host"></div>
+            <div id="mydd-pragati-feed" class="mydd-att-strip-host"></div>
             <div class="mtx-list mtx-list-top" id="mtx-search-results"></div>
             <div class="mddq-host" id="mtx-addhost-task"></div>
             <div class="mddq-host" id="mydd-addhost-disc"></div>
@@ -31990,6 +32020,151 @@ function _masGroup(label, arr, color){
   if (!arr.length) return '';
   return '<div class="mas-grp"><div class="mas-grp-h" style="color:' + color + ';">' + label + ' (' + arr.length + ')</div><div class="mas-grp-b">' + arr.map(function(n){ return '<span class="mas-name">' + _mddEsc(n) + '</span>'; }).join('') + '</div></div>';
 }
+// ── shared helpers for live widgets ──
+function _mddIoFilterOptions(sel){
+  var base = _mddIoOptionsHTML(sel || '');
+  base = base.replace(/^<option value=\"\">[^<]*<\/option>/, '');
+  return '<option value="">सभी IO</option>' + base;
+}
+function _mddInitials(name){
+  var s = String(name||'').replace(/^(SI|ASI|HC|Insp(ector)?|Constable|CT|C|DSP|DYSP|SDOP|SP|ADDL SP|ADDITIONAL SP|ASP|DIG|IG|ADG)\s+/i,'').trim();
+  var p = s.split(/\s+/);
+  var r = ((p[0]||'')[0]||'') + ((p[1]||'')[0]||'');
+  return r ? r.toUpperCase() : '👮';
+}
+function _mddRelTime(iso){
+  if (!iso) return '';
+  var d = new Date(iso); if (isNaN(d.getTime())) return '';
+  var mins = (Date.now() - d.getTime())/60000;
+  if (mins < 1) return 'अभी-अभी';
+  if (mins < 60) return Math.floor(mins) + ' मिनट पूर्व';
+  if (mins < 1440) return Math.floor(mins/60) + ' घंटा पूर्व';
+  return d.toLocaleDateString('en-GB');
+}
+function _mddInRange(dateStr, from, to){
+  if (!dateStr) return (!from && !to);
+  var d = String(dateStr).slice(0,10);
+  if (from && d < from) return false;
+  if (to && d > to) return false;
+  return true;
+}
+
+// ══════════ LIVE: Notices (Summons & Warrants) ══════════
+var _mddNoticeFilt = { io:'', from:'', to:'' }; var _mddNoticeOpen = null;
+function _mddNoticeFiltered(which){
+  var list = (typeof _noticeBucket === 'function') ? (_noticeBucket(which) || []) : [];
+  return list.filter(function(n){
+    if (_mddNoticeFilt.io && n.io_name !== _mddNoticeFilt.io) return false;
+    if ((_mddNoticeFilt.from || _mddNoticeFilt.to) && !_mddInRange(n.notice_date, _mddNoticeFilt.from, _mddNoticeFilt.to)) return false;
+    return true;
+  });
+}
+function mddRenderNoticeStrip(){
+  var host = document.getElementById('mydd-notice-strip'); if (!host) return;
+  var issued=_mddNoticeFiltered('issued'), served=_mddNoticeFiltered('served'), pending=_mddNoticeFiltered('taameeli'), adam=_mddNoticeFiltered('adam');
+  var i=issued.length, s=served.length, pn=pending.length, ad=adam.length, t=i||1;
+  function pct(n){ return t?(n/t*100):0; }
+  function act(k){ return _mddNoticeOpen===k ? ' is-open' : ''; }
+  var groups = { issued:{lbl:'📤 जारी', arr:issued}, served:{lbl:'✅ तामील', arr:served}, taameeli:{lbl:'⏳ लंबित', arr:pending}, adam:{lbl:'❌ अदम-तामील', arr:adam} };
+  var g = _mddNoticeOpen ? groups[_mddNoticeOpen] : null;
+  host.innerHTML =
+    '<div class="mydd-att-strip mln-strip">' +
+      '<div class="mas-top">' +
+        '<span class="mas-dot"></span><span class="mas-ttl">📜 Summons / Warrants — Live</span>' +
+        '<button class="mln-add" onclick="event.stopPropagation();(typeof openNoticeModal===\'function\')&&openNoticeModal();">＋ Notice</button>' +
+      '</div>' +
+      '<div class="mln-filt" onclick="event.stopPropagation();">' +
+        '<span class="mln-fl">🔎</span>' +
+        '<select id="mln-io" class="mln-inp" onchange="mddNoticeApplyFilter();">' + _mddIoFilterOptions(_mddNoticeFilt.io) + '</select>' +
+        '<input type="date" id="mln-from" class="mln-inp" value="' + _mddNoticeFilt.from + '" onchange="mddNoticeApplyFilter();">' +
+        '<span class="mln-dash">—</span>' +
+        '<input type="date" id="mln-to" class="mln-inp" value="' + _mddNoticeFilt.to + '" onchange="mddNoticeApplyFilter();">' +
+        (_mddNoticeFilt.io||_mddNoticeFilt.from||_mddNoticeFilt.to ? '<button class="mln-clr" onclick="event.stopPropagation();mddNoticeClearFilter();">✕</button>' : '') +
+      '</div>' +
+      '<div class="mas-pills">' +
+        '<div class="mas-pill mp-out' + act('issued') + '" onclick="event.stopPropagation();mddNoticePill(\'issued\');"><div class="n">' + i + '</div><div class="l">जारी ▾</div></div>' +
+        '<div class="mas-pill mp-present' + act('served') + '" onclick="event.stopPropagation();mddNoticePill(\'served\');"><div class="n">' + s + '</div><div class="l">तामील ▾</div></div>' +
+        '<div class="mas-pill mp-leave' + act('taameeli') + '" onclick="event.stopPropagation();mddNoticePill(\'taameeli\');"><div class="n">' + pn + '</div><div class="l">लंबित ▾</div></div>' +
+        '<div class="mas-pill mp-absent' + act('adam') + '" onclick="event.stopPropagation();mddNoticePill(\'adam\');"><div class="n">' + ad + '</div><div class="l">अदम ▾</div></div>' +
+      '</div>' +
+      '<div class="mas-detail' + (g ? ' hct-anim' : '') + '" style="display:' + (g ? 'block' : 'none') + ';">' +
+        (g ? _mddNoticeList(g.lbl, g.arr) : '') +
+      '</div>' +
+    '</div>';
+}
+function _mddNoticeList(label, arr){
+  if (!arr.length) return '<div class="mas-grp"><div class="mas-grp-h" style="color:#fff;">' + label + ' (0)</div><div class="mydd-empty" style="color:#cbd5e1;">कोई notice नहीं</div></div>';
+  return '<div class="mas-grp"><div class="mas-grp-h" style="color:#fff;">' + label + ' (' + arr.length + ')</div>' +
+    arr.slice(0,40).map(function(n){
+      var line = (n.notice_type || 'Notice') + ' — ' + (n.recipient || '—');
+      var sub = [ n.io_name || '', n.notice_date ? _mddDate(n.notice_date) : '' ].filter(Boolean).join(' · ');
+      return '<div class="mln-row" onclick="event.stopPropagation();(typeof openNoticeModal===\'function\')&&openNoticeModal(\'' + n.id + '\');">' +
+        '<span class="mln-row-main">' + _mddEsc(line) + '</span>' + (sub ? '<span class="mln-row-sub">' + _mddEsc(sub) + '</span>' : '') + '</div>';
+    }).join('') + '</div>';
+}
+function mddNoticePill(which){ _mddNoticeOpen = (_mddNoticeOpen===which) ? null : which; mddRenderNoticeStrip(); }
+function mddNoticeApplyFilter(){
+  _mddNoticeFilt.io = (document.getElementById('mln-io')||{}).value || '';
+  _mddNoticeFilt.from = (document.getElementById('mln-from')||{}).value || '';
+  _mddNoticeFilt.to = (document.getElementById('mln-to')||{}).value || '';
+  mddRenderNoticeStrip();
+}
+function mddNoticeClearFilter(){ _mddNoticeFilt = { io:'', from:'', to:'' }; mddRenderNoticeStrip(); }
+
+// ══════════ LIVE: प्रगति प्रतिवेदन (activity feed) ══════════
+var _mddPragatiFilt = { io:'', from:'', to:'' };
+function _mddPragatiFiltered(){
+  var list = (state.ioUpdates || []).slice();
+  list = list.filter(function(u){
+    if (_mddPragatiFilt.io && u.io_name !== _mddPragatiFilt.io) return false;
+    if ((_mddPragatiFilt.from || _mddPragatiFilt.to) && !_mddInRange(u.update_date || u.created_at, _mddPragatiFilt.from, _mddPragatiFilt.to)) return false;
+    return true;
+  });
+  list.sort(function(a,b){ return new Date(b.update_date||b.created_at||0) - new Date(a.update_date||a.created_at||0); });
+  return list;
+}
+function mddRenderPragatiFeed(){
+  var host = document.getElementById('mydd-pragati-feed'); if (!host) return;
+  var list = _mddPragatiFiltered();
+  var todayY = new Date().toISOString().slice(0,10);
+  var todayCount = (state.ioUpdates||[]).filter(function(u){ return String(u.update_date||'').slice(0,10)===todayY; }).length;
+  var items = list.slice(0, 12).map(function(u){
+    var prak = (typeof _cmdFormatUpdatePrakaran === 'function') ? _cmdFormatUpdatePrakaran(u) : (u.case_display || '');
+    var act = (u.action_taken || u.note || '—');
+    var main = (prak ? prak + ' — ' : '') + act;
+    var rel = _mddRelTime(u.created_at || u.update_date);
+    var fresh = (rel === 'अभी-अभी');
+    return '<div class="mpf-item">' +
+      '<span class="mpf-av">' + _mddEsc(_mddInitials(u.io_name)) + '</span>' +
+      '<div class="mpf-body"><div class="mpf-main">' + _mddEsc(main.slice(0,90)) + '</div>' +
+        '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div></div>' +
+    '</div>';
+  }).join('');
+  host.innerHTML =
+    '<div class="mpf-feed">' +
+      '<div class="mpf-top">' +
+        '<span class="mas-dot"></span><span class="mpf-ttl">📈 प्रगति — ताज़ा</span><span class="mpf-cnt">आज ' + todayCount + '</span>' +
+        '<button class="mpf-add" onclick="event.stopPropagation();(typeof openPragatiInlineForm===\'function\')&&openPragatiInlineForm();">＋ प्रगति</button>' +
+      '</div>' +
+      '<div class="mln-filt light" onclick="event.stopPropagation();">' +
+        '<span class="mln-fl">🔎</span>' +
+        '<select id="mpf-io" class="mln-inp" onchange="mddPragatiApplyFilter();">' + _mddIoFilterOptions(_mddPragatiFilt.io) + '</select>' +
+        '<input type="date" id="mpf-from" class="mln-inp" value="' + _mddPragatiFilt.from + '" onchange="mddPragatiApplyFilter();">' +
+        '<span class="mln-dash">—</span>' +
+        '<input type="date" id="mpf-to" class="mln-inp" value="' + _mddPragatiFilt.to + '" onchange="mddPragatiApplyFilter();">' +
+        (_mddPragatiFilt.io||_mddPragatiFilt.from||_mddPragatiFilt.to ? '<button class="mln-clr dark" onclick="event.stopPropagation();mddPragatiClearFilter();">✕</button>' : '') +
+      '</div>' +
+      '<div class="mpf-list">' + (items || '<div class="mydd-empty">कोई प्रगति नहीं</div>') + '</div>' +
+    '</div>';
+}
+function mddPragatiApplyFilter(){
+  _mddPragatiFilt.io = (document.getElementById('mpf-io')||{}).value || '';
+  _mddPragatiFilt.from = (document.getElementById('mpf-from')||{}).value || '';
+  _mddPragatiFilt.to = (document.getElementById('mpf-to')||{}).value || '';
+  mddRenderPragatiFeed();
+}
+function mddPragatiClearFilter(){ _mddPragatiFilt = { io:'', from:'', to:'' }; mddRenderPragatiFeed(); }
+
 function mddRenderAttStrip(){
   var host = document.getElementById('mydd-att-strip'); if (!host) return;
   var c = _mddAttCompute();
@@ -32030,11 +32205,11 @@ function mddAttPill(which){
 var _mddAttTimer = null; var _masOpenGroup = null;
 async function mddAttLiveTick(){
   try { var r = await supa.from('attendance_log').select('*').eq('is_test', false).order('att_date', { ascending:false }); if (r && !r.error) state.attendance = r.data || []; } catch(e){}
-  mddRenderAttStrip();
+  mddRenderAttStrip(); try { mddRenderNoticeStrip(); mddRenderPragatiFeed(); } catch(e){}
 }
 function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval(mddAttLiveTick, 60000); }
 function renderMyDailyBox() {
-  try { mddRenderAttStrip(); mddAttStartLive(); } catch(e){}
+  try { mddRenderAttStrip(); mddRenderNoticeStrip(); mddRenderPragatiFeed(); mddAttStartLive(); } catch(e){}
   var box = document.getElementById('mydaily-box');
   if (!box) return;
   var mo = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
