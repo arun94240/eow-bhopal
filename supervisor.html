@@ -23158,6 +23158,10 @@ body.role-staff header { margin-top: 30px; }
               </div>
             </div>
             <div class="form-group">
+              <label class="form-label">👤 संबंधित IO (optional)</label>
+              <select class="form-select" id="dgf-io"><option value="">👤 IO चुनें (optional)</option></select>
+            </div>
+            <div class="form-group">
               <label class="form-label">Remarks (optional)</label>
               <input type="text" class="form-input" id="dgf-remarks" placeholder="Any additional remarks…">
             </div>
@@ -32151,6 +32155,7 @@ function mddReviewAddPicker() {
         '</select>' +
         '<select id="mddq-rev-num" class="mddq-inp mddq-sm"><option value="">— number चुनें —</option></select>' +
       '</div>' +
+      '<select id="mddq-rev-io" class="mddq-inp">' + _mddIoOptionsHTML('') + '</select>' +
       '<div class="mddq-reminder-box">' +
         '<span class="mddq-rem-lbl">इस प्रकरण की समीक्षा —</span>' +
         '<div class="mddq-row2">' +
@@ -32178,17 +32183,18 @@ async function mddReviewAddGo2() {
     if (!date) { if (typeof toast === 'function') toast('समीक्षा की तारीख़ चुनें', true); return; }
     var cobj = ((state.enquiries && state.enquiries[tp]) || []).find(function(x){ return x.id === id; });
     var disp = cobj ? ((typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(cobj, tp) : (cobj.no || '')) : 'प्रकरण';
+    var ioName = (document.getElementById('mddq-rev-io') || {}).value || null;
     var payload = {
       task_title: '⭐ प्रकरण समीक्षा — ' + disp,
-      task_detail: 'नियत तिथि को इस प्रकरण की समीक्षा करनी है।',
-      remarks: null, priority: 'High', status: 'Pending',
+      task_detail: 'नियत तिथि को इस प्रकरण की समीक्षा करनी है।' + (ioName ? ' (IO: ' + ioName + ')' : ''),
+      remarks: null, io_name: ioName, priority: 'High', status: 'Pending',
       task_date: date, deadline: date,
       reminder_at: _mddCombineReminder(date, '09:00'),
       case_type: tp, case_id: id, case_display: disp,
       updated_at: new Date().toISOString()
     };
     try {
-      var r = await supa.from('my_office_tasks').insert(payload).select().single();
+      var r = await _mddInsertResilient('my_office_tasks', payload);
       if (r.error) throw r.error;
       if (!state.myOfficeTasks) state.myOfficeTasks = [];
       state.myOfficeTasks.unshift(r.data);
@@ -32334,7 +32340,7 @@ function mtxRenderList(which) {
       return {
         title: '📝 ' + _mddEsc(t.task_title || '(बिना शीर्षक)'),
         meta: [ t.task_date ? _mddDate(t.task_date) : '', t.priority || '', t.status || '' ].filter(Boolean).map(_mddEsc).join(' · '),
-        brief: (t.task_detail ? '<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>' : '') + (t.case_display ? '<div class="mydd-brief-row"><b>प्रकरण:</b> ' + _mddEsc(t.case_display) + '</div>' : ''),
+        brief: (t.task_detail ? '<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>' : '') + (t.io_name ? '<div class="mydd-brief-row"><b>IO:</b> ' + _mddEsc(t.io_name) + '</div>' : '') + (t.remarks ? '<div class="mydd-brief-row"><b>संदर्भ:</b> ' + _mddEsc(t.remarks) + '</div>' : '') + (t.case_display ? '<div class="mydd-brief-row"><b>प्रकरण:</b> ' + _mddEsc(t.case_display) + '</div>' : ''),
         oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\');">✎ Open / Edit</button>'
       };
     }, 'कोई To-Do नहीं');
@@ -32645,6 +32651,25 @@ function _mddCombineReminder(dateVal, timeVal){
   var d = new Date(dateVal + 'T' + t);
   return isNaN(d.getTime()) ? null : d.toISOString();
 }
+function _mddIoOptionsHTML(sel){
+  var ios = (state.ioMaster || []).slice();
+  ios.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||'')); });
+  return '<option value="">👤 IO चुनें (optional)</option>' + ios.map(function(o){
+    var nm = (o.rank ? o.rank + ' ' : '') + (o.name || '');
+    return '<option value="' + _mddEsc(o.name||'') + '"' + (sel && sel===o.name ? ' selected' : '') + '>' + _mddEsc(nm) + '</option>';
+  }).join('');
+}
+async function _mddInsertResilient(table, payload){
+  var r = await supa.from(table).insert(payload).select().single();
+  if (r.error){
+    var m = (r.error.message||'')+' '+(r.error.details||'')+' '+(r.error.hint||'');
+    if (('io_name' in payload) && /io_name|column|schema cache|does not exist/i.test(m)){
+      var p2 = Object.assign({}, payload); delete p2.io_name;
+      r = await supa.from(table).insert(p2).select().single();
+    }
+  }
+  return r;
+}
 function mddTaskEditInline(id){
   var t = (state.myOfficeTasks || []).find(function(x){ return x.id === id; });
   if (!t) return;
@@ -32663,6 +32688,7 @@ function mddTaskFormOpen(hostId, task) {
     detail: task ? (task.task_detail || '') : '',
     date: task ? (String(task.task_date || today).slice(0,10)) : today,
     priority: task ? (task.priority || 'Normal') : 'Normal',
+    io: task ? (task.io_name || '') : '',
     remDate: '', remTime: ''
   };
   if (task && task.reminder_at) { var rd = new Date(task.reminder_at); if (!isNaN(rd.getTime())) {
@@ -32675,6 +32701,7 @@ function mddTaskFormOpen(hostId, task) {
       '<div class="mddq-formttl">' + (_mddTaskEditId ? '✎ To-Do संपादित करें' : '📝 नया To-Do / Office task') + '</div>' +
       '<input type="text" id="mddq-title" class="mddq-inp" placeholder="📋 विषय / Subject (क्या करना है)..." value="' + _mddEsc(v.title) + '">' +
       '<input type="text" id="mddq-ref" class="mddq-inp" placeholder="👤 किसके संदर्भ में / किसके लिए (नाम/अनुभाग/पत्र क्र.)..." value="' + _mddEsc(v.ref) + '">' +
+      '<select id="mddq-io" class="mddq-inp">' + _mddIoOptionsHTML(v.io) + '</select>' +
       '<textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="📝 विवरण / Detail (optional)...">' + _mddEsc(v.detail) + '</textarea>' +
       '<div class="mddq-row2">' +
         '<label class="mddq-lbl">📅 <input type="date" id="mddq-date" class="mddq-inp mddq-sm" value="' + v.date + '"></label>' +
@@ -32714,6 +32741,7 @@ async function mddTaskFormSave(hostId) {
   var date = (document.getElementById('mddq-date') || {}).value || new Date().toISOString().slice(0,10);
   var priority = (document.getElementById('mddq-priority') || {}).value || 'Normal';
   var remAt = _mddCombineReminder((document.getElementById('mddq-rem-date') || {}).value || '', (document.getElementById('mddq-rem-time') || {}).value || '');
+  var ioName = (document.getElementById('mddq-io') || {}).value || null;
   var _ctype = (document.getElementById('mddq-task-ctype') || {}).value || '';
   var _cid = (document.getElementById('mddq-task-cnum') || {}).value || '';
   var caseType = null, caseId = null, caseDisplay = null;
@@ -32722,7 +32750,7 @@ async function mddTaskFormSave(hostId) {
     if (_cobj) { caseType = _ctype; caseId = _cid; caseDisplay = (typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(_cobj, _ctype) : (_cobj.no || ''); }
   }
   var payload = {
-    task_title: title, task_detail: detail || null, remarks: ref || null,
+    task_title: title, task_detail: detail || null, remarks: ref || null, io_name: ioName,
     priority: priority, reminder_at: remAt, updated_at: new Date().toISOString(),
     case_type: caseType, case_id: caseId, case_display: caseDisplay,
     task_date: date
@@ -32730,13 +32758,14 @@ async function mddTaskFormSave(hostId) {
   try {
     if (_mddTaskEditId) {
       var ru = await supa.from('my_office_tasks').update(payload).eq('id', _mddTaskEditId).select().single();
+      if (ru.error && /io_name|column|schema cache|does not exist/i.test((ru.error.message||'')+(ru.error.details||''))) { var _p=Object.assign({},payload); delete _p.io_name; ru = await supa.from('my_office_tasks').update(_p).eq('id', _mddTaskEditId).select().single(); }
       if (ru.error) throw ru.error;
       var idx = (state.myOfficeTasks || []).findIndex(function(x){ return x.id === _mddTaskEditId; });
       if (idx >= 0) state.myOfficeTasks[idx] = ru.data;
       if (typeof toast === 'function') toast('To-Do अद्यतन ✓');
     } else {
       payload.status = 'Pending'; payload.deadline = null;
-      var r = await supa.from('my_office_tasks').insert(payload).select().single();
+      var r = await _mddInsertResilient('my_office_tasks', payload);
       if (r.error) throw r.error;
       if (!state.myOfficeTasks) state.myOfficeTasks = [];
       state.myOfficeTasks.unshift(r.data);
@@ -32769,6 +32798,7 @@ function mddDiscInlineAdd() {
         '<label class="mddq-lbl">⏰ <input type="date" id="mddd-reminder" class="mddq-inp mddq-sm"></label>' +
         '<label class="mddq-lbl">⚑ <select id="mddd-priority" class="mddq-inp mddq-sm"><option>Normal</option><option>High</option><option>Low</option></select></label>' +
       '</div>' +
+      '<select id="mddd-io" class="mddq-inp">' + _mddIoOptionsHTML('') + '</select>' +
       '<input type="url" id="mddd-link" class="mddq-inp" placeholder="🔗 Apple Notes / Craft / कोई hyperlink paste करें (optional)">' +
       '<div class="mddq-btns">' +
         '<button class="mddq-save" onclick="event.stopPropagation();mddDiscInlineSave();">✓ Save</button>' +
@@ -32789,8 +32819,9 @@ async function mddDiscInlineSave() {
   var rem = (document.getElementById('mddd-reminder') || {}).value || null;
   var priority = (document.getElementById('mddd-priority') || {}).value || 'Normal';
   var link = ((document.getElementById('mddd-link') || {}).value || '').trim();
+  var ioName = (document.getElementById('mddd-io') || {}).value || null;
   var payload = {
-    scope: 'dg_eow', title: title, note_text: note || null, participants: null,
+    scope: 'dg_eow', title: title, note_text: note || null, participants: ioName,
     reminder_date: rem, reminder_time: null, reminder_lead: null,
     priority: priority, status: 'Open',
     attachments: [], links: link ? [{ url: link, label: link }] : [], tag_ids: []
@@ -35090,6 +35121,7 @@ function openDgDirectiveForm() {
   document.getElementById('dgf-priority').value = 'Normal';
   document.getElementById('dgf-status').value = 'Pending';
   document.getElementById('dgf-remarks').value = '';
+  var _dgio = document.getElementById('dgf-io'); if (_dgio && typeof _mddIoOptionsHTML === 'function') { _dgio.innerHTML = _mddIoOptionsHTML(''); _dgio.value = ''; }
   document.getElementById('dgf-task-title').value = '';
   // Reset kind to case-linked
   var kindCase = document.querySelector('input[name="dgf-kind"][value="case"]');
@@ -35272,10 +35304,12 @@ async function saveDgDirective() {
   var priority = document.getElementById('dgf-priority').value;
   var status = document.getElementById('dgf-status').value;
   var remarks = document.getElementById('dgf-remarks').value.trim();
+  var ioName = (document.getElementById('dgf-io') || {}).value || null;
   
   var payload = {
     entry_kind: entryKind,
     direction_text: direction,
+    io_name: ioName,
     direction_date: dirDate,
     deadline: deadline,
     priority: priority,
@@ -35316,9 +35350,11 @@ async function saveDgDirective() {
   try {
     if (_dgEditingId) {
       var r = await supa.from('dg_directives').update(payload).eq('id', _dgEditingId);
+      if (r.error && /io_name|column|schema cache|does not exist/i.test((r.error.message||'')+(r.error.details||''))) { var _pu=Object.assign({},payload); delete _pu.io_name; r = await supa.from('dg_directives').update(_pu).eq('id', editId); }
       if (r.error) throw r.error;
     } else {
       var r2 = await supa.from('dg_directives').insert(payload);
+      if (r2.error && /io_name|column|schema cache|does not exist/i.test((r2.error.message||'')+(r2.error.details||''))) { var _pp=Object.assign({},payload); delete _pp.io_name; r2 = await supa.from('dg_directives').insert(_pp); }
       if (r2.error) throw r2.error;
     }
     var dgRes = await supa.from('dg_directives').select('*').order('created_at', { ascending: false });
