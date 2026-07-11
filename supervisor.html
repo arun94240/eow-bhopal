@@ -15290,6 +15290,7 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mydd-master{ flex:1 1 100%; min-height:0; }
 #mydaily-box .mydd-master .mydd-dg-toprow{ position:relative; }
 #mydaily-box .mydd-master .mydd-dg-toprow{ flex-wrap:wrap; gap:7px; }
+#mydaily-box .mtx-add-menu .mtx-add-sep{ border-top:1px solid #eef2f7; }
 #mydaily-box .mtx-add-btn{ background:#dc2626; color:#fff; border:none; border-radius:8px; font-size:12px; font-weight:800; padding:6px 12px; cursor:pointer; margin-left:6px; }
 #mydaily-box .mtx-add-menu{ position:absolute; top:38px; right:0; background:#fff; border:1px solid #cbd5e1; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.28); min-width:190px; overflow:hidden; z-index:30; }
 #mydaily-box .mtx-add-mi{ padding:10px 14px; font-size:13px; font-weight:700; color:#0d2c54; cursor:pointer; }
@@ -22485,27 +22486,13 @@ body.role-staff header { margin-top: 30px; }
       <!-- 📋 My Daily Dashboard — below Overview Stats (4 daily tiles)  -->
       <!-- ════════════════════════════════════════════════════════════ -->
       <div class="mydd-box" id="mydaily-box">
-        <div class="mydd-toolbar">
-          <button class="mydd-pill" id="mydd-pill-reminder" onclick="event.stopPropagation();mddToggleReminder();">⏰ Reminder</button>
-          <button class="mydd-pill" id="mydd-pill-calendar" onclick="event.stopPropagation();mddToggleCalendar();">📅 Calendar</button>
-          <button class="mydd-add" onclick="event.stopPropagation();mddAddMenu();" title="Reminder / Calendar">＋ Add</button>
-          <div class="mydd-add-menu" id="mydd-add-menu" style="display:none;">
-            <div class="mydd-add-mi" onclick="event.stopPropagation();mddAddMenuPick('reminder');">⏰ Reminder</div>
-            <div class="mydd-add-mi" onclick="event.stopPropagation();mddAddMenuPick('calendar');">📅 Calendar</div>
-          </div>
-        </div>
-        <div class="mydd-head" onclick="event.stopPropagation();mddCloseAllLists();" title="सभी सूचियाँ बंद करें">
-          <span class="mydd-cal" id="mydd-mini-cal"><span class="mc-mo">—</span><span class="mc-dy">—</span></span>
-          <span class="mydd-title">📋 My Daily Dashboard</span>
-          <span class="mydd-total">Total: <strong id="mydd-total">0</strong></span>
-        </div>
         <div id="mydd-reminder-panel" class="mydd-toppanel" style="display:none;"></div>
         <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
         <div class="mydd-tiles">
           <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleBox();">
               <span class="mydd-tcal"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
-              <div class="mydd-tlabel">📋 My Tasks</div>
+              <div class="mydd-tlabel">📋 My Daily Dashboard</div>
               <span class="mydd-tnum" id="mydd-cnt-mytask">0</span>
               <div class="mtx-search mtx-blk-keyword mtx-search-inline" onclick="event.stopPropagation();">
                 <span class="mtx-ico mtx-ico-keyword">🔍</span>
@@ -22514,7 +22501,9 @@ body.role-staff header { margin-top: 30px; }
               </div>
               <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddMenu();">＋ Add</button>
               <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;">
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('disc');">💬 Discussion Note</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';mddAddMenuPick('reminder');">⏰ Reminder</div>
+                <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';mddAddMenuPick('calendar');">📅 Calendar</div>
+                <div class="mtx-add-mi mtx-add-sep" onclick="event.stopPropagation();mtxAddPick('disc');">💬 Discussion Note</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('dg');">🏛 DG EOW</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('review');">⭐ प्रकरण समीक्षा</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('task');">📝 To-Dos / Office</div>
