@@ -9079,6 +9079,27 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .att-chart-bar{ display:flex; height:16px; border-radius:9px; overflow:hidden; margin:13px 0 8px; background:#eef2f7; }
 .att-chart-bar>div{ height:100%; }
 .att-chart-legend{ font-size:12px; color:#475569; }
+.mydd-att-strip-host{ margin:2px 0 8px; }
+.mydd-att-strip{ background:linear-gradient(160deg,#062a52,#0a3a6e); border-radius:12px; padding:10px 12px; }
+.mas-top{ display:flex; align-items:center; gap:7px; margin-bottom:9px; cursor:pointer; }
+.mas-dot{ width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,0.6); animation:masPulse 1.8s infinite; flex:0 0 auto; }
+@keyframes masPulse{ 0%{box-shadow:0 0 0 0 rgba(34,197,94,0.5);} 70%{box-shadow:0 0 0 7px rgba(34,197,94,0);} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0);} }
+.mas-ttl{ font-size:12.5px; font-weight:900; color:#fff; }
+.mas-time{ margin-left:auto; font-size:10px; color:#cbd5e1; font-weight:600; }
+.mas-caret{ color:#cbd5e1; font-size:11px; }
+.mas-pills{ display:flex; gap:6px; }
+.mas-pill{ flex:1; border-radius:9px; padding:7px 4px; text-align:center; color:#fff; }
+.mas-pill .n{ font-size:19px; font-weight:900; line-height:1; }
+.mas-pill .l{ font-size:9.5px; font-weight:700; margin-top:2px; opacity:.95; }
+.mp-present{ background:rgba(34,197,94,0.92); } .mp-out{ background:rgba(59,130,246,0.92); }
+.mp-leave{ background:rgba(245,158,11,0.92); } .mp-absent{ background:rgba(239,68,68,0.92); }
+.mas-bar{ display:flex; height:7px; border-radius:5px; overflow:hidden; margin-top:9px; background:rgba(255,255,255,0.14); }
+.mas-bar>div{ height:100%; }
+.mas-detail{ margin-top:10px; border-top:1px solid rgba(255,255,255,0.14); padding-top:9px; }
+.mas-grp{ margin-bottom:8px; }
+.mas-grp-h{ font-size:11px; font-weight:900; margin-bottom:4px; }
+.mas-grp-b{ display:flex; flex-wrap:wrap; gap:5px; }
+.mas-name{ background:rgba(255,255,255,0.14); color:#fff; border-radius:999px; font-size:10.5px; font-weight:600; padding:2px 9px; }
 /* smooth inline open for Overview-Stats panels */
 @keyframes ovPanelIn{ from{ opacity:0; transform:translateY(-9px); } to{ opacity:1; transform:translateY(0); } }
 .ovstats-panel.ovp-anim{ animation:ovPanelIn .28s cubic-bezier(.22,.61,.36,1); }
@@ -22516,6 +22537,7 @@ body.role-staff header { margin-top: 30px; }
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('keyword');">🏷 Keyword (प्रकरण में)</div>
               </div>
             </div>
+            <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
             <div class="mtx-list mtx-list-top" id="mtx-search-results"></div>
             <div class="mddq-host" id="mtx-addhost-task"></div>
             <div class="mddq-host" id="mydd-addhost-disc"></div>
@@ -31940,7 +31962,77 @@ function refreshAll() {
 // ════════════════════════════════════════════════════════════════
 // 📋 My Daily Dashboard box — date calendars + live counts
 // ════════════════════════════════════════════════════════════════
+function _mddAttCompute(ymd){
+  ymd = ymd || new Date().toISOString().slice(0,10);
+  var dayRows = (state.attendance || []).filter(function(a){ return a.att_date === ymd; });
+  var byStaff = {}; dayRows.forEach(function(a){ if (a.staff_id) byStaff[a.staff_id] = a; });
+  var onLeave = {};
+  (state.leaves || []).forEach(function(l){
+    if (String(l.status||'').toLowerCase()==='approved' && l.from_date && l.to_date && l.from_date<=ymd && l.to_date>=ymd && l.officer_id) onLeave[l.officer_id] = true;
+  });
+  var present=[], out=[], leave=[], absent=[];
+  (state.ioMaster || []).forEach(function(s){
+    var a = byStaff[s.id]; var nm = (s.rank ? s.rank + ' ' : '') + (s.name || '');
+    if (a && a.check_in_time && a.check_out_time) out.push(nm);
+    else if (a && a.check_in_time) present.push(nm);
+    else if (onLeave[s.id]) leave.push(nm);
+    else absent.push(nm);
+  });
+  return { present:present, out:out, leave:leave, absent:absent, total:(state.ioMaster||[]).length };
+}
+function _masGroup(label, arr, color){
+  if (!arr.length) return '';
+  return '<div class="mas-grp"><div class="mas-grp-h" style="color:' + color + ';">' + label + ' (' + arr.length + ')</div><div class="mas-grp-b">' + arr.map(function(n){ return '<span class="mas-name">' + _mddEsc(n) + '</span>'; }).join('') + '</div></div>';
+}
+function mddRenderAttStrip(){
+  var host = document.getElementById('mydd-att-strip'); if (!host) return;
+  var c = _mddAttCompute();
+  var p=c.present.length, o=c.out.length, l=c.leave.length, ab=c.absent.length, t=c.total||1;
+  function pct(n){ return t ? (n/t*100) : 0; }
+  var detailOpen = (function(){ var d=document.getElementById('mas-detail'); return d && d.style.display && d.style.display!=='none'; })();
+  var tm = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  host.innerHTML =
+    '<div class="mydd-att-strip">' +
+      '<div class="mas-top" onclick="event.stopPropagation();mddAttToggleDetail();">' +
+        '<span class="mas-dot"></span>' +
+        '<span class="mas-ttl">अभी उपस्थिति — Live</span>' +
+        '<span class="mas-time">अद्यतन ' + tm + '</span>' +
+        '<span class="mas-caret" id="mas-caret">' + (detailOpen ? '▴' : '▾') + '</span>' +
+      '</div>' +
+      '<div class="mas-pills">' +
+        '<div class="mas-pill mp-present"><div class="n">' + p + '</div><div class="l">उपस्थित</div></div>' +
+        '<div class="mas-pill mp-out"><div class="n">' + o + '</div><div class="l">जा चुके</div></div>' +
+        '<div class="mas-pill mp-leave"><div class="n">' + l + '</div><div class="l">अवकाश</div></div>' +
+        '<div class="mas-pill mp-absent"><div class="n">' + ab + '</div><div class="l">अनुपस्थित</div></div>' +
+      '</div>' +
+      '<div class="mas-bar">' +
+        (p ? '<div style="width:' + pct(p) + '%;background:#22c55e;"></div>' : '') +
+        (o ? '<div style="width:' + pct(o) + '%;background:#3b82f6;"></div>' : '') +
+        (l ? '<div style="width:' + pct(l) + '%;background:#f59e0b;"></div>' : '') +
+        (ab ? '<div style="width:' + pct(ab) + '%;background:#ef4444;"></div>' : '') +
+      '</div>' +
+      '<div class="mas-detail" id="mas-detail" style="display:' + (detailOpen ? 'block' : 'none') + ';">' +
+        _masGroup('🟢 उपस्थित', c.present, '#16a34a') +
+        _masGroup('🔵 जा चुके', c.out, '#2563eb') +
+        _masGroup('🏖️ अवकाश', c.leave, '#b45309') +
+        _masGroup('🔴 अनुपस्थित', c.absent, '#dc2626') +
+      '</div>' +
+    '</div>';
+}
+function mddAttToggleDetail(){
+  var d = document.getElementById('mas-detail'); var c = document.getElementById('mas-caret');
+  if (!d) return; var open = (d.style.display==='none' || !d.style.display);
+  d.style.display = open ? 'block' : 'none'; if (c) c.textContent = open ? '▴' : '▾';
+  if (open) { d.classList.remove('hct-anim'); void d.offsetWidth; d.classList.add('hct-anim'); }
+}
+var _mddAttTimer = null;
+async function mddAttLiveTick(){
+  try { var r = await supa.from('attendance_log').select('*').eq('is_test', false).order('att_date', { ascending:false }); if (r && !r.error) state.attendance = r.data || []; } catch(e){}
+  mddRenderAttStrip();
+}
+function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval(mddAttLiveTick, 60000); }
 function renderMyDailyBox() {
+  try { mddRenderAttStrip(); mddAttStartLive(); } catch(e){}
   var box = document.getElementById('mydaily-box');
   if (!box) return;
   var mo = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
