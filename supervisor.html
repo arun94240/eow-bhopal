@@ -15328,6 +15328,7 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mtx-ag-chip{ background:#f5b942; color:#062a52; border-radius:999px; font-size:11px; font-weight:900; padding:1px 9px; }
 #mydaily-box .mtx-list{ display:none; background:#fff; border-radius:11px; padding:8px 10px; color:#0f2238; }
 #mydaily-box .mtx-subttl{ font-size:10.5px; font-weight:800; letter-spacing:.08em; color:rgba(255,255,255,0.65); margin-top:3px; text-transform:uppercase; }
+#mydaily-box .mtx-io-row .mtx-ico-io{ background:#0d9488; }
 #mydaily-box .mtx-name-row{ background:rgba(255,255,255,0.07); border:1px dashed rgba(255,255,255,0.32); }
 /* ── My Daily Dashboard — Option C (Minimal): uniform navy rows, colored icon-chips ── */
 #mydaily-box .mtx-search.mtx-blk-keyword{ background:#fff !important; border-left:0 !important; }
@@ -22576,6 +22577,8 @@ body.role-staff header { margin-top: 30px; }
             <div class="mtx-list" id="mtx-list-td"></div>
             <div class="mtx-subttl" id="mtx-name-title" style="display:none;">References — @name</div>
             <div id="mtx-name-rows"></div>
+            <div class="mtx-subttl" id="mtx-io-title" style="display:none;">👮 IO अनुसार</div>
+            <div id="mtx-io-rows"></div>
             </div>
           </div>
         </div>
@@ -32314,6 +32317,33 @@ function mddReviewAddGo() {
 var _mtxNameGroups = {};
 function _mtxEl(id){ return document.getElementById(id); }
 function _mtxOpen(el){ return el && el.style.display === 'block'; }
+var _mtxIoGroups = {}; var _mtxIoOrder = [];
+function _mtxIoItem(ico, title, meta, openExpr){
+  return '<div class="mydd-item"><div class="mydd-item-head" onclick="event.stopPropagation();mddRowToggle(this);">' +
+      '<span class="mydd-item-title">' + ico + ' ' + _mddEsc(title) + '</span>' +
+      (meta ? '<span class="mydd-item-meta">' + _mddEsc(meta) + '</span>' : '') +
+    '</div><div class="mydd-item-brief" style="display:none;">' +
+      '<button class="mydd-oe-btn" onclick="event.stopPropagation();(function(){try{' + openExpr + ';}catch(e){}})();">✎ Open / Edit</button>' +
+    '</div></div>';
+}
+function mtxIoRender(i){
+  var el = _mtxEl('mtx-io-list-' + i); if (!el) return;
+  var nm = (_mtxIoOrder || [])[i]; var items = (_mtxIoGroups || {})[nm] || [];
+  if (!items.length) { el.innerHTML = '<div class="mydd-empty">कोई item नहीं</div>'; return; }
+  el.innerHTML = items.map(function(it){
+    if (it.kind === 'task') { var t=it.row; return _mtxIoItem('📝', t.task_title || '(task)', [t.task_date ? _mddDate(t.task_date) : '', t.case_display || ''].filter(Boolean).join(' · '), "mddTaskEditInline('" + t.id + "')"); }
+    if (it.kind === 'dg')   { var d=it.row; return _mtxIoItem('🏛', d.instruction || d.direction_text || d.task_title || '(DG)', d.case_display || '', "editDgDirective('" + d.id + "')"); }
+    if (it.kind === 'disc') { var n=it.row; return _mtxIoItem('💬', n.title || n.note_text || '(note)', n.reminder_date ? _mddDate(n.reminder_date) : '', "editDiscussionNote('" + n.id + "')"); }
+    return '';
+  }).join('');
+}
+function mtxIoToggle(i){
+  var l = _mtxEl('mtx-io-list-' + i); if (!l) return;
+  var open = !_mtxOpen(l);
+  l.style.display = open ? 'block' : 'none';
+  var c = _mtxEl('mtx-io-caret-' + i); if (c) c.textContent = open ? '▴' : '▾';
+  if (open) mtxIoRender(i);
+}
 function mtxRefresh() {
   // counts
   var dg = (state.dgDirectives || []).length;
@@ -32365,6 +32395,29 @@ function mtxRefresh() {
     Object.keys(openIds).forEach(function(id){
       var l=_mtxEl(id); if (l) { l.style.display='block'; mtxNameRender(id.replace('mtx-name-list-','')); var c=_mtxEl('mtx-name-caret-'+id.replace('mtx-name-list-','')); if (c) c.textContent='▴'; }
     });
+  }
+  // ── group by chosen IO (io_name on task/dg, participants on discussion) ──
+  var byIo = {};
+  function _pushIo(name, obj){ if(!name) return; name=String(name).trim(); if(!name) return; (byIo[name]=byIo[name]||[]).push(obj); }
+  (state.myOfficeTasks || []).forEach(function(t){ if (t.io_name) _pushIo(t.io_name, { kind:'task', row:t }); });
+  (state.dgDirectives || []).forEach(function(d){ if (d.io_name) _pushIo(d.io_name, { kind:'dg', row:d }); });
+  (state.discussionNotes || []).forEach(function(d){ if (d.participants) _pushIo(d.participants, { kind:'disc', row:d }); });
+  _mtxIoGroups = byIo;
+  _mtxIoOrder = Object.keys(byIo).sort(function(a,b){ return a.localeCompare(b); });
+  var ioHost = _mtxEl('mtx-io-rows'); var ioTitle = _mtxEl('mtx-io-title');
+  if (ioHost) {
+    var openIo = {};
+    Array.prototype.forEach.call(ioHost.querySelectorAll('.mtx-list'), function(l){ if (_mtxOpen(l)) openIo[l.id] = 1; });
+    ioHost.innerHTML = _mtxIoOrder.map(function(nm, i){
+      return '<div class="mydd-dg-subrow mtx-name-row mtx-io-row" onclick="event.stopPropagation();mtxIoToggle(' + i + ');">' +
+          '<span class="mtx-ico mtx-ico-io">👮</span><span class="mydd-dg-sublabel">' + _mddEsc(nm) + '</span>' +
+          '<span class="mydd-dg-subnum">' + byIo[nm].length + '</span>' +
+          '<span class="mydd-dg-subcaret" id="mtx-io-caret-' + i + '">▾</span>' +
+        '</div>' +
+        '<div class="mtx-list" id="mtx-io-list-' + i + '"></div>';
+    }).join('');
+    if (ioTitle) ioTitle.style.display = _mtxIoOrder.length ? 'block' : 'none';
+    Object.keys(openIo).forEach(function(id){ var l=_mtxEl(id); if (l) { l.style.display='block'; var i=id.replace('mtx-io-list-',''); mtxIoRender(i); var c=_mtxEl('mtx-io-caret-'+i); if (c) c.textContent='▴'; } });
   }
   // agenda chips
   var ag = _mtxAgendaItems();
