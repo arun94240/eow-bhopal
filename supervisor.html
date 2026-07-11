@@ -12106,6 +12106,9 @@ body.view-mobile .cao-matrix-tile .caom-num {
 }
 
 /* ════════════ Inline quick-add form ════════════ */
+.mddq-formttl{ font-size:12.5px; font-weight:800; color:#062a52; margin-bottom:2px; }
+.mddq-reminder-box{ background:#f8fafc; border:1px dashed #cbd5e1; border-radius:9px; padding:8px 10px; margin-top:2px; }
+.mddq-rem-lbl{ font-size:11.5px; font-weight:700; color:#64748b; display:block; margin-bottom:5px; }
 .mt-quickadd {
   background: #f5f3ff;
   border: 2px dashed #c7d2fe;
@@ -32022,7 +32025,7 @@ function mddRenderTodos() {
         (meta ? '<span class="mydd-item-meta">' + meta + '</span>' : '') +
       '</div>' +
       '<div class="mydd-item-brief" style="display:none;">' + brief +
-        '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openMtEdit===\'function\')&&openMtEdit(\'' + t.id + '\');">✎ Open / Edit</button>' +
+        '<button class="mydd-oe-btn" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\');">✎ Open / Edit</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -32293,7 +32296,7 @@ function mtxRenderList(which) {
         title: '📝 ' + _mddEsc(t.task_title || '(बिना शीर्षक)'),
         meta: [ t.task_date ? _mddDate(t.task_date) : '', t.priority || '', t.status || '' ].filter(Boolean).map(_mddEsc).join(' · '),
         brief: (t.task_detail ? '<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>' : '') + (t.case_display ? '<div class="mydd-brief-row"><b>प्रकरण:</b> ' + _mddEsc(t.case_display) + '</div>' : ''),
-        oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openMtEdit===\'function\')&&openMtEdit(\'' + t.id + '\');">✎ Open / Edit</button>'
+        oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\');">✎ Open / Edit</button>'
       };
     }, 'कोई To-Do नहीं');
     var elt = _mtxEl('mtx-list-td');
@@ -32328,7 +32331,7 @@ function mtxNameRender(tid) {
       title: '📝 ' + _mddEsc(t.task_title || '(task)'),
       meta: [ t.task_date ? _mddDate(t.task_date) : '', t.priority || '', t.status || '' ].filter(Boolean).map(_mddEsc).join(' · '),
       brief: (t.task_detail ? '<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>' : '<div class="mydd-brief-row">📎 Reference task</div>'),
-      oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openMtEdit===\'function\')&&openMtEdit(\'' + t.id + '\');">✎ Open / Edit</button>'
+      oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\');">✎ Open / Edit</button>'
     }; }
     return {
       title: _mddEsc(r.case_display || '(प्रकरण)'),
@@ -32595,20 +32598,48 @@ function _mddCloseAllTaskForms() {
   Array.prototype.forEach.call(document.querySelectorAll('#mydaily-box .mddq-host'), function(h){ h.innerHTML = ''; h.setAttribute('data-open', ''); });
   var am = document.getElementById('mydd-add-menu'); if (am) am.style.display = 'none';
 }
-function mddTaskFormClose(hostId) { var h = document.getElementById(hostId); if (h) { h.innerHTML = ''; h.setAttribute('data-open', ''); } }
-function mddTaskFormOpen(hostId) {
+function mddTaskFormClose(hostId) { _mddTaskEditId = null; var h = document.getElementById(hostId); if (h) { h.innerHTML = ''; h.setAttribute('data-open', ''); } }
+var _mddTaskEditId = null;
+function _mddCombineReminder(dateVal, timeVal){
+  if (!dateVal) return null;
+  var t = timeVal || '09:00';
+  var d = new Date(dateVal + 'T' + t);
+  return isNaN(d.getTime()) ? null : d.toISOString();
+}
+function mddTaskEditInline(id){
+  var t = (state.myOfficeTasks || []).find(function(x){ return x.id === id; });
+  if (!t) return;
+  mddTaskFormOpen('mtx-addhost-task', t);
+}
+function mddTaskFormOpen(hostId, task) {
   var host = document.getElementById(hostId); if (!host) return;
-  if (host.getAttribute('data-open') === '1') { mddTaskFormClose(hostId); return; }
+  if (host.getAttribute('data-open') === '1' && !task) { mddTaskFormClose(hostId); return; }
   _mddCloseAllTaskForms();
   host.setAttribute('data-open', '1');
+  _mddTaskEditId = (task && task.id) ? task.id : null;
   var today = new Date().toISOString().slice(0, 10);
+  var v = {
+    title: task ? (task.task_title || '') : '',
+    ref: task ? (task.remarks || '') : '',
+    detail: task ? (task.task_detail || '') : '',
+    date: task ? (String(task.task_date || today).slice(0,10)) : today,
+    priority: task ? (task.priority || 'Normal') : 'Normal',
+    remDate: '', remTime: ''
+  };
+  if (task && task.reminder_at) { var rd = new Date(task.reminder_at); if (!isNaN(rd.getTime())) {
+    v.remDate = rd.getFullYear()+'-'+String(rd.getMonth()+1).padStart(2,'0')+'-'+String(rd.getDate()).padStart(2,'0');
+    v.remTime = String(rd.getHours()).padStart(2,'0')+':'+String(rd.getMinutes()).padStart(2,'0');
+  }}
+  function pr(p){ return v.priority===p ? ' selected' : ''; }
   host.innerHTML =
     '<div class="mddq-form">' +
-      '<input type="text" id="mddq-title" class="mddq-inp" placeholder="Task title...">' +
-      '<textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="Detail (optional)..."></textarea>' +
+      '<div class="mddq-formttl">' + (_mddTaskEditId ? '✎ To-Do संपादित करें' : '📝 नया To-Do / Office task') + '</div>' +
+      '<input type="text" id="mddq-title" class="mddq-inp" placeholder="📋 विषय / Subject (क्या करना है)..." value="' + _mddEsc(v.title) + '">' +
+      '<input type="text" id="mddq-ref" class="mddq-inp" placeholder="👤 किसके संदर्भ में / किसके लिए (नाम/अनुभाग/पत्र क्र.)..." value="' + _mddEsc(v.ref) + '">' +
+      '<textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="📝 विवरण / Detail (optional)...">' + _mddEsc(v.detail) + '</textarea>' +
       '<div class="mddq-row2">' +
-        '<label class="mddq-lbl">📅 <input type="date" id="mddq-date" class="mddq-inp mddq-sm" value="' + today + '"></label>' +
-        '<label class="mddq-lbl">⚑ <select id="mddq-priority" class="mddq-inp mddq-sm"><option>Normal</option><option>High</option><option>Low</option></select></label>' +
+        '<label class="mddq-lbl">📅 <input type="date" id="mddq-date" class="mddq-inp mddq-sm" value="' + v.date + '"></label>' +
+        '<label class="mddq-lbl">⚑ <select id="mddq-priority" class="mddq-inp mddq-sm"><option' + pr('Normal') + '>Normal</option><option' + pr('High') + '>High</option><option' + pr('Low') + '>Low</option></select></label>' +
       '</div>' +
       '<div class="mddq-row2">' +
         '<select id="mddq-task-ctype" class="mddq-inp mddq-sm" onchange="_mddFillCaseSelect(\'mddq-task-cnum\', this.value);">' +
@@ -32616,21 +32647,34 @@ function mddTaskFormOpen(hostId) {
         '</select>' +
         '<select id="mddq-task-cnum" class="mddq-inp mddq-sm"><option value="">— number —</option></select>' +
       '</div>' +
+      '<div class="mddq-reminder-box">' +
+        '<span class="mddq-rem-lbl">⏰ Reminder सेट करें (optional):</span>' +
+        '<div class="mddq-row2">' +
+          '<input type="date" id="mddq-rem-date" class="mddq-inp mddq-sm" value="' + v.remDate + '">' +
+          '<input type="time" id="mddq-rem-time" class="mddq-inp mddq-sm" value="' + v.remTime + '">' +
+        '</div>' +
+      '</div>' +
       '<div class="mddq-btns">' +
         '<button class="mddq-save" onclick="event.stopPropagation();mddTaskFormSave(\'' + hostId + '\');">✓ Save</button>' +
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'' + hostId + '\');">Cancel</button>' +
       '</div>' +
     '</div>';
+  // pre-fill प्रकरण in edit mode
+  if (task && task.case_type && task.case_id) {
+    var ct = document.getElementById('mddq-task-ctype');
+    if (ct) { ct.value = task.case_type; _mddFillCaseSelect('mddq-task-cnum', task.case_type); var cn = document.getElementById('mddq-task-cnum'); if (cn) cn.value = task.case_id; }
+  }
   var ti = document.getElementById('mddq-title'); if (ti) { try { ti.focus(); } catch(e){} }
   try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
 async function mddTaskFormSave(hostId) {
   var title = ((document.getElementById('mddq-title') || {}).value || '').trim();
-  if (!title) { if (typeof toast === 'function') toast('Title likhें', true); return; }
+  if (!title) { if (typeof toast === 'function') toast('विषय (Subject) लिखें', true); return; }
+  var ref = ((document.getElementById('mddq-ref') || {}).value || '').trim();
   var detail = ((document.getElementById('mddq-detail') || {}).value || '').trim();
   var date = (document.getElementById('mddq-date') || {}).value || new Date().toISOString().slice(0,10);
   var priority = (document.getElementById('mddq-priority') || {}).value || 'Normal';
-  // optional linked प्रकरण (type + number)
+  var remAt = _mddCombineReminder((document.getElementById('mddq-rem-date') || {}).value || '', (document.getElementById('mddq-rem-time') || {}).value || '');
   var _ctype = (document.getElementById('mddq-task-ctype') || {}).value || '';
   var _cid = (document.getElementById('mddq-task-cnum') || {}).value || '';
   var caseType = null, caseId = null, caseDisplay = null;
@@ -32639,17 +32683,27 @@ async function mddTaskFormSave(hostId) {
     if (_cobj) { caseType = _ctype; caseId = _cid; caseDisplay = (typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(_cobj, _ctype) : (_cobj.no || ''); }
   }
   var payload = {
-    task_title: title, task_detail: detail || null, deadline: null, priority: priority,
-    reminder_at: null, updated_at: new Date().toISOString(),
+    task_title: title, task_detail: detail || null, remarks: ref || null,
+    priority: priority, reminder_at: remAt, updated_at: new Date().toISOString(),
     case_type: caseType, case_id: caseId, case_display: caseDisplay,
-    task_date: date, status: 'Pending'
+    task_date: date
   };
   try {
-    var r = await supa.from('my_office_tasks').insert(payload).select().single();
-    if (r.error) throw r.error;
-    if (!state.myOfficeTasks) state.myOfficeTasks = [];
-    state.myOfficeTasks.unshift(r.data);
-    if (typeof toast === 'function') toast('Task जुड़ा ✓');
+    if (_mddTaskEditId) {
+      var ru = await supa.from('my_office_tasks').update(payload).eq('id', _mddTaskEditId).select().single();
+      if (ru.error) throw ru.error;
+      var idx = (state.myOfficeTasks || []).findIndex(function(x){ return x.id === _mddTaskEditId; });
+      if (idx >= 0) state.myOfficeTasks[idx] = ru.data;
+      if (typeof toast === 'function') toast('To-Do अद्यतन ✓');
+    } else {
+      payload.status = 'Pending'; payload.deadline = null;
+      var r = await supa.from('my_office_tasks').insert(payload).select().single();
+      if (r.error) throw r.error;
+      if (!state.myOfficeTasks) state.myOfficeTasks = [];
+      state.myOfficeTasks.unshift(r.data);
+      if (typeof toast === 'function') toast('To-Do जुड़ा ✓');
+    }
+    _mddTaskEditId = null;
     mddTaskFormClose(hostId);
     if (typeof renderMyDailyBox === 'function') renderMyDailyBox();
     try { mtRender('office'); } catch(e){}
@@ -32744,7 +32798,7 @@ function mtRender(which) {
       title: _mddEsc(t.task_title || '(बिना शीर्षक)'),
       meta: [ t.task_date ? _mddDate(t.task_date) : '', t.priority || '', t.status || '' ].filter(Boolean).map(_mddEsc).join(' · '),
       brief: (t.task_detail ? '<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>' : '') + (t.case_display ? '<div class="mydd-brief-row"><b>प्रकरण:</b> ' + _mddEsc(t.case_display) + '</div>' : ''),
-      oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openMtEdit===\'function\')&&openMtEdit(\'' + t.id + '\');">✎ Open / Edit</button>'
+      oe: '<button class="mydd-oe-btn" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\');">✎ Open / Edit</button>'
     };
   }, 'कोई Office Task नहीं');
   if (which === 'reftasks') {
