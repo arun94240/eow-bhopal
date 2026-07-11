@@ -9091,6 +9091,9 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .mas-pill{ flex:1; border-radius:9px; padding:7px 4px; text-align:center; color:#fff; }
 .mas-pill .n{ font-size:19px; font-weight:900; line-height:1; }
 .mas-pill .l{ font-size:9.5px; font-weight:700; margin-top:2px; opacity:.95; }
+.mas-pill{ cursor:pointer; transition:transform .1s, box-shadow .12s; }
+.mas-pill:hover{ transform:translateY(-1px); }
+.mas-pill.is-open{ box-shadow:0 0 0 2px #fff inset, 0 3px 8px rgba(0,0,0,0.25); }
 .mp-present{ background:rgba(34,197,94,0.92); } .mp-out{ background:rgba(59,130,246,0.92); }
 .mp-leave{ background:rgba(245,158,11,0.92); } .mp-absent{ background:rgba(239,68,68,0.92); }
 .mas-bar{ display:flex; height:7px; border-radius:5px; overflow:hidden; margin-top:9px; background:rgba(255,255,255,0.14); }
@@ -31992,21 +31995,22 @@ function mddRenderAttStrip(){
   var c = _mddAttCompute();
   var p=c.present.length, o=c.out.length, l=c.leave.length, ab=c.absent.length, t=c.total||1;
   function pct(n){ return t ? (n/t*100) : 0; }
-  var detailOpen = (function(){ var d=document.getElementById('mas-detail'); return d && d.style.display && d.style.display!=='none'; })();
   var tm = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  function act(k){ return _masOpenGroup===k ? ' is-open' : ''; }
+  var groups = { present:{lbl:'🟢 उपस्थित', arr:c.present, col:'#16a34a'}, out:{lbl:'🔵 जा चुके', arr:c.out, col:'#2563eb'}, leave:{lbl:'🏖️ अवकाश', arr:c.leave, col:'#b45309'}, absent:{lbl:'🔴 अनुपस्थित', arr:c.absent, col:'#dc2626'} };
+  var g = _masOpenGroup ? groups[_masOpenGroup] : null;
   host.innerHTML =
     '<div class="mydd-att-strip">' +
-      '<div class="mas-top" onclick="event.stopPropagation();mddAttToggleDetail();">' +
+      '<div class="mas-top">' +
         '<span class="mas-dot"></span>' +
         '<span class="mas-ttl">अभी उपस्थिति — Live</span>' +
         '<span class="mas-time">अद्यतन ' + tm + '</span>' +
-        '<span class="mas-caret" id="mas-caret">' + (detailOpen ? '▴' : '▾') + '</span>' +
       '</div>' +
       '<div class="mas-pills">' +
-        '<div class="mas-pill mp-present"><div class="n">' + p + '</div><div class="l">उपस्थित</div></div>' +
-        '<div class="mas-pill mp-out"><div class="n">' + o + '</div><div class="l">जा चुके</div></div>' +
-        '<div class="mas-pill mp-leave"><div class="n">' + l + '</div><div class="l">अवकाश</div></div>' +
-        '<div class="mas-pill mp-absent"><div class="n">' + ab + '</div><div class="l">अनुपस्थित</div></div>' +
+        '<div class="mas-pill mp-present' + act('present') + '" onclick="event.stopPropagation();mddAttPill(\'present\');"><div class="n">' + p + '</div><div class="l">उपस्थित ▾</div></div>' +
+        '<div class="mas-pill mp-out' + act('out') + '" onclick="event.stopPropagation();mddAttPill(\'out\');"><div class="n">' + o + '</div><div class="l">जा चुके ▾</div></div>' +
+        '<div class="mas-pill mp-leave' + act('leave') + '" onclick="event.stopPropagation();mddAttPill(\'leave\');"><div class="n">' + l + '</div><div class="l">अवकाश ▾</div></div>' +
+        '<div class="mas-pill mp-absent' + act('absent') + '" onclick="event.stopPropagation();mddAttPill(\'absent\');"><div class="n">' + ab + '</div><div class="l">अनुपस्थित ▾</div></div>' +
       '</div>' +
       '<div class="mas-bar">' +
         (p ? '<div style="width:' + pct(p) + '%;background:#22c55e;"></div>' : '') +
@@ -32014,21 +32018,16 @@ function mddRenderAttStrip(){
         (l ? '<div style="width:' + pct(l) + '%;background:#f59e0b;"></div>' : '') +
         (ab ? '<div style="width:' + pct(ab) + '%;background:#ef4444;"></div>' : '') +
       '</div>' +
-      '<div class="mas-detail" id="mas-detail" style="display:' + (detailOpen ? 'block' : 'none') + ';">' +
-        _masGroup('🟢 उपस्थित', c.present, '#16a34a') +
-        _masGroup('🔵 जा चुके', c.out, '#2563eb') +
-        _masGroup('🏖️ अवकाश', c.leave, '#b45309') +
-        _masGroup('🔴 अनुपस्थित', c.absent, '#dc2626') +
+      '<div class="mas-detail' + (g ? ' hct-anim' : '') + '" id="mas-detail" style="display:' + (g ? 'block' : 'none') + ';">' +
+        (g ? _masGroup(g.lbl, g.arr, g.col) : '') +
       '</div>' +
     '</div>';
 }
-function mddAttToggleDetail(){
-  var d = document.getElementById('mas-detail'); var c = document.getElementById('mas-caret');
-  if (!d) return; var open = (d.style.display==='none' || !d.style.display);
-  d.style.display = open ? 'block' : 'none'; if (c) c.textContent = open ? '▴' : '▾';
-  if (open) { d.classList.remove('hct-anim'); void d.offsetWidth; d.classList.add('hct-anim'); }
+function mddAttPill(which){
+  _masOpenGroup = (_masOpenGroup === which) ? null : which;
+  mddRenderAttStrip();
 }
-var _mddAttTimer = null;
+var _mddAttTimer = null; var _masOpenGroup = null;
 async function mddAttLiveTick(){
   try { var r = await supa.from('attendance_log').select('*').eq('is_test', false).order('att_date', { ascending:false }); if (r && !r.error) state.attendance = r.data || []; } catch(e){}
   mddRenderAttStrip();
@@ -32798,9 +32797,19 @@ function _mddCombineReminder(dateVal, timeVal){
   var d = new Date(dateVal + 'T' + t);
   return isNaN(d.getTime()) ? null : d.toISOString();
 }
+var _IO_RANK_ORDER = ['ADG','IG','DIG','AIG','SP','ADDL SP','ADDITIONAL SP','ASP','DYSP','DSP','SDOP','INSPECTOR','INSP','SI','SUB INSPECTOR','ASI','HC','HEAD CONSTABLE','CONSTABLE','CT','C'];
+function _ioRankScore(rank){
+  var r = String(rank||'').toUpperCase().replace(/[.\-]/g,'').replace(/\s+/g,' ').trim();
+  for (var i=0;i<_IO_RANK_ORDER.length;i++){ if (r.indexOf(_IO_RANK_ORDER[i])===0) return i; }
+  return 999;
+}
 function _mddIoOptionsHTML(sel){
   var ios = (state.ioMaster || []).slice();
-  ios.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||'')); });
+  ios.sort(function(a,b){
+    var ra=_ioRankScore(a.rank), rb=_ioRankScore(b.rank);
+    if (ra!==rb) return ra-rb;                                  // post-wise (वरिष्ठता क्रम)
+    return String(a.name||'').localeCompare(String(b.name||'')); // फिर नाम अनुसार
+  });
   return '<option value="">👤 IO चुनें (optional)</option>' + ios.map(function(o){
     var nm = (o.rank ? o.rank + ' ' : '') + (o.name || '');
     return '<option value="' + _mddEsc(o.name||'') + '"' + (sel && sel===o.name ? ' selected' : '') + '>' + _mddEsc(nm) + '</option>';
