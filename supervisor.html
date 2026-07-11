@@ -8167,6 +8167,8 @@ body.view-mobile .cao-matrix-tile .caom-num {
 }
 
 /* ─── All-years summary strip (in Year-wise panel) ─── */
+.ycc-total-click{ cursor:pointer; transition:background .13s,color .13s; border-radius:6px; }
+.ycc-total-click:hover{ background:#062a52; color:#f5b942; }
 .ovstats-years-strip-wrap {
   display: flex;
   align-items: flex-start;
@@ -49011,7 +49013,7 @@ function renderYearCards() {
     
     return '<div class="year-cal-card' + (isCurrent ? ' is-current' : '') + '" data-year="' + y + '" title="Year ' + y + ' — ' + d.total + ' cases">' +
       '<div class="ycc-strip">YEAR-' + y + '</div>' +
-      '<div class="ycc-total">Total-' + d.total + '</div>' +
+      '<div class="ycc-total ycc-total-click" onclick="inlineNavYearTotal(\'' + y + '\',event)" title="इस वर्ष के सभी प्रकरण chronology में">Total-' + d.total + ' ▾</div>' +
       (headBadges ? '<div class="ycc-heads">' + headBadges + '</div>' : '') +
     '</div>';
   }).join('');
@@ -49091,7 +49093,7 @@ function renderEnqTypeCards() {
     
     return '<div class="year-cal-card" title="' + escapeHtml(ENQ_LABELS[t]) + ' — ' + total + ' cases">' +
       '<div class="ycc-strip ycc-strip-io">' + escapeHtml(ENQ_LABELS[t]) + '</div>' +
-      '<div class="ycc-total">Total-' + total + '</div>' +
+      '<div class="ycc-total ycc-total-click" onclick="inlineNavEnqTypeTotal(\'' + t + '\',event)" title="सभी वर्ष chronology में">Total-' + total + ' ▾</div>' +
       (yearBadges ? '<div class="ycc-heads">' + yearBadges + '</div>' : '') +
     '</div>';
   }).filter(function(c){ return c; }).join('');
@@ -56540,12 +56542,32 @@ function closeInlineFilteredList() {
 // kind: 'year' | 'enqtype' | 'io'
 // args: { headType, year, ioName } depending on kind
 // triggerEl: the badge that was clicked
+function _iflChrono(a, b){
+  var ay = parseInt(a._row.entry_year || a._row.case_year || 0, 10) || 0;
+  var by = parseInt(b._row.entry_year || b._row.case_year || 0, 10) || 0;
+  if (ay !== by) return ay - by;
+  var an = parseInt(a._row.no || a._row.case_no || 0, 10) || 0;
+  var bn = parseInt(b._row.no || b._row.case_no || 0, 10) || 0;
+  return an - bn;
+}
+function inlineNavYearTotal(year, evt){
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  var trigger = evt && evt.currentTarget ? evt.currentTarget : null;
+  showInlineFilteredList('yeartotal', { year: String(year) }, trigger);
+}
+function inlineNavEnqTypeTotal(headType, evt){
+  if (evt && evt.stopPropagation) evt.stopPropagation();
+  var trigger = evt && evt.currentTarget ? evt.currentTarget : null;
+  showInlineFilteredList('enqtypetotal', { headType: headType }, trigger);
+}
 function showInlineFilteredList(kind, args, triggerEl) {
   // Build stable filter key for tap-tap toggle
   var key;
   if (kind === 'year') key = 'year:' + args.headType + ':' + args.year;
   else if (kind === 'enqtype') key = 'enqtype:' + args.headType + ':' + args.year;
   else if (kind === 'io') key = 'io:' + args.ioName + ':' + args.headType;
+  else if (kind === 'yeartotal') key = 'yeartotal:' + args.year;
+  else if (kind === 'enqtypetotal') key = 'enqtypetotal:' + args.headType;
   else return;
   
   // Re-tap on same badge → close
@@ -56596,6 +56618,25 @@ function showInlineFilteredList(kind, args, triggerEl) {
         return r.io_name === args.ioName;
       }).map(function(r){ return { _isCourt: false, _type: args.headType, _row: r }; });
     }
+  } else if (kind === 'yeartotal') {
+    headLabel = 'सभी';
+    titleName = 'Year ' + args.year + ' — सभी प्रकरण (chronology)';
+    Object.keys(ENQ_LABELS).forEach(function(t){
+      (state.enquiries[t] || []).forEach(function(r){
+        if (String(r.entry_year || '') === args.year) matches.push({ _isCourt: false, _type: t, _row: r });
+      });
+    });
+    (state.courts || []).forEach(function(c){
+      if (String(c.case_year || '') === args.year) matches.push({ _isCourt: true, _row: c });
+    });
+    matches.sort(_iflChrono);
+  } else if (kind === 'enqtypetotal') {
+    headLabel = args.headType.toUpperCase();
+    titleName = ((typeof ENQ_LABELS !== 'undefined' && ENQ_LABELS[args.headType]) ? ENQ_LABELS[args.headType] : args.headType) + ' — सभी वर्ष (chronology)';
+    (state.enquiries[args.headType] || []).forEach(function(r){
+      matches.push({ _isCourt: false, _type: args.headType, _row: r });
+    });
+    matches.sort(_iflChrono);
   }
   
   // Find host element — the card containing this badge (so panel sits below the card row)
