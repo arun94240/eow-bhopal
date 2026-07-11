@@ -32610,6 +32610,12 @@ function mddTaskFormOpen(hostId) {
         '<label class="mddq-lbl">📅 <input type="date" id="mddq-date" class="mddq-inp mddq-sm" value="' + today + '"></label>' +
         '<label class="mddq-lbl">⚑ <select id="mddq-priority" class="mddq-inp mddq-sm"><option>Normal</option><option>High</option><option>Low</option></select></label>' +
       '</div>' +
+      '<div class="mddq-row2">' +
+        '<select id="mddq-task-ctype" class="mddq-inp mddq-sm" onchange="_mddFillCaseSelect(\'mddq-task-cnum\', this.value);">' +
+          '<option value="">🔗 प्रकरण (optional)</option>' + _mddTypeOptionsHTML() +
+        '</select>' +
+        '<select id="mddq-task-cnum" class="mddq-inp mddq-sm"><option value="">— number —</option></select>' +
+      '</div>' +
       '<div class="mddq-btns">' +
         '<button class="mddq-save" onclick="event.stopPropagation();mddTaskFormSave(\'' + hostId + '\');">✓ Save</button>' +
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'' + hostId + '\');">Cancel</button>' +
@@ -32624,10 +32630,18 @@ async function mddTaskFormSave(hostId) {
   var detail = ((document.getElementById('mddq-detail') || {}).value || '').trim();
   var date = (document.getElementById('mddq-date') || {}).value || new Date().toISOString().slice(0,10);
   var priority = (document.getElementById('mddq-priority') || {}).value || 'Normal';
+  // optional linked प्रकरण (type + number)
+  var _ctype = (document.getElementById('mddq-task-ctype') || {}).value || '';
+  var _cid = (document.getElementById('mddq-task-cnum') || {}).value || '';
+  var caseType = null, caseId = null, caseDisplay = null;
+  if (_ctype && _cid) {
+    var _cobj = ((state.enquiries && state.enquiries[_ctype]) || []).find(function(x){ return x.id === _cid; });
+    if (_cobj) { caseType = _ctype; caseId = _cid; caseDisplay = (typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(_cobj, _ctype) : (_cobj.no || ''); }
+  }
   var payload = {
     task_title: title, task_detail: detail || null, deadline: null, priority: priority,
     reminder_at: null, updated_at: new Date().toISOString(),
-    case_type: null, case_id: null, case_display: null,
+    case_type: caseType, case_id: caseId, case_display: caseDisplay,
     task_date: date, status: 'Pending'
   };
   try {
