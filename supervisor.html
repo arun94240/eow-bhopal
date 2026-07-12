@@ -47306,9 +47306,15 @@ async function deleteMotTask(id) {
   }
 }
 
-// ─── Subscribe modal (placeholder — same UX as DG EOW; full webcal feed can be added later) ───
+// ─── Subscribe modal → delegates to the live unified-feed tasks subscribe modal (v103) ───
 function openMotSubscribeModal() {
-  toast('📆 Calendar subscribe coming soon for My Office Tasks');
+  // Unified EOW calendar feed is live (eow-calender edge function).
+  // Reuse the fully-wired tasks subscribe modal instead of the old placeholder toast.
+  if (typeof openTasksSubscribeModal === 'function') {
+    openTasksSubscribeModal();
+  } else {
+    toast('📆 Calendar subscribe coming soon for My Office Tasks');
+  }
 }
 
 // ─── Hook: refresh if MOT box open after external changes ───
