@@ -9123,6 +9123,27 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .mpf-main{ font-size:12px; font-weight:700; color:#0f2238; }
 .mpf-sub{ font-size:10.5px; color:#64748b; margin-top:1px; }
 .mpf-fresh{ color:#16a34a; font-weight:800; }
+.mbr-brief{ background:linear-gradient(160deg,#062a52,#0a3a6e); border-radius:14px; padding:14px 15px; margin-bottom:12px; box-shadow:0 8px 22px rgba(6,42,82,0.26); }
+.mbr-brief.mbr-calm{ padding-bottom:14px; }
+.mbr-top{ display:flex; align-items:center; gap:9px; }
+.mbr-title{ font-size:15.5px; font-weight:900; color:#fff; }
+.mbr-sub{ font-size:11px; color:#cbd5e1; margin-left:auto; }
+.mbr-line{ font-size:12.5px; color:#e2e8f0; margin:4px 0 11px; line-height:1.5; }
+.mbr-line b{ color:#f5b942; }
+.mbr-sec{ background:rgba(255,255,255,0.07); border-radius:11px; padding:10px 12px; margin-top:8px; }
+.mbr-sec-h{ display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:900; color:#fff; margin-bottom:6px; }
+.mbr-pin{ width:20px; height:20px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; flex:0 0 auto; }
+.mbr-pin-rv{ background:#eab308; } .mbr-pin-td{ background:#16a34a; } .mbr-pin-ag{ background:#f59e0b; } .mbr-pin-ap{ background:#0ea5e9; }
+.mbr-cnt{ margin-left:auto; background:#fff; color:#062a52; border-radius:999px; font-size:10.5px; font-weight:900; padding:1px 8px; }
+.mbr-it{ display:flex; gap:8px; padding:4px 0; font-size:12px; color:#e8eef5; align-items:baseline; }
+.mbr-it.mbr-click{ cursor:pointer; border-radius:6px; }
+.mbr-it.mbr-click:hover{ background:rgba(255,255,255,0.08); }
+.mbr-d{ color:#f5b942; font-weight:900; flex:0 0 auto; }
+.mbr-t{ flex:1; }
+.mbr-tag{ font-size:9.5px; font-weight:800; border-radius:999px; padding:1px 7px; flex:0 0 auto; }
+.mbr-over{ background:#7f1d1d; color:#fecaca; } .mbr-due{ background:#78350f; color:#fed7aa; } .mbr-today{ background:#14532d; color:#bbf7d0; }
+.mbr-more{ font-size:11px; color:#93c5fd; padding:3px 0 0 16px; }
+.mbr-foot{ font-size:10.5px; color:#94a3b8; margin-top:10px; text-align:center; }
 /* Attendance at-a-glance chart */
 .att-chart{ background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(6,42,82,0.06); }
 .att-chart-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
@@ -22589,6 +22610,7 @@ body.role-staff header { margin-top: 30px; }
       <!-- 📋 My Daily Dashboard — below Overview Stats (4 daily tiles)  -->
       <!-- ════════════════════════════════════════════════════════════ -->
       <div class="mydd-box" id="mydaily-box">
+        <div id="mydd-brief"></div>
         <div id="mydd-reminder-panel" class="mydd-toppanel" style="display:none;"></div>
         <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
         <div class="mydd-tiles">
@@ -32324,8 +32346,89 @@ async function mddAttLiveTick(){
   mddRenderAttStrip(); try { mddRenderNoticeStrip(); mddRenderPragatiFeed(); } catch(e){}
 }
 function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval(mddAttLiveTick, 60000); }
+function _mddBriefItem(dot, text, tag){
+  return '<div class="mbr-it"><span class="mbr-d">' + dot + '</span><span class="mbr-t">' + text + '</span>' + (tag ? tag : '') + '</div>';
+}
+function mddRenderBrief(){
+  var host = document.getElementById('mydd-brief'); if (!host) return;
+  var today = _mddYMD(new Date());
+  var reviews = [];
+  try { reviews = (reviewGatherCases() || []); } catch(e){ reviews = []; }
+  var todos = (state.myOfficeTasks || []).filter(function(t){
+    var d = String(t.task_date||'').slice(0,10);
+    var rd = t.reminder_at ? String(t.reminder_at).slice(0,10) : '';
+    return (d === today || rd === today) && String(t.status||'').toLowerCase() !== 'done';
+  });
+  var agenda = [];
+  try { agenda = (_mtxAgendaItems() || []).filter(function(a){ return a.date === today && a.ico !== '⭐'; }); } catch(e){ agenda = []; }
+  var pend = (state.pendingApprovals || []).length;
+  var overdueN = reviews.filter(function(r){ return r.status === 'overdue'; }).length;
+
+  var hr = new Date().getHours();
+  var greet = hr < 12 ? '☀️ सुप्रभात' : (hr < 17 ? '🌤️ नमस्कार' : '🌙 शुभ संध्या');
+  var dateLabel = new Date().toLocaleDateString('hi-IN', { weekday:'long', day:'numeric', month:'long' });
+
+  var totalItems = reviews.length + todos.length + agenda.length + pend;
+  if (!totalItems){
+    host.innerHTML = '<div class="mbr-brief mbr-calm"><div class="mbr-top"><span class="mbr-title">' + greet + ', SP साहब</span><span class="mbr-sub">' + dateLabel + '</span></div><div class="mbr-line">आज कोई तत्काल समीक्षा/To-Do/agenda लंबित नहीं — दिन नियंत्रण में है। ✅</div></div>';
+    return;
+  }
+  // summary line
+  var bits = [];
+  if (reviews.length) bits.push('<b>' + reviews.length + ' समीक्षाएँ</b>' + (overdueN ? ' (' + overdueN + ' overdue)' : ''));
+  if (todos.length) bits.push('<b>' + todos.length + ' To-Dos</b>');
+  if (agenda.length) bits.push('<b>' + agenda.length + ' agenda</b>');
+  if (pend) bits.push('<b>' + pend + ' लंबित अनुमोदन</b>');
+  var summary = 'आज ' + bits.join(', ') + ' ध्यान माँगते हैं। संक्षेप —';
+
+  var html = '<div class="mbr-brief">' +
+    '<div class="mbr-top"><span class="mbr-title">' + greet + ', SP साहब</span><span class="mbr-sub">' + dateLabel + '</span></div>' +
+    '<div class="mbr-line">' + summary + '</div>';
+
+  if (reviews.length){
+    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-rv">⭐</span> प्रकरण समीक्षा — आज देखना है <span class="mbr-cnt">' + reviews.length + '</span></div>';
+    reviews.slice(0,4).forEach(function(r){
+      var disp = (typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(r.raw, r.type) : '';
+      var tag = (r.status === 'overdue') ? '<span class="mbr-tag mbr-over">OVERDUE</span>' : '<span class="mbr-tag mbr-due">DUE</span>';
+      html += '<div class="mbr-it mbr-click" onclick="event.stopPropagation();(typeof openReviewModal===\'function\')&&openReviewModal(\'' + r.type + '\',\'' + r.id + '\');"><span class="mbr-d">•</span><span class="mbr-t">' + _mddEsc(disp) + '</span>' + tag + '</div>';
+    });
+    if (reviews.length > 4) html += '<div class="mbr-more">+ ' + (reviews.length-4) + ' और…</div>';
+    html += '</div>';
+  }
+  if (todos.length){
+    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-td">📝</span> To-Dos — आज करना है <span class="mbr-cnt">' + todos.length + '</span></div>';
+    todos.slice(0,4).forEach(function(t){
+      var extra = t.io_name ? ' (IO: ' + _mddEsc(t.io_name) + ')' : '';
+      html += '<div class="mbr-it mbr-click" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\');"><span class="mbr-d">•</span><span class="mbr-t">' + _mddEsc(t.task_title || '(task)') + extra + '</span><span class="mbr-tag mbr-today">आज</span></div>';
+    });
+    if (todos.length > 4) html += '<div class="mbr-more">+ ' + (todos.length-4) + ' और…</div>';
+    html += '</div>';
+  }
+  if (pend){
+    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ap">🗳️</span> लंबित अनुमोदन <span class="mbr-cnt">' + pend + '</span></div>' +
+      '<div class="mbr-it"><span class="mbr-d">•</span><span class="mbr-t">' + pend + ' अवकाश/आवेदन आपके निर्णय हेतु — Overview Stats में देखें</span></div></div>';
+  }
+  if (agenda.length){
+    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ag">⏰</span> Agenda / Reminders <span class="mbr-cnt">' + agenda.length + '</span></div>';
+    agenda.slice(0,4).forEach(function(a){
+      html += '<div class="mbr-it"><span class="mbr-d">' + (a.ico||'•') + '</span><span class="mbr-t">' + _mddEsc(String(a.lbl||'').slice(0,80)) + '</span></div>';
+    });
+    html += '</div>';
+  }
+  html += '<div class="mbr-foot">↻ हर बार Home खोलने पर अपने-आप अद्यतन</div></div>';
+  host.innerHTML = html;
+}
+function hctOpenReports(){
+  try {
+    if (typeof hctInit === 'function') hctInit();
+    var b = _hctBox('reports'); if (!b) return;
+    b.style.display = 'block'; b.classList.remove('collapsed');
+    var c = document.getElementById('hct-car-reports'); if (c) c.textContent = '▴';
+    if (typeof renderSearchMatrices === 'function') renderSearchMatrices();
+  } catch(e){}
+}
 function renderMyDailyBox() {
-  try { mddRenderAttStrip(); mddRenderNoticeStrip(); mddRenderPragatiFeed(); mddAttStartLive(); } catch(e){}
+  try { mddRenderBrief(); mddRenderAttStrip(); mddRenderNoticeStrip(); mddRenderPragatiFeed(); mddAttStartLive(); hctOpenReports(); } catch(e){}
   var box = document.getElementById('mydaily-box');
   if (!box) return;
   var mo = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
