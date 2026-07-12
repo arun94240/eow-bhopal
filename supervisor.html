@@ -9103,7 +9103,15 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .mpf-detail{ margin-top:10px; border-top:1px solid #eef2f7; padding-top:8px; }
 .mpf-detail-h{ font-size:11.5px; font-weight:900; color:#062a52; margin-bottom:5px; }
 /* Pragati feed */
-.mpf-feed{ background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:11px 13px; box-shadow:0 2px 8px rgba(6,42,82,0.06); }
+.mpf-feed{ background:linear-gradient(160deg,#062a52,#0a3a6e); border:none; border-radius:12px; padding:11px 13px; box-shadow:0 6px 18px rgba(6,42,82,0.25); }
+.mpf-ttl{ color:#fff !important; }
+.mpf-detail{ border-top-color:rgba(255,255,255,0.16) !important; }
+.mpf-detail-h{ color:#f5b942 !important; }
+.mpf-item{ border-bottom-color:rgba(255,255,255,0.12) !important; }
+.mpf-main{ color:#fff !important; }
+.mpf-sub{ color:#cbd5e1 !important; }
+.mpf-av{ background:rgba(255,255,255,0.16) !important; color:#fff !important; }
+.mpf-feed .mydd-empty{ color:#cbd5e1 !important; }
 .mpf-top{ display:flex; align-items:center; gap:7px; }
 .mpf-ttl{ font-size:13px; font-weight:900; color:#062a52; }
 .mpf-cnt{ background:#f1f5f9; color:#062a52; border-radius:999px; font-size:10px; font-weight:800; padding:2px 8px; }
@@ -9152,6 +9160,15 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .mas-grp-h{ font-size:11px; font-weight:900; margin-bottom:4px; }
 .mas-grp-b{ display:flex; flex-wrap:wrap; gap:5px; }
 .mas-name{ background:rgba(255,255,255,0.14); color:#fff; border-radius:999px; font-size:10.5px; font-weight:600; padding:2px 9px; }
+.mas-name-wrap{ display:inline-flex; flex-direction:column; }
+.mas-name-click{ cursor:pointer; }
+.mas-name-det{ display:none; font-size:10px; color:#e2e8f0; background:rgba(0,0,0,0.22); border-radius:7px; padding:4px 8px; margin-top:3px; }
+.mas-name-det.show{ display:block; }
+.mddq-voice-row{ display:flex; gap:6px; align-items:flex-start; }
+.mddq-voice-row > .mddq-inp{ flex:1; }
+.mddq-mic{ flex:0 0 auto; border:1px solid #cbd5e1; background:#fff; border-radius:8px; font-size:15px; padding:6px 9px; cursor:pointer; align-self:stretch; }
+.mddq-mic:hover{ background:#f1f5f9; }
+.mddq-mic.rec{ background:#dc2626; border-color:#dc2626; animation:masPulse 1.2s infinite; }
 /* smooth inline open for Overview-Stats panels */
 @keyframes ovPanelIn{ from{ opacity:0; transform:translateY(-9px); } to{ opacity:1; transform:translateY(0); } }
 .ovstats-panel.ovp-anim{ animation:ovPanelIn .28s cubic-bezier(.22,.61,.36,1); }
@@ -15734,6 +15751,12 @@ body.view-mobile #mydaily-box .mydd-tile{ width:100%; }
 /* Uniform "Reports & Search" tiles — main label + differentiator sub-label */
 .reports-uni-stack .rep-pchip{ flex-direction:column !important; align-items:flex-start !important; gap:3px !important; background:#fff !important; border:1.5px solid #e6edf5 !important; border-left:4px solid #134d8a !important; border-radius:12px !important; padding:12px 14px !important; box-shadow:0 1px 4px rgba(6,42,82,0.05) !important; min-height:auto !important; cursor:pointer; transition:transform .12s, box-shadow .12s; }
 .reports-uni-stack .rep-pchip:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(6,42,82,0.11) !important; }
+.rep-pchip-estab{ background:#dcfce7 !important; border-color:#16a34a !important; }
+.rep-pchip-estab .rep-sub{ color:#15803d !important; }
+.rep-pchip-bytypes{ background:#dbeafe !important; border-color:#2563eb !important; }
+.rep-pchip-bytypes .rep-sub{ color:#1d4ed8 !important; }
+.rep-pchip-cao{ background:#f3e8ff !important; border-color:#7c3aed !important; }
+.rep-pchip-cao .rep-sub{ color:#6d28d9 !important; }
 .reports-uni-stack .rep-main{ font-size:10.5px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.04em; }
 .reports-uni-stack .rep-sub{ font-size:14px; font-weight:800; color:#062a52; line-height:1.15; }
 .reports-uni-stack .rep-sub-n{ background:#134d8a; color:#fff; border-radius:999px; font-size:11px; font-weight:900; padding:1px 8px; margin-left:4px; }
@@ -21697,6 +21720,7 @@ body.role-staff #overview-approvals .btn-danger {
 }
 
 /* Staff banner — small notice at top */
+body.role-staff #mydaily-box { display:none !important; }
 body.role-staff::before {
   content: '👤 STAFF MODE — Add/Edit allowed, Delete & Approve sirf SP ke liye';
   position: fixed;
@@ -32031,16 +32055,41 @@ function _mddAttCompute(ymd){
   var present=[], out=[], leave=[], absent=[];
   (state.ioMaster || []).forEach(function(s){
     var a = byStaff[s.id]; var nm = (s.rank ? s.rank + ' ' : '') + (s.name || '');
-    if (a && a.check_in_time && a.check_out_time) out.push(nm);
-    else if (a && a.check_in_time) present.push(nm);
-    else if (onLeave[s.id]) leave.push(nm);
-    else absent.push(nm);
+    if (a && a.check_in_time && a.check_out_time) out.push({ name:nm, att:a, status:'out' });
+    else if (a && a.check_in_time) present.push({ name:nm, att:a, status:'present' });
+    else if (onLeave[s.id]) leave.push({ name:nm, att:null, status:'leave' });
+    else absent.push({ name:nm, att:null, status:'absent' });
   });
   return { present:present, out:out, leave:leave, absent:absent, total:(state.ioMaster||[]).length };
 }
+function _mddAttTime(t){
+  if (!t) return '';
+  var s = String(t);
+  if (/^\d{1,2}:\d{2}/.test(s)) return s.slice(0,5);
+  var d = new Date(s); return isNaN(d.getTime()) ? s : d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
 function _masGroup(label, arr, color){
   if (!arr.length) return '';
-  return '<div class="mas-grp"><div class="mas-grp-h" style="color:' + color + ';">' + label + ' (' + arr.length + ')</div><div class="mas-grp-b">' + arr.map(function(n){ return '<span class="mas-name">' + _mddEsc(n) + '</span>'; }).join('') + '</div></div>';
+  return '<div class="mas-grp"><div class="mas-grp-h" style="color:' + color + ';">' + label + ' (' + arr.length + ')</div><div class="mas-grp-b">' +
+    arr.map(function(o){
+      var det = '';
+      if (o.att){
+        var parts = [];
+        if (o.att.check_in_time) parts.push('🕐 दर्ज: ' + _mddAttTime(o.att.check_in_time));
+        if (o.att.check_out_time) parts.push('🚪 गए: ' + _mddAttTime(o.att.check_out_time));
+        if (o.att.check_in_lat && o.att.check_in_long){
+          var ll = o.att.check_in_lat + ',' + o.att.check_in_long;
+          parts.push('📍 <a href="https://maps.google.com/?q=' + ll + '" target="_blank" rel="noopener" style="color:#93c5fd;">Location' + (o.att.check_in_acc ? ' (±' + Math.round(o.att.check_in_acc) + 'm)' : '') + '</a>');
+        } else { parts.push('📍 location दर्ज नहीं'); }
+        det = parts.join(' · ');
+      } else {
+        det = (o.status === 'leave') ? '🏖️ अवकाश पर' : '— उपस्थिति दर्ज नहीं —';
+      }
+      return '<span class="mas-name-wrap">' +
+          '<span class="mas-name mas-name-click" onclick="event.stopPropagation();var d=this.parentNode.querySelector(\'.mas-name-det\');if(d)d.classList.toggle(\'show\');">' + _mddEsc(o.name) + ' ▾</span>' +
+          '<span class="mas-name-det">' + det + '</span>' +
+        '</span>';
+    }).join('') + '</div></div>';
 }
 // ── shared helpers for live widgets ──
 function _mddIoFilterOptions(sel){
@@ -33068,6 +33117,19 @@ async function _mddInsertResilient(table, payload){
   }
   return r;
 }
+function mddVoiceInput(targetId, btn){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR){ if (typeof toast==='function') toast('इस ब्राउज़र में voice input उपलब्ध नहीं — Chrome/Safari आज़माएँ', true); return; }
+  var el = document.getElementById(targetId); if (!el) return;
+  if (window._mddRec){ try { window._mddRec.stop(); } catch(e){} window._mddRec=null; if (btn) btn.classList.remove('rec'); return; }
+  var rec = new SR(); rec.lang='hi-IN'; rec.interimResults=false; rec.continuous=false; rec.maxAlternatives=1;
+  window._mddRec = rec; if (btn) btn.classList.add('rec');
+  if (typeof toast==='function') toast('🎤 बोलिए…');
+  rec.onresult = function(e){ var t=''; for (var i=0;i<e.results.length;i++){ t += e.results[i][0].transcript; } el.value = (el.value ? el.value + ' ' : '') + t; try { el.focus(); } catch(x){} };
+  rec.onerror = function(){ if (btn) btn.classList.remove('rec'); window._mddRec=null; };
+  rec.onend = function(){ if (btn) btn.classList.remove('rec'); window._mddRec=null; };
+  try { rec.start(); } catch(e){ if (btn) btn.classList.remove('rec'); window._mddRec=null; }
+}
 function mddTaskEditInline(id){
   var t = (state.myOfficeTasks || []).find(function(x){ return x.id === id; });
   if (!t) return;
@@ -33097,10 +33159,10 @@ function mddTaskFormOpen(hostId, task) {
   host.innerHTML =
     '<div class="mddq-form">' +
       '<div class="mddq-formttl">' + (_mddTaskEditId ? '✎ To-Do संपादित करें' : '📝 नया To-Do / Office task') + '</div>' +
-      '<input type="text" id="mddq-title" class="mddq-inp" placeholder="📋 विषय / Subject (क्या करना है)..." value="' + _mddEsc(v.title) + '">' +
+      '<div class="mddq-voice-row"><input type="text" id="mddq-title" class="mddq-inp" placeholder="📋 विषय / Subject (क्या करना है)..." value="' + _mddEsc(v.title) + '"><button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-title\',this);" title="बोलकर लिखें">🎤</button></div>' +
       '<input type="text" id="mddq-ref" class="mddq-inp" placeholder="👤 किसके संदर्भ में / किसके लिए (नाम/अनुभाग/पत्र क्र.)..." value="' + _mddEsc(v.ref) + '">' +
       '<select id="mddq-io" class="mddq-inp">' + _mddIoOptionsHTML(v.io) + '</select>' +
-      '<textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="📝 विवरण / Detail (optional)...">' + _mddEsc(v.detail) + '</textarea>' +
+      '<div class="mddq-voice-row"><textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="📝 विवरण / Detail (optional)...">' + _mddEsc(v.detail) + '</textarea><button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-detail\',this);" title="बोलकर लिखें">🎤</button></div>' +
       '<div class="mddq-row2">' +
         '<label class="mddq-lbl">📅 <input type="date" id="mddq-date" class="mddq-inp mddq-sm" value="' + v.date + '"></label>' +
         '<label class="mddq-lbl">⚑ <select id="mddq-priority" class="mddq-inp mddq-sm"><option' + pr('Normal') + '>Normal</option><option' + pr('High') + '>High</option><option' + pr('Low') + '>Low</option></select></label>' +
