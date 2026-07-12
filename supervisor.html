@@ -9066,6 +9066,9 @@ body.view-mobile .cao-matrix-tile .caom-num {
   #estab-tile-row { grid-template-columns: 1fr 1fr !important; }
 }
 
+.mln-cal{ display:inline-flex; flex-direction:column; align-items:center; line-height:1; background:#fff; border-radius:6px; overflow:hidden; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,0.25); }
+.mln-cal .tc-mo{ background:#dc2626; color:#fff; font-size:8px; font-weight:800; padding:1px 7px; }
+.mln-cal .tc-dy{ color:#152a44; font-size:15px; font-weight:800; padding:0 7px 2px; }
 .mln-strip .mln-add, .mpf-add{ margin-left:auto; background:#dc2626; color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:800; padding:4px 10px; cursor:pointer; }
 .mpf-add{ background:#f5b942; color:#062a52; }
 .mln-filt{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-top:9px; padding:7px; border-radius:8px; background:rgba(255,255,255,0.10); }
@@ -15772,12 +15775,12 @@ body.view-mobile #mydaily-box .mydd-tile{ width:100%; }
 /* Uniform "Reports & Search" tiles — main label + differentiator sub-label */
 .reports-uni-stack .rep-pchip{ flex-direction:column !important; align-items:flex-start !important; gap:3px !important; background:#fff !important; border:1.5px solid #e6edf5 !important; border-left:4px solid #134d8a !important; border-radius:12px !important; padding:12px 14px !important; box-shadow:0 1px 4px rgba(6,42,82,0.05) !important; min-height:auto !important; cursor:pointer; transition:transform .12s, box-shadow .12s; }
 .reports-uni-stack .rep-pchip:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(6,42,82,0.11) !important; }
-.rep-pchip-estab{ background:#dcfce7 !important; border-color:#16a34a !important; }
-.rep-pchip-estab .rep-sub{ color:#15803d !important; }
-.rep-pchip-bytypes{ background:#dbeafe !important; border-color:#2563eb !important; }
-.rep-pchip-bytypes .rep-sub{ color:#1d4ed8 !important; }
-.rep-pchip-cao{ background:#f3e8ff !important; border-color:#7c3aed !important; }
-.rep-pchip-cao .rep-sub{ color:#6d28d9 !important; }
+.rep-pchip-estab{ background:#16a34a !important; border-color:#16a34a !important; border-left-color:#166534 !important; }
+.rep-pchip-bytypes{ background:#2563eb !important; border-color:#2563eb !important; border-left-color:#1d4ed8 !important; }
+.rep-pchip-cao{ background:#7c3aed !important; border-color:#7c3aed !important; border-left-color:#5b21b6 !important; }
+.rep-pchip-estab .rep-main, .rep-pchip-bytypes .rep-main, .rep-pchip-cao .rep-main{ color:rgba(255,255,255,0.82) !important; }
+.rep-pchip-estab .rep-sub, .rep-pchip-bytypes .rep-sub, .rep-pchip-cao .rep-sub{ color:#fff !important; }
+.rep-pchip-cao .rep-sub-n{ background:#fff !important; color:#6d28d9 !important; }
 .reports-uni-stack .rep-main{ font-size:10.5px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.04em; }
 .reports-uni-stack .rep-sub{ font-size:14px; font-weight:800; color:#062a52; line-height:1.15; }
 .reports-uni-stack .rep-sub-n{ background:#134d8a; color:#fff; border-radius:999px; font-size:11px; font-weight:900; padding:1px 8px; margin-left:4px; }
@@ -22695,7 +22698,7 @@ body.role-staff header { margin-top: 30px; }
           <span>📈</span><span class="hct-lbl">Pragati Prativedan</span>
           <span class="hct-num" id="hct-cnt-pragati">0</span><span class="hct-car" id="hct-car-pragati">▾</span>
         </div>
-        <div class="hct-tile hct-set" onclick="event.stopPropagation();hctToggle('reports');">
+        <div class="hct-tile hct-set" onclick="event.stopPropagation();hctToggle('reports');" style="display:none;">
           <span>⚙️</span><span class="hct-lbl">Settings &amp; Reports</span>
           <span class="hct-num">›</span><span class="hct-car" id="hct-car-reports">▾</span>
         </div>
@@ -32119,6 +32122,11 @@ function _mddIoFilterOptions(sel){
   base = base.replace(/^<option value=\"\">[^<]*<\/option>/, '');
   return '<option value="">सभी IO</option>' + base;
 }
+function _mddMiniCalHTML(){
+  var d = new Date();
+  var mo = d.toLocaleString('en-US', { month:'short' }).toUpperCase();
+  return '<span class="mln-cal"><span class="tc-mo">' + mo + '</span><span class="tc-dy">' + d.getDate() + '</span></span>';
+}
 function _mddInitials(name){
   var s = String(name||'').replace(/^(SI|ASI|HC|Insp(ector)?|Constable|CT|C|DSP|DYSP|SDOP|SP|ADDL SP|ADDITIONAL SP|ASP|DIG|IG|ADG)\s+/i,'').trim();
   var p = s.split(/\s+/);
@@ -32163,7 +32171,7 @@ function mddRenderNoticeStrip(){
   host.innerHTML =
     '<div class="mydd-att-strip mln-strip">' +
       '<div class="mas-top">' +
-        '<span class="mas-dot"></span><span class="mas-ttl">📜 Summons / Warrants — Live</span>' +
+        _mddMiniCalHTML() + '<span class="mas-dot"></span><span class="mas-ttl">📜 Summons / Warrants — Live</span>' +
         '<button class="mln-add" onclick="event.stopPropagation();(typeof openNoticeModal===\'function\')&&openNoticeModal();">＋ Notice</button>' +
       '</div>' +
       '<div class="mln-filt" onclick="event.stopPropagation();">' +
@@ -32264,7 +32272,7 @@ function mddRenderPragatiFeed(){
   host.innerHTML =
     '<div class="mpf-feed">' +
       '<div class="mpf-top">' +
-        '<span class="mas-dot"></span><span class="mpf-ttl">📈 प्रगति प्रतिवेदन — Live</span>' +
+        _mddMiniCalHTML() + '<span class="mas-dot"></span><span class="mpf-ttl">📈 प्रगति प्रतिवेदन — Live</span>' +
         '<button class="mpf-add" onclick="event.stopPropagation();(typeof openPragatiInlineForm===\'function\')&&openPragatiInlineForm();">＋ प्रगति जोड़ें</button>' +
       '</div>' +
       '<div class="mln-filt light" onclick="event.stopPropagation();">' +
@@ -32315,7 +32323,7 @@ function mddRenderAttStrip(){
   host.innerHTML =
     '<div class="mydd-att-strip">' +
       '<div class="mas-top">' +
-        '<span class="mas-dot"></span>' +
+        _mddMiniCalHTML() + '<span class="mas-dot"></span>' +
         '<span class="mas-ttl">अभी उपस्थिति — Live</span>' +
         '<span class="mas-time">अद्यतन ' + tm + '</span>' +
       '</div>' +
