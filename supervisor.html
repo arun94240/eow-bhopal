@@ -21911,8 +21911,6 @@ body.role-staff header { margin-top: 30px; }
 }
 
 /* ===== Reports & Reports live box — clean uniform colorful design (v101) ===== */
-#reports-summary-wrap{ display:block !important; }
-#reports-summary-wrap.collapsed{ }
 #reports-summary-wrap .ov-section-header{ cursor:default !important; }
 #reports-summary-wrap .ov-section-toggle{ display:none !important; }
 #reports-summary-wrap .reports-uni-stack{ display:grid !important; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important; gap:10px !important; }
@@ -21925,6 +21923,22 @@ body.role-staff header { margin-top: 30px; }
 #reports-summary-wrap .rep-pchip-bytypes{ background:#2563eb !important; }
 #reports-summary-wrap .rep-pchip-cao{ background:#7c3aed !important; }
 #reports-summary-wrap .reports-uni-stack .rep-pchip.is-active{ box-shadow:0 0 0 2px #fff inset, 0 4px 12px rgba(0,0,0,0.28) !important; }
+
+/* ===== Reports box polish (v102) ===== */
+/* #1 mini-cal size → match live boxes' .mln-cal (smaller) */
+#reports-mini-cal.sup-mini-cal{ width:auto !important; }
+#reports-mini-cal .smc-mo{ font-size:8px !important; padding:1px 7px !important; }
+#reports-mini-cal .smc-dy{ font-size:15px !important; padding:0 7px 2px !important; }
+/* #4 three live-box headings same font/weight */
+.mpf-ttl, .mas-ttl, #reports-summary-wrap .ov-section-title{ font-size:14px !important; font-weight:900 !important; }
+/* #5 Custom button — top-right pill like ＋प्रगति / ＋Notice */
+#reports-summary-wrap .sup-title-row{ display:flex !important; align-items:center !important; gap:8px !important; }
+.rep-custom-btn{ margin-left:auto; background:#dc2626; color:#fff; border:none; border-radius:8px; font-size:11.5px; font-weight:800; padding:5px 11px; cursor:pointer; flex:0 0 auto; }
+.rep-custom-btn:hover{ filter:brightness(1.08); }
+/* #6 no load-flash: keep old collapsible boxes hidden from first paint; reveal reports only after relocation into host */
+#notices-summary-wrap, #pragati-summary-wrap{ display:none !important; }
+#reports-summary-wrap{ display:none; }
+#home-compact-host > #reports-summary-wrap{ display:block !important; }
 </style>
 </head>
 <body>
@@ -24166,18 +24180,18 @@ body.role-staff header { margin-top: 30px; }
               <span class="sup-mini-cal" id="reports-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
               <div class="ov-section-title">⚙ Settings &amp; Reports</div>
               <span class="dgeow-total-pill">DB: <strong id="reports-cnt-total">0</strong></span>
+              <button class="rep-custom-btn" onclick="event.stopPropagation();openReportBuilderInline()" title="Custom report builder">⚙ Custom</button>
             </div>
-            <div class="ov-section-sub">Quick presets + custom builder — preview / PDF export</div>
             <!-- Quick preset matrices (always visible) -->
             <div class="hdr-counter-stack reports-counter-stack reports-uni-stack" id="reports-counter-stack">
               <div class="hdr-counter rep-pchip rep-pchip-estab" onclick="event.stopPropagation();reportsShowEstabReports(event)">
-                <span class="rep-ic">🏖️</span><span class="rep-lbl">Leaves</span>
+                <span class="rep-ic">🏖️</span><span class="rep-lbl">Search by Leaves</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-bytypes" onclick="event.stopPropagation();reportsShowByTypes(event)">
-                <span class="rep-ic">📁</span><span class="rep-lbl">Inquiries</span>
+                <span class="rep-ic">📁</span><span class="rep-lbl">Search by Inquiries</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-cao" onclick="event.stopPropagation();reportsToggleCao(event)">
-                <span class="rep-ic">👮</span><span class="rep-lbl">Cases vs Officers</span><span class="rep-sub-n" id="sb-cao-cnt-total">0</span>
+                <span class="rep-ic">👮</span><span class="rep-lbl">Cases Against Officers</span><span class="rep-sub-n" id="sb-cao-cnt-total">0</span>
               </div>
             </div>
             <!-- CAO chips — collapsible, tap the tile above -->
@@ -24219,7 +24233,6 @@ body.role-staff header { margin-top: 30px; }
             </div>
           </div>
           <div class="ov-section-actions">
-            <button class="dgeow-hdr-add-btn-red" onclick="event.stopPropagation();openReportBuilderInline()" title="Custom report builder">⚙ Custom</button>
             <div class="ov-section-toggle">▼</div>
           </div>
         </div>
@@ -24229,9 +24242,6 @@ body.role-staff header { margin-top: 30px; }
     <div id="cao-inline-panel" class="cao-inline-panel" style="display:none;"></div>
         <div class="ov-section-body">
           <div id="reports-home-content" class="reports-home-content">
-            <div class="reph-info" id="reports-home-info">
-              <strong>💡 Quick Tip:</strong> Tap any preset above to see filtered cases, or use <strong>⚙ Custom</strong> for advanced builder.
-            </div>
             <div id="reports-home-preview" class="reports-home-preview"></div>
           </div>
           <!-- Establishment Reports & Search (moved here) -->
