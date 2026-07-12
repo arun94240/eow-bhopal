@@ -21909,6 +21909,22 @@ body.role-staff header { margin-top: 30px; }
   .modal-body, .modal-header, .modal-footer { padding-left: 18px; padding-right: 18px; }
   .io-master-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== Reports & Reports live box — clean uniform colorful design (v101) ===== */
+#reports-summary-wrap{ display:block !important; }
+#reports-summary-wrap.collapsed{ }
+#reports-summary-wrap .ov-section-header{ cursor:default !important; }
+#reports-summary-wrap .ov-section-toggle{ display:none !important; }
+#reports-summary-wrap .reports-uni-stack{ display:grid !important; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important; gap:10px !important; }
+#reports-summary-wrap .reports-uni-stack .rep-pchip{ display:flex !important; flex-direction:row !important; align-items:center !important; justify-content:flex-start !important; gap:9px !important; height:50px !important; min-height:50px !important; padding:0 15px !important; margin:0 !important; border:none !important; border-left:none !important; border-radius:12px !important; cursor:pointer; color:#fff !important; box-shadow:0 3px 10px rgba(6,42,82,0.14) !important; transition:transform .12s, filter .12s; }
+#reports-summary-wrap .reports-uni-stack .rep-pchip:hover{ transform:translateY(-2px); filter:brightness(1.08); }
+#reports-summary-wrap .reports-uni-stack .rep-pchip .rep-ic{ font-size:18px; flex:0 0 auto; }
+#reports-summary-wrap .reports-uni-stack .rep-pchip .rep-lbl{ flex:1; font-size:13.5px; font-weight:800; color:#fff !important; line-height:1.15; }
+#reports-summary-wrap .reports-uni-stack .rep-pchip .rep-sub-n{ background:#fff !important; color:#062a52 !important; border-radius:999px; font-size:11px; font-weight:900; padding:1px 8px; flex:0 0 auto; }
+#reports-summary-wrap .rep-pchip-estab{ background:#16a34a !important; }
+#reports-summary-wrap .rep-pchip-bytypes{ background:#2563eb !important; }
+#reports-summary-wrap .rep-pchip-cao{ background:#7c3aed !important; }
+#reports-summary-wrap .reports-uni-stack .rep-pchip.is-active{ box-shadow:0 0 0 2px #fff inset, 0 4px 12px rgba(0,0,0,0.28) !important; }
 </style>
 </head>
 <body>
@@ -24143,8 +24159,8 @@ body.role-staff header { margin-top: 30px; }
       <!-- ═══════════════════════════════════════════════════════════ -->
       <!-- 📑 REPORTS BOX — Quick preset reports + custom builder      -->
       <!-- ═══════════════════════════════════════════════════════════ -->
-      <div class="ov-section collapsed" id="reports-summary-wrap">
-        <div class="ov-section-header" onclick="toggleReportsSection(event)">
+      <div class="ov-section" id="reports-summary-wrap">
+        <div class="ov-section-header reports-static-header">
           <div class="ov-section-titles">
             <div class="sup-title-row dgeow-title-row">
               <span class="sup-mini-cal" id="reports-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -24155,16 +24171,13 @@ body.role-staff header { margin-top: 30px; }
             <!-- Quick preset matrices (always visible) -->
             <div class="hdr-counter-stack reports-counter-stack reports-uni-stack" id="reports-counter-stack">
               <div class="hdr-counter rep-pchip rep-pchip-estab" onclick="event.stopPropagation();reportsShowEstabReports(event)">
-                <span class="rep-main">🔍 Reports & Search</span>
-                <span class="rep-sub">Leaves</span>
+                <span class="rep-ic">🏖️</span><span class="rep-lbl">Leaves</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-bytypes" onclick="event.stopPropagation();reportsShowByTypes(event)">
-                <span class="rep-main">🔍 Reports & Search</span>
-                <span class="rep-sub">Inquiries</span>
+                <span class="rep-ic">📁</span><span class="rep-lbl">Inquiries</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-cao" onclick="event.stopPropagation();reportsToggleCao(event)">
-                <span class="rep-main">🔍 Reports & Search</span>
-                <span class="rep-sub">Cases Against Officers <span class="rep-sub-n" id="sb-cao-cnt-total">0</span></span>
+                <span class="rep-ic">👮</span><span class="rep-lbl">Cases vs Officers</span><span class="rep-sub-n" id="sb-cao-cnt-total">0</span>
               </div>
             </div>
             <!-- CAO chips — collapsible, tap the tile above -->
@@ -32433,6 +32446,7 @@ function hctOpenReports(){
     b.style.display = 'block'; b.classList.remove('collapsed');
     var c = document.getElementById('hct-car-reports'); if (c) c.textContent = '▴';
     if (typeof renderSearchMatrices === 'function') renderSearchMatrices();
+    if (typeof renderReportsHomePreview === 'function') renderReportsHomePreview();
   } catch(e){}
 }
 function renderMyDailyBox() {
