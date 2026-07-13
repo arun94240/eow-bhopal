@@ -21963,6 +21963,12 @@ body.role-staff header { margin-top: 30px; }
 
 .mas-table-toggle{ background:rgba(245,185,66,0.16); color:#f5b942; border:1px solid rgba(245,185,66,0.5); border-radius:8px; padding:3px 10px; font-size:11px; font-weight:700; cursor:pointer; margin-left:8px; white-space:nowrap; }
 .mas-table-toggle:hover{ background:rgba(245,185,66,0.28); }
+
+.mas-sort-bar{ display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.mas-sort-lbl{ font-size:11px; color:#94a3b8; margin-right:2px; }
+.mas-sort-btn{ background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:3px 11px; font-size:11px; font-weight:700; cursor:pointer; }
+.mas-sort-btn:hover{ background:rgba(255,255,255,0.16); }
+.mas-sort-btn.is-on{ background:#f5b942; color:#062a52; border-color:#f5b942; }
 </style>
 </head>
 <body>
@@ -32222,13 +32228,34 @@ function _masTableRow(o, key){
     '<td style="padding:7px 8px;color:#334155;white-space:nowrap;">' + (dep ? (isLeave ? dep : ('🚪 ' + dep)) : dash) + '</td>' +
   '</tr>';
 }
+var _MAS_RANKORD = { dsp:1, dysp:1, ti:2, inspector:2, si:3, asi:4, hc:5, 'head constable':5, const:6, constable:6 };
+function _masRankOrder(name){
+  var m = String(name||'').toLowerCase().match(/^(dsp|dysp|ti|inspector|si|asi|hc|head constable|const|constable)\b/);
+  return m ? (_MAS_RANKORD[m[1]] || 9) : 9;
+}
+function _masTimeKey(o){
+  var t = o.att && o.att.check_in_time; if (!t) return 99999;
+  var mm = String(t).match(/(\d{1,2}):(\d{2})/);
+  if (mm) return parseInt(mm[1],10)*60 + parseInt(mm[2],10);
+  var d = new Date(t); return isNaN(d.getTime()) ? 99998 : (d.getHours()*60 + d.getMinutes());
+}
+function _masNameKey(name){ return String(name||'').toLowerCase().replace(/^(dsp|dysp|ti|inspector|si|asi|hc|head constable|const|constable)\s+/,'').trim(); }
+function mddAttTableSort(m){ _masTableSort = m; mddRenderAttStrip(); }
+
 function _masTable(c){
-  var rows = '';
-  ['present','out','leave','absent'].forEach(function(k){
-    (c[k] || []).forEach(function(o){ rows += _masTableRow(o, k); });
-  });
+  var all = [];
+  ['present','out','leave','absent'].forEach(function(k){ (c[k] || []).forEach(function(o){ all.push({ o:o, key:k }); }); });
+  var srt = _masTableSort || 'status';
+  if (srt === 'time') all.sort(function(a,b){ return _masTimeKey(a.o) - _masTimeKey(b.o); });
+  else if (srt === 'rank') all.sort(function(a,b){ return (_masRankOrder(a.o.name) - _masRankOrder(b.o.name)) || _masNameKey(a.o.name).localeCompare(_masNameKey(b.o.name)); });
+  else if (srt === 'name') all.sort(function(a,b){ return _masNameKey(a.o.name).localeCompare(_masNameKey(b.o.name)); });
+  var rows = all.map(function(x){ return _masTableRow(x.o, x.key); }).join('');
   if (!rows) rows = '<tr><td colspan="5" style="padding:12px;text-align:center;color:#9ca3af;">कोई डेटा नहीं</td></tr>';
-  return '<div style="overflow-x:auto;margin-top:8px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;">' +
+  function sb(k, lbl){ return '<button class="mas-sort-btn' + (srt===k ? ' is-on' : '') + '" onclick="event.stopPropagation();mddAttTableSort(\'' + k + '\');">' + lbl + '</button>'; }
+  var sortBar = '<div class="mas-sort-bar"><span class="mas-sort-lbl">Sort:</span>' +
+    sb('status','स्थिति') + sb('time','समय') + sb('rank','पद') + sb('name','नाम') + '</div>';
+  return sortBar +
+    '<div style="overflow-x:auto;margin-top:6px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;">' +
     '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">' +
       '<thead><tr style="background:#f8fafc;color:#64748b;text-align:left;">' +
         '<th style="padding:7px 10px;font-weight:700;">नाम</th>' +
@@ -32477,7 +32504,7 @@ function mddAttPill(which){
   _masOpenGroup = (_masOpenGroup === which) ? null : which;
   mddRenderAttStrip();
 }
-var _mddAttTimer = null; var _masOpenGroup = null; var _masTableOpen = false;
+var _mddAttTimer = null; var _masOpenGroup = null; var _masTableOpen = false; var _masTableSort = 'status';
 async function mddAttLiveTick(){
   try { var r = await supa.from('attendance_log').select('*').eq('is_test', false).order('att_date', { ascending:false }); if (r && !r.error) state.attendance = r.data || []; } catch(e){}
   mddRenderAttStrip(); try { mddRenderNoticeStrip(); mddRenderPragatiFeed(); } catch(e){}
