@@ -21922,6 +21922,8 @@ body.role-staff header { margin-top: 30px; }
 #reports-summary-wrap .rep-pchip-estab{ background:#16a34a !important; }
 #reports-summary-wrap .rep-pchip-bytypes{ background:#2563eb !important; }
 #reports-summary-wrap .rep-pchip-cao{ background:#7c3aed !important; }
+#reports-summary-wrap .rep-pchip-dept{ background:#ea580c !important; }
+#reports-summary-wrap .reports-uni-stack > .hdr-counter{ width:auto !important; min-width:0 !important; max-width:none !important; }
 #reports-summary-wrap .reports-uni-stack .rep-pchip.is-active{ box-shadow:0 0 0 2px #fff inset, 0 4px 12px rgba(0,0,0,0.28) !important; }
 
 /* ===== Reports box polish (v102) ===== */
@@ -33100,10 +33102,20 @@ function mtxAgendaToggle() {
   var todayY = _mddYMD(new Date()); var last = null; var html = '';
   items.slice(0, 60).forEach(function(it){
     if (it.date !== last) { html += '<div class="mydd-tp-day">' + _mddDayLabel(it.date) + '</div>'; last = it.date; }
-    html += '<div class="mydd-tp-item" onclick="event.stopPropagation();(function(){try{' + it.open + ';}catch(e){}})();">' +
-      '<span class="mydd-tp-ico">' + it.ico + '</span><span class="mydd-tp-lbl">' + _mddEsc(it.lbl) + '</span>' +
-      '<span class="mtx-kind k-' + (it.kind === 'DG' ? 'dg' : it.kind === 'समीक्षा' ? 'rv' : 'td') + '">' + it.kind + '</span>' +
-      '<span class="mydd-tp-date' + (it.date < todayY ? ' ovd' : '') + '">' + _mddDayLabel(it.date) + '</span></div>';
+    var kc = (it.kind === 'DG' ? 'dg' : it.kind === 'समीक्षा' ? 'rv' : 'td');
+    html += '<div class="mydd-item">' +
+      '<div class="mydd-item-head" onclick="event.stopPropagation();mddRowToggle(this);">' +
+        '<span class="mydd-tp-ico">' + it.ico + '</span>' +
+        '<span class="mydd-item-title">' + _mddEsc(it.lbl) + '</span>' +
+        '<span class="mtx-kind k-' + kc + '">' + it.kind + '</span>' +
+        '<span class="mydd-tp-date' + (it.date < todayY ? ' ovd' : '') + '">' + _mddDayLabel(it.date) + '</span>' +
+      '</div>' +
+      '<div class="mydd-item-brief" style="display:none;">' +
+        '<div class="mydd-brief-row">' + _mddEsc(it.lbl) + '</div>' +
+        '<div class="mydd-brief-row"><b>प्रकार:</b> ' + _mddEsc(it.kind) + ' &nbsp;·&nbsp; <b>तिथि:</b> ' + _mddDayLabel(it.date) + '</div>' +
+        '<button class="mydd-oe-btn" onclick="event.stopPropagation();(function(){try{' + it.open + ';}catch(e){}})();">✎ Open / Edit</button>' +
+      '</div>' +
+    '</div>';
   });
   p.innerHTML = html;
 }
