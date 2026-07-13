@@ -57923,11 +57923,13 @@ function pfUpdateTypes() {
     typeSel.innerHTML = '<option value="">— पहले IO चुनें —</option>';
     return;
   }
+  var _ioRow = (state.ioMaster||[]).find(function(m){ return m.id === ioId; });
+  var _ioNm = _ioRow ? getDisplayIOName(_ioRow) : '';
   var availableTypes = [];
   Object.keys(ENQ_LABELS).forEach(function(t){
-    if (state.enquiries[t].some(function(e){ return e.io_id === ioId; })) availableTypes.push(t);
+    if (state.enquiries[t].some(function(e){ return e.io_id === ioId || (_ioNm && e.io_name === _ioNm); })) availableTypes.push(t);
   });
-  if (state.courts.some(function(c){ return c.incharge_io_id === ioId; })) availableTypes.push('court');
+  if (state.courts.some(function(c){ return c.incharge_io_id === ioId || (_ioNm && c.incharge_officer === _ioNm); })) availableTypes.push('court');
   if (!availableTypes.length) {
     typeSel.innerHTML = '<option value="">— इस IO को कोई case assigned नहीं है —</option>';
     return;
@@ -57971,9 +57973,11 @@ function pfUpdateCases() {
   var typeVal = document.getElementById('pf-type').value;
   var caseSel = document.getElementById('pf-case');
   if (!typeVal) { caseSel.innerHTML = '<option value="">— पहले प्रकार चुनें —</option>'; return; }
+  var _ioRow = (state.ioMaster||[]).find(function(m){ return m.id === ioId; });
+  var _ioNm = _ioRow ? getDisplayIOName(_ioRow) : '';
   var cases;
   if (typeVal === 'court') {
-    cases = state.courts.filter(function(c){ return c.incharge_io_id === ioId; });
+    cases = state.courts.filter(function(c){ return c.incharge_io_id === ioId || (_ioNm && c.incharge_officer === _ioNm); });
     cases.sort(function(a,b){
       var ay = (a.case_no || '').split('/')[1] || '0';
       var by = (b.case_no || '').split('/')[1] || '0';
@@ -57989,7 +57993,7 @@ function pfUpdateCases() {
       return '<option value="'+c.id+'">'+escapeHtml(label)+'</option>';
     }).join('');
   } else {
-    cases = sortCasesChronological(state.enquiries[typeVal].filter(function(e){ return e.io_id === ioId; }));
+    cases = sortCasesChronological(state.enquiries[typeVal].filter(function(e){ return e.io_id === ioId || (_ioNm && e.io_name === _ioNm); }));
     caseSel.innerHTML = '<option value="">— चुनें —</option>' + cases.map(function(c){
       var label = buildCaseLabel(typeVal, c);
       return '<option value="'+c.id+'">'+escapeHtml(label)+'</option>';
