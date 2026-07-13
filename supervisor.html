@@ -21958,6 +21958,8 @@ body.role-staff header { margin-top: 30px; }
 .vc-pill.on{background:#062a52;color:#fff;border-color:#062a52;}
 .vc-chip{font-size:12px;padding:6px 10px;border-radius:14px;cursor:pointer;border:1px solid #cfd8e3;background:#fff;color:#456;}
 
+
+.nd-craft-btn{background:#0f6e56 !important;color:#fff !important;border-color:#0f6e56 !important;}
 </style>
 </head>
 <body>
@@ -50696,6 +50698,7 @@ function _buildEnquiryRow(type, r, i, scoped) {
     reviewBtn = '<button class="ctc-btn-full nd-review-btn" title="समीक्षा दर्ज करें" onclick="event.stopPropagation();openReviewModal(\''+type+'\',\''+r.id+'\')">⭐ प्रकरण समीक्षा</button>';
   }
   var rowReviewRibbon = _buildReviewRibbon(type, r);
+  var craftBtn = '<button class="ctc-btn-full nd-craft-btn" title="Craft में यह प्रकरण खोलें" onclick="event.stopPropagation();craftOpenForCase(\''+type+'\',\''+r.id+'\')">📄 Craft</button>';
   var expandHandler = scoped
     ? ('tcToggleExpand(\''+type+'\',\''+r.id+'\',event)')
     : ('toggleEnquiryExpand(\''+type+'\',\''+r.id+'\')');
@@ -50709,6 +50712,7 @@ function _buildEnquiryRow(type, r, i, scoped) {
       rowReviewRibbon +
       '<button class="ctc-btn-full nd-timeline-btn" title="Case Timeline kholen" onclick="event.stopPropagation();showCasePragatiTimeline(\''+type+'\',\''+r.id+'\')">📊 Case Timeline</button>'+
       reviewBtn +
+      craftBtn +
     '</td>'+
     '<td data-label="IO">'+(r.io_name ? renderIOInlineCell(r.io_name, r.io_assigned_date) : '—')+'</td>'+
     '<td data-label="पक्षकार" class="enq-parties-cell">'+
@@ -61165,6 +61169,11 @@ if ('serviceWorker' in navigator) {
   };
   window.craftOpenFromEntryModal=function(){
     var t=(window.editing&&editing.type), id=(window.editing&&editing.id);
+    var e=(t&&state.enquiries&&state.enquiries[t])?state.enquiries[t].find(function(x){return x.id===id;}):null;
+    if(!e){ if(typeof toast==='function')toast('\u092a\u094d\u0930\u0915\u0930\u0923 \u0928\u0939\u0940\u0902 \u092e\u093f\u0932\u093e',true); return; }
+    craftOpenDeeplink(t,e.no,e.entry_year);
+  };
+  window.craftOpenForCase=function(t,id){
     var e=(t&&state.enquiries&&state.enquiries[t])?state.enquiries[t].find(function(x){return x.id===id;}):null;
     if(!e){ if(typeof toast==='function')toast('\u092a\u094d\u0930\u0915\u0930\u0923 \u0928\u0939\u0940\u0902 \u092e\u093f\u0932\u093e',true); return; }
     craftOpenDeeplink(t,e.no,e.entry_year);
