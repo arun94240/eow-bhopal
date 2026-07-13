@@ -21997,6 +21997,10 @@ body.role-staff header { margin-top: 30px; }
 .dmx-case-main{ flex:1; font-size:11.5px; color:#334155; cursor:pointer; }
 .dmx-cat{ display:inline-block; background:#e0e7ff; color:#3730a3; font-size:9.5px; font-weight:800; border-radius:5px; padding:1px 5px; }
 .dmx-craft{ background:#0f6e56; color:#fff; border:none; border-radius:7px; padding:2px 7px; font-size:11px; cursor:pointer; }
+
+.enq-craft-btn{ background:#0f6e56; color:#fff; border:none; border-radius:8px; padding:0 10px; font-size:11px; font-weight:700; cursor:pointer; margin-left:4px; }
+.enq-craft-btn:hover{ filter:brightness(1.08); }
+.dmx-en{ font-style:italic; color:#64748b; font-weight:500; font-size:10.5px; }
 </style>
 </head>
 <body>
@@ -24410,7 +24414,7 @@ body.role-staff header { margin-top: 30px; }
     <div class="smart-chips" id="ss-complaints-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-complaints" onclick="openMobileYearModal('complaints')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-complaints">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-complaints"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-complaints" onclick="setEnquiryView('complaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-complaints" onclick="setEnquiryView('complaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-complaints" onclick="enqToggleSort('complaints')">↑ क्रमांक (छोटे पहले)</button></div><div class="enq-list-wrap" id="complaints-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="complaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="complaints-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-complaints" onclick="setEnquiryView('complaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-complaints" onclick="setEnquiryView('complaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-complaints" onclick="enqToggleSort('complaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-complaints" onclick="craftOpenCategory('complaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="complaints-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="complaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="complaints-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="rcomplaints" class="section">
@@ -24426,7 +24430,7 @@ body.role-staff header { margin-top: 30px; }
     <div class="smart-chips" id="ss-rcomplaints-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-rcomplaints" onclick="openMobileYearModal('rcomplaints')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-rcomplaints">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-rcomplaints"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcomplaints" onclick="enqToggleSort('rcomplaints')">↑ क्रमांक (छोटे पहले)</button></div><div class="enq-list-wrap" id="rcomplaints-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="rcomplaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcomplaints-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcomplaints" onclick="enqToggleSort('rcomplaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcomplaints" onclick="craftOpenCategory('rcomplaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcomplaints-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="rcomplaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcomplaints-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="rcs" class="section">
@@ -24442,7 +24446,7 @@ body.role-staff header { margin-top: 30px; }
     <div class="smart-chips" id="ss-rcs-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-rcs" onclick="openMobileYearModal('rcs')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-rcs">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-rcs"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcs" onclick="setEnquiryView('rcs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcs" onclick="setEnquiryView('rcs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcs" onclick="enqToggleSort('rcs')">↑ क्रमांक (छोटे पहले)</button></div><div class="enq-list-wrap" id="rcs-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="rcs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcs-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcs" onclick="setEnquiryView('rcs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcs" onclick="setEnquiryView('rcs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcs" onclick="enqToggleSort('rcs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcs" onclick="craftOpenCategory('rcs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcs-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="rcs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcs-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="pes" class="section">
@@ -24458,7 +24462,7 @@ body.role-staff header { margin-top: 30px; }
     <div class="smart-chips" id="ss-pes-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-pes" onclick="openMobileYearModal('pes')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-pes">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-pes"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-pes" onclick="setEnquiryView('pes','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-pes" onclick="setEnquiryView('pes','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-pes" onclick="enqToggleSort('pes')">↑ क्रमांक (छोटे पहले)</button></div><div class="enq-list-wrap" id="pes-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="pes-body"></tbody></table></div></div><div class="enq-cards-wrap" id="pes-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-pes" onclick="setEnquiryView('pes','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-pes" onclick="setEnquiryView('pes','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-pes" onclick="enqToggleSort('pes')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-pes" onclick="craftOpenCategory('pes')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="pes-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="pes-body"></tbody></table></div></div><div class="enq-cards-wrap" id="pes-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="strs" class="section">
@@ -24474,7 +24478,7 @@ body.role-staff header { margin-top: 30px; }
     <div class="smart-chips" id="ss-strs-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-strs" onclick="openMobileYearModal('strs')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-strs">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-strs"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-strs" onclick="setEnquiryView('strs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-strs" onclick="setEnquiryView('strs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-strs" onclick="enqToggleSort('strs')">↑ क्रमांक (छोटे पहले)</button></div><div class="enq-list-wrap" id="strs-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="strs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="strs-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-strs" onclick="setEnquiryView('strs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-strs" onclick="setEnquiryView('strs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-strs" onclick="enqToggleSort('strs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-strs" onclick="craftOpenCategory('strs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="strs-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="strs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="strs-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="sutra" class="section">
@@ -24490,7 +24494,7 @@ body.role-staff header { margin-top: 30px; }
     <div class="smart-chips" id="ss-sutra-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-sutra" onclick="openMobileYearModal('sutra')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-sutra">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-sutra"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-sutra" onclick="setEnquiryView('sutra','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-sutra" onclick="setEnquiryView('sutra','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-sutra" onclick="enqToggleSort('sutra')">↑ क्रमांक (छोटे पहले)</button></div><div class="enq-list-wrap" id="sutra-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="sutra-body"></tbody></table></div></div><div class="enq-cards-wrap" id="sutra-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-sutra" onclick="setEnquiryView('sutra','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-sutra" onclick="setEnquiryView('sutra','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-sutra" onclick="enqToggleSort('sutra')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-sutra" onclick="craftOpenCategory('sutra')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="sutra-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="sutra-body"></tbody></table></div></div><div class="enq-cards-wrap" id="sutra-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <!-- COURT -->
@@ -29499,9 +29503,15 @@ function renderNcompCell(text) {
 
 // Parse stored text into array of names
 var MP_DEPARTMENTS = ["सामान्य प्रशासन विभाग","गृह विभाग","जेल विभाग","वित्त विभाग","वाणिज्यिक कर विभाग","राजस्व विभाग","परिवहन विभाग","खेल एवं युवक कल्याण विभाग","वन विभाग","औद्योगिक नीति एवं निवेश प्रोत्साहन विभाग","खनिज साधन विभाग","ऊर्जा विभाग","किसान कल्याण तथा कृषि विकास विभाग","सहकारिता विभाग","श्रम","लोक स्वास्थ्य एवं चिकित्सा शिक्षा","नगरीय विकास एवं आवास विभाग","लोक निर्माण","स्कूल शिक्षा","विधि एवं विधायी कार्य","पंचायत एवं ग्रामीण विकास","योजना, आर्थिक एवं सांख्यिकी","जनसम्पर्क","जनजातीय कार्य विभाग","सामाजिक न्याय एवं दिव्यांगजन सशक्तिकरण विभाग","नर्मदा घाटी विकास","खाद्य एवं नागरिक आपूर्ति एवं उपभोक्ता संरक्षण","संस्कृति","जल संसाधन","पर्यटन","लोक स्वास्थ्य यांत्रिकी","पशुपालन एवं डेयरी विभाग","मछुआ कल्याण तथा मत्स्य विकास विभाग","उच्च शिक्षा","विज्ञान एवं प्रौद्योगिकी","तकनीकी शिक्षा, कौशल विकास एवं रोजगार विभाग","विमानन","भोपाल गैस त्रासदी, राहत एवं पुनर्वास","संसदीय कार्य","महिला-बाल विकास","कुटीर एवं ग्रामोद्योग विभाग","पिछड़ा वर्ग एवं अल्पसंख्यक कल्याण विभाग","प्रवासी भारतीय विभाग","उद्यानिकी तथा खाद्य प्रसंस्करण विभाग","आयुष विभाग","नवीन एवं नवीकरणीय ऊर्जा","लोक सेवा प्रबंधन","विमुक्त, घुमक्कड़ एवं अर्धघुमक्कड़ जनजाति कल्याण","अनुसूचित जाति कल्याण","सूक्ष्म, लघु और मध्यम उद्यम","पर्यावरण विभाग","लोक परिसम्पत्ति प्रबंधन विभाग","आनंद विभाग","धार्मिक न्यास एवं धर्मस्व विभाग"];
+var DEPT_EN = {
+"सामान्य प्रशासन विभाग":"General Administration","गृह विभाग":"Home","जेल विभाग":"Jail / Prisons","वित्त विभाग":"Finance","वाणिज्यिक कर विभाग":"Commercial Tax","राजस्व विभाग":"Revenue","परिवहन विभाग":"Transport","खेल एवं युवक कल्याण विभाग":"Sports & Youth Welfare","वन विभाग":"Forest","औद्योगिक नीति एवं निवेश प्रोत्साहन विभाग":"Industrial Policy & Investment Promotion","खनिज साधन विभाग":"Mineral Resources","ऊर्जा विभाग":"Energy","किसान कल्याण तथा कृषि विकास विभाग":"Farmer Welfare & Agriculture","सहकारिता विभाग":"Cooperatives","श्रम":"Labour","लोक स्वास्थ्य एवं चिकित्सा शिक्षा":"Public Health & Medical Education","नगरीय विकास एवं आवास विभाग":"Urban Development & Housing","लोक निर्माण":"Public Works (PWD)","स्कूल शिक्षा":"School Education","विधि एवं विधायी कार्य":"Law & Legislative Affairs","पंचायत एवं ग्रामीण विकास":"Panchayat & Rural Development","योजना, आर्थिक एवं सांख्यिकी":"Planning, Economics & Statistics","जनसम्पर्क":"Public Relations","जनजातीय कार्य विभाग":"Tribal Affairs","सामाजिक न्याय एवं दिव्यांगजन सशक्तिकरण विभाग":"Social Justice & Disability Empowerment","नर्मदा घाटी विकास":"Narmada Valley Development","खाद्य एवं नागरिक आपूर्ति एवं उपभोक्ता संरक्षण":"Food, Civil Supplies & Consumer Protection","संस्कृति":"Culture","जल संसाधन":"Water Resources","पर्यटन":"Tourism","लोक स्वास्थ्य यांत्रिकी":"Public Health Engineering (PHE)","पशुपालन एवं डेयरी विभाग":"Animal Husbandry & Dairy","मछुआ कल्याण तथा मत्स्य विकास विभाग":"Fisheries","उच्च शिक्षा":"Higher Education","विज्ञान एवं प्रौद्योगिकी":"Science & Technology","तकनीकी शिक्षा, कौशल विकास एवं रोजगार विभाग":"Technical Education, Skill Development & Employment","विमानन":"Aviation","भोपाल गैस त्रासदी, राहत एवं पुनर्वास":"Bhopal Gas Tragedy Relief & Rehabilitation","संसदीय कार्य":"Parliamentary Affairs","महिला-बाल विकास":"Women & Child Development","कुटीर एवं ग्रामोद्योग विभाग":"Cottage & Rural Industries","पिछड़ा वर्ग एवं अल्पसंख्यक कल्याण विभाग":"Backward Classes & Minorities Welfare","प्रवासी भारतीय विभाग":"NRI / Overseas Indians","उद्यानिकी तथा खाद्य प्रसंस्करण विभाग":"Horticulture & Food Processing","आयुष विभाग":"AYUSH","नवीन एवं नवीकरणीय ऊर्जा":"New & Renewable Energy","लोक सेवा प्रबंधन":"Public Service Management","विमुक्त, घुमक्कड़ एवं अर्धघुमक्कड़ जनजाति कल्याण":"Denotified & Nomadic Tribes Welfare","अनुसूचित जाति कल्याण":"Scheduled Caste Welfare","सूक्ष्म, लघु और मध्यम उद्यम":"MSME","पर्यावरण विभाग":"Environment","लोक परिसम्पत्ति प्रबंधन विभाग":"Public Asset Management","आनंद विभाग":"Anand (Happiness)","धार्मिक न्यास एवं धर्मस्व विभाग":"Religious Trust & Endowments"
+};
+function deptHindi(v){ v=String(v||''); var i=v.indexOf(' — '); return (i>-1? v.slice(0,i): v).trim(); }
+function deptCombined(hi){ var en=DEPT_EN[hi]; return en ? (hi+' — '+en) : hi; }
 function _mpDeptOptions(sel){
-  var o = '<option value="">— विभाग —</option>';
-  for (var i=0;i<MP_DEPARTMENTS.length;i++){ var d=MP_DEPARTMENTS[i]; o += '<option value="'+escapeHtml(d)+'"'+(d===sel?' selected':'')+'>'+escapeHtml(d)+'</option>'; }
+  var selHi = deptHindi(sel);
+  var o = '<option value="">— विभाग / Dept —</option>';
+  for (var i=0;i<MP_DEPARTMENTS.length;i++){ var d=MP_DEPARTMENTS[i]; var comb=deptCombined(d); o += '<option value="'+escapeHtml(comb)+'"'+((d===selHi)?' selected':'')+'>'+escapeHtml(comb)+'</option>'; }
   return o;
 }
 function ncompParseFull(text){
@@ -29513,7 +29523,7 @@ function ncompParseFull(text){
   }).filter(function(x){ return x.name; });
 }
 function ncompDisplay(text){
-  return ncompParseFull(text).map(function(x){ return x.name + (x.dept ? ' ('+x.dept+')' : ''); }).join(', ');
+  return ncompParseFull(text).map(function(x){ return x.name + (x.dept ? ' ('+deptHindi(x.dept)+')' : ''); }).join(', ');
 }
 function ncompParse(text) {
   return ncompParseFull(text).map(function(x){ return x.name; });
@@ -50792,7 +50802,7 @@ var _enqSortDir = {};    // { type: 'asc' (oldest first, default) | 'desc' (newe
 function enqToggleSort(type) {
   _enqSortDir[type] = (_enqSortDir[type] === 'desc') ? 'asc' : 'desc';
   var btn = document.getElementById('enq-sort-btn-' + type);
-  if (btn) btn.textContent = _enqSortDir[type] === 'desc' ? '↓ क्रमांक (बड़े पहले)' : '↑ क्रमांक (छोटे पहले)';
+  if (btn) btn.textContent = _enqSortDir[type] === 'desc' ? '↓ Descending' : '↑ Ascending';
   renderTable(type);
 }
 var _enqCardOpen = {};   // { type: openId }
@@ -61402,7 +61412,7 @@ function _deptMatrixCompute(){
       var seen={};
       items.forEach(function(x){
         if(!x.dept || seen[x.dept]) return; seen[x.dept]=true;
-        (map[x.dept]=map[x.dept]||[]).push({type:t,r:r});
+        var dk=deptHindi(x.dept); (map[dk]=map[dk]||[]).push({type:t,r:r});
       });
     });
   });
@@ -61421,7 +61431,7 @@ function renderDeptMatrix(){
     var on=_deptMxSel===x.dept;
     var da=String(x.dept).replace(/'/g,"\\'");
     var head='<div class="dmx-row'+(on?' is-on':'')+'" onclick="event.stopPropagation();deptMxSelect(\''+da+'\')">'+
-      '<span class="dmx-name">'+escapeHtml(x.dept)+'</span>'+
+      '<span class="dmx-name">'+escapeHtml(x.dept)+(DEPT_EN[x.dept]?' <em class="dmx-en">'+escapeHtml(DEPT_EN[x.dept])+'</em>':'')+'</span>'+
       '<span class="dmx-cnt">'+x.cases.length+'</span>'+
       '<span class="dmx-car">'+(on?'▴':'▾')+'</span></div>';
     var body='';
@@ -61446,6 +61456,16 @@ function renderDeptMatrix(){
     (_deptMxOpen?('<div class="dmx-list">'+rows+'</div>'):'')+
   '</div>';
 }
+</script>
+<script>
+window.craftOpenCategory = function(type){
+  var pre={complaints:'Complaint',rcomplaints:'R-Complaint',rcs:'RC',pes:'PE',strs:'STR',sutra:'Sutra Suchna'};
+  var q=pre[type]||'';
+  var url='craftdocs://opensearch?spaceId=333543bc-c59b-3089-bcdc-c8880c8f9bdd&query='+encodeURIComponent(q);
+  try{ var a=document.createElement('a'); a.href=url; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){try{a.remove();}catch(e){}},700); }
+  catch(e){ try{ window.location.href=url; }catch(_){} }
+  if(typeof toast==='function')toast('\ud83d\udd04 Craft \u092e\u0947\u0902 '+q+' \u0916\u094b\u0932 \u0930\u0939\u0947 \u0939\u0948\u0902');
+};
 </script>
 </body>
 </html>
