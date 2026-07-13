@@ -22009,6 +22009,10 @@ body.role-staff header { margin-top: 30px; }
 .csb-badge{ background:#f5b942; color:#062a52; font-size:11px; font-weight:800; border-radius:9px; padding:1px 8px; }
 .csb-ok{ font-size:11px; color:#0f6e56; font-weight:700; }
 .mydd-craftsync-btn.has-new .csb-ok{ color:#fff; }
+
+.rep-pchip-dept{ background:#ea580c !important; }
+.rep-pchip-dept.is-active{ filter:brightness(1.08); }
+.rep-dept-strip{ margin-top:8px; }
 </style>
 </head>
 <body>
@@ -24267,7 +24271,12 @@ body.role-staff header { margin-top: 30px; }
               <div class="hdr-counter rep-pchip rep-pchip-cao" onclick="event.stopPropagation();reportsToggleCao(event)">
                 <span class="rep-ic">👮</span><span class="rep-lbl">Cases Against Officers</span><span class="rep-sub-n" id="sb-cao-cnt-total">0</span>
               </div>
+              <div class="hdr-counter rep-pchip rep-pchip-dept" onclick="event.stopPropagation();reportsToggleDept(event)">
+                <span class="rep-ic">🏛️</span><span class="rep-lbl">Search by Departments</span><span class="rep-sub-n" id="sb-dept-cnt-total">0</span>
+              </div>
             </div>
+            <!-- Department matrix — collapsible, tap the tile above -->
+            <div class="rep-dept-strip" id="rep-dept-wrap" style="display:none;" onclick="event.stopPropagation();"></div>
             <!-- CAO chips — collapsible, tap the tile above -->
             <div class="cao-strip cao-strip-collapsible" id="cao-chips-wrap" style="display:none;" onclick="event.stopPropagation();">
                       <div class="cao-strip-tiles">
@@ -32511,14 +32520,13 @@ function mddRenderPragatiFeed(){
         _mddMiniCalHTML() + '<span class="mas-dot"></span><span class="mpf-ttl">📈 प्रगति प्रतिवेदन — Live</span>' +
         '<button class="mpf-add" onclick="event.stopPropagation();(typeof openPragatiInlineForm===\'function\')&&openPragatiInlineForm();">＋ प्रगति जोड़ें</button>' +
       '</div>' +
-      '<div class="mln-filt light" onclick="event.stopPropagation();">' +
+      '<div class="mln-filt" onclick="event.stopPropagation();">' +
         '<span class="mln-fl">🔎</span>' +
         '<select id="mpf-io" class="mln-inp" onchange="mddPragatiApplyFilter();">' + _mddIoFilterOptions(_mddPragatiFilt.io) + '</select>' +
-        '<input type="date" id="mpf-from" class="mln-inp" value="' + _mddPragatiFilt.from + '" onchange="mddPragatiSetCustom();">' +
+        '<input type="date" id="mpf-from" class="mln-inp" value="' + _mddPragatiFilt.from + '" onchange="mddPragatiSetCustom(true);">' +
         '<span class="mln-dash">—</span>' +
-        '<input type="date" id="mpf-to" class="mln-inp" value="' + _mddPragatiFilt.to + '" onchange="mddPragatiSetCustom();">' +
-        '<button class="mpf-go" onclick="event.stopPropagation();mddPragatiSetCustom(true);">देखें</button>' +
-        (hasFilt ? '<button class="mln-clr dark" onclick="event.stopPropagation();mddPragatiClearFilter();">✕</button>' : '') +
+        '<input type="date" id="mpf-to" class="mln-inp" value="' + _mddPragatiFilt.to + '" onchange="mddPragatiSetCustom(true);">' +
+        (hasFilt ? '<button class="mln-clr" onclick="event.stopPropagation();mddPragatiClearFilter();">✕</button>' : '') +
       '</div>' +
       '<div class="mpf-periods">' +
         '<div class="mpf-per mpf-per-today' + act('today') + '" onclick="event.stopPropagation();mddPragatiPeriod(\'today\');"><div class="n">' + cToday + '</div><div class="l">आज ▾</div></div>' +
@@ -35045,6 +35053,7 @@ function refreshCaoMatrix() {
   if (totalEl) totalEl.textContent = total;
   var sbTotalEl = document.getElementById('sb-cao-cnt-total');
   if (sbTotalEl) sbTotalEl.textContent = total;
+  try { var _dc=document.getElementById('sb-dept-cnt-total'); if(_dc) _dc.textContent = _deptMatrixCompute().length; } catch(e){}
   
   // Sync active class on active tile (both legacy + new)
   document.querySelectorAll('.cao-matrix-tile, .sb-cao-tile, .cao-chip').forEach(function(t){ t.classList.remove('is-active'); });
@@ -61631,6 +61640,42 @@ function craftSyncTap(){
   var synced=_craftSyncedSet(); pend.forEach(function(e){ synced.add(_craftKey(e)); }); _craftSyncedSave(synced);
   if(typeof toast==='function')toast('🔄 '+pend.length+' नया प्रकरण Craft में भेजा जा रहा है'+(pend.length>3?' — कुछ छूटे तो मुझसे "sync" कहें, पक्का कर दूँगा':''));
   renderCraftSyncBtn();
+}
+</script>\n<script>
+/* ══════════ Reports: Search by Departments (4th sub-box) — v122 ══════════ */
+var _repDeptSel=null;
+function reportsToggleDept(ev){ if(ev&&ev.stopPropagation)ev.stopPropagation();
+  var w=document.getElementById('rep-dept-wrap'); if(!w) return;
+  var open = (w.style.display==='none' || !w.style.display);
+  w.style.display = open ? 'block' : 'none';
+  var tile=document.querySelector('.rep-pchip-dept'); if(tile) tile.classList.toggle('is-active', open);
+  if(open){ _repDeptSel=null; renderReportsDeptMatrix(); }
+}
+function repDeptSelect(d){ _repDeptSel=(_repDeptSel===d)?null:d; renderReportsDeptMatrix(); }
+function renderReportsDeptMatrix(){
+  var w=document.getElementById('rep-dept-wrap'); if(!w) return;
+  var data=[]; try{ data=_deptMatrixCompute(); }catch(e){}
+  var cnt=document.getElementById('sb-dept-cnt-total'); if(cnt) cnt.textContent=data.length;
+  if(!data.length){ w.innerHTML='<div class="mydd-dept-box" style="margin:6px 0;"><div style="padding:11px 13px;color:#64748b;font-size:12px;">कोई विभाग-वार लंबित प्रकरण नहीं — प्रकरण के non-complainant में विभाग भरें, फिर यहाँ दिखेगा।</div></div>'; return; }
+  w.innerHTML='<div class="mydd-dept-box" style="margin:6px 0;">'+data.map(function(x){
+    var on=_repDeptSel===x.dept; var da=String(x.dept).replace(/'/g,"\\'");
+    var head='<div class="dmx-row'+(on?' is-on':'')+'" onclick="event.stopPropagation();repDeptSelect(\''+da+'\')">'+
+      '<span class="dmx-name">'+escapeHtml(x.dept)+(DEPT_EN[x.dept]?' <em class="dmx-en">'+escapeHtml(DEPT_EN[x.dept])+'</em>':'')+'</span>'+
+      '<span class="dmx-cnt">'+x.cases.length+'</span>'+
+      '<span class="dmx-car">'+(on?'▴':'▾')+'</span></div>';
+    var body='';
+    if(on){
+      body='<div class="dmx-cases">'+x.cases.map(function(c){
+        var no=formatEntryNo(c.type,c.r.no,c.r.entry_year);
+        var comp=c.r.complainant?(' · '+escapeHtml(String(c.r.complainant).split(/[\n,]/)[0].trim())):'';
+        return '<div class="dmx-case">'+
+          '<span class="dmx-case-main" onclick="event.stopPropagation();openEntryModal(\''+c.type+'\',\''+c.r.id+'\')"><span class="dmx-cat">'+(_tcShort[c.type]||'')+'</span> <b>'+escapeHtml(no)+'</b>'+comp+'</span>'+
+          '<button class="dmx-craft" title="Craft" onclick="event.stopPropagation();craftOpenForCase(\''+c.type+'\',\''+c.r.id+'\')">📄</button>'+
+        '</div>';
+      }).join('')+'</div>';
+    }
+    return head+body;
+  }).join('')+'</div>';
 }
 </script>\n</body>
 </html>
