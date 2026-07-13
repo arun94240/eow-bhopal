@@ -25587,6 +25587,7 @@ body.role-staff header { margin-top: 30px; }
       <button class="modal-edit-toggle-btn" id="entry-edit-toggle-btn" onclick="toggleEntryEditMode()" style="display:none;">✎ Edit</button>
       <button class="modal-timeline-btn" id="entry-modal-timeline-btn" onclick="openTimelineFromEntryModal()" title="Case Timeline" style="display:none;">📊 Timeline</button>
       <button class="modal-linked-btn" id="entry-modal-linked-btn" onclick="openLinkedCluster(editing.id)" title="सभी Linked प्रकरण देखें" style="display:none;">🔗 Linked</button>
+      <button class="modal-timeline-btn" id="entry-modal-craft-btn" onclick="craftOpenFromEntryModal()" title="Craft में यह प्रकरण खोलें" style="display:none;">📄 Craft</button>
       <button class="close-btn" onclick="closeModal('entryModal')">×</button>
     </div>
   </div>
@@ -51985,12 +51986,16 @@ function openEntryModal(type, id) {
     // Show Case Timeline button (existing case)
     var tBtn = document.getElementById('entry-modal-timeline-btn');
     if (tBtn) tBtn.style.display = 'inline-flex';
+    var cBtn = document.getElementById('entry-modal-craft-btn');
+    if (cBtn) cBtn.style.display = 'inline-flex';
   } else {
     entry = { serial: generateSerial(type), date: todayISO() };
     document.getElementById('ef-delete').style.display = 'none';
     // Hide Case Timeline button (new entry, no history yet)
     var tBtn2 = document.getElementById('entry-modal-timeline-btn');
     if (tBtn2) tBtn2.style.display = 'none';
+    var cBtn2 = document.getElementById('entry-modal-craft-btn');
+    if (cBtn2) cBtn2.style.display = 'none';
   }
   document.getElementById('ef-serial').value = entry.serial || '';
   document.getElementById('ef-no').value = entry.no || '';
@@ -61135,6 +61140,35 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('resize',function(){if(mic.style.display!=='none'&&curField)place(curField);});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+<script>
+/* ══════════ Craft deeplink — open प्रकरण in Craft (v106) ══════════ */
+(function(){
+  var CRAFT_SPACE_ID='333543bc-c59b-3089-bcdc-c8880c8f9bdd';
+  var CRAFT_PREFIX={complaints:'Complaint',rcomplaints:'R-Complaint',rcs:'RC',pes:'PE',strs:'STR',sutra:'Sutra Suchna'};
+  window.craftQueryForCase=function(category,no,entry_year){
+    var pre=CRAFT_PREFIX[category]||'';
+    var yy=String(entry_year||'').slice(-2);
+    return (pre+' '+(no==null?'':no)+'-'+yy).trim();
+  };
+  window.craftOpenDeeplink=function(category,no,entry_year){
+    var q=craftQueryForCase(category,no,entry_year);
+    var url='craftdocs://opensearch?spaceId='+CRAFT_SPACE_ID+'&query='+encodeURIComponent(q);
+    try{
+      var a=document.createElement('a');a.href=url;a.style.display='none';
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){try{a.remove();}catch(e){}},600);
+    }catch(e){ try{window.location.href=url;}catch(_){} }
+    if(typeof toast==='function')toast('\ud83d\udcc4 Craft \u092e\u0947\u0902 \u0916\u094b\u0932 \u0930\u0939\u0947 \u0939\u0948\u0902: '+q);
+  };
+  window.craftOpenFromEntryModal=function(){
+    var t=(window.editing&&editing.type), id=(window.editing&&editing.id);
+    var e=(t&&state.enquiries&&state.enquiries[t])?state.enquiries[t].find(function(x){return x.id===id;}):null;
+    if(!e){ if(typeof toast==='function')toast('\u092a\u094d\u0930\u0915\u0930\u0923 \u0928\u0939\u0940\u0902 \u092e\u093f\u0932\u093e',true); return; }
+    craftOpenDeeplink(t,e.no,e.entry_year);
+  };
 })();
 </script>
 
