@@ -22015,7 +22015,7 @@ body.role-staff header { margin-top: 30px; }
 .rep-pchip-dept{ background:#ea580c !important; }
 .rep-pchip-dept.is-active{ filter:brightness(1.08); }
 .rep-dept-strip{ margin-top:8px; }
-\n.mbr-dayhdr{ margin:9px 0 3px; font-size:12px; font-weight:800; color:#062a52; letter-spacing:.2px; display:flex; align-items:center; gap:7px; }\n</style>
+\n.mbr-dayhdr{ margin:9px 0 3px; font-size:12px; font-weight:800; color:#062a52; letter-spacing:.2px; display:flex; align-items:center; gap:7px; }\n\n.mbr-meta{ color:#94a3b8; font-size:11.5px; font-weight:600; }\n</style>
 </head>
 <body>
 
@@ -32630,7 +32630,8 @@ function mddRenderBrief(){
     arr.forEach(function(a){
       if(a.date!==last){ out+='<div class="mbr-dayhdr">'+_briefEnDate(a.date)+' '+tagFor(a.date)+'</div>'; last=a.date; }
       var kc=(a.kind==='DG'?'dg':a.kind==='\u0938\u092e\u0940\u0915\u094d\u0937\u093e'?'rv':'td');
-      out+='<div class="mbr-it"><span class="mbr-d">'+(a.ico||'\u2022')+'</span><span class="mbr-t">'+_mddEsc(String(a.lbl||''))+'</span><span class="mtx-kind k-'+kc+'">'+a.kind+'</span></div>';
+      var _m=a.meta?'<span class="mbr-meta">  \u00b7  '+_mddEsc(a.meta)+'</span>':'';
+      out+='<div class="mbr-it"><span class="mbr-d">'+(a.ico||'\u2022')+'</span><span class="mbr-t">'+_mddEsc(String(a.lbl||''))+_m+'</span><span class="mtx-kind k-'+kc+'">'+a.kind+'</span></div>';
     });
     return out;
   }
@@ -33049,7 +33050,7 @@ function _mtxAgendaItems() {
   try { out = _mddCalendarItems().map(function(i){ i.kind = (i.ico === '🏛') ? 'DG' : 'To-Do'; return i; }); } catch(e) { out = []; }
   try {
     reviewGatherCases().forEach(function(r){
-      out.push({ date: _mddYMD(new Date()), ico:'⭐', kind:'समीक्षा', lbl: _reviewCaseDisplay(r.raw, r.type) + (r.status === 'overdue' ? ' — समीक्षा overdue' : ' — समीक्षा due'), open: "openReviewModal('" + r.type + "','" + r.id + "')" });
+      out.push({ date: _mddYMD(new Date()), ico:'⭐', kind:'समीक्षा', lbl: _reviewCaseDisplay(r.raw, r.type) + (r.status === 'overdue' ? ' — समीक्षा overdue' : ' — समीक्षा due'), meta:'', open: "openReviewModal('" + r.type + "','" + r.id + "')" });
     });
   } catch(e) {}
   out.sort(function(a,b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
@@ -33789,17 +33790,18 @@ function _mddReminderItems() {
   out.sort(function(a,b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
   return out;
 }
+function _taskMeta(t){ return [t.case_display, t.io_name?('IO: '+t.io_name):'', /high/i.test(String(t.priority||''))?'🔴 High':''].filter(Boolean).join('  ·  '); }
 function _mddCalendarItems() {
   var out = [];
   (state.myOfficeTasks || []).forEach(function(t){
     if (t.reminder_at) {
-      out.push({ date: String(t.reminder_at).slice(0,10), ico:'⏰', lbl: (t.task_title || '(task)') + (t.remarks ? ' — ' + t.remarks : ''), open: "mddTaskEditInline('" + t.id + "')" });
+      out.push({ date: String(t.reminder_at).slice(0,10), ico:'⏰', lbl: (t.task_title || '(task)') + (t.remarks ? ' — ' + t.remarks : ''), meta: _taskMeta(t), open: "mddTaskEditInline('" + t.id + "')" });
     } else {
-      var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), open: "mddTaskEditInline('" + t.id + "')" });
+      var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), meta: _taskMeta(t), open: "mddTaskEditInline('" + t.id + "')" });
     }
   });
   (state.dgDirectives || []).forEach(function(d){
-    if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), open: "editDgDirective('" + d.id + "')" });
+    if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), meta: [d.case_display, d.io_name?('IO: '+d.io_name):''].filter(Boolean).join('  ·  '), open: "editDgDirective('" + d.id + "')" });
   });
   (state.discussionNotes || []).forEach(function(d){
     if (d.reminder_date) out.push({ date: String(d.reminder_date).slice(0,10), ico:'💬', lbl: (d.title || '(note)'), open: "editDiscussionNote('" + d.id + "')" });
