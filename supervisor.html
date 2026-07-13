@@ -21975,6 +21975,9 @@ body.role-staff header { margin-top: 30px; }
 
 .mtx-craft-push{ margin-left:auto; background:#0f6e56; color:#fff; border:none; border-radius:8px; padding:3px 10px; font-size:10.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
 .mtx-craft-push:hover{ filter:brightness(1.09); }
+
+.ncomp-row .ncomp-dept{ flex:0 0 auto; max-width:210px; font-size:12px; padding:6px 8px; }
+@media(max-width:640px){ .ncomp-row{ flex-wrap:wrap; } .ncomp-row .ncomp-dept{ max-width:none; flex:1 1 100%; margin-left:26px; } }
 </style>
 </head>
 <body>
@@ -29394,7 +29397,7 @@ function renderLinkedEnquiryCard(enq, type) {
     '</div>' +
     (enq.io_name ? '<div class="lc-row"><span class="lc-lbl">IO</span> ' + escapeHtml(formatOfficerName(enq.io_name)) + '</div>' : '') +
     (enq.complainant ? '<div class="lc-row"><span class="lc-lbl">Complainant</span> ' + escapeHtml(enq.complainant) + '</div>' : '') +
-    (enq.non_complainant ? '<div class="lc-row"><span class="lc-lbl">Non-Complainant</span> ' + escapeHtml(enq.non_complainant) + '</div>' : '') +
+    (enq.non_complainant ? '<div class="lc-row"><span class="lc-lbl">Non-Complainant</span> ' + escapeHtml(ncompDisplay(enq.non_complainant)) + '</div>' : '') +
     (date ? '<div class="lc-row"><span class="lc-lbl">Date</span> ' + date + '</div>' : '') +
     (actionDate ? '<div class="lc-row"><span class="lc-lbl">Last Action</span> ' + actionDate + '</div>' : '') +
     (brief ? '<div class="lc-row"><span class="lc-lbl">Brief</span> ' + brief + '</div>' : '') +
@@ -29475,54 +29478,77 @@ function renderNcompCell(text) {
 // Display format: numbered list with add/remove
 
 // Parse stored text into array of names
-function ncompParse(text) {
+var MP_DEPARTMENTS = ["सामान्य प्रशासन विभाग","गृह विभाग","जेल विभाग","वित्त विभाग","वाणिज्यिक कर विभाग","राजस्व विभाग","परिवहन विभाग","खेल एवं युवक कल्याण विभाग","वन विभाग","औद्योगिक नीति एवं निवेश प्रोत्साहन विभाग","खनिज साधन विभाग","ऊर्जा विभाग","किसान कल्याण तथा कृषि विकास विभाग","सहकारिता विभाग","श्रम","लोक स्वास्थ्य एवं चिकित्सा शिक्षा","नगरीय विकास एवं आवास विभाग","लोक निर्माण","स्कूल शिक्षा","विधि एवं विधायी कार्य","पंचायत एवं ग्रामीण विकास","योजना, आर्थिक एवं सांख्यिकी","जनसम्पर्क","जनजातीय कार्य विभाग","सामाजिक न्याय एवं दिव्यांगजन सशक्तिकरण विभाग","नर्मदा घाटी विकास","खाद्य एवं नागरिक आपूर्ति एवं उपभोक्ता संरक्षण","संस्कृति","जल संसाधन","पर्यटन","लोक स्वास्थ्य यांत्रिकी","पशुपालन एवं डेयरी विभाग","मछुआ कल्याण तथा मत्स्य विकास विभाग","उच्च शिक्षा","विज्ञान एवं प्रौद्योगिकी","तकनीकी शिक्षा, कौशल विकास एवं रोजगार विभाग","विमानन","भोपाल गैस त्रासदी, राहत एवं पुनर्वास","संसदीय कार्य","महिला-बाल विकास","कुटीर एवं ग्रामोद्योग विभाग","पिछड़ा वर्ग एवं अल्पसंख्यक कल्याण विभाग","प्रवासी भारतीय विभाग","उद्यानिकी तथा खाद्य प्रसंस्करण विभाग","आयुष विभाग","नवीन एवं नवीकरणीय ऊर्जा","लोक सेवा प्रबंधन","विमुक्त, घुमक्कड़ एवं अर्धघुमक्कड़ जनजाति कल्याण","अनुसूचित जाति कल्याण","सूक्ष्म, लघु और मध्यम उद्यम","पर्यावरण विभाग","लोक परिसम्पत्ति प्रबंधन विभाग","आनंद विभाग","धार्मिक न्यास एवं धर्मस्व विभाग"];
+function _mpDeptOptions(sel){
+  var o = '<option value="">— विभाग —</option>';
+  for (var i=0;i<MP_DEPARTMENTS.length;i++){ var d=MP_DEPARTMENTS[i]; o += '<option value="'+escapeHtml(d)+'"'+(d===sel?' selected':'')+'>'+escapeHtml(d)+'</option>'; }
+  return o;
+}
+function ncompParseFull(text){
   if (!text) return [];
-  // Try newline first (new format), then comma (legacy)
   var sep = text.indexOf('\n') > -1 ? '\n' : ',';
-  return text.split(sep).map(function(s){ return s.trim(); }).filter(Boolean);
+  return text.split(sep).map(function(s){
+    var parts = s.split('\t');
+    return { name:(parts[0]||'').trim(), dept:(parts[1]||'').trim() };
+  }).filter(function(x){ return x.name; });
+}
+function ncompDisplay(text){
+  return ncompParseFull(text).map(function(x){ return x.name + (x.dept ? ' ('+x.dept+')' : ''); }).join(', ');
+}
+function ncompParse(text) {
+  return ncompParseFull(text).map(function(x){ return x.name; });
 }
 
 // Serialize array back to text for storage
 function ncompSerialize(arr) {
   if (!arr || !arr.length) return '';
-  return arr.filter(Boolean).map(function(s){ return s.trim(); }).filter(Boolean).join('\n');
+  return arr.map(function(x){
+    if (typeof x === 'string') return x.trim();
+    var nm=(x.name||'').trim(); if(!nm) return '';
+    return x.dept ? (nm + '\t' + x.dept) : nm;
+  }).filter(Boolean).join('\n');
 }
 
 // Render the non-complainant list UI
-function ncompRender(names) {
+function ncompRender(items) {
   var listEl = document.getElementById('ncomp-list');
   var countEl = document.getElementById('ncomp-count');
   if (!listEl) return;
-  if (!names || !names.length) {
+  items = (items||[]).map(function(x){ return (typeof x==='string') ? {name:x,dept:''} : x; });
+  if (!items.length) {
     listEl.innerHTML = '<div class="ncomp-empty">कोई non-complainant नहीं — "+ Add" से जोड़ें</div>';
     if (countEl) countEl.textContent = '';
     return;
   }
-  listEl.innerHTML = names.map(function(name, i){
+  listEl.innerHTML = items.map(function(it, i){
     return '<div class="ncomp-row">' +
       '<span class="ncomp-num">' + (i + 1) + '</span>' +
-      '<input type="text" class="form-input ncomp-input" value="' + escapeHtml(name) + '" placeholder="नाम लिखें" oninput="ncompUpdate(' + i + ', this.value)">' +
+      '<input type="text" class="form-input ncomp-input" value="' + escapeHtml(it.name||'') + '" placeholder="नाम लिखें" oninput="ncompUpdate(' + i + ', this.value)">' +
+      '<select class="form-input ncomp-dept" title="विभाग">' + _mpDeptOptions(it.dept||'') + '</select>' +
       '<button type="button" class="ncomp-remove" onclick="ncompRemove(' + i + ')" title="हटाएँ">×</button>' +
     '</div>';
   }).join('');
-  if (countEl) countEl.textContent = '(' + names.length + ')';
+  if (countEl) countEl.textContent = '(' + items.length + ')';
 }
 
 // Get current names from DOM
 function ncompGetCurrent() {
-  var inputs = document.querySelectorAll('.ncomp-input');
-  var names = [];
-  for (var i = 0; i < inputs.length; i++) {
-    var v = (inputs[i].value || '').trim();
-    if (v) names.push(v);
+  var rows = document.querySelectorAll('#ncomp-list .ncomp-row');
+  var out = [];
+  for (var i = 0; i < rows.length; i++) {
+    var inp = rows[i].querySelector('.ncomp-input');
+    var nm = inp ? (inp.value||'').trim() : '';
+    var sel = rows[i].querySelector('.ncomp-dept');
+    var dp = sel ? (sel.value||'') : '';
+    if (nm) out.push({ name: nm, dept: dp });
   }
-  return names;
+  return out;
 }
 
 // Add a new empty row
 function ncompAdd() {
   var current = ncompGetCurrent();
-  current.push('');
+  current.push({name:'',dept:''});
   ncompRender(current);
   // Focus on new input
   setTimeout(function(){
@@ -29549,8 +29575,7 @@ function ncompUpdate(idx, value) {
 
 // Load non-complainant data into the form
 function ncompLoad(text) {
-  var names = ncompParse(text);
-  ncompRender(names);
+  ncompRender(ncompParseFull(text));
 }
 
 // Get serialized text for save
