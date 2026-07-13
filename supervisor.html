@@ -22015,7 +22015,7 @@ body.role-staff header { margin-top: 30px; }
 .rep-pchip-dept{ background:#ea580c !important; }
 .rep-pchip-dept.is-active{ filter:brightness(1.08); }
 .rep-dept-strip{ margin-top:8px; }
-</style>
+\n.mbr-dayhdr{ margin:9px 0 3px; font-size:12px; font-weight:800; color:#062a52; letter-spacing:.2px; display:flex; align-items:center; gap:7px; }\n</style>
 </head>
 <body>
 
@@ -32608,74 +32608,37 @@ function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval
 function _mddBriefItem(dot, text, tag){
   return '<div class="mbr-it"><span class="mbr-d">' + dot + '</span><span class="mbr-t">' + text + '</span>' + (tag ? tag : '') + '</div>';
 }
+function _briefEnDate(ds){
+  var DAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var p=String(ds||'').split('-'); if(p.length<3) return ds;
+  var dt=new Date(Date.UTC(+p[0],+p[1]-1,+p[2]));
+  return DAY[dt.getUTCDay()]+', '+(+p[2])+' '+MON[+p[1]-1];
+}
 function mddRenderBrief(){
-  var host = document.getElementById('mydd-brief'); if (!host) return;
-  var today = _mddYMD(new Date());
-  var reviews = [];
-  try { reviews = (reviewGatherCases() || []); } catch(e){ reviews = []; }
-  var todos = (state.myOfficeTasks || []).filter(function(t){
-    var d = String(t.task_date||'').slice(0,10);
-    var rd = t.reminder_at ? String(t.reminder_at).slice(0,10) : '';
-    return (d === today || rd === today) && String(t.status||'').toLowerCase() !== 'done';
-  });
-  var agenda = [];
-  try { agenda = (_mtxAgendaItems() || []).filter(function(a){ return a.date === today && a.ico !== '⭐'; }); } catch(e){ agenda = []; }
-  var pend = (state.pendingApprovals || []).length;
-  var overdueN = reviews.filter(function(r){ return r.status === 'overdue'; }).length;
-
-  var hr = new Date().getHours();
-  var greet = hr < 12 ? '☀️ सुप्रभात' : (hr < 17 ? '🌤️ नमस्कार' : '🌙 शुभ संध्या');
-  var dateLabel = new Date().toLocaleDateString('hi-IN', { weekday:'long', day:'numeric', month:'long' });
-
-  var totalItems = reviews.length + todos.length + agenda.length + pend;
-  if (!totalItems){
-    host.innerHTML = '<div class="mbr-brief mbr-calm"><div class="mbr-top"><span class="mbr-title">' + greet + ', SP साहब</span><span class="mbr-sub">' + dateLabel + '</span></div><div class="mbr-line">आज कोई तत्काल समीक्षा/To-Do/agenda लंबित नहीं — दिन नियंत्रण में है। ✅</div></div>';
-    return;
-  }
-  // summary line
-  var bits = [];
-  if (reviews.length) bits.push('<b>' + reviews.length + ' समीक्षाएँ</b>' + (overdueN ? ' (' + overdueN + ' overdue)' : ''));
-  if (todos.length) bits.push('<b>' + todos.length + ' To-Dos</b>');
-  if (agenda.length) bits.push('<b>' + agenda.length + ' agenda</b>');
-  if (pend) bits.push('<b>' + pend + ' लंबित अनुमोदन</b>');
-  var summary = 'आज ' + bits.join(', ') + ' ध्यान माँगते हैं। संक्षेप —';
-
-  var html = '<div class="mbr-brief">' +
-    '<div class="mbr-top"><span class="mbr-title">' + greet + ', SP साहब</span><span class="mbr-sub">' + dateLabel + '</span></div>' +
-    '<div class="mbr-line">' + summary + '</div>';
-
-  if (reviews.length){
-    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-rv">⭐</span> प्रकरण समीक्षा — आज देखना है <span class="mbr-cnt">' + reviews.length + '</span></div>';
-    reviews.slice(0,4).forEach(function(r){
-      var disp = (typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(r.raw, r.type) : '';
-      var tag = (r.status === 'overdue') ? '<span class="mbr-tag mbr-over">OVERDUE</span>' : '<span class="mbr-tag mbr-due">DUE</span>';
-      html += '<div class="mbr-it mbr-click" onclick="event.stopPropagation();(typeof openReviewModal===\'function\')&&openReviewModal(\'' + r.type + '\',\'' + r.id + '\');"><span class="mbr-d">•</span><span class="mbr-t">' + _mddEsc(disp) + '</span>' + tag + '</div>';
+  var host=document.getElementById('mydd-brief'); if(!host) return;
+  var today=_mddYMD(new Date());
+  var wkEnd=_mddYMD(new Date(Date.now()+7*86400000));
+  var items=[]; try{ items=(_mtxAgendaItems()||[]); }catch(e){ items=[]; }
+  var todayArr=items.filter(function(a){ return a.date<=today; });
+  var weekArr=items.filter(function(a){ return a.date>today && a.date<=wkEnd; });
+  var hr=new Date().getHours();
+  var greet=hr<12?'\u2600\ufe0f \u0938\u0941\u092a\u094d\u0930\u092d\u093e\u0924':(hr<17?'\ud83c\udf24\ufe0f \u0928\u092e\u0938\u094d\u0915\u093e\u0930':'\ud83c\udf19 \u0936\u0941\u092d \u0938\u0902\u0927\u094d\u092f\u093e');
+  function tagFor(ds){ if(ds<today) return '<span class="mbr-tag mbr-over">Overdue</span>'; if(ds===today) return '<span class="mbr-tag mbr-today">Today</span>'; return '<span class="mbr-tag mbr-due">Due</span>'; }
+  function sec(arr,empty){
+    if(!arr.length) return '<div class="mbr-line" style="color:#94a3b8;">'+empty+'</div>';
+    var out='',last=null;
+    arr.forEach(function(a){
+      if(a.date!==last){ out+='<div class="mbr-dayhdr">'+_briefEnDate(a.date)+' '+tagFor(a.date)+'</div>'; last=a.date; }
+      var kc=(a.kind==='DG'?'dg':a.kind==='\u0938\u092e\u0940\u0915\u094d\u0937\u093e'?'rv':'td');
+      out+='<div class="mbr-it"><span class="mbr-d">'+(a.ico||'\u2022')+'</span><span class="mbr-t">'+_mddEsc(String(a.lbl||''))+'</span><span class="mtx-kind k-'+kc+'">'+a.kind+'</span></div>';
     });
-    if (reviews.length > 4) html += '<div class="mbr-more">+ ' + (reviews.length-4) + ' और…</div>';
-    html += '</div>';
+    return out;
   }
-  if (todos.length){
-    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-td">📝</span> To-Dos — आज करना है <span class="mbr-cnt">' + todos.length + '</span></div>';
-    todos.slice(0,4).forEach(function(t){
-      var extra = t.io_name ? ' (IO: ' + _mddEsc(t.io_name) + ')' : '';
-      html += '<div class="mbr-it mbr-click" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\');"><span class="mbr-d">•</span><span class="mbr-t">' + _mddEsc(t.task_title || '(task)') + extra + '</span><span class="mbr-tag mbr-today">आज</span></div>';
-    });
-    if (todos.length > 4) html += '<div class="mbr-more">+ ' + (todos.length-4) + ' और…</div>';
-    html += '</div>';
-  }
-  if (pend){
-    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ap">🗳️</span> लंबित अनुमोदन <span class="mbr-cnt">' + pend + '</span></div>' +
-      '<div class="mbr-it"><span class="mbr-d">•</span><span class="mbr-t">' + pend + ' अवकाश/आवेदन आपके निर्णय हेतु — Overview Stats में देखें</span></div></div>';
-  }
-  if (agenda.length){
-    html += '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ag">⏰</span> Agenda / Reminders <span class="mbr-cnt">' + agenda.length + '</span></div>';
-    agenda.slice(0,4).forEach(function(a){
-      html += '<div class="mbr-it"><span class="mbr-d">' + (a.ico||'•') + '</span><span class="mbr-t">' + _mddEsc(String(a.lbl||'').slice(0,80)) + '</span></div>';
-    });
-    html += '</div>';
-  }
-  html += '<div class="mbr-foot">↻ हर बार Home खोलने पर अपने-आप अद्यतन</div></div>';
-  host.innerHTML = html;
+  host.innerHTML='<div class="mbr-brief">'+
+    '<div class="mbr-top"><span class="mbr-title">'+greet+', SP \u0938\u093e\u0939\u092c</span><span class="mbr-sub">'+_briefEnDate(today)+'</span></div>'+
+    '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ag">\ud83d\udcc5</span> \u0906\u091c \u0915\u093e Agenda <span class="mbr-cnt">'+todayArr.length+'</span></div>'+sec(todayArr,'\u0906\u091c \u0915\u094b\u0908 agenda \u0928\u0939\u0940\u0902 \u2014 \u0926\u093f\u0928 \u0928\u093f\u092f\u0902\u0924\u094d\u0930\u0923 \u092e\u0947\u0902 \u2705')+'</div>'+
+    '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ag">\ud83d\uddd3\ufe0f</span> \u0907\u0938 \u0938\u092a\u094d\u0924\u093e\u0939 \u0915\u093e Agenda <span class="mbr-cnt">'+weekArr.length+'</span></div>'+sec(weekArr,'\u0907\u0938 \u0938\u092a\u094d\u0924\u093e\u0939 \u0915\u094b\u0908 \u0905\u0924\u093f\u0930\u093f\u0915\u094d\u0924 agenda \u0928\u0939\u0940\u0902\u0964')+'</div>'+
+    '<div class="mbr-foot">\u21bb Home \u0916\u094b\u0932\u0928\u0947 \u092a\u0930 \u0905\u092a\u0928\u0947-\u0906\u092a \u0905\u0926\u094d\u092f\u0924\u0928 \u00b7 \u092f\u0939\u0940 Craft (\ud83d\udcc6 Subscribe) \u092e\u0947\u0902 \u092d\u0940 live</div></div>';
 }
 function hctOpenReports(){
   try {
