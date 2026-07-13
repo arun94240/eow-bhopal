@@ -22758,6 +22758,7 @@ body.role-staff header { margin-top: 30px; }
               <span class="mtx-ico mtx-ico-agenda">⏰</span><span class="mtx-ag-lbl">Agenda</span>
               <span class="mtx-ag-chip">आज <b id="mtx-ag-today">0</b></span>
               <span class="mtx-ag-chip">सप्ताह <b id="mtx-ag-week">0</b></span>
+              <button class="mtx-craft-push" onclick="event.stopPropagation();openAgendaSubscribeModal();" title="Agenda को Apple/Google Calendar में subscribe करें (8 बजे reminder)">📆 Subscribe</button>
               <button class="mtx-craft-push" onclick="event.stopPropagation();craftOpenTaskList();" title="Craft Agenda (live) खोलें">🔄 Craft</button>
               <span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span>
             </div>
@@ -61424,6 +61425,35 @@ function leaveFromIOModal(){
 
 <script>
 /* ══════════ Craft: open the single living Task List doc (v114) ══════════ */
+window.openAgendaSubscribeModal = function(){
+  var feedUrl = 'https://hwfdeqlqavakyakugyqq.supabase.co/functions/v1/agenda-calendar';
+  var webcalUrl = feedUrl.replace(/^https?:/, 'webcal:');
+  var ex=document.getElementById('agenda-subscribe-modal'); if(ex) ex.remove();
+  var modal=document.createElement('div');
+  modal.className='modal-overlay active'; modal.id='agenda-subscribe-modal';
+  modal.innerHTML =
+    '<div class="modal" style="max-width:560px;">'+
+      '<div class="modal-header" style="background:linear-gradient(135deg,#062a52 0%,#0a3a6e 100%);">'+
+        '<div class="modal-title" style="color:white;">\ud83d\udcc6 EOW Agenda — Subscribe</div>'+
+        '<button class="close-btn" onclick="document.getElementById(\'agenda-subscribe-modal\').remove()" style="color:white;">\u00d7</button>'+
+      '</div>'+
+      '<div class="modal-body">'+
+        '<p style="margin:0 0 12px 0;font-size:13.5px;color:#374151;">\u0906\u091c \u0935 \u0907\u0938 \u0938\u092a\u094d\u0924\u093e\u0939 \u0915\u093e EOW agenda \u0915\u094b Apple / Google Calendar \u092e\u0947\u0902 live subscribe \u0915\u0930\u0947\u0902 \u2014 \u0939\u0930 item \u092a\u0930 \u0938\u0941\u092c\u0939 8 \u092c\u091c\u0947 reminder\u0964 Calendar \u0905\u092a\u0928\u0947-\u0906\u092a refresh \u0939\u094b\u0924\u093e \u0930\u0939\u0947\u0917\u093e\u0964</p>'+
+        '<div style="background:#fff8ec;border:1px solid #f5d08a;border-radius:10px;padding:14px;margin-bottom:14px;">'+
+          '<div style="font-size:12px;font-weight:800;color:#7a5b12;margin-bottom:8px;letter-spacing:0.4px;">\ud83d\udcf1 iOS / macOS (1-tap subscribe):</div>'+
+          '<a href="'+webcalUrl+'" style="display:inline-block;background:linear-gradient(135deg,#f5b942 0%,#e8a82e 100%);color:#062a52;padding:10px 16px;border-radius:8px;font-weight:800;text-decoration:none;font-size:14px;">\ud83d\udcc5 Apple Calendar \u092e\u0947\u0902 \u091c\u094b\u0921\u093c\u0947\u0902</a>'+
+        '</div>'+
+        '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;">'+
+          '<div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:6px;letter-spacing:0.4px;">\ud83e\udd16 Google Calendar / Other:</div>'+
+          '<p style="font-size:12px;color:#64748b;margin:0 0 8px 0;">Calendar app \u092e\u0947\u0902 "Add by URL / From URL" \u0938\u0947 \u092f\u0939 link paste \u0915\u0930\u0947\u0902:</p>'+
+          '<input type="text" readonly value="'+feedUrl+'" onclick="this.select();" style="width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-family:monospace;font-size:11px;background:white;">'+
+          '<button onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+feedUrl+'\').then(function(){toast(\'Link copied \u2713\');});" style="margin-top:8px;background:white;border:1.5px solid #cbd5e1;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:12px;">\ud83d\udccb Copy Link</button>'+
+        '</div>'+
+        '<p style="font-size:11px;color:#94a3b8;margin-top:14px;font-style:italic;">Note: Apple Calendar 8 \u092c\u091c\u0947 \u0915\u0947 reminders \u0926\u093f\u0916\u093e\u0924\u093e \u0939\u0948; Google subscribed-calendar events \u0926\u093f\u0916\u093e\u0924\u093e \u0939\u0948 \u092a\u0930 alarms \u0926\u092c\u093e \u0938\u0915\u0924\u093e \u0939\u0948\u0964</p>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(modal);
+};
 window.craftOpenTaskList = function(){
   var url = 'craftdocs://open?spaceId=333543bc-c59b-3089-bcdc-c8880c8f9bdd&documentId=2e8f24f3-9203-aaf4-f926-a9f245e324e6';
   try{ var a=document.createElement('a'); a.href=url; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){try{a.remove();}catch(e){}},700); }
