@@ -22716,7 +22716,7 @@ body.role-staff header { margin-top: 30px; }
               <span class="mtx-ico mtx-ico-agenda">⏰</span><span class="mtx-ag-lbl">Agenda</span>
               <span class="mtx-ag-chip">आज <b id="mtx-ag-today">0</b></span>
               <span class="mtx-ag-chip">सप्ताह <b id="mtx-ag-week">0</b></span>
-              <button class="mtx-craft-push" onclick="event.stopPropagation();craftPushDailyToCraft();" title="आज का Agenda व To-Dos Craft में भेजें">📋 Craft</button>
+              <button class="mtx-craft-push" onclick="event.stopPropagation();craftOpenTaskList();" title="Craft Task List (live) खोलें">🔄 Craft</button>
               <span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span>
             </div>
             <div class="mtx-list" id="mtx-agenda-panel"></div>
@@ -61323,36 +61323,12 @@ function leaveFromIOModal(){
 </script>
 
 <script>
-/* ══════════ App → Craft: push today's Agenda + To-Dos (v113) ══════════ */
-window.craftPushDailyToCraft = function(){
-  var SPACE='333543bc-c59b-3089-bcdc-c8880c8f9bdd';
-  var FOLDER='e9658006-4ce5-e306-30c0-e32fc3e95a89';
-  var today = (typeof todayISO==='function') ? todayISO() : new Date().toISOString().slice(0,10);
-  var todos = ((window.state&&state.myOfficeTasks)||[]).filter(function(t){
-    var d=String(t.task_date||'').slice(0,10); var rd=t.reminder_at?String(t.reminder_at).slice(0,10):'';
-    return (d===today||rd===today) && String(t.status||'').toLowerCase()!=='done';
-  });
-  var agenda=[]; try{ agenda=(_mtxAgendaItems()||[]).filter(function(a){ return a.date===today && a.ico!=='\u2b50'; }); }catch(e){}
-  if(!todos.length && !agenda.length){ if(typeof toast==='function')toast('\u0906\u091c \u0915\u094b\u0908 agenda/to-do \u0928\u0939\u0940\u0902 \u2014 \u092d\u0947\u091c\u0928\u0947 \u0915\u094b \u0915\u0941\u091b \u0928\u0939\u0940\u0902'); return; }
-  var dLabel = new Date().toLocaleDateString('en-GB');
-  var L = ['# \ud83d\udccb EOW \u2014 Agenda & To-Dos \u00b7 '+dLabel, ''];
-  if(agenda.length){
-    L.push('## \u23f0 Agenda / Reminders');
-    agenda.forEach(function(a){ L.push('- [ ] '+(a.ico?a.ico+' ':'')+String(a.lbl||'').trim()); });
-    L.push('');
-  }
-  if(todos.length){
-    L.push('## \ud83d\udcdd To-Dos');
-    todos.forEach(function(t){ L.push('- [ ] '+String(t.task_title||'(task)').trim()+(t.io_name?(' (IO: '+t.io_name+')'):'')); });
-    L.push('');
-  }
-  L.push('_App \u0938\u0947 \u092d\u0947\u091c\u093e \u0917\u092f\u093e \u00b7 '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'_');
-  var content = L.join('\n');
-  var title = 'Agenda '+dLabel;
-  var url = 'craftdocs://createdocument?spaceId='+SPACE+'&folderId='+FOLDER+'&title='+encodeURIComponent(title)+'&content='+encodeURIComponent(content);
+/* ══════════ Craft: open the single living Task List doc (v114) ══════════ */
+window.craftOpenTaskList = function(){
+  var url = 'craftdocs://open?spaceId=333543bc-c59b-3089-bcdc-c8880c8f9bdd&documentId=2e8f24f3-9203-aaf4-f926-a9f245e324e6';
   try{ var a=document.createElement('a'); a.href=url; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){try{a.remove();}catch(e){}},700); }
   catch(e){ try{ window.location.href=url; }catch(_){} }
-  if(typeof toast==='function')toast('\ud83d\udccb Craft \u092e\u0947\u0902 \u092d\u0947\u091c\u093e \u091c\u093e \u0930\u0939\u093e \u0939\u0948 ('+(agenda.length+todos.length)+' items)');
+  if(typeof toast==='function')toast('\ud83d\udd04 Craft Task List \u0916\u094b\u0932 \u0930\u0939\u0947 \u0939\u0948\u0902');
 };
 </script>
 </body>
