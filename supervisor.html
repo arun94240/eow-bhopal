@@ -26807,6 +26807,7 @@ body.role-staff header { margin-top: 30px; }
     <div><div class="modal-eyebrow" id="io-eyebrow">New Member</div><div class="modal-title">Establishment</div></div>
     <div style="display:flex;align-items:center;gap:8px;">
       <button class="modal-edit-toggle-btn" id="io-edit-toggle-btn" onclick="toggleIOEditMode()" style="display:none;">✎ Edit</button>
+      <button class="modal-timeline-btn" id="io-modal-leave-btn" onclick="leaveFromIOModal()" title="इस staff की leave जोड़ें / edit करें" style="display:none;">🏖️ Leave</button>
       <button class="close-btn" onclick="closeModal('ioModal')">×</button>
     </div>
   </div>
@@ -55305,6 +55306,8 @@ function openIOModal(id) {
   var ioModalBody = document.getElementById('io-modal-body');
   if (id) {
     if (ioModalBody) ioModalBody.classList.add('form-readonly');
+    var _ioLvBtn = document.getElementById('io-modal-leave-btn');
+    if (_ioLvBtn) _ioLvBtn.style.display = 'inline-flex';
     if (ioEditToggleBtn) {
       ioEditToggleBtn.style.display = 'inline-flex';
       ioEditToggleBtn.textContent = '✎ Edit';
@@ -55314,6 +55317,8 @@ function openIOModal(id) {
     if (ioFooterClose) ioFooterClose.textContent = 'Close';
   } else {
     if (ioModalBody) ioModalBody.classList.remove('form-readonly');
+    var _ioLvBtn2 = document.getElementById('io-modal-leave-btn');
+    if (_ioLvBtn2) _ioLvBtn2.style.display = 'none';
     if (ioEditToggleBtn) ioEditToggleBtn.style.display = 'none';
     if (ioFooterSave) ioFooterSave.style.display = 'inline-flex';
     if (ioFooterClose) ioFooterClose.textContent = 'Cancel';
@@ -61196,6 +61201,30 @@ if ('serviceWorker' in navigator) {
     craftOpenDeeplink(t,e.no,e.entry_year);
   };
 })();
+</script>
+
+<script>
+/* ══════════ Per-staff leave from Establishment edit modal (v108) ══════════ */
+function leaveFromIOModal(){
+  var el=document.getElementById('io-name');
+  var nm=el?String(el.value||'').trim():'';
+  if(!nm){ if(typeof toast==='function')toast('\u092a\u0939\u0932\u0947 staff \u0938\u0939\u0947\u091c\u0947\u0902',true); return; }
+  try{ closeModal('ioModal'); }catch(e){}
+  if(typeof openLeaveModal!=='function'){ if(typeof toast==='function')toast('Leave form \u0928\u0939\u0940\u0902 \u092e\u093f\u0932\u093e',true); return; }
+  openLeaveModal();
+  setTimeout(function(){
+    var sel=document.getElementById('lv-name');
+    if(sel){
+      sel.value=nm;
+      if(sel.value!==nm && sel.options){
+        for(var i=0;i<sel.options.length;i++){
+          if(String(sel.options[i].value).trim()===nm || String(sel.options[i].text).trim()===nm){ sel.selectedIndex=i; break; }
+        }
+      }
+      if(typeof lvNameChange==='function'){ try{ lvNameChange(); }catch(e){} }
+    }
+  },90);
+}
 </script>
 
 </body>
