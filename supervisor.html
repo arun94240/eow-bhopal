@@ -28252,15 +28252,8 @@ function refreshCommandMetrics() {
   
   pragatiCount = todayPragatiCount + todayCourtCount + todayNoticeCount;
   
-  // 3. अवकाश पर — leaves where today is between from_date and to_date (approved)
-  var leaveCount = 0;
-  (state.leaves || []).forEach(function(l){
-    if (!l.from_date || !l.to_date) return;
-    if (l.status && l.status !== 'Approved' && l.status !== 'approved') return;
-    var f = String(l.from_date).slice(0,10);
-    var t = String(l.to_date).slice(0,10);
-    if (todayYMD >= f && todayYMD <= t) leaveCount++;
-  });
+  // 3. अवकाश पर — leaves where today is between from_date and to_date (approved) — canonical helper (v108)
+  var leaveCount = _leaveOnDay(todayYMD).count;
   
   // 4. Court Cases — total court cases (sab)
   var courtCount = (state.courts || []).length;
@@ -32115,23 +32108,52 @@ function refreshAll() {
 // ════════════════════════════════════════════════════════════════
 // 📋 My Daily Dashboard box — date calendars + live counts
 // ════════════════════════════════════════════════════════════════
+// ── Canonical अवकाश helper (v108) — single source of truth for "on leave today" everywhere ──
+function _lvNormName(n){
+  return String(n||'').toLowerCase()
+    .replace(/[\u0964.]/g,' ')
+    .replace(/^(dsp|dy\s*sp|ti|si|asi|hc|const(?:able)?|inspector|sub\s*inspector|head\s*constable|\u0906\u0930\u0915\u094d\u0937\u0915|\u092a\u094d\u0930\u0927\u093e\u0928\s*\u0906\u0930\u0915\u094d\u0937\u0915|\u0928\u093f\u0930\u0940\u0915\u094d\u0937\u0915|\u0909\u092a\u0928\u093f\u0930\u0940\u0915\u094d\u0937\u0915|\u0938\u0939\u093e\u092f\u0915\s*\u0909\u092a\u0928\u093f\u0930\u0940\u0915\u094d\u0937\u0915|\u0928\u093f|\u0909\u0928\u093f|\u092a\u094d\u0930\u0906\u0930|\u0906\u0930)\s+/i,'')
+    .replace(/\s+/g,' ').trim();
+}
+function _leaveOnDay(ymd){
+  ymd = ymd || new Date().toISOString().slice(0,10);
+  var byId={}, byName={}, list=[], seen={};
+  (state.leaves || []).forEach(function(l){
+    if (String(l.status||'').toLowerCase() !== 'approved') return;
+    if (!l.from_date || !l.to_date) return;
+    var f=String(l.from_date).slice(0,10), t=String(l.to_date).slice(0,10);
+    if (!(ymd>=f && ymd<=t)) return;
+    var nm=_lvNormName(l.officer_name);
+    var key = l.officer_id ? ('id:'+l.officer_id) : ('nm:'+nm);
+    if (seen[key]) return; seen[key]=true;
+    if (l.officer_id) byId[l.officer_id]=l;
+    if (nm) byName[nm]=l;
+    list.push(l);
+  });
+  function _keyOf(l){ return l.officer_id ? ('id:'+l.officer_id) : ('nm:'+_lvNormName(l.officer_name)); }
+  return {
+    list:list, count:list.length, keyOf:_keyOf,
+    get:function(s){ if(!s) return null; return byId[s.id] || byName[_lvNormName((s.rank?s.rank+' ':'')+(s.name||''))] || byName[_lvNormName(s.name)] || null; }
+  };
+}
+
 function _mddAttCompute(ymd){
   ymd = ymd || new Date().toISOString().slice(0,10);
   var dayRows = (state.attendance || []).filter(function(a){ return a.att_date === ymd; });
   var byStaff = {}; dayRows.forEach(function(a){ if (a.staff_id) byStaff[a.staff_id] = a; });
-  var onLeave = {};
-  (state.leaves || []).forEach(function(l){
-    if (String(l.status||'').toLowerCase()==='approved' && l.from_date && l.to_date && l.from_date<=ymd && l.to_date>=ymd && l.officer_id) onLeave[l.officer_id] = true;
-  });
-  var present=[], out=[], leave=[], absent=[];
+  var lv = _leaveOnDay(ymd);
+  var present=[], out=[], leave=[], absent=[], matched={};
   (state.ioMaster || []).forEach(function(s){
-    var a = byStaff[s.id]; var nm = (s.rank ? s.rank + ' ' : '') + (s.name || '');
+    var nm = (s.rank ? s.rank + ' ' : '') + (s.name || '');
+    var lrec = lv.get(s);
+    if (lrec) { leave.push({ name:nm, att:null, status:'leave', leave:lrec }); matched[lv.keyOf(lrec)]=true; return; }
+    var a = byStaff[s.id];
     if (a && a.check_in_time && a.check_out_time) out.push({ name:nm, att:a, status:'out' });
     else if (a && a.check_in_time) present.push({ name:nm, att:a, status:'present' });
-    else if (onLeave[s.id]) leave.push({ name:nm, att:null, status:'leave' });
     else absent.push({ name:nm, att:null, status:'absent' });
   });
-  return { present:present, out:out, leave:leave, absent:absent, total:(state.ioMaster||[]).length };
+  lv.list.forEach(function(l){ if (!matched[lv.keyOf(l)]) leave.push({ name:(l.officer_name||'—'), att:null, status:'leave', leave:l }); });
+  return { present:present, out:out, leave:leave, absent:absent, total:(present.length+out.length+leave.length+absent.length) };
 }
 function _mddAttTime(t){
   if (!t) return '';
@@ -38565,14 +38587,8 @@ function refreshEstabTileCounts() {
     else if (a.check_in_time) attPresent++;
   });
   
-  // On Leave Today — auto-fetch from approved leaves
-  var leaveStaffIds = {};
-  (state.leaves || []).forEach(function(l){
-    if (l.from_date <= today && l.to_date >= today && l.officer_id) {
-      leaveStaffIds[l.officer_id] = true;
-    }
-  });
-  var attOnLeave = Object.keys(leaveStaffIds).length;
+  // On Leave Today — canonical helper (v108, matches Overview/My Daily)
+  var attOnLeave = _leaveOnDay(today).count;
   
   // Absent = total - present - out - on_leave
   var attMarked = dayRows.length;
@@ -38717,25 +38733,26 @@ function renderEstabAttendance() {
   var attMap = {};
   dayRows.forEach(function(a){ attMap[a.staff_id || a.io_id] = a; });
   
-  // Build on-leave map from approved leaves where today is in range
-  var leaveMap = {};
-  (state.leaves || []).forEach(function(l){
-    if (l.from_date <= today && l.to_date >= today && l.officer_id) {
-      leaveMap[l.officer_id] = l;
-    }
-  });
-  
+  // Build on-leave from canonical helper (v108) — matches Overview/My Daily
+  var lv = _leaveOnDay(today);
+
   // Categorize each staff member — priority: on_leave > out > present > absent
   var present = [], out = [], absent = [], onLeave = [];
+  var _lvMatched = {};
   staff.forEach(function(s){
-    if (leaveMap[s.id]) {
-      onLeave.push({ staff: s, leave: leaveMap[s.id] });
+    var lrec = lv.get(s);
+    if (lrec) {
+      onLeave.push({ staff: s, leave: lrec }); _lvMatched[lv.keyOf(lrec)] = true;
       return;
     }
     var a = attMap[s.id];
     if (a && a.check_in_time && a.check_out_time) out.push({ staff: s, att: a });
     else if (a && a.check_in_time) present.push({ staff: s, att: a });
     else absent.push({ staff: s, att: null });
+  });
+  // leave people not matched to any active staff (null officer_id / not in roster)
+  lv.list.forEach(function(l){
+    if (!_lvMatched[lv.keyOf(l)]) onLeave.push({ staff: { id:null, name:(l.officer_name||'—'), rank:'' }, leave: l });
   });
   
   // Counters at top (4 categories now)
