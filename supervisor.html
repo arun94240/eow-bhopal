@@ -29629,7 +29629,7 @@ function ncompSerialize(arr) {
   if (!arr || !arr.length) return '';
   return arr.map(function(x){
     if (typeof x === 'string') return x.trim();
-    var nm=(x.name||'').trim(); if(!nm) return '';
+    var nm=(x.name||'').replace(/[\r\n\t]+/g,' ').replace(/\s{2,}/g,' ').trim(); if(!nm) return '';
     return x.dept ? (nm + '\t' + x.dept) : nm;
   }).filter(Boolean).join('\n');
 }
@@ -29662,7 +29662,7 @@ function ncompGetCurrent() {
   var out = [];
   for (var i = 0; i < rows.length; i++) {
     var inp = rows[i].querySelector('.ncomp-input');
-    var nm = inp ? (inp.value||'').trim() : '';
+    var nm = inp ? (inp.value||'').replace(/[\r\n\t]+/g,' ').replace(/\s{2,}/g,' ').trim() : '';
     var sel = rows[i].querySelector('.ncomp-dept');
     var dp = sel ? (sel.value||'') : '';
     if (nm) out.push({ name: nm, dept: dp });
@@ -52587,7 +52587,7 @@ async function saveEntry() {
     no: no, date: date,
     entry_year: year || null,
     io_name: formatOfficerName(document.getElementById('ef-io').value) || null,
-    complainant: document.getElementById('ef-comp').value || null,
+    complainant: (document.getElementById('ef-comp').value||'').replace(/[\r\n\t]+/g,' ').replace(/\s{2,}/g,' ').trim() || null,
     non_complainant: ncompGetSerialized() || null,
     // Note: action_date no longer set from form — auto-updated from Pragati submissions
     case_status: document.getElementById('ef-status').value || 'Active',
