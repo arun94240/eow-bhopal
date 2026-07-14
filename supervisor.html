@@ -22073,6 +22073,12 @@ body.role-staff header { margin-top: 30px; }
 
 .ccx-cnr-btn{ background:#f5b942; color:#062a52; border:none; border-radius:5px; padding:2px 7px; font-size:11px; cursor:pointer; margin-left:5px; line-height:1; }
 .ccx-cnr-btn:active{ transform:translateY(1px); }
+
+.mbr-cchip{ display:inline-flex; align-items:center; gap:5px; margin-top:8px; background:rgba(245,185,66,0.16); color:#ffd98a; border:1px solid rgba(245,185,66,0.42); border-radius:7px; padding:4px 10px; font-size:12px; font-weight:800; cursor:pointer; }
+.mbr-cc-car{ font-size:10px; }
+.mbr-cbrief{ margin-top:7px; background:rgba(255,255,255,0.10); border-radius:8px; padding:9px 11px; }
+.mbr-cb-row{ font-size:12px; color:#e6eefb; line-height:1.55; margin-bottom:3px; }
+.mbr-cb-brief{ color:#c7d6ea; font-style:italic; }
 </style>
 </head>
 <body>
@@ -32679,6 +32685,29 @@ function _briefEnDate(ds){
   var dt=new Date(Date.UTC(+p[0],+p[1]-1,+p[2]));
   return DAY[dt.getUTCDay()]+', '+(+p[2])+' '+MON[+p[1]-1];
 }
+function _briefEnqLabel(type,id){
+  var e=((state.enquiries||{})[type]||[]).find(function(x){return x.id===id;});
+  return e?buildCaseLabel(type,e):'प्रकरण';
+}
+function _briefEnqCard(type,id){
+  var e=((state.enquiries||{})[type]||[]).find(function(x){return x.id===id;});
+  if(!e) return '<div class="mbr-cb-row">— प्रकरण नहीं मिला —</div>';
+  var s='<div class="mbr-cb-row"><b>'+_mddEsc(buildCaseLabel(type,e))+'</b> · '+_mddEsc(((typeof ENQ_LABELS!=='undefined'&&ENQ_LABELS[type])?ENQ_LABELS[type]:type))+'</div>';
+  if(e.complainant) s+='<div class="mbr-cb-row">शिकायतकर्ता: '+_mddEsc(String(e.complainant).split(/[\n,]/)[0].trim())+'</div>';
+  if(e.non_complainant) s+='<div class="mbr-cb-row">अनावेदक: '+_mddEsc(String(e.non_complainant).split('\n')[0].trim())+'</div>';
+  if(e.io_name) s+='<div class="mbr-cb-row">IO: '+_mddEsc(e.io_name)+'</div>';
+  if(e.case_status) s+='<div class="mbr-cb-row">स्थिति: '+_mddEsc((typeof getStatusLabel==='function')?getStatusLabel(e.case_status):e.case_status)+'</div>';
+  if(e.brief) s+='<div class="mbr-cb-row mbr-cb-brief">'+_mddEsc(String(e.brief).slice(0,180))+'</div>';
+  s+='<button class="mbr-oe" onclick="event.stopPropagation();openEntryModal(\''+type+'\',\''+id+'\')">✎ Open / Edit</button>';
+  return s;
+}
+function _briefEnqToggle(el,type,id){
+  var b=el.nextElementSibling; if(!b||!b.classList||!b.classList.contains('mbr-cbrief')) return;
+  var open=(b.style.display==='none'||!b.style.display);
+  if(open && !b.getAttribute('data-filled')){ b.innerHTML=_briefEnqCard(type,id); b.setAttribute('data-filled','1'); }
+  b.style.display=open?'block':'none';
+  var c=el.querySelector('.mbr-cc-car'); if(c)c.textContent=open?'▴':'▾';
+}
 function mddRenderBrief(){
   var host=document.getElementById('mydd-brief'); if(!host) return;
   var today=_mddYMD(new Date());
@@ -32704,6 +32733,7 @@ function mddRenderBrief(){
         '<div class="mbr-bb" style="display:none;">'+
           (a.meta?'<div class="mbr-bmeta">'+_mddEsc(a.meta)+'</div>':'')+
           '<div class="mbr-bmeta2">'+_mddEsc(a.kind||'')+' \u00b7 '+_briefEnDate(a.date)+'</div>'+
+          ((a.caseType && a.caseId && a.caseType!=='court') ? '<div class="mbr-cchip" onclick="event.stopPropagation();_briefEnqToggle(this,\''+a.caseType+'\',\''+a.caseId+'\')">📋 '+_mddEsc(_briefEnqLabel(a.caseType,a.caseId))+' <span class="mbr-cc-car">▾</span></div><div class="mbr-cbrief" style="display:none;"></div>' : '')+
           (openJs?'<button class="mbr-oe" onclick="event.stopPropagation();(function(){try{'+openJs+';}catch(e){}})();">\u270e Open / Edit</button>':'')+
         '</div>'+
       '</div>';
@@ -33125,7 +33155,7 @@ function _mtxAgendaItems() {
   try { out = _mddCalendarItems().map(function(i){ i.kind = (i.ico === '🏛') ? 'DG' : 'To-Do'; return i; }); } catch(e) { out = []; }
   try {
     reviewGatherCases().forEach(function(r){
-      out.push({ date: _mddYMD(new Date()), ico:'⭐', kind:'समीक्षा', lbl: _reviewCaseDisplay(r.raw, r.type) + (r.status === 'overdue' ? ' — समीक्षा overdue' : ' — समीक्षा due'), meta:'', open: "openReviewModal('" + r.type + "','" + r.id + "')" });
+      out.push({ date: _mddYMD(new Date()), ico:'⭐', kind:'समीक्षा', lbl: _reviewCaseDisplay(r.raw, r.type) + (r.status === 'overdue' ? ' — समीक्षा overdue' : ' — समीक्षा due'), meta:'', caseType: r.type, caseId: r.id, open: "openReviewModal('" + r.type + "','" + r.id + "')" });
     });
   } catch(e) {}
   out.sort(function(a,b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
@@ -33870,13 +33900,13 @@ function _mddCalendarItems() {
   var out = [];
   (state.myOfficeTasks || []).forEach(function(t){
     if (t.reminder_at) {
-      out.push({ date: String(t.reminder_at).slice(0,10), ico:'⏰', lbl: (t.task_title || '(task)') + (t.remarks ? ' — ' + t.remarks : ''), meta: _taskMeta(t), open: "mddTaskEditInline('" + t.id + "')" });
+      out.push({ date: String(t.reminder_at).slice(0,10), ico:'⏰', lbl: (t.task_title || '(task)') + (t.remarks ? ' — ' + t.remarks : ''), meta: _taskMeta(t), caseType: t.related_to_type, caseId: t.related_to_id, open: "mddTaskEditInline('" + t.id + "')" });
     } else {
-      var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), meta: _taskMeta(t), open: "mddTaskEditInline('" + t.id + "')" });
+      var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), meta: _taskMeta(t), caseType: t.related_to_type, caseId: t.related_to_id, open: "mddTaskEditInline('" + t.id + "')" });
     }
   });
   (state.dgDirectives || []).forEach(function(d){
-    if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), meta: [d.case_display, d.io_name?('IO: '+d.io_name):''].filter(Boolean).join('  ·  '), open: "editDgDirective('" + d.id + "')" });
+    if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), meta: [d.case_display, d.io_name?('IO: '+d.io_name):''].filter(Boolean).join('  ·  '), caseType: d.related_to_type, caseId: d.related_to_id, open: "editDgDirective('" + d.id + "')" });
   });
   (state.discussionNotes || []).forEach(function(d){
     if (d.reminder_date) out.push({ date: String(d.reminder_date).slice(0,10), ico:'💬', lbl: (d.title || '(note)'), open: "editDiscussionNote('" + d.id + "')" });
