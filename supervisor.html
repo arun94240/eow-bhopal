@@ -57200,6 +57200,18 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
 function renderEntryTagsWidget(appliedIds) {
   renderTagsWidget('ef-tags-widget', appliedIds || [], async function(newIds){
     renderEntryTagsWidget(newIds);  // Re-render on change
+    // Instant save: tapping a tag persists immediately for an existing record — no Edit + Save needed
+    try {
+      if (editing && editing.id && editing.type && typeof supa !== 'undefined') {
+        var rec = (state.enquiries[editing.type] || []).find(function(e){ return e.id === editing.id; });
+        var resp = await supa.from('enquiries').update({ tag_ids: newIds, updated_at: new Date().toISOString() }).eq('id', editing.id);
+        if (resp.error) throw resp.error;
+        if (rec) rec.tag_ids = newIds;
+        try { toast('🏷️ Tag अद्यतन'); } catch(e){}
+        try { if (typeof renderEnquiries === 'function') renderEnquiries(); } catch(e){}
+        try { if (typeof renderMyDailyBox === 'function') renderMyDailyBox(); } catch(e){}
+      }
+    } catch(e){ try{ toast('Tag save विफल: ' + (e.message||e), true); }catch(_){} }
   });
 }
 
@@ -57207,6 +57219,18 @@ function renderEntryTagsWidget(appliedIds) {
 function renderCourtTagsWidget(appliedIds) {
   renderTagsWidget('cf-tags-widget', appliedIds || [], async function(newIds){
     renderCourtTagsWidget(newIds);
+    // Instant save for court cases — tap to add/remove, no Edit + Save needed
+    try {
+      if (typeof editingCourt !== 'undefined' && editingCourt && typeof supa !== 'undefined') {
+        var rec = (state.courts || []).find(function(c){ return c.id === editingCourt; });
+        var resp = await supa.from('court_cases').update({ tag_ids: newIds, updated_at: new Date().toISOString() }).eq('id', editingCourt);
+        if (resp.error) throw resp.error;
+        if (rec) rec.tag_ids = newIds;
+        try { toast('🏷️ Tag अद्यतन'); } catch(e){}
+        try { if (typeof renderCourtTable === 'function') renderCourtTable(); } catch(e){}
+        try { if (typeof renderMyDailyBox === 'function') renderMyDailyBox(); } catch(e){}
+      }
+    } catch(e){ try{ toast('Tag save विफल: ' + (e.message||e), true); }catch(_){} }
   });
 }
 
