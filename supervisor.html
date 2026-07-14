@@ -24610,22 +24610,15 @@ body.role-staff header { margin-top: 30px; }
     <div class="court-tier-tabs" id="court-tier-tabs"></div>
     <div class="year-tabs-row" id="yt-court"></div>
     
-    <!-- View Toggle (left) + Sort controls — HIDDEN from above list per request (controls kept in DOM for JS refs) -->
-    <div style="display:none;justify-content:flex-start;align-items:center;gap:12px;margin:8px 0;flex-wrap:wrap;">
+    <!-- View Toggle + Sort — shown, same trio as enquiry lists (List | Cards | Ascending) -->
+    <div style="display:flex;justify-content:flex-start;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap;">
       <div class="court-view-toggle" role="tablist">
         <button type="button" class="court-view-toggle-btn" id="court-view-list-btn" onclick="setCourtView('list')">📋 List</button>
         <button type="button" class="court-view-toggle-btn active" id="court-view-cards-btn" onclick="setCourtView('cards')">🃏 Cards</button>
       </div>
-      <div class="court-sort-controls">
-        <span class="court-sort-label">Sort:</span>
-        <select id="court-sort-field" class="filter-select" onchange="courtSetSortField(this.value)">
-          <option value="year">📅 वर्ष अनुसार</option>
-          <option value="petition">📋 Petition प्रकार अनुसार</option>
-          <option value="bench">⚖ Bench अनुसार</option>
-        </select>
-        <button type="button" class="court-sort-dir-btn" id="court-sort-dir-btn" onclick="courtToggleSortDir()">↓ नए पहले</button>
-      </div>
+      <button type="button" class="enq-sort-btn" id="court-sort-dir-btn" onclick="courtToggleSortDir()">↑ Ascending</button>
       <button type="button" class="court-disposed-toggle" id="court-disposed-toggle" onclick="courtToggleShowDisposed()" title="निराकृत (disposed) cases दिखाएँ/छिपाएँ">🚫 Disposed छिपे हैं</button>
+      <select id="court-sort-field" class="filter-select" style="display:none;" onchange="courtSetSortField(this.value)"><option value="year">year</option></select>
     </div>
     
     <div class="table-wrap" id="court-list-wrap" style="display:none;"><table><thead><tr><th>SN</th><th>Court &amp; Case</th><th>Related To</th><th>Petitioner / Respondent</th><th>I/C Officer</th><th>Files</th><th></th></tr></thead><tbody id="court-body"></tbody></table></div>
@@ -54266,7 +54259,7 @@ function renderCourtTierTabs() {
 
 // Court Cases sorting: by year / petition-type / bench, asc or desc
 var _courtSortField = 'year';   // 'year' | 'petition' | 'bench'
-var _courtSortDir = 'desc';     // 'desc' | 'asc'
+var _courtSortDir = 'asc';      // 'asc' | 'desc'
 
 // Show/hide disposed (निराकृत) court cases — default hidden
 var _courtShowDisposed = false;
@@ -54284,10 +54277,7 @@ function courtSetSortField(f) { _courtSortField = f; renderCourtTable(); }
 function courtToggleSortDir() {
   _courtSortDir = (_courtSortDir === 'desc') ? 'asc' : 'desc';
   var b = document.getElementById('court-sort-dir-btn');
-  if (b) {
-    if (_courtSortField === 'year') b.textContent = _courtSortDir === 'desc' ? '↓ नए पहले' : '↑ पुराने पहले';
-    else b.textContent = _courtSortDir === 'desc' ? '↓ Z→A' : '↑ A→Z';
-  }
+  if (b) b.textContent = _courtSortDir === 'asc' ? '↑ Ascending' : '↓ Descending';
   renderCourtTable();
 }
 
