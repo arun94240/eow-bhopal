@@ -58056,20 +58056,8 @@ function pfUpdateCases() {
       return '<option value="'+c.id+'">'+escapeHtml(label)+'</option>';
     }).join('');
   }
-  try { _pfDebug(typeVal, ioId, _ioNm, cases); } catch(e){}
 }
-function _pfDebug(typeVal, ioId, ioNm, cases){
-  var host=document.getElementById('pf-case'); if(!host) return;
-  var dbg=document.getElementById('pf-dbg');
-  if(!dbg){ dbg=document.createElement('div'); dbg.id='pf-dbg'; dbg.style.cssText='margin-top:6px;font-size:11px;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:7px 9px;font-family:monospace;line-height:1.5;word-break:break-all;'; (host.parentNode||host).appendChild(dbg); }
-  if(typeVal==='court'){ dbg.textContent=''; return; }
-  var arr=(state.enquiries[typeVal]||[]);
-  var find=function(list){ return list.filter(function(e){ return String(e.no)==='476' && String(e.entry_year)==='2025'; }); };
-  var inState=find(arr), inCases=find(cases);
-  var extra='';
-  if(inState.length){ var e=inState[0]; extra=' | 476: io_id='+String(e.io_id||'∅').slice(0,8)+' io_name="'+(e.io_name||'∅')+'"'; }
-  dbg.textContent='🔍 चुना IO id='+String(ioId||'∅').slice(0,8)+' → नाम="'+ioNm+'" | '+typeVal+': कुल '+arr.length+', इस IO के '+cases.length+' | 476/25 state में:'+(inState.length?'हाँ':'नहीं')+' matched:'+(inCases.length?'हाँ':'नहीं')+extra;
-}
+
 
 // Date quick-pick for supervisor's pragati form
 function pfSetDate(mode) {
