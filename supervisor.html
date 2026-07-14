@@ -22048,6 +22048,23 @@ body.role-staff header { margin-top: 30px; }
 .dmx-brief-acts{ display:flex; gap:8px; }
 .dmx-oe{ background:linear-gradient(135deg,#f5b942,#e8a82e); color:#062a52; border:none; border-radius:7px; padding:5px 13px; font-weight:900; font-size:11.5px; cursor:pointer; }
 .dmx-craft-brief{ background:#0d9488; color:#fff; border:none; border-radius:7px; padding:5px 11px; font-size:11.5px; font-weight:700; cursor:pointer; }
+
+.court-card.ccx{ position:relative; background:#fff; border-radius:12px; padding:11px 13px 26px 15px; border-left:6px solid #94a3b8; box-shadow:0 2px 10px rgba(6,42,82,.10); cursor:pointer; }
+.court-card.ccx.cc-sup{ border-left-color:#7c3aed; } .court-card.ccx.cc-high{ border-left-color:#2563eb; } .court-card.ccx.cc-dist{ border-left-color:#0d9488; }
+.ccx-top{ display:flex; align-items:center; gap:8px; margin-bottom:5px; flex-wrap:wrap; }
+.ccx-tier{ font-size:10.5px; font-weight:900; padding:2px 9px; border-radius:999px; color:#fff; background:#64748b; letter-spacing:.3px; white-space:nowrap; }
+.cc-sup .ccx-tier{ background:#7c3aed; } .cc-high .ccx-tier{ background:#2563eb; } .cc-dist .ccx-tier{ background:#0d9488; }
+.ccx-no{ font-size:14.5px; font-weight:900; color:#062a52; cursor:pointer; }
+.ccx-cnr{ font-family:monospace; font-size:10.5px; font-weight:800; background:#062a52; color:#f5b942; border-radius:5px; padding:2px 7px; margin-left:auto; letter-spacing:.03em; white-space:nowrap; }
+.ccx-court{ font-size:11px; color:#64748b; font-weight:600; margin-bottom:7px; }
+.ccx-parties{ display:flex; align-items:center; gap:8px; font-size:12.5px; margin-bottom:7px; flex-wrap:wrap; }
+.ccx-pet{ color:#7a2e00; font-weight:700; } .ccx-vs{ font-size:10px; font-weight:900; color:#94a3b8; } .ccx-resp{ color:#0f5132; font-weight:700; }
+.ccx-meta{ display:flex; align-items:center; gap:9px; font-size:11.5px; color:#475569; flex-wrap:wrap; }
+.ccx-io{ display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; border-radius:6px; padding:3px 9px; font-weight:700; }
+.ccx-hear{ color:#b45309; font-weight:800; }
+.ccx-status{ font-weight:800; padding:2px 8px; border-radius:6px; background:#e2e8f0; color:#334155; }
+.ccx-status.closed{ background:#fee2e2; color:#991b1b; } .ccx-status.converted{ background:#fef9c3; color:#854d0e; }
+.ccx-rel{ color:#475569; } .ccx-car{ position:absolute; right:12px; bottom:9px; color:#cbd5e1; font-size:13px; }
 </style>
 </head>
 <body>
@@ -24588,8 +24605,8 @@ body.role-staff header { margin-top: 30px; }
     <!-- View Toggle (left) + Sort controls — HIDDEN from above list per request (controls kept in DOM for JS refs) -->
     <div style="display:none;justify-content:flex-start;align-items:center;gap:12px;margin:8px 0;flex-wrap:wrap;">
       <div class="court-view-toggle" role="tablist">
-        <button type="button" class="court-view-toggle-btn active" id="court-view-list-btn" onclick="setCourtView('list')">📋 List</button>
-        <button type="button" class="court-view-toggle-btn" id="court-view-cards-btn" onclick="setCourtView('cards')">🃏 Cards</button>
+        <button type="button" class="court-view-toggle-btn" id="court-view-list-btn" onclick="setCourtView('list')">📋 List</button>
+        <button type="button" class="court-view-toggle-btn active" id="court-view-cards-btn" onclick="setCourtView('cards')">🃏 Cards</button>
       </div>
       <div class="court-sort-controls">
         <span class="court-sort-label">Sort:</span>
@@ -24603,8 +24620,8 @@ body.role-staff header { margin-top: 30px; }
       <button type="button" class="court-disposed-toggle" id="court-disposed-toggle" onclick="courtToggleShowDisposed()" title="निराकृत (disposed) cases दिखाएँ/छिपाएँ">🚫 Disposed छिपे हैं</button>
     </div>
     
-    <div class="table-wrap" id="court-list-wrap"><table><thead><tr><th>SN</th><th>Court &amp; Case</th><th>Related To</th><th>Petitioner / Respondent</th><th>I/C Officer</th><th>Files</th><th></th></tr></thead><tbody id="court-body"></tbody></table></div>
-    <div id="court-cards-wrap" class="court-cards-grid" style="display:none;"></div>
+    <div class="table-wrap" id="court-list-wrap" style="display:none;"><table><thead><tr><th>SN</th><th>Court &amp; Case</th><th>Related To</th><th>Petitioner / Respondent</th><th>I/C Officer</th><th>Files</th><th></th></tr></thead><tbody id="court-body"></tbody></table></div>
+    <div id="court-cards-wrap" class="court-cards-grid"></div>
   </div></section>
 
   <!-- LEAVES -->
@@ -54481,41 +54498,31 @@ function renderCourtCards(rows) {
     if (sLower.indexOf('closed') > -1 || sLower.indexOf('nasti') > -1) statusClass = 'closed';
     else if (sLower.indexOf('convert') > -1 || sLower.indexOf('rc') > -1) statusClass = 'converted';
     
+    var _tier = cm ? String(cm.tier||'') : '';
+    var _tierCls = _tier==='supreme'?'cc-sup':_tier==='high'?'cc-high':_tier==='district'?'cc-dist':'cc-unassigned';
+    var _tierLbl = ({supreme:'🏛 Supreme Court',high:'⚖ High Court',district:'📜 District Court'})[_tier] || '⚖ Court';
+    var _nextHear = c.next_hearing ? ((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing) : '';
     return '<div class="court-card-wrap" id="court-card-wrap-' + c.id + '">' +
-      '<div class="court-card status-' + statusClass + '" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
-        // Court → Type/No → Diary → CNR — colored stacked boxes (matches list view) — shown FIRST
-        '<div class="crt-court-stack court-card-stack">' +
-          '<div class="crt-court-name"><span class="court-badge">' + escapeHtml(courtName) + '</span></div>' +
-          (typeNo ? '<div class="crt-type-line"><span class="type-no-cell type-no-clickable" onclick="event.stopPropagation();openCourtStatusSite(\'' + c.id + '\', event)" title="Court website पर खोलें + details copy">' + escapeHtml(typeNo) + '</span></div>' : '') +
-          (c.diary_no ? '<div class="crt-diary-line"><span class="diary-cell">Diary: ' + escapeHtml(courtDiaryDisplay(c)) + '</span></div>' : '') +
-          (cnr ? '<div class="crt-cnr-line"><span class="cnr-cell">' + escapeHtml(cnr) + '</span></div>' : '') +
+      '<div class="court-card ccx ' + _tierCls + ' status-' + statusClass + '" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
+        '<div class="ccx-top">' +
+          '<span class="ccx-tier">' + _tierLbl + '</span>' +
+          (typeNo ? '<span class="ccx-no" onclick="event.stopPropagation();openCourtStatusSite(\'' + c.id + '\', event)" title="Court site पर खोलें">' + escapeHtml(typeNo) + '</span>' : '') +
+          (cnr ? '<span class="ccx-cnr">' + escapeHtml(cnr) + '</span>' : '') +
         '</div>' +
-        
-        // Header: Petitioner Vs Respondent (in colored boxes) — shown AFTER court/case details
-        '<div class="court-card-vs court-card-vs-after">' +
-          '<span class="court-name-chip court-pet-chip" title="'+escapeHtml(c.petitioner||'')+'">👤 ' + petitioner + '</span>' +
-          ' <span class="court-card-vs-sep">Vs</span> ' +
-          '<span class="court-name-chip court-resp-chip" title="'+escapeHtml(c.respondent||'')+'">⚖ ' + respondent + '</span>' +
+        '<div class="ccx-court">' + escapeHtml(courtName) + (c.diary_no ? ' · Diary: ' + escapeHtml(courtDiaryDisplay(c)) : '') + '</div>' +
+        '<div class="ccx-parties">' +
+          '<span class="ccx-pet" title="'+escapeHtml(c.petitioner||'')+'">👤 ' + petitioner + '</span>' +
+          '<span class="ccx-vs">Vs</span>' +
+          '<span class="ccx-resp" title="'+escapeHtml(c.respondent||'')+'">⚖ ' + respondent + '</span>' +
         '</div>' +
-        
-        // Meta rows
-        '<div class="court-card-meta">' +
-          (relatedTo ? '<div class="court-card-row"><span class="court-card-row-key">Related to:</span>' +
-            (c.related_to_id
-              ? '<span class="court-rel-chip court-rel-linked">🔗 ' + escapeHtml(relatedTo) + '</span>'
-              : '<span class="court-rel-chip court-rel-manual">📎 ' + escapeHtml(relatedTo) + '</span>') +
-          '</div>' : '') +
+        '<div class="ccx-meta">' +
+          (officer ? '<span class="ccx-io">👮 ' + escapeHtml(officer) + '</span>' : '') +
+          (_nextHear ? '<span class="ccx-hear">📅 अगली: ' + escapeHtml(_nextHear) + '</span>' : '') +
+          '<span class="ccx-status ' + statusClass + '">' + escapeHtml(statusLabel) + '</span>' +
+          (relatedTo ? '<span class="ccx-rel">' + (c.related_to_id?'🔗 ':'📎 ') + escapeHtml(relatedTo) + '</span>' : '') +
         '</div>' +
-        
-        // Footer: IO + status + expand hint
-        '<div class="court-card-footer">' +
-          (officer ? '<span class="court-io-chip">👮 ' + escapeHtml(officer) + '</span>' : '') +
-          '<span class="court-card-status ' + statusClass + '">' + escapeHtml(statusLabel) + '</span>' +
-        '</div>' +
-        '<div class="court-card-tap-hint">Tap for brief ▾</div>' +
+        '<span class="ccx-car">▾</span>' +
       '</div>' +
-      
-      // Inline brief container (rendered on-demand via toggleCourtCardBrief)
       '<div class="court-card-brief" id="court-card-brief-' + c.id + '" style="display:none;"></div>' +
     '</div>';
   }).join('');
@@ -54599,7 +54606,7 @@ function setCourtView(mode) {
 function restoreCourtViewMode() {
   try {
     var saved = localStorage.getItem('court_view_mode');
-    if (saved === 'cards') setCourtView('cards');
+    if (saved === 'list') setCourtView('list'); else setCourtView('cards');
   } catch(e) {}
 }
 
