@@ -22081,6 +22081,30 @@ body.role-staff header { margin-top: 30px; }
 .mbr-cb-brief{ color:#c7d6ea; font-style:italic; }
 
 .mbr-craftlink{ display:inline-flex; align-items:center; gap:5px; margin-top:8px; margin-left:8px; background:rgba(13,148,136,0.22); color:#7fe0cb; border:1px solid rgba(13,148,136,0.5); border-radius:7px; padding:4px 10px; font-size:12px; font-weight:800; text-decoration:none; cursor:pointer; }
+
+.mbr-brief .n-top{ display:flex; align-items:center; gap:11px; margin-bottom:12px; }
+.mbr-brief .n-cal{ width:52px; flex:0 0 auto; background:#fff; border-radius:10px; overflow:hidden; text-align:center; box-shadow:0 3px 8px rgba(0,0,0,.3); }
+.mbr-brief .n-cal .m{ background:#dc2626; color:#fff; font-size:9px; font-weight:900; padding:2px 0; letter-spacing:.5px; }
+.mbr-brief .n-cal .d{ color:#062a52; font-size:23px; font-weight:900; line-height:1.15; }
+.mbr-brief .n-cal .w{ color:#64748b; font-size:8.5px; font-weight:700; padding-bottom:2px; }
+.mbr-brief .n-hd{ flex:1; }
+.mbr-brief .n-t{ font-size:15px; font-weight:900; color:#fff; }
+.mbr-brief .n-pills{ display:flex; gap:5px; margin-top:4px; flex-wrap:wrap; }
+.mbr-brief .n-pill{ font-size:10px; font-weight:900; padding:2px 8px; border-radius:999px; }
+.mbr-brief .n-pill.a{ background:#f5b942; color:#062a52; }
+.mbr-brief .n-pill.o{ background:#ef4444; color:#fff; }
+.mbr-brief .n-pill.w{ background:rgba(255,255,255,.16); color:#fff; }
+.mbr-brief .n-sec-lbl{ font-size:11px; font-weight:900; letter-spacing:.3px; color:#9ec5ff; text-transform:uppercase; margin:12px 2px 7px; }
+.mbr-brief .n-db{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:900; padding:3px 10px; border-radius:7px; margin:9px 0 5px; }
+.mbr-brief .n-db.today{ background:rgba(245,185,66,.18); color:#ffd98a; border:1px solid rgba(245,185,66,.4); }
+.mbr-brief .n-db.over{ background:#ef4444; color:#fff; }
+.mbr-brief .n-db.week{ background:rgba(147,197,253,.16); color:#bcd8ff; border:1px solid rgba(147,197,253,.4); }
+.mbr-brief .n-it{ display:flex; gap:8px; padding:5px 8px; font-size:12.5px; align-items:center; border-radius:7px; cursor:pointer; }
+.mbr-brief .n-it:active{ background:rgba(255,255,255,.06); }
+.mbr-brief .n-it .d{ font-size:14px; }
+.mbr-brief .n-it .t{ flex:1; color:#fff; font-weight:600; }
+.mbr-brief .n-it .car{ color:#9ec5ff; font-size:11px; }
+.mbr-cnum{ font-size:11px; color:#ffd98a; background:rgba(245,185,66,.14); border:1px solid rgba(245,185,66,.35); border-radius:6px; padding:1px 7px; font-weight:800; cursor:pointer; white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -32722,6 +32746,15 @@ function _briefEnqToggle(el,type,id){
   b.style.display=open?'block':'none';
   var c=el.querySelector('.mbr-cc-car'); if(c)c.textContent=open?'▴':'▾';
 }
+function _briefDShort(ds){
+  try{ var d=new Date(ds+'T00:00:00'); var WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return WD[d.getDay()]+' '+d.getDate()+' '+MO[d.getMonth()]; }catch(e){ return ds; }
+}
+function _briefEnqToggleRow(k){
+  var b=document.getElementById('mbr-cb-'+k); if(!b) return;
+  var open=(b.style.display==='none'||!b.style.display);
+  if(open && !b.getAttribute('data-filled')){ b.innerHTML=_briefEnqCard(b.getAttribute('data-type'),b.getAttribute('data-id')); b.setAttribute('data-filled','1'); }
+  b.style.display=open?'block':'none';
+}
 function mddRenderBrief(){
   var host=document.getElementById('mydd-brief'); if(!host) return;
   var today=_mddYMD(new Date());
@@ -32729,37 +32762,52 @@ function mddRenderBrief(){
   var items=[]; try{ items=(_mtxAgendaItems()||[]); }catch(e){ items=[]; }
   var todayArr=items.filter(function(a){ return a.date<=today; });
   var weekArr=items.filter(function(a){ return a.date>today && a.date<=wkEnd; });
-  var hr=new Date().getHours();
-  var greet=hr<12?'\u2600\ufe0f \u0938\u0941\u092a\u094d\u0930\u092d\u093e\u0924':(hr<17?'\ud83c\udf24\ufe0f \u0928\u092e\u0938\u094d\u0915\u093e\u0930':'\ud83c\udf19 \u0936\u0941\u092d \u0938\u0902\u0927\u094d\u092f\u093e');
-  function tagFor(ds){ if(ds<today) return '<span class="mbr-tag mbr-over">Overdue</span>'; if(ds===today) return '<span class="mbr-tag mbr-today">Today</span>'; return '<span class="mbr-tag mbr-due">Due</span>'; }
+  var overdueN=items.filter(function(a){ return a.date<today; }).length;
+  var todayN=items.filter(function(a){ return a.date===today; }).length;
+  var MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  var WD=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var nd=new Date();
+  var cal='<div class="n-cal"><div class="m">'+MO[nd.getMonth()]+'</div><div class="d">'+nd.getDate()+'</div><div class="w">'+WD[nd.getDay()]+'</div></div>';
+  var _bk=0;
+  function item(a){
+    var openJs=a.open||'';
+    var k=++_bk; var chip=''; var cont='';
+    if(a.caseType && a.caseId && a.caseType!=='court'){
+      chip=' <span class="mbr-cnum" onclick="event.stopPropagation();_briefEnqToggleRow('+k+')">📋 '+_mddEsc(_briefEnqLabel(a.caseType,a.caseId))+'</span>';
+      cont='<div class="mbr-cbrief" id="mbr-cb-'+k+'" data-type="'+_mddEsc(a.caseType)+'" data-id="'+_mddEsc(a.caseId)+'" style="display:none;"></div>';
+    }
+    return '<div class="mbr-item">'+
+      '<div class="n-it mbr-click" onclick="event.stopPropagation();mbrToggle(this)">'+
+        '<span class="d">'+(a.ico||'•')+'</span>'+
+        '<span class="t">'+_mddEsc(String(a.lbl||''))+chip+'</span>'+
+        '<span class="mbr-caret car">▾</span>'+
+      '</div>'+
+      '<div class="mbr-bb" style="display:none;">'+
+        (a.meta?'<div class="mbr-bmeta">'+_mddEsc(a.meta)+'</div>':'')+
+        '<div class="mbr-bmeta2">'+_mddEsc(a.kind||'')+' · '+_briefEnDate(a.date)+'</div>'+
+        (a.craftLink ? '<a class="mbr-craftlink" href="'+_mddEsc(a.craftLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation();">🔗 Craft note</a>' : '')+
+        (openJs?'<button class="mbr-oe" onclick="event.stopPropagation();(function(){try{'+openJs+';}catch(e){}})();">✎ Open / Edit</button>':'')+
+      '</div>'+cont+
+    '</div>';
+  }
+  function dateBlock(ds){
+    if(ds<today) return '<div class="n-db over">⚠ Overdue · '+_briefDShort(ds)+'</div>';
+    if(ds===today) return '<div class="n-db today">📅 आज · '+_briefDShort(ds)+'</div>';
+    return '<div class="n-db week">📅 '+_briefDShort(ds)+'</div>';
+  }
   function sec(arr,empty){
     if(!arr.length) return '<div class="mbr-empty">'+empty+'</div>';
     var out='',last=null;
-    arr.forEach(function(a){
-      if(a.date!==last){ out+='<div class="mbr-dayhdr"><span class="mbr-dh-ic">📅</span>'+_briefEnDate(a.date)+' '+tagFor(a.date)+'</div>'; last=a.date; }
-      var openJs=a.open||'';
-      out+='<div class="mbr-item">'+
-        '<div class="mbr-it mbr-click" onclick="event.stopPropagation();mbrToggle(this)">'+
-          '<span class="mbr-d">'+(a.ico||'\u2022')+'</span>'+
-          '<span class="mbr-t">'+_mddEsc(String(a.lbl||''))+'</span>'+
-          '<span class="mbr-caret">\u25be</span>'+
-        '</div>'+
-        '<div class="mbr-bb" style="display:none;">'+
-          (a.meta?'<div class="mbr-bmeta">'+_mddEsc(a.meta)+'</div>':'')+
-          '<div class="mbr-bmeta2">'+_mddEsc(a.kind||'')+' \u00b7 '+_briefEnDate(a.date)+'</div>'+
-          ((a.caseType && a.caseId && a.caseType!=='court') ? '<div class="mbr-cchip" onclick="event.stopPropagation();_briefEnqToggle(this,\''+a.caseType+'\',\''+a.caseId+'\')">📋 '+_mddEsc(_briefEnqLabel(a.caseType,a.caseId))+' <span class="mbr-cc-car">▾</span></div><div class="mbr-cbrief" style="display:none;"></div>' : '')+
-          (a.craftLink ? '<a class="mbr-craftlink" href="'+_mddEsc(a.craftLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation();">🔗 Craft note</a>' : '')+
-          (openJs?'<button class="mbr-oe" onclick="event.stopPropagation();(function(){try{'+openJs+';}catch(e){}})();">\u270e Open / Edit</button>':'')+
-        '</div>'+
-      '</div>';
-    });
+    arr.forEach(function(a){ if(a.date!==last){ out+=dateBlock(a.date); last=a.date; } out+=item(a); });
     return out;
   }
   host.innerHTML='<div class="mbr-brief">'+
-    '<div class="mbr-top"><span class="mbr-title">'+greet+', SP \u0938\u093e\u0939\u092c</span><span class="mbr-sub">'+_briefEnDate(today)+'</span></div>'+
-    '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ag">\ud83d\udcc5</span> \u0906\u091c \u0915\u093e Agenda <span class="mbr-cnt">'+todayArr.length+'</span></div>'+sec(todayArr,'\u0906\u091c \u0915\u094b\u0908 agenda \u0928\u0939\u0940\u0902 \u2014 \u0926\u093f\u0928 \u0928\u093f\u092f\u0902\u0924\u094d\u0930\u0923 \u092e\u0947\u0902 \u2705')+'</div>'+
-    '<div class="mbr-sec"><div class="mbr-sec-h"><span class="mbr-pin mbr-pin-ag">\ud83d\uddd3\ufe0f</span> \u0907\u0938 \u0938\u092a\u094d\u0924\u093e\u0939 \u0915\u093e Agenda <span class="mbr-cnt">'+weekArr.length+'</span></div>'+sec(weekArr,'\u0907\u0938 \u0938\u092a\u094d\u0924\u093e\u0939 \u0915\u094b\u0908 \u0905\u0924\u093f\u0930\u093f\u0915\u094d\u0924 agenda \u0928\u0939\u0940\u0902\u0964')+'</div>'+
-    '<div class="mbr-foot">\u21bb Home \u0916\u094b\u0932\u0928\u0947 \u092a\u0930 \u0905\u092a\u0928\u0947-\u0906\u092a \u0905\u0926\u094d\u092f\u0924\u0928 \u00b7 \u092f\u0939\u0940 Craft (\ud83d\udcc6 Subscribe) \u092e\u0947\u0902 \u092d\u0940 live</div></div>';
+    '<div class="n-top">'+cal+'<div class="n-hd"><div class="n-t">📋 आज का Brief</div>'+
+      '<div class="n-pills"><span class="n-pill a">आज '+todayN+'</span>'+(overdueN?'<span class="n-pill o">अतिदेय '+overdueN+'</span>':'')+'<span class="n-pill w">सप्ताह '+weekArr.length+'</span></div>'+
+    '</div></div>'+
+    '<div class="n-sec-lbl">📅 आज व अतिदेय</div>'+sec(todayArr,'आज कोई agenda नहीं — दिन नियंत्रण में ✅')+
+    '<div class="n-sec-lbl">🗓️ इस सप्ताह</div>'+sec(weekArr,'इस सप्ताह कोई अतिरिक्त agenda नहीं।')+
+    '<div class="mbr-foot">↻ Home खोलने पर अपने-आप अद्यतन · यही Craft (📆 Subscribe) में भी live</div></div>';
 }
 function hctOpenReports(){
   try {
