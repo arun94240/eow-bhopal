@@ -22079,6 +22079,8 @@ body.role-staff header { margin-top: 30px; }
 .mbr-cbrief{ margin-top:7px; background:rgba(255,255,255,0.10); border-radius:8px; padding:9px 11px; }
 .mbr-cb-row{ font-size:12px; color:#e6eefb; line-height:1.55; margin-bottom:3px; }
 .mbr-cb-brief{ color:#c7d6ea; font-style:italic; }
+
+.mbr-craftlink{ display:inline-flex; align-items:center; gap:5px; margin-top:8px; margin-left:8px; background:rgba(13,148,136,0.22); color:#7fe0cb; border:1px solid rgba(13,148,136,0.5); border-radius:7px; padding:4px 10px; font-size:12px; font-weight:800; text-decoration:none; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -23346,6 +23348,10 @@ body.role-staff header { margin-top: 30px; }
             <div class="form-group">
               <label class="form-label">Remarks (optional)</label>
               <input type="text" class="form-input" id="motf-remarks" placeholder="Any additional remarks…">
+            </div>
+            <div class="form-group">
+              <label class="form-label">🔗 Craft note link (optional)</label>
+              <input type="text" class="form-input" id="motf-craft-link" placeholder="Craft note की link यहाँ paste करें…">
             </div>
             
             <!-- Tags widget (inline) -->
@@ -32734,6 +32740,7 @@ function mddRenderBrief(){
           (a.meta?'<div class="mbr-bmeta">'+_mddEsc(a.meta)+'</div>':'')+
           '<div class="mbr-bmeta2">'+_mddEsc(a.kind||'')+' \u00b7 '+_briefEnDate(a.date)+'</div>'+
           ((a.caseType && a.caseId && a.caseType!=='court') ? '<div class="mbr-cchip" onclick="event.stopPropagation();_briefEnqToggle(this,\''+a.caseType+'\',\''+a.caseId+'\')">📋 '+_mddEsc(_briefEnqLabel(a.caseType,a.caseId))+' <span class="mbr-cc-car">▾</span></div><div class="mbr-cbrief" style="display:none;"></div>' : '')+
+          (a.craftLink ? '<a class="mbr-craftlink" href="'+_mddEsc(a.craftLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation();">🔗 Craft note</a>' : '')+
           (openJs?'<button class="mbr-oe" onclick="event.stopPropagation();(function(){try{'+openJs+';}catch(e){}})();">\u270e Open / Edit</button>':'')+
         '</div>'+
       '</div>';
@@ -33900,9 +33907,9 @@ function _mddCalendarItems() {
   var out = [];
   (state.myOfficeTasks || []).forEach(function(t){
     if (t.reminder_at) {
-      out.push({ date: String(t.reminder_at).slice(0,10), ico:'⏰', lbl: (t.task_title || '(task)') + (t.remarks ? ' — ' + t.remarks : ''), meta: _taskMeta(t), caseType: t.related_to_type, caseId: t.related_to_id, open: "mddTaskEditInline('" + t.id + "')" });
+      out.push({ date: String(t.reminder_at).slice(0,10), ico:'⏰', lbl: (t.task_title || '(task)') + (t.remarks ? ' — ' + t.remarks : ''), meta: _taskMeta(t), caseType: t.related_to_type, caseId: t.related_to_id, craftLink: t.craft_link, open: "mddTaskEditInline('" + t.id + "')" });
     } else {
-      var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), meta: _taskMeta(t), caseType: t.related_to_type, caseId: t.related_to_id, open: "mddTaskEditInline('" + t.id + "')" });
+      var dt = t.deadline || t.task_date; if (dt) out.push({ date: String(dt).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), meta: _taskMeta(t), caseType: t.related_to_type, caseId: t.related_to_id, craftLink: t.craft_link, open: "mddTaskEditInline('" + t.id + "')" });
     }
   });
   (state.dgDirectives || []).forEach(function(d){
@@ -47343,6 +47350,7 @@ function openMotForm() {
   document.getElementById('motf-priority').value = 'Normal';
   document.getElementById('motf-status').value = 'Pending';
   document.getElementById('motf-remarks').value = '';
+  var _mcl=document.getElementById('motf-craft-link'); if(_mcl) _mcl.value='';
   pendingMotFiles = []; pendingMotLinks = [];
   renderAttachList('motf-attach-list', pendingMotFiles);
   renderLinkList('motf-link-list', pendingMotLinks);
@@ -47503,6 +47511,7 @@ async function saveMotTask() {
     priority: document.getElementById('motf-priority').value || 'Normal',
     status: document.getElementById('motf-status').value || 'Pending',
     remarks: (document.getElementById('motf-remarks').value || '').trim() || null,
+    craft_link: (document.getElementById('motf-craft-link') ? (document.getElementById('motf-craft-link').value||'').trim() : '') || null,
     // Only persist case link when checkbox is checked AND a case is picked
     case_type: (document.getElementById('motf-link-toggle') && document.getElementById('motf-link-toggle').checked)
       ? (document.getElementById('motf-case-type').value || null)
@@ -47567,6 +47576,7 @@ function _motPopulateForm(t) {
   document.getElementById('motf-priority').value = t.priority || 'Normal';
   document.getElementById('motf-status').value = t.status || 'Pending';
   document.getElementById('motf-remarks').value = t.remarks || '';
+  var _mcl2=document.getElementById('motf-craft-link'); if(_mcl2) _mcl2.value = t.craft_link || '';
   
   if (t.case_id && t.case_display) {
     document.getElementById('motf-case-id').value = t.case_id;
