@@ -22105,6 +22105,22 @@ body.role-staff header { margin-top: 30px; }
 .mbr-brief .n-it .t{ flex:1; color:#fff; font-weight:600; }
 .mbr-brief .n-it .car{ color:#9ec5ff; font-size:11px; }
 .mbr-cnum{ font-size:11px; color:#ffd98a; background:rgba(245,185,66,.14); border:1px solid rgba(245,185,66,.35); border-radius:6px; padding:1px 7px; font-weight:800; cursor:pointer; white-space:nowrap; }
+
+.ef-head-new{ position:relative; background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; padding:15px 16px 13px; display:block; }
+.ef-head-new .modal-eyebrow{ font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:#f5b942; font-weight:800; }
+.ef-head-new .modal-title{ font-size:19px; font-weight:900; margin-top:2px; color:#fff; letter-spacing:.2px; }
+.ef-subtitle{ font-size:11.5px; opacity:.8; margin-top:3px; color:#dbe7f5; }
+.ef-close-new{ position:absolute; top:12px; right:13px; width:28px; height:28px; border-radius:8px; border:none; background:rgba(255,255,255,.15); color:#fff; font-size:16px; line-height:1; cursor:pointer; }
+.ef-close-new:hover{ background:rgba(255,255,255,.28); }
+.ef-toolbar{ display:flex; gap:7px; margin-top:12px; }
+.ef-edit-primary{ flex:1; background:#f5b942 !important; color:#062a52 !important; border:none !important; border-radius:9px !important; padding:9px !important; font-size:13px !important; font-weight:900 !important; }
+.ef-edit-primary.is-editing{ background:rgba(255,255,255,.16) !important; color:#fff !important; }
+.ef-ico-btn{ width:40px; border:none; border-radius:9px; background:rgba(255,255,255,.15); color:#fff; font-size:15px; cursor:pointer; }
+.ef-ico-btn:hover{ background:rgba(255,255,255,.28); }
+.ef-foot-new{ display:flex; align-items:center; gap:10px; }
+.ef-del-new{ background:#fff !important; color:#dc2626 !important; border:1.5px solid #fecaca !important; }
+.ef-save-new{ background:linear-gradient(135deg,#f5b942,#e8a82e) !important; color:#062a52 !important; border:none !important; font-weight:900 !important; box-shadow:0 3px 9px rgba(245,185,66,.32); }
+#entryModal .form-input:focus, #entryModal .form-select:focus, #entryModal textarea:focus{ border-color:#f5b942; box-shadow:0 0 0 3px rgba(245,185,66,.15); outline:none; }
 </style>
 </head>
 <body>
@@ -25745,14 +25761,16 @@ body.role-staff header { margin-top: 30px; }
 <!-- Tag Picker Modal REMOVED — replaced by inline tags widget -->
 
 <div class="modal-overlay" id="entryModal"><div class="modal">
-  <div class="modal-header">
-    <div><div class="modal-eyebrow" id="entry-eyebrow">New Entry</div><div class="modal-title" id="entry-title">—</div></div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button class="modal-edit-toggle-btn" id="entry-edit-toggle-btn" onclick="toggleEntryEditMode()" style="display:none;">✎ Edit</button>
-      <button class="modal-timeline-btn" id="entry-modal-timeline-btn" onclick="openTimelineFromEntryModal()" title="Case Timeline" style="display:none;">📊 Timeline</button>
-      <button class="modal-linked-btn" id="entry-modal-linked-btn" onclick="openLinkedCluster(editing.id)" title="सभी Linked प्रकरण देखें" style="display:none;">🔗 Linked</button>
-      <button class="modal-timeline-btn" id="entry-modal-craft-btn" onclick="craftOpenFromEntryModal()" title="Craft में यह प्रकरण खोलें" style="display:none;">📄 Craft</button>
-      <button class="close-btn" onclick="closeModal('entryModal')">×</button>
+  <div class="modal-header ef-head-new">
+    <button class="ef-close-new" onclick="closeModal('entryModal')" aria-label="Close">×</button>
+    <div class="modal-eyebrow" id="entry-eyebrow">New Entry</div>
+    <div class="modal-title" id="entry-title">—</div>
+    <div class="ef-subtitle" id="entry-subtitle" style="display:none;"></div>
+    <div class="ef-toolbar">
+      <button class="modal-edit-toggle-btn ef-edit-primary" id="entry-edit-toggle-btn" onclick="toggleEntryEditMode()" style="display:none;">✎ Edit</button>
+      <button class="ef-ico-btn" id="entry-modal-timeline-btn" onclick="openTimelineFromEntryModal()" title="Timeline" style="display:none;">📊</button>
+      <button class="ef-ico-btn" id="entry-modal-linked-btn" onclick="openLinkedCluster(editing.id)" title="Linked प्रकरण" style="display:none;">🔗</button>
+      <button class="ef-ico-btn" id="entry-modal-craft-btn" onclick="craftOpenFromEntryModal()" title="Craft" style="display:none;">📄</button>
     </div>
   </div>
   <div class="modal-body" id="entry-modal-body"><div class="form-grid">
@@ -26016,11 +26034,11 @@ body.role-staff header { margin-top: 30px; }
       <div id="ef-directives-list"></div>
     </div>
   </div></div>
-  <div class="modal-footer">
-    <button class="btn btn-danger" id="ef-delete" onclick="deleteEntry()" style="display:none;">Delete</button>
+  <div class="modal-footer ef-foot-new">
+    <button class="btn btn-danger ef-del-new" id="ef-delete" onclick="deleteEntry()" style="display:none;">🗑 Delete</button>
     <div style="flex:1"></div>
-    <button class="btn" id="entry-footer-close" onclick="closeModal('entryModal')">Close</button>
-    <button class="btn btn-primary" id="entry-footer-save" onclick="saveEntry()" style="display:none;">💾 Save</button>
+    <button class="btn ef-close-btn2" id="entry-footer-close" onclick="closeModal('entryModal')">Close</button>
+    <button class="btn btn-primary ef-save-new" id="entry-footer-save" onclick="saveEntry()" style="display:none;">💾 Save</button>
   </div>
 </div></div>
 
@@ -52358,6 +52376,20 @@ function openEntryModal(type, id) {
     var cBtn2 = document.getElementById('entry-modal-craft-btn');
     if (cBtn2) cBtn2.style.display = 'none';
   }
+  // header: eyebrow=category, big title=case-no, subtitle=complainant · IO
+  try {
+    document.getElementById('entry-eyebrow').textContent = ENQ_LABELS[type];
+    var _tno = entry.no ? (entry.no + (entry.entry_year ? '/'+String(entry.entry_year).slice(-2) : '')) : '';
+    document.getElementById('entry-title').textContent = (id && _tno) ? _tno : (id ? ENQ_LABELS[type] : ('नया '+ENQ_LABELS[type]));
+    var _sub = document.getElementById('entry-subtitle');
+    if (_sub) {
+      var _p = [];
+      if (id && entry.complainant) _p.push(String(entry.complainant).split(/[\n\r\t]/)[0].trim());
+      if (id && entry.io_name) _p.push(entry.io_name);
+      _sub.textContent = _p.join('  ·  ');
+      _sub.style.display = _p.length ? 'block' : 'none';
+    }
+  } catch(e){}
   document.getElementById('ef-serial').value = entry.serial || '';
   document.getElementById('ef-no').value = entry.no || '';
   document.getElementById('ef-year').value = entry.entry_year || '';
