@@ -22121,6 +22121,11 @@ body.role-staff header { margin-top: 30px; }
 .ef-del-new{ background:#fff !important; color:#dc2626 !important; border:1.5px solid #fecaca !important; }
 .ef-save-new{ background:linear-gradient(135deg,#f5b942,#e8a82e) !important; color:#062a52 !important; border:none !important; font-weight:900 !important; box-shadow:0 3px 9px rgba(245,185,66,.32); }
 #entryModal .form-input:focus, #entryModal .form-select:focus, #entryModal textarea:focus{ border-color:#f5b942; box-shadow:0 0 0 3px rgba(245,185,66,.15); outline:none; }
+
+.report-inline-host{ margin-top:12px; }
+.section.report-inlined{ display:block !important; padding:14px !important; margin:0 !important; background:#fff; border:1px solid #dbe6f2; border-radius:12px; }
+.section.report-inlined > .section-header{ margin-top:0; }
+.rep-pchip-reports.is-active{ box-shadow:0 0 0 2px #0d9488 inset; }
 </style>
 </head>
 <body>
@@ -34535,6 +34540,13 @@ function navGoBack() {
 }
 
 function switchSection(id) {
+  // 📊 Reports is now an INLINE panel on Home — route the tab there smoothly
+  if (id === 'report') {
+    _switchSectionInternal('overview');
+    renderHomeButton();
+    try { _reportInlineOpen(true); } catch(e){}
+    return;
+  }
   // If the real court list was borrowed into Overview Stats, return it before showing the Court tab
   if (id === 'court' && typeof _returnCourtListHome === 'function') _returnCourtListHome();
   // TOGGLE: agar yeh tab pehle se active hai aur Home nahi hai →
@@ -45345,10 +45357,27 @@ function renderReportsHomePreview() {
   preview.innerHTML = html;
 }
 
-function openReportBuilderInline() {
-  // Navigate to full report builder section
-  if (typeof switchSection === 'function') switchSection('report');
+function _reportInlineHost(){
+  var box=document.getElementById('reports-summary-wrap'); if(!box) return null;
+  if(box.classList.contains('collapsed')) box.classList.remove('collapsed');
+  box.style.display='block';
+  var host=document.getElementById('report-inline-host');
+  if(!host){ host=document.createElement('div'); host.id='report-inline-host'; host.className='report-inline-host'; box.appendChild(host); }
+  var rep=document.getElementById('report');
+  if(rep && rep.parentNode!==host){ host.appendChild(rep); rep.classList.add('report-inlined'); }
+  return host;
 }
+function _reportInlineOpen(force){
+  var host=_reportInlineHost(); if(!host) return;
+  var chip=document.querySelector('.rep-pchip-reports');
+  var isOpen = host.style.display!=='none' && host.style.display!=='';
+  var open = force ? true : !isOpen;
+  host.style.display = open ? 'block' : 'none';
+  if(chip) chip.classList.toggle('is-active', open);
+  if(open){ try{ rbInit(); }catch(e){} try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+}
+// Report builder now opens INLINE inside the Reports box (no section jump)
+function openReportBuilderInline(){ _reportInlineOpen(false); }
 
 // ═══ Overview Stats — inline summary renderers (light, with 'open full' button in panel head) ═══
 function ovstatsRenderTagsSummary() {
