@@ -23477,6 +23477,10 @@ body.role-staff header { margin-top: 30px; }
               <label class="form-label">Remarks (optional)</label>
               <input type="text" class="form-input" id="dgf-remarks" placeholder="Any additional remarks…">
             </div>
+            <div class="form-group">
+              <label class="form-label">🔗 Craft note link (optional)</label>
+              <input type="text" class="form-input" id="dgf-craft-link" placeholder="Craft note की link यहाँ paste करें…">
+            </div>
             
             <!-- ============ CUSTOM TAGS (DG Directive Inline Widget) ============ -->
             <div class="form-group custom-tags-section">
@@ -33913,7 +33917,7 @@ function _mddCalendarItems() {
     }
   });
   (state.dgDirectives || []).forEach(function(d){
-    if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), meta: [d.case_display, d.io_name?('IO: '+d.io_name):''].filter(Boolean).join('  ·  '), caseType: d.related_to_type, caseId: d.related_to_id, open: "editDgDirective('" + d.id + "')" });
+    if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), meta: [d.case_display, d.io_name?('IO: '+d.io_name):''].filter(Boolean).join('  ·  '), caseType: d.related_to_type, caseId: d.related_to_id, craftLink: d.craft_link, open: "editDgDirective('" + d.id + "')" });
   });
   (state.discussionNotes || []).forEach(function(d){
     if (d.reminder_date) out.push({ date: String(d.reminder_date).slice(0,10), ico:'💬', lbl: (d.title || '(note)'), open: "editDiscussionNote('" + d.id + "')" });
@@ -36034,6 +36038,7 @@ function openDgDirectiveForm() {
   document.getElementById('dgf-priority').value = 'Normal';
   document.getElementById('dgf-status').value = 'Pending';
   document.getElementById('dgf-remarks').value = '';
+  var _dcl=document.getElementById('dgf-craft-link'); if(_dcl) _dcl.value='';
   var _dgio = document.getElementById('dgf-io'); if (_dgio && typeof _mddIoOptionsHTML === 'function') { _dgio.innerHTML = _mddIoOptionsHTML(''); _dgio.value = ''; }
   document.getElementById('dgf-task-title').value = '';
   // Reset kind to case-linked
@@ -36228,6 +36233,7 @@ async function saveDgDirective() {
     priority: priority,
     status: status,
     remarks: remarks || null,
+    craft_link: ((document.getElementById('dgf-craft-link')||{}).value||'').trim() || null,
     attachments: pendingDgFiles,
     links: pendingDgLinks
   };
@@ -36308,6 +36314,7 @@ function _dgPopulateForm(d) {
   document.getElementById('dgf-priority').value = d.priority || 'Normal';
   document.getElementById('dgf-status').value = d.status || 'Pending';
   document.getElementById('dgf-remarks').value = d.remarks || '';
+  var _dcl2=document.getElementById('dgf-craft-link'); if(_dcl2) _dcl2.value = d.craft_link || '';
   // Attachments / links
   pendingDgFiles = (d.attachments || []).slice();
   pendingDgLinks = (d.links || []).slice();
