@@ -9129,22 +9129,23 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .mbr-brief{ background:linear-gradient(160deg,#062a52,#0a3a6e); border-radius:14px; padding:14px 15px; margin-bottom:12px; box-shadow:0 8px 22px rgba(6,42,82,0.26); }
 .mbr-brief.mbr-calm{ padding-bottom:14px; }
 .mbr-top{ display:flex; align-items:center; gap:9px; }
-.mbr-title{ font-size:15.5px; font-weight:900; color:#fff; }
-.mbr-sub{ font-size:11px; color:#cbd5e1; margin-left:auto; }
+.mbr-title{ font-size:16.5px; font-weight:900; color:#fff; letter-spacing:.2px; }
+.mbr-sub{ font-size:11.5px; color:#f5b942; font-weight:700; margin-left:auto; }
 .mbr-line{ font-size:12.5px; color:#e2e8f0; margin:4px 0 11px; line-height:1.5; }
 .mbr-line b{ color:#f5b942; }
 .mbr-sec{ background:rgba(255,255,255,0.07); border-radius:11px; padding:10px 12px; margin-top:8px; }
-.mbr-sec-h{ display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:900; color:#fff; margin-bottom:6px; }
+.mbr-sec-h{ display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:900; color:#fff; margin-bottom:7px; letter-spacing:.2px; }
 .mbr-pin{ width:20px; height:20px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; flex:0 0 auto; }
 .mbr-pin-rv{ background:#eab308; } .mbr-pin-td{ background:#16a34a; } .mbr-pin-ag{ background:#f59e0b; } .mbr-pin-ap{ background:#0ea5e9; }
-.mbr-cnt{ margin-left:auto; background:#fff; color:#062a52; border-radius:999px; font-size:10.5px; font-weight:900; padding:1px 8px; }
-.mbr-it{ display:flex; gap:8px; padding:4px 0; font-size:12px; color:#e8eef5; align-items:baseline; }
-.mbr-it.mbr-click{ cursor:pointer; border-radius:6px; }
+.mbr-cnt{ margin-left:auto; background:#f5b942; color:#062a52; border-radius:999px; font-size:11px; font-weight:900; padding:2px 9px; }
+.mbr-it{ display:flex; gap:9px; padding:6px 2px; font-size:13px; color:#eef4fb; align-items:center; border-radius:7px; }
+.mbr-it.mbr-click{ cursor:pointer; border-radius:7px; transition:background .12s; }
+.mbr-click:hover{ background:rgba(255,255,255,0.06); }
 .mbr-it.mbr-click:hover{ background:rgba(255,255,255,0.08); }
 .mbr-d{ color:#f5b942; font-weight:900; flex:0 0 auto; }
-.mbr-t{ flex:1; }
-.mbr-tag{ font-size:9.5px; font-weight:800; border-radius:999px; padding:1px 7px; flex:0 0 auto; }
-.mbr-over{ background:#7f1d1d; color:#fecaca; } .mbr-due{ background:#78350f; color:#fed7aa; } .mbr-today{ background:#14532d; color:#bbf7d0; }
+.mbr-t{ flex:1; color:#ffffff; font-weight:600; }
+.mbr-tag{ font-size:10px; font-weight:900; border-radius:999px; padding:2px 9px; flex:0 0 auto; letter-spacing:.2px; }
+.mbr-over{ background:#ef4444; color:#fff; } .mbr-due{ background:#f59e0b; color:#241704; } .mbr-today{ background:#22c55e; color:#052e16; }
 .mbr-more{ font-size:11px; color:#93c5fd; padding:3px 0 0 16px; }
 .mbr-foot{ font-size:10.5px; color:#94a3b8; margin-top:10px; text-align:center; }
 /* Attendance at-a-glance chart */
@@ -21923,6 +21924,7 @@ body.role-staff header { margin-top: 30px; }
 #reports-summary-wrap .rep-pchip-bytypes{ background:#2563eb !important; }
 #reports-summary-wrap .rep-pchip-cao{ background:#7c3aed !important; }
 #reports-summary-wrap .rep-pchip-dept{ background:#ea580c !important; }
+#reports-summary-wrap .rep-pchip-reports{ background:#0d9488 !important; }
 #reports-summary-wrap .reports-uni-stack > .hdr-counter{ width:auto !important; min-width:0 !important; max-width:none !important; }
 #reports-summary-wrap .reports-uni-stack .rep-pchip.is-active{ box-shadow:0 0 0 2px #fff inset, 0 4px 12px rgba(0,0,0,0.28) !important; }
 
@@ -22015,7 +22017,17 @@ body.role-staff header { margin-top: 30px; }
 .rep-pchip-dept{ background:#ea580c !important; }
 .rep-pchip-dept.is-active{ filter:brightness(1.08); }
 .rep-dept-strip{ margin-top:8px; }
-\n.mbr-dayhdr{ margin:9px 0 3px; font-size:12px; font-weight:800; color:#062a52; letter-spacing:.2px; display:flex; align-items:center; gap:7px; }\n\n.mbr-meta{ color:#94a3b8; font-size:11.5px; font-weight:600; }\n</style>
+\n.mbr-dayhdr{ margin:11px 0 4px; font-size:12.5px; font-weight:900; color:#f5b942; letter-spacing:.3px; display:flex; align-items:center; gap:8px; }\n\n.mbr-meta{ color:#94a3b8; font-size:11.5px; font-weight:600; }\n
+.mbr-item{ border-bottom:1px solid rgba(255,255,255,0.07); }
+.mbr-item:last-child{ border-bottom:none; }
+.mbr-caret{ color:#9ec5ff; font-size:11px; margin-left:auto; flex:0 0 auto; }
+.mbr-bb{ background:rgba(255,255,255,0.09); border-radius:9px; padding:9px 11px; margin:1px 0 8px 27px; }
+.mbr-bmeta{ color:#e6eefb; font-size:12.5px; line-height:1.5; font-weight:600; }
+.mbr-bmeta2{ color:#9ec5ff; font-size:11px; margin-top:3px; }
+.mbr-oe{ margin-top:9px; background:linear-gradient(135deg,#f5b942,#e8a82e); color:#062a52; border:none; border-radius:8px; padding:6px 14px; font-weight:900; font-size:12px; cursor:pointer; box-shadow:0 3px 8px rgba(245,185,66,0.28); }
+.mbr-oe:active{ transform:translateY(1px); }
+.mbr-empty{ font-size:12.5px; color:#9fb3cc; font-style:italic; padding:5px 0 2px; }
+</style>
 </head>
 <body>
 
@@ -24261,7 +24273,7 @@ body.role-staff header { margin-top: 30px; }
               <span class="sup-mini-cal" id="reports-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
               <div class="ov-section-title">⚙ Settings &amp; Reports</div>
               <span class="dgeow-total-pill">DB: <strong id="reports-cnt-total">0</strong></span>
-              <button class="rep-custom-btn" onclick="event.stopPropagation();openReportBuilderInline()" title="Custom report builder">⚙ Custom</button>
+              
             </div>
             <!-- Quick preset matrices (always visible) -->
             <div class="hdr-counter-stack reports-counter-stack reports-uni-stack" id="reports-counter-stack">
@@ -24276,6 +24288,9 @@ body.role-staff header { margin-top: 30px; }
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-dept" onclick="event.stopPropagation();reportsToggleDept(event)">
                 <span class="rep-ic">🏛️</span><span class="rep-lbl">Search by Departments</span><span class="rep-sub-n" id="sb-dept-cnt-total">0</span>
+              </div>
+              <div class="hdr-counter rep-pchip rep-pchip-reports" onclick="event.stopPropagation();openReportBuilderInline()">
+                <span class="rep-ic">📊</span><span class="rep-lbl">Reports</span><span class="rep-sub-n">↗</span>
               </div>
             </div>
             <!-- Department matrix — collapsible, tap the tile above -->
@@ -32608,6 +32623,7 @@ function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval
 function _mddBriefItem(dot, text, tag){
   return '<div class="mbr-it"><span class="mbr-d">' + dot + '</span><span class="mbr-t">' + text + '</span>' + (tag ? tag : '') + '</div>';
 }
+function mbrToggle(el){ var b=el.nextElementSibling; if(!b) return; var open=(b.style.display==='none'||!b.style.display); b.style.display=open?'block':'none'; var c=el.querySelector('.mbr-caret'); if(c) c.textContent=open?'\u25b4':'\u25be'; }
 function _briefEnDate(ds){
   var DAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var p=String(ds||'').split('-'); if(p.length<3) return ds;
@@ -32625,13 +32641,23 @@ function mddRenderBrief(){
   var greet=hr<12?'\u2600\ufe0f \u0938\u0941\u092a\u094d\u0930\u092d\u093e\u0924':(hr<17?'\ud83c\udf24\ufe0f \u0928\u092e\u0938\u094d\u0915\u093e\u0930':'\ud83c\udf19 \u0936\u0941\u092d \u0938\u0902\u0927\u094d\u092f\u093e');
   function tagFor(ds){ if(ds<today) return '<span class="mbr-tag mbr-over">Overdue</span>'; if(ds===today) return '<span class="mbr-tag mbr-today">Today</span>'; return '<span class="mbr-tag mbr-due">Due</span>'; }
   function sec(arr,empty){
-    if(!arr.length) return '<div class="mbr-line" style="color:#94a3b8;">'+empty+'</div>';
+    if(!arr.length) return '<div class="mbr-empty">'+empty+'</div>';
     var out='',last=null;
     arr.forEach(function(a){
       if(a.date!==last){ out+='<div class="mbr-dayhdr">'+_briefEnDate(a.date)+' '+tagFor(a.date)+'</div>'; last=a.date; }
-      var kc=(a.kind==='DG'?'dg':a.kind==='\u0938\u092e\u0940\u0915\u094d\u0937\u093e'?'rv':'td');
-      var _m=a.meta?'<span class="mbr-meta">  \u00b7  '+_mddEsc(a.meta)+'</span>':'';
-      out+='<div class="mbr-it"><span class="mbr-d">'+(a.ico||'\u2022')+'</span><span class="mbr-t">'+_mddEsc(String(a.lbl||''))+_m+'</span><span class="mtx-kind k-'+kc+'">'+a.kind+'</span></div>';
+      var openJs=a.open||'';
+      out+='<div class="mbr-item">'+
+        '<div class="mbr-it mbr-click" onclick="event.stopPropagation();mbrToggle(this)">'+
+          '<span class="mbr-d">'+(a.ico||'\u2022')+'</span>'+
+          '<span class="mbr-t">'+_mddEsc(String(a.lbl||''))+'</span>'+
+          '<span class="mbr-caret">\u25be</span>'+
+        '</div>'+
+        '<div class="mbr-bb" style="display:none;">'+
+          (a.meta?'<div class="mbr-bmeta">'+_mddEsc(a.meta)+'</div>':'')+
+          '<div class="mbr-bmeta2">'+_mddEsc(a.kind||'')+' \u00b7 '+_briefEnDate(a.date)+'</div>'+
+          (openJs?'<button class="mbr-oe" onclick="event.stopPropagation();(function(){try{'+openJs+';}catch(e){}})();">\u270e Open / Edit</button>':'')+
+        '</div>'+
+      '</div>';
     });
     return out;
   }
