@@ -22220,7 +22220,7 @@ body.role-staff header { margin-top: 30px; }
     <div class="search-controls">
       <div class="global-search-box">
         <span class="global-search-icon">🔎</span>
-        <input type="text" id="global-search" placeholder="कोई number, नाम, serial, keyword, या IO खोजें..." oninput="performGlobalSearch()" autocomplete="off">
+        <input type="text" id="global-search" placeholder="कोई number, नाम, serial, keyword, tag, या IO खोजें..." oninput="performGlobalSearch()" autocomplete="off">
         <button class="global-search-clear" onclick="clearGlobalSearch()" id="global-search-clear" style="display:none;">✕</button>
       </div>
       <div class="io-search-box">
@@ -43058,14 +43058,15 @@ var _refMonSearchTimer = null;
 function _refMonGatherTagged() {
   var rows = [];
   var refTag = (typeof getTagByName === 'function') ? getTagByName('Reference') : null;
-  if (!refTag) return rows;  // tag not created yet
+  var refId = refTag ? refTag.id : null;
+  function _hasNameTag(tids){ return (Array.isArray(tids)?tids:[]).some(function(id){ var tg=(state.tags||[]).find(function(t){return t.id===id;}); return tg && typeof _isNameTag==='function' && _isNameTag(tg); }); }
   function otherTags(tids){
-    return (Array.isArray(tids) ? tids : []).filter(function(id){ return id !== refTag.id; });
+    return (Array.isArray(tids) ? tids : []).filter(function(id){ return id !== refId; });
   }
   var heads = ['complaints','rcomplaints','rcs','pes','strs','sutra'];
   heads.forEach(function(head){
     (state.enquiries[head] || []).forEach(function(r){
-      if (Array.isArray(r.tag_ids) && r.tag_ids.indexOf(refTag.id) >= 0) {
+      if (_hasNameTag(r.tag_ids)) {
         rows.push({
           case_type: head, case_id: r.id,
           case_display: _refMonCaseLabel(r, head),
@@ -43076,7 +43077,7 @@ function _refMonGatherTagged() {
     });
   });
   (state.courts || []).forEach(function(c){
-    if (Array.isArray(c.tag_ids) && c.tag_ids.indexOf(refTag.id) >= 0) {
+    if (_hasNameTag(c.tag_ids)) {
       rows.push({
         case_type: 'court', case_id: c.id,
         case_display: _refMonCaseLabel(c, 'court'),
@@ -43091,7 +43092,7 @@ function _refMonGatherTagged() {
       rows.push({
         case_type: 'task', case_id: n.id,
         case_display: n.case_display || '(General task)',
-        otherTagIds: Array.isArray(n.tag_ids) ? n.tag_ids.filter(function(id){ return id !== refTag.id; }) : [],
+        otherTagIds: Array.isArray(n.tag_ids) ? n.tag_ids.filter(function(id){ return id !== refId; }) : [],
         raw: n, isGeneralTask: true
       });
     }
@@ -59038,9 +59039,10 @@ function matchEntry(r, q) {
     noWithYear = String(r.no) + '-' + yr2;        // "354-12"
     noWithYearSlash = String(r.no) + '/' + yr2;   // "354/12"
   }
+  var tagNames = (Array.isArray(r.tag_ids) ? r.tag_ids : []).map(function(id){ var tg=(state.tags||[]).find(function(t){return t.id===id;}); return tg ? tg.name : ''; }).join(' ');
   var fields = [
     r.serial, r.no, r.complainant, r.non_complainant, r.brief, r.io_name, r.keywords,
-    formattedNo, noWithYear, noWithYearSlash
+    formattedNo, noWithYear, noWithYearSlash, tagNames
   ];
   return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
 }
@@ -59062,11 +59064,12 @@ function matchCourt(c, q) {
       typeNoFormatted = typ + '-' + c.case_no;
     }
   }
+  var tagNames = (Array.isArray(c.tag_ids) ? c.tag_ids : []).map(function(id){ var tg=(state.tags||[]).find(function(t){return t.id===id;}); return tg ? tg.name : ''; }).join(' ');
   var fields = [
     c.serial, c.cnr_no, c.case_type, c.case_type_other, c.case_no,
     c.petitioner, c.respondent, c.incharge_officer, c.court,
     typeNoFormatted, noWithYear, noWithYearSlash
-  ];
+  , tagNames];
   return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
 }
 
