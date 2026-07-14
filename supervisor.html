@@ -22020,7 +22020,12 @@ body.role-staff header { margin-top: 30px; }
 .rep-pchip-dept{ background:#ea580c !important; }
 .rep-pchip-dept.is-active{ filter:brightness(1.08); }
 .rep-dept-strip{ margin-top:8px; }
-\n.mbr-dayhdr{ margin:11px 0 4px; font-size:12.5px; font-weight:900; color:#f5b942; letter-spacing:.3px; display:flex; align-items:center; gap:8px; }\n\n.mbr-meta{ color:#94a3b8; font-size:11.5px; font-weight:600; }\n
+
+.mbr-dayhdr{ margin:13px 0 6px; font-size:13.5px; font-weight:900; color:#ffd98a; letter-spacing:.3px; display:flex; align-items:center; gap:8px; padding-bottom:4px; border-bottom:1px solid rgba(245,185,66,0.28); }
+.mbr-dh-ic{ font-size:13px; filter:saturate(1.2); }
+
+.mbr-meta{ color:#94a3b8; font-size:11.5px; font-weight:600; }
+
 .mbr-item{ border-bottom:1px solid rgba(255,255,255,0.07); }
 .mbr-item:last-child{ border-bottom:none; }
 .mbr-caret{ color:#9ec5ff; font-size:11px; margin-left:auto; flex:0 0 auto; }
@@ -32692,7 +32697,7 @@ function mddRenderBrief(){
     if(!arr.length) return '<div class="mbr-empty">'+empty+'</div>';
     var out='',last=null;
     arr.forEach(function(a){
-      if(a.date!==last){ out+='<div class="mbr-dayhdr">'+_briefEnDate(a.date)+' '+tagFor(a.date)+'</div>'; last=a.date; }
+      if(a.date!==last){ out+='<div class="mbr-dayhdr"><span class="mbr-dh-ic">📅</span>'+_briefEnDate(a.date)+' '+tagFor(a.date)+'</div>'; last=a.date; }
       var openJs=a.open||'';
       out+='<div class="mbr-item">'+
         '<div class="mbr-it mbr-click" onclick="event.stopPropagation();mbrToggle(this)">'+
