@@ -54822,6 +54822,11 @@ function shareViaWhatsApp(which) {
 
 // ============ COURT/OFFICER NAME FORMATTERS ============
 var ECOURTS_URL = 'https://hcservices.ecourts.gov.in/hcservices/main.php#';
+var ECOURTS_URLS = {
+  supreme:  'https://www.sci.gov.in/case-status-cnr-number/',
+  high:     'https://hcservices.ecourts.gov.in/hcservices/main.php#',
+  district: 'https://services.ecourts.gov.in/ecourtindia_v6/?p=home/index'
+};
 
 // ════════════════════════════════════════════════════════════════
 // COURT STATUS WEBSITES — per-tier case-status URLs.
@@ -54870,18 +54875,21 @@ function openCourtStatusSite(caseId, ev) {
 
 function openEcourtsWithCnr(cnr, ev) {
   if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  var tierEl = document.querySelector('input[name="cf-tier"]:checked');
+  var tier = tierEl ? tierEl.value : 'high';
+  var tierLbl = { supreme:'Supreme Court', high:'High Court', district:'District Court' }[tier] || 'eCourts';
+  var url = ECOURTS_URLS[tier] || ECOURTS_URLS.high || ECOURTS_URL;
   if (!cnr || cnr.indexOf('SN-') !== -1) {
-    window.open(ECOURTS_URL, '_blank');
+    window.open(url, '_blank');
     return;
   }
   var clean = String(cnr).trim();
-  // Try to copy CNR to clipboard so user can paste in CNR Number field on eCourts
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(clean).then(function(){
-      toast('CNR ' + clean + ' clipboard में copy हो गया — eCourts पर paste करें');
+      toast('CNR ' + clean + ' copy हो गया — ' + tierLbl + ' site पर paste करें');
     }).catch(function(){});
   }
-  window.open(ECOURTS_URL, '_blank');
+  window.open(url, '_blank');
 }
 
 function buildEcourtsUrl(cnr) {
