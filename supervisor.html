@@ -22070,6 +22070,9 @@ body.role-staff header { margin-top: 30px; }
 .ccx-status{ font-weight:800; padding:2px 8px; border-radius:6px; background:#e2e8f0; color:#334155; }
 .ccx-status.closed{ background:#fee2e2; color:#991b1b; } .ccx-status.converted{ background:#fef9c3; color:#854d0e; }
 .ccx-rel{ color:#475569; } .ccx-car{ position:absolute; right:12px; bottom:9px; color:#cbd5e1; font-size:13px; }
+
+.ccx-cnr-btn{ background:#f5b942; color:#062a52; border:none; border-radius:5px; padding:2px 7px; font-size:11px; cursor:pointer; margin-left:5px; line-height:1; }
+.ccx-cnr-btn:active{ transform:translateY(1px); }
 </style>
 </head>
 <body>
@@ -54401,7 +54404,7 @@ function renderCourtTable() {
     var cnrBlock = '';
     if (c.cnr_no) {
       cnrBlock = '<div class="crt-cnr-line"><span class="cnr-cell">'+escapeHtml(c.cnr_no)+'</span>' +
-        (c.cnr_no.indexOf('SN-') === -1 ? ' <a href="javascript:void(0)" class="ecourts-link" onclick="openEcourtsWithCnr(\''+escapeHtml(c.cnr_no).replace(/\\'/g,"\\\\'")+'\', event)" title="CNR copy होगा">🔍</a>' : '') +
+        (c.cnr_no.indexOf('SN-') === -1 ? ' <a href="javascript:void(0)" class="ecourts-link" onclick="openEcourtsForCase(\''+c.id+'\', event)" title="इस court की site पर खोलें (CNR copy)">🔍</a>' : '') +
       '</div>';
     } else {
       cnrBlock = '<div class="crt-cnr-line crt-cnr-none">CNR: —</div>';
@@ -54512,7 +54515,7 @@ function renderCourtCards(rows) {
         '<div class="ccx-top">' +
           '<span class="ccx-tier">' + _tierLbl + '</span>' +
           (typeNo ? '<span class="ccx-no" onclick="event.stopPropagation();openCourtStatusSite(\'' + c.id + '\', event)" title="Court site पर खोलें">' + escapeHtml(typeNo) + '</span>' : '') +
-          (cnr ? '<span class="ccx-cnr">' + escapeHtml(cnr) + '</span>' : '') +
+          (cnr ? '<span class="ccx-cnr">' + escapeHtml(cnr) + '</span><button class="ccx-cnr-btn" onclick="event.stopPropagation();openEcourtsForCase(\'' + c.id + '\', event)" title="इस court की site पर खोलें (CNR copy)">🔍</button>' : '') +
         '</div>' +
         '<div class="ccx-court">' + escapeHtml(courtName) + (c.diary_no ? ' · Diary: ' + escapeHtml(courtDiaryDisplay(c)) : '') + '</div>' +
         '<div class="ccx-parties">' +
@@ -54900,6 +54903,20 @@ function openEcourtsWithCnr(cnr, ev) {
     navigator.clipboard.writeText(clean).then(function(){
       toast('CNR ' + clean + ' copy हो गया — ' + tierLbl + ' site पर paste करें');
     }).catch(function(){});
+  }
+  window.open(url, '_blank');
+}
+
+function openEcourtsForCase(caseId, ev) {
+  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  var c = (state.courts||[]).find(function(x){ return x.id===caseId; });
+  var cm = c ? (state.courtsMaster||[]).find(function(x){ return x.id===c.court_id; }) : null;
+  var tier = cm ? String(cm.tier||'') : '';
+  var tierLbl = { supreme:'Supreme Court', high:'High Court', district:'District Court' }[tier] || 'eCourts';
+  var url = ECOURTS_URLS[tier] || ECOURTS_URLS.high || ECOURTS_URL;
+  var cnr = (c && c.cnr_no && c.cnr_no.indexOf('SN-')===-1) ? String(c.cnr_no).trim() : '';
+  if (cnr && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(cnr).then(function(){ toast('CNR ' + cnr + ' copy — ' + tierLbl + ' site पर paste करें'); }).catch(function(){});
   }
   window.open(url, '_blank');
 }
