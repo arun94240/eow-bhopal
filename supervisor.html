@@ -22039,6 +22039,15 @@ body.role-staff header { margin-top: 30px; }
 .mydd-dg-subrow.mtx-blk-review .mydd-dg-subnum{ background:#ca8a04; color:#fff; }
 .mydd-dg-subrow.mtx-blk-td{ background:rgba(22,163,74,0.20); border-left-color:#16a34a; }
 .mydd-dg-subrow.mtx-blk-td .mydd-dg-subnum{ background:#16a34a; color:#fff; }
+
+.dmx-case-item{ border-bottom:1px solid rgba(255,255,255,0.05); }
+.dmx-case.dmx-vf{ cursor:pointer; }
+.dmx-vf-car{ margin-left:6px; color:#93c5fd; font-size:11px; flex:0 0 auto; }
+.dmx-case-brief{ padding:7px 10px 9px 22px; }
+.dmx-brief-meta{ font-size:11.5px; color:#d3e0f0; margin-bottom:7px; line-height:1.5; font-weight:600; }
+.dmx-brief-acts{ display:flex; gap:8px; }
+.dmx-oe{ background:linear-gradient(135deg,#f5b942,#e8a82e); color:#062a52; border:none; border-radius:7px; padding:5px 13px; font-weight:900; font-size:11.5px; cursor:pointer; }
+.dmx-craft-brief{ background:#0d9488; color:#fff; border:none; border-radius:7px; padding:5px 11px; font-size:11.5px; font-weight:700; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -61513,6 +61522,25 @@ function _deptMatrixCompute(){
 }
 function deptMxToggle(){ _deptMxOpen=!_deptMxOpen; if(!_deptMxOpen)_deptMxSel=null; renderDeptMatrix(); }
 function deptMxSelect(d){ _deptMxSel=(_deptMxSel===d)?null:d; renderDeptMatrix(); }
+function _dmxCaseVF(c){
+  var no=formatEntryNo(c.type,c.r.no,c.r.entry_year);
+  var comp=c.r.complainant?(' · '+escapeHtml(String(c.r.complainant).split(/[\n,]/)[0].trim())):'';
+  var st=c.r.case_status?((typeof getStatusLabel==='function')?getStatusLabel(c.r.case_status):c.r.case_status):'';
+  var meta=[c.r.io_name?('IO: '+c.r.io_name):'', st, c.r.io_assigned_date?('आवंटन: '+c.r.io_assigned_date):''].filter(Boolean).join(' · ');
+  return '<div class="dmx-case-item">'+
+    '<div class="dmx-case dmx-vf" onclick="event.stopPropagation();mbrToggle(this)">'+
+      '<span class="dmx-case-main"><span class="dmx-cat">'+(_tcShort[c.type]||'')+'</span> <b>'+escapeHtml(no)+'</b>'+comp+'</span>'+
+      '<span class="dmx-vf-car mbr-caret">▾</span>'+
+    '</div>'+
+    '<div class="dmx-case-brief" style="display:none;">'+
+      (meta?'<div class="dmx-brief-meta">'+escapeHtml(meta)+'</div>':'')+
+      '<div class="dmx-brief-acts">'+
+        '<button class="dmx-oe" onclick="event.stopPropagation();openEntryModal(\''+c.type+'\',\''+c.r.id+'\')">✎ Open / Edit</button>'+
+        '<button class="dmx-craft-brief" title="Craft" onclick="event.stopPropagation();craftOpenForCase(\''+c.type+'\',\''+c.r.id+'\')">📄 Craft</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
 function renderDeptMatrix(){
   var host=document.getElementById('mydd-dept-matrix'); if(!host) return;
   var data=_deptMatrixCompute();
@@ -61530,10 +61558,7 @@ function renderDeptMatrix(){
       body='<div class="dmx-cases">'+x.cases.map(function(c){
         var no=formatEntryNo(c.type,c.r.no,c.r.entry_year);
         var comp=c.r.complainant?(' · '+escapeHtml(String(c.r.complainant).split(/[\n,]/)[0].trim())):'';
-        return '<div class="dmx-case">'+
-          '<span class="dmx-case-main" onclick="event.stopPropagation();openEntryModal(\''+c.type+'\',\''+c.r.id+'\')"><span class="dmx-cat">'+(_tcShort[c.type]||'')+'</span> <b>'+escapeHtml(no)+'</b>'+comp+'</span>'+
-          '<button class="dmx-craft" title="Craft में खोलें" onclick="event.stopPropagation();craftOpenForCase(\''+c.type+'\',\''+c.r.id+'\')">📄</button>'+
-        '</div>';
+        return _dmxCaseVF(c);
       }).join('')+'</div>';
     }
     return head+body;
@@ -61740,10 +61765,7 @@ function renderReportsDeptMatrix(){
       body='<div class="dmx-cases">'+x.cases.map(function(c){
         var no=formatEntryNo(c.type,c.r.no,c.r.entry_year);
         var comp=c.r.complainant?(' · '+escapeHtml(String(c.r.complainant).split(/[\n,]/)[0].trim())):'';
-        return '<div class="dmx-case">'+
-          '<span class="dmx-case-main" onclick="event.stopPropagation();openEntryModal(\''+c.type+'\',\''+c.r.id+'\')"><span class="dmx-cat">'+(_tcShort[c.type]||'')+'</span> <b>'+escapeHtml(no)+'</b>'+comp+'</span>'+
-          '<button class="dmx-craft" title="Craft" onclick="event.stopPropagation();craftOpenForCase(\''+c.type+'\',\''+c.r.id+'\')">📄</button>'+
-        '</div>';
+        return _dmxCaseVF(c);
       }).join('')+'</div>';
     }
     return head+body;
