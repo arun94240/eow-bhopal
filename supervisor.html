@@ -23545,6 +23545,10 @@ body.role-staff header { margin-top: 30px; }
               <label class="form-label">With whom (Participants)</label>
               <input type="text" class="form-input" id="dn-participants" placeholder="e.g. DG sir / DSP Pankaj Gautam / Team meeting">
             </div>
+            <div class="form-group">
+              <label class="form-label">🔗 Craft note link (optional)</label>
+              <input type="text" class="form-input" id="dn-craft-link" placeholder="Craft note की link यहाँ paste करें…">
+            </div>
 
             <!-- Reminder: date + time + lead -->
             <div class="form-group">
@@ -33901,7 +33905,7 @@ function _mddReminderItems() {
     if (t.reminder_at) out.push({ date: String(t.reminder_at).slice(0,10), ico:'📝', lbl: (t.task_title || '(task)'), open: "openMtEdit('" + t.id + "')" });
   });
   (state.discussionNotes || []).forEach(function(d){
-    if (d.reminder_date) out.push({ date: String(d.reminder_date).slice(0,10), ico:'💬', lbl: (d.title || d.note_text || '(note)'), open: "editDiscussionNote('" + d.id + "')" });
+    if (d.reminder_date) out.push({ date: String(d.reminder_date).slice(0,10), ico:'💬', lbl: (d.title || d.note_text || '(note)'), craftLink: d.craft_link, open: "editDiscussionNote('" + d.id + "')" });
   });
   out.sort(function(a,b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
   return out;
@@ -33920,7 +33924,7 @@ function _mddCalendarItems() {
     if (d.deadline) out.push({ date: String(d.deadline).slice(0,10), ico:'🏛', lbl: (d.instruction || d.subject || '(निर्देश)'), meta: [d.case_display, d.io_name?('IO: '+d.io_name):''].filter(Boolean).join('  ·  '), caseType: d.related_to_type, caseId: d.related_to_id, craftLink: d.craft_link, open: "editDgDirective('" + d.id + "')" });
   });
   (state.discussionNotes || []).forEach(function(d){
-    if (d.reminder_date) out.push({ date: String(d.reminder_date).slice(0,10), ico:'💬', lbl: (d.title || '(note)'), open: "editDiscussionNote('" + d.id + "')" });
+    if (d.reminder_date) out.push({ date: String(d.reminder_date).slice(0,10), ico:'💬', lbl: (d.title || '(note)'), craftLink: d.craft_link, open: "editDiscussionNote('" + d.id + "')" });
   });
   out.sort(function(a,b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
   return out;
@@ -46627,6 +46631,7 @@ function openDiscussionNoteForm(scope, editId) {
   document.getElementById('dn-title').value = '';
   document.getElementById('dn-note-text').value = '';
   document.getElementById('dn-participants').value = '';
+  var _ncl=document.getElementById('dn-craft-link'); if(_ncl) _ncl.value='';
   document.getElementById('dn-reminder-date').value = '';
   document.getElementById('dn-reminder-time').value = '';
   document.getElementById('dn-reminder-lead').value = '';
@@ -46668,6 +46673,7 @@ function openDiscussionNoteForm(scope, editId) {
       document.getElementById('dn-title').value = existing.title || '';
       document.getElementById('dn-note-text').value = existing.note_text || '';
       document.getElementById('dn-participants').value = existing.participants || '';
+      var _ncl2=document.getElementById('dn-craft-link'); if(_ncl2) _ncl2.value = existing.craft_link || '';
       document.getElementById('dn-reminder-date').value = existing.reminder_date || '';
       document.getElementById('dn-reminder-time').value = existing.reminder_time || '';
       document.getElementById('dn-reminder-lead').value = existing.reminder_lead != null ? String(existing.reminder_lead) : '';
@@ -46904,6 +46910,7 @@ async function saveDiscussionNote() {
     title: title,
     note_text: document.getElementById('dn-note-text').value || null,
     participants: document.getElementById('dn-participants').value || null,
+    craft_link: ((document.getElementById('dn-craft-link')||{}).value||'').trim() || null,
     reminder_date: document.getElementById('dn-reminder-date').value || null,
     reminder_time: document.getElementById('dn-reminder-time').value || null,
     reminder_lead: document.getElementById('dn-reminder-lead').value ? parseInt(document.getElementById('dn-reminder-lead').value) : null,
