@@ -32474,8 +32474,18 @@ function _mddNoticeList(label, arr){
     arr.slice(0,40).map(function(n){
       var line = (n.notice_type || 'Notice') + ' — ' + (n.recipient || '—');
       var sub = [ n.io_name || '', n.notice_date ? _mddDate(n.notice_date) : '' ].filter(Boolean).join(' · ');
-      return '<div class="mln-row" onclick="event.stopPropagation();(typeof openNoticeModal===\'function\')&&openNoticeModal(\'' + n.id + '\');">' +
-        '<span class="mln-row-main">' + _mddEsc(line) + '</span>' + (sub ? '<span class="mln-row-sub">' + _mddEsc(sub) + '</span>' : '') + '</div>';
+      return '<div class="mydd-item">' +
+        '<div class="mydd-item-head" onclick="event.stopPropagation();mddRowToggle(this)">' +
+          '<span class="mydd-item-title">' + _mddEsc(line) + '</span>' +
+          (sub ? '<span class="mydd-tp-date">' + _mddEsc(sub) + '</span>' : '') +
+        '</div>' +
+        '<div class="mydd-item-brief" style="display:none;">' +
+          '<div class="mydd-brief-row">' + _mddEsc(line) + '</div>' +
+          (sub ? '<div class="mydd-brief-row">' + _mddEsc(sub) + '</div>' : '') +
+          (n.notice_status ? '<div class="mydd-brief-row"><b>स्थिति:</b> ' + _mddEsc(n.notice_status) + '</div>' : '') +
+          '<button class="mydd-oe-btn" onclick="event.stopPropagation();(typeof openNoticeModal===\'function\')&&openNoticeModal(\'' + n.id + '\');">✎ Open / Edit</button>' +
+        '</div>' +
+      '</div>';
     }).join('') + '</div>';
 }
 function mddNoticePill(which){ _mddNoticeOpen = (_mddNoticeOpen===which) ? null : which; mddRenderNoticeStrip(); }
