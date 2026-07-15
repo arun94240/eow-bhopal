@@ -45590,10 +45590,13 @@ function ovstatsRenderReportsSummary() {
 }
 
 function ovstatsRunReport(cat) {
-  if (typeof switchSection !== 'function') return;
-  if (cat === '__court') { switchSection('court'); return; }
-  if (cat === '__officers') { switchSection('officers'); return; }
-  switchSection('report');
+  if (cat === '__court') { if (typeof switchSection === 'function') switchSection('court'); return; }
+  if (cat === '__officers') { if (typeof switchSection === 'function') switchSection('officers'); return; }
+  // Open the report builder INLINE (in the Reports box) and apply the type filter — no section jump
+  try {
+    if (typeof _reportInlineOpen === 'function') _reportInlineOpen(true);
+    else if (typeof switchSection === 'function') switchSection('report');
+  } catch(e){ if (typeof switchSection === 'function') switchSection('report'); }
   setTimeout(function(){
     if (typeof rbToggleAllTypes === 'function') {
       rbToggleAllTypes(false);
@@ -45601,7 +45604,7 @@ function ovstatsRunReport(cat) {
       if (cb) cb.checked = true;
       if (typeof rbPreview === 'function') rbPreview();
     }
-  }, 120);
+  }, 140);
 }
 
 // ═══════════════════════════════════════════════════════════════════
