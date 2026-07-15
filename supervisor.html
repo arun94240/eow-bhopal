@@ -24690,7 +24690,7 @@ body.role-staff header { margin-top: 30px; }
 
   <!-- COURT -->
   <section id="court" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('court')"><span class="collapse-arrow" id="court-arrow">▼</span> Court Cases</h2></div><div><button class="btn" onclick="openCourtsMasterManager()" id="manage-courts-btn">⚙ Manage Courts</button> <button class="btn btn-primary" data-action="add-court">+ Add Court Case</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('court')"><span class="collapse-arrow" id="court-arrow">▼</span> ⚖️ Court Cases / न्यायालय</h2><div class="desc">न्यायालयीन प्रकरण — 8 ज़िले</div></div><div><button class="btn" onclick="openCourtsMasterManager()" id="manage-courts-btn">⚙ Manage Courts</button> <button class="btn btn-primary" data-action="add-court">+ Add Court Case</button></div></div>
     <div class="section-collapse" id="court-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -24736,7 +24736,7 @@ body.role-staff header { margin-top: 30px; }
 
   <!-- LEAVES -->
   <section id="leaves" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('leaves')"><span class="collapse-arrow" id="leaves-arrow">▼</span> Leaves</h2></div><div><button class="btn btn-primary" data-action="add-leave">+ Add Leave</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('leaves')"><span class="collapse-arrow" id="leaves-arrow">▼</span> 🏖 Leaves / अवकाश</h2><div class="desc">अवकाश आवेदन — केवल SP approve करें</div></div><div><button class="btn btn-primary" data-action="add-leave">+ Add Leave</button></div></div>
     <div class="section-collapse" id="leaves-collapse">
     <div class="leave-summary">
       <div class="leave-card leave-card-cl">
@@ -24825,7 +24825,7 @@ body.role-staff header { margin-top: 30px; }
 
   <!-- ESTABLISHMENT (formerly IO Master) -->
   <section id="iomaster" class="section">
-    <div class="section-header"><div><h2>Establishment</h2><div class="desc">SP EOW Office Bhopal — पूरा staff database</div></div><div><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
+    <div class="section-header"><div><h2>🏢 Establishment</h2><div class="desc">SP EOW Office Bhopal — पूरा staff database</div></div><div><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
     <div class="toolbar"><input type="search" class="search-input" id="search-io" placeholder="Search name, rank, mobile…" oninput="renderIOMaster()"><select class="filter-select" id="filter-io-status" onchange="renderIOMaster()"><option value="">All</option><option value="io">IOs</option><option value="non-io">Other Staff</option></select></div>
     <div id="io-master-list"><div class="empty-state"><h3>कोई member नहीं — पहला member जोड़ें</h3></div></div>
   </section>
