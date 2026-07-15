@@ -22170,6 +22170,22 @@ body.role-staff header { margin-top: 30px; }
 #officers .section-header{ border-left-color:#7c3aed !important; background:linear-gradient(90deg,rgba(124,58,237,.055),#fff 55%) !important; }
 #court    .section-header{ border-left-color:#2563eb !important; background:linear-gradient(90deg,rgba(37,99,235,.055),#fff 55%) !important; }
 #tags     .section-header{ border-left-color:#0891b2 !important; background:linear-gradient(90deg,rgba(8,145,178,.055),#fff 55%) !important; }
+
+/* ── Leaves minimalistic (v156) ── */
+#leaves .lv-filterbar{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:4px 0 9px; width:100%; }
+#leaves .lv-filters-toggle{ font-size:11.5px; font-weight:800; color:#d97706; background:#fef3e2; border:none; border-radius:9px; padding:7px 12px; cursor:pointer; }
+#leaves .lv-quick{ display:flex; gap:6px; flex-wrap:wrap; }
+#leaves .lv-qp{ font-size:11px; font-weight:700; padding:6px 12px; border-radius:999px; border:1px solid #eaeef4; color:#556677; background:#fff; cursor:pointer; }
+#leaves .lv-qp:hover{ border-color:#cbd5e1; }
+#leaves .lv-qp.is-on{ background:#062a52; color:#fff; border-color:#062a52; }
+#leaves .lv-adv-filters{ display:flex; flex-wrap:wrap; gap:7px; padding:10px; background:#fbfcfe; border:1px solid #eaeef4; border-radius:12px; margin-bottom:10px; width:100%; }
+#leaves .smart-search-wrap .smart-search-input{ border:1.5px solid #eaeef4 !important; border-radius:12px !important; background:#fbfcfe !important; padding:10px 12px !important; }
+#leaves .leave-summary{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:14px; }
+#leaves .leave-card{ border:1px solid #eaeef4 !important; border-radius:13px !important; padding:13px 10px !important; text-align:center; position:relative; overflow:hidden; background:#fff !important; box-shadow:0 2px 8px rgba(6,42,82,.05) !important; }
+#leaves .leave-card::before{ content:""; position:absolute; left:0; right:0; top:0; height:3px; }
+#leaves .leave-card-cl::before{ background:#2563eb; }
+#leaves .leave-card-el::before{ background:#0d9488; }
+#leaves .leave-card-sl::before{ background:#db2777; }
 </style>
 </head>
 <body>
@@ -24764,7 +24780,7 @@ body.role-staff header { margin-top: 30px; }
         <input type="search" class="search-input smart-search-input" id="ss-leaves-input" placeholder="🔍 Officer / Type / Cause / Status खोजें…" oninput="ssOnInput('leaves')" onfocus="ssOnInput('leaves')" autocomplete="off">
         <div class="smart-suggestions" id="ss-leaves-suggestions" style="display:none;"></div>
       </div>
-      <select class="filter-select" id="filter-leave-type" onchange="renderLeaveTable()" title="Leave Type">
+      <div class="lv-filterbar"><button type="button" class="lv-filters-toggle" onclick="lvToggleFilters()">⚙ Filters <span id="lv-filters-caret">▾</span></button><div class="lv-quick"><button type="button" class="lv-qp" data-lvq="active" onclick="lvQuickFilter('active')">🟢 Active today</button><button type="button" class="lv-qp" data-lvq="upcoming" onclick="lvQuickFilter('upcoming')">🔵 Upcoming</button><button type="button" class="lv-qp" data-lvq="pending" onclick="lvQuickFilter('pending')">⏳ Pending</button><button type="button" class="lv-qp" data-lvq="staff" onclick="lvQuickFilter('staff')">👥 Staff-wise</button></div></div><div id="lv-adv-filters" class="lv-adv-filters" style="display:none;"><select class="filter-select" id="filter-leave-type" onchange="renderLeaveTable()" title="Leave Type">
         <option value="">📋 All Types</option>
         <option value="CL">CL — Casual</option>
         <option value="EL">EL — Earned</option>
@@ -24811,7 +24827,7 @@ body.role-staff header { margin-top: 30px; }
         <option value="staff" selected>👥 Staff-wise</option>
         <option value="table">≡ Table</option>
       </select>
-      <button type="button" class="filter-select lv-filter-clear" onclick="clearLeaveFilters()" title="Clear all filters">⊘ Clear</button>
+      <button type="button" class="filter-select lv-filter-clear" onclick="clearLeaveFilters()" title="Clear all filters">⊘ Clear</button></div>
     </div>
     <div class="smart-chips" id="ss-leaves-chips"></div>
     
@@ -55425,6 +55441,23 @@ function _lvPopulateYearFilter() {
 }
 
 // Clear all leave filters
+function lvToggleFilters(){
+  var b=document.getElementById('lv-adv-filters'); if(!b) return;
+  var open=(b.style.display==='none'||!b.style.display);
+  b.style.display=open?'flex':'none';
+  var c=document.getElementById('lv-filters-caret'); if(c) c.textContent=open?'\u25b4':'\u25be';
+}
+function lvQuickFilter(kind){
+  var pill=document.querySelector('.lv-qp[data-lvq="'+kind+'"]');
+  var on=pill && pill.classList.contains('is-on');
+  function setSel(id,val){ var s=document.getElementById(id); if(s) s.value=val; }
+  if(kind==='active'){ var up=document.querySelector('.lv-qp[data-lvq="upcoming"]'); if(up) up.classList.remove('is-on'); setSel('filter-leave-period', on?'':'active_today'); }
+  else if(kind==='upcoming'){ var ac=document.querySelector('.lv-qp[data-lvq="active"]'); if(ac) ac.classList.remove('is-on'); setSel('filter-leave-period', on?'':'upcoming'); }
+  else if(kind==='pending'){ setSel('filter-leave-status', on?'':'pending'); }
+  else if(kind==='staff'){ setSel('filter-leaves-view', on?'table':'staff'); }
+  if(pill) pill.classList.toggle('is-on', !on);
+  if(typeof renderLeaveTable==='function') renderLeaveTable();
+}
 function clearLeaveFilters() {
   ['filter-leave-type','filter-leave-status','filter-leave-rank','filter-leave-year','filter-leave-period','filter-leave-from','filter-leave-to'].forEach(function(id){
     var el = document.getElementById(id);
