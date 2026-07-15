@@ -22307,6 +22307,23 @@ body.role-staff #mydaily-box{ display:none !important; }
 @media(max-width:380px){ .dbgrid{ grid-template-columns:repeat(2,1fr); } }
 /* ovstats slim → कार्यालय (प्रकरण tiles Database में गए) */
 #ovstats-tile-row .ovstats-tile-year, #ovstats-tile-row .ovstats-tile-enqtype, #ovstats-tile-row .ovstats-tile-io, #ovstats-tile-row .ovstats-tile-court{ display:none !important; }
+
+/* ── Database live pills + Notice flow (v177) ── */
+.dbx-live{ display:flex; gap:7px; padding:0 13px 11px; }
+.dbx-pill{ flex:1; border-radius:10px; padding:7px 5px; text-align:center; font-size:9.5px; font-weight:800; color:#fff; cursor:pointer; box-shadow:0 2px 7px rgba(0,0,0,.25); }
+.dbx-pill .n{ display:block; font-size:15px; font-weight:900; line-height:1.1; }
+.ntc-flow{ display:flex; align-items:flex-start; margin-top:8px; }
+.nflow-step{ flex:1; text-align:center; position:relative; }
+.nflow-step .nfs-dot{ width:20px; height:20px; border-radius:50%; margin:0 auto 3px; display:flex; align-items:center; justify-content:center; font-size:9px; background:#e8edf4; color:#8aa0b8; position:relative; z-index:1; }
+.nflow-step.done .nfs-dot{ background:#0d9488; color:#fff; }
+.nflow-step.cur .nfs-dot{ background:#f5b942; color:#062a52; box-shadow:0 0 0 3px rgba(245,185,66,.3); }
+.nflow-step.fail .nfs-dot{ background:#dc2626; color:#fff; }
+.nflow-step .nfs-lb{ font-size:8.5px; font-weight:800; color:#7b8ca3; line-height:1.2; }
+.nflow-step.done .nfs-lb,.nflow-step.cur .nfs-lb{ color:#0f2a4a; }
+.nflow-step.fail .nfs-lb{ color:#b91c1c; }
+.nflow-step::after{ content:""; position:absolute; top:10px; left:calc(50% + 12px); width:calc(100% - 24px); height:2px; background:#e2e8f0; }
+.nflow-step.done::after{ background:#0d9488; }
+.nflow-step:last-child::after{ display:none; }
 </style>
 </head>
 <body>
@@ -49267,6 +49284,14 @@ function _buildNoticeCard(n, today) {
 
   var assignedLine = n.assigned_to ? '👮 ' + escapeHtml(n.assigned_to) : '<span class="ntc-unassigned">⚠️ Assign baaki</span>';
 
+  var _fsrv = _noticeIsServed(n), _fadm = _noticeIsAdam(n), _fasg = !!n.assigned_to;
+  function _stp(st, ic, lb){ return '<div class="nflow-step '+st+'"><div class="nfs-dot">'+ic+'</div><div class="nfs-lb">'+lb+'</div></div>'; }
+  var flowStrip = '<div class="ntc-flow">' +
+    _stp('done','✓','जारी') +
+    _stp(_fasg?'done':'cur', _fasg?'✓':'👮', _fasg? escapeHtml(String(n.assigned_to).split(' ').slice(0,2).join(' ')) : 'Assign') +
+    _stp(_fsrv?'done':(_fadm?'fail':(_fasg?'cur':'')), _fsrv?'✓':(_fadm?'✕':'📩'), _fadm?'अदम-तामील':'तामील') +
+    _stp(_fsrv?'cur':'', '📊', 'Report') +
+  '</div>';
   return '<div class="ntc-card" id="ntc-card-' + n.id + '">' +
     '<div class="ntc-card-head" onclick="event.stopPropagation();toggleNoticeCardBrief(\'' + n.id + '\')">' +
       '<div class="ntc-card-top">' +
@@ -49279,6 +49304,7 @@ function _buildNoticeCard(n, today) {
         '<span>📅 उपस्थिति: <b>' + fmtDateShort(n.appearance_date) + '</b></span>' +
       '</div>' +
       '<div class="ntc-card-chips">' + statusChip + urgent + ' <span class="ntc-card-assigned">' + assignedLine + '</span></div>' +
+      flowStrip +
     '</div>' +
     '<div class="ntc-card-brief" id="ntc-brief-' + n.id + '" style="display:none;"></div>' +
   '</div>';
@@ -51249,11 +51275,20 @@ function renderTotalCases() {
   var _dn = new Date();
   var _dmo = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][_dn.getMonth()];
   var _dwk = ['SUN','MON','TUE','WED','THU','FRI','SAT'][_dn.getDay()];
+  var _tymd = _dn.getFullYear()+'-'+String(_dn.getMonth()+1).padStart(2,'0')+'-'+String(_dn.getDate()).padStart(2,'0');
+  var _tAdd=0; enquiryHeads.forEach(function(hh){ (state.enquiries[hh]||[]).forEach(function(e){ if(String(e.created_at||e.date||'').slice(0,10)===_tymd) _tAdd++; }); });
+  var _tPrag=0; try{ (state.ioUpdates||[]).forEach(function(u){ if(String(u.created_at||u.update_date||u.date||'').slice(0,10)===_tymd) _tPrag++; }); }catch(e){}
+  var _tNot=0; try{ (state.notices||[]).forEach(function(nn){ if(!nn.tameel_result) _tNot++; }); }catch(e){}
   var dbbox = '<div class="dbbox">' +
     '<div class="dbbox-hd">' +
       '<span class="dbbox-cal"><span class="dbc-m">'+_dmo+'</span><span class="dbc-d">'+_dn.getDate()+'</span><span class="dbc-w">'+_dwk+'</span></span>' +
       '<div class="dbbox-tt"><div class="dbbox-t">🗄️ Database</div><div class="dbbox-s">' + escapeHtml(contextLabel) + ' — सभी श्रेणियाँ</div></div>' +
       '<div class="dbbox-gt"><div class="dbbox-gn">' + grandTotal + '</div><div class="dbbox-gl">कुल प्रकरण</div></div>' +
+    '</div>' +
+    '<div class="dbx-live">' +
+      '<div class="dbx-pill" style="background:linear-gradient(135deg,#16a34a,#15803d)"><span class="n">+' + _tAdd + '</span>आज जुड़े</div>' +
+      '<div class="dbx-pill" style="background:linear-gradient(135deg,#0d9488,#0f766e)" onclick="switchSection(\'pragati\')"><span class="n">' + _tPrag + '</span>आज प्रगति</div>' +
+      '<div class="dbx-pill" style="background:linear-gradient(135deg,#d97706,#b45309)" onclick="gotoNotices()"><span class="n">' + _tNot + '</span>Notice pending</div>' +
     '</div>' +
     '<div class="dbgrid">' + cards + '</div>' +
     '<div class="db-an-row"><div class="db-an-h">📊 विश्लेषण — इसी DATA के दृश्य</div>' +
