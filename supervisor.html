@@ -22134,6 +22134,13 @@ body.role-staff header { margin-top: 30px; }
 .cf-tier-supreme .cf-tierpill{ background:#7c3aed; }
 .cf-tier-high .cf-tierpill{ background:#2563eb; }
 .cf-tier-district .cf-tierpill{ background:#0d9488; }
+
+.mbr-brief .mbr-overbar{ display:flex; align-items:center; gap:6px; background:rgba(239,68,68,.16); border:1px solid rgba(239,68,68,.5); border-radius:8px; padding:6px 10px; font-size:11.5px; font-weight:800; color:#fecaca; margin-bottom:7px; cursor:pointer; }
+.mbr-brief .mbr-overbar .car{ margin-left:auto; }
+.mbr-brief .mbr-weekbar{ display:flex; align-items:center; gap:6px; background:rgba(147,197,253,.12); border:1px solid rgba(147,197,253,.32); border-radius:8px; padding:6px 10px; font-size:11.5px; font-weight:800; color:#bcd8ff; margin-top:9px; cursor:pointer; }
+.mbr-brief .mbr-weekbar .car{ margin-left:auto; }
+.mbr-brief .n-daylbl{ font-size:10.5px; font-weight:900; color:#ffd98a; margin:6px 2px 5px; letter-spacing:.3px; }
+.mbr-brief .mbr-more{ font-size:10.5px; color:#9ec5ff; padding:4px 7px; cursor:pointer; font-weight:700; }
 </style>
 </head>
 <body>
@@ -32779,6 +32786,8 @@ function _briefEnqToggle(el,type,id){
   b.style.display=open?'block':'none';
   var c=el.querySelector('.mbr-cc-car'); if(c)c.textContent=open?'▴':'▾';
 }
+function _mbrBoxToggleNext(el){ var b=el.nextElementSibling; if(!b) return; var open=(b.style.display==='none'||!b.style.display); b.style.display=open?'block':'none'; var c=el.querySelector('.car'); if(c) c.textContent=open?'▴':'▾'; }
+function _mbrMoreNext(el){ var b=el.nextElementSibling; if(b) b.style.display='block'; el.style.display='none'; }
 function _briefDShort(ds){
   try{ var d=new Date(ds+'T00:00:00'); var WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return WD[d.getDay()]+' '+d.getDate()+' '+MO[d.getMonth()]; }catch(e){ return ds; }
 }
@@ -32793,10 +32802,9 @@ function mddRenderBrief(){
   var today=_mddYMD(new Date());
   var wkEnd=_mddYMD(new Date(Date.now()+7*86400000));
   var items=[]; try{ items=(_mtxAgendaItems()||[]); }catch(e){ items=[]; }
-  var todayArr=items.filter(function(a){ return a.date<=today; });
+  var overdue=items.filter(function(a){ return a.date<today; });
+  var todayItems=items.filter(function(a){ return a.date===today; });
   var weekArr=items.filter(function(a){ return a.date>today && a.date<=wkEnd; });
-  var overdueN=items.filter(function(a){ return a.date<today; }).length;
-  var todayN=items.filter(function(a){ return a.date===today; }).length;
   var MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   var WD=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   var nd=new Date();
@@ -32825,22 +32833,41 @@ function mddRenderBrief(){
   }
   function dateBlock(ds){
     if(ds<today) return '<div class="n-db over">⚠ Overdue · '+_briefDShort(ds)+'</div>';
-    if(ds===today) return '<div class="n-db today">📅 आज · '+_briefDShort(ds)+'</div>';
     return '<div class="n-db week">📅 '+_briefDShort(ds)+'</div>';
   }
-  function sec(arr,empty){
-    if(!arr.length) return '<div class="mbr-empty">'+empty+'</div>';
+  function listOf(arr){
     var out='',last=null;
     arr.forEach(function(a){ if(a.date!==last){ out+=dateBlock(a.date); last=a.date; } out+=item(a); });
     return out;
   }
-  host.innerHTML='<div class="mbr-brief">'+
-    '<div class="n-top">'+cal+'<div class="n-hd"><div class="n-t">📋 आज का Brief</div>'+
-      '<div class="n-pills"><span class="n-pill a">आज '+todayN+'</span>'+(overdueN?'<span class="n-pill o">अतिदेय '+overdueN+'</span>':'')+'<span class="n-pill w">सप्ताह '+weekArr.length+'</span></div>'+
-    '</div></div>'+
-    '<div class="n-sec-lbl">📅 आज व अतिदेय</div>'+sec(todayArr,'आज कोई agenda नहीं — दिन नियंत्रण में ✅')+
-    '<div class="n-sec-lbl">🗓️ इस सप्ताह</div>'+sec(weekArr,'इस सप्ताह कोई अतिरिक्त agenda नहीं।')+
-    '<div class="mbr-foot">↻ Home खोलने पर अपने-आप अद्यतन · यही Craft (📆 Subscribe) में भी live</div></div>';
+  // ── header ──
+  var html='<div class="mbr-brief"><div class="n-top">'+cal+'<div class="n-hd"><div class="n-t">📋 आज का Brief</div>'+
+    '<div class="n-pills"><span class="n-pill a">आज '+todayItems.length+'</span>'+(overdue.length?'<span class="n-pill o">अतिदेय '+overdue.length+'</span>':'')+'<span class="n-pill w">सप्ताह '+weekArr.length+'</span></div>'+
+  '</div></div>';
+  // ── overdue: one collapsible red bar ──
+  if(overdue.length){
+    html+='<div class="mbr-overbar" onclick="_mbrBoxToggleNext(this)">⚠ '+overdue.length+' अतिदेय — देखने हेतु tap<span class="car">▾</span></div>'+
+      '<div style="display:none;">'+listOf(overdue)+'</div>';
+  }
+  // ── today (cap 4 + more) ──
+  if(todayItems.length){
+    html+='<div class="n-daylbl">📅 आज · '+_briefDShort(today)+'</div>';
+    var CAP=4;
+    html+=todayItems.slice(0,CAP).map(item).join('');
+    if(todayItems.length>CAP){
+      html+='<div class="mbr-more" onclick="_mbrMoreNext(this)">+ '+(todayItems.length-CAP)+' और आज का काम…</div>'+
+        '<div style="display:none;">'+todayItems.slice(CAP).map(item).join('')+'</div>';
+    }
+  } else {
+    html+='<div class="mbr-empty">आज कोई agenda नहीं — दिन नियंत्रण में ✅</div>';
+  }
+  // ── week: collapsible ──
+  if(weekArr.length){
+    html+='<div class="mbr-weekbar" onclick="_mbrBoxToggleNext(this)">🗓️ इस सप्ताह · '+weekArr.length+' काम<span class="car">▾</span></div>'+
+      '<div style="display:none;">'+listOf(weekArr)+'</div>';
+  }
+  html+='<div class="mbr-foot">↻ Home खोलने पर अपने-आप अद्यतन · Craft (📆 Subscribe) में भी live</div></div>';
+  host.innerHTML=html;
 }
 function hctOpenReports(){
   try {
