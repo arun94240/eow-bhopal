@@ -22250,6 +22250,11 @@ body.role-staff header { margin-top: 30px; }
 body.role-staff .staff-live-host{ display:block; margin-bottom:16px; }
 .staff-live-host .slh-head{ font-size:15px; font-weight:900; color:#0f2a4a; padding:2px 2px 10px; }
 body.role-staff #mydaily-box{ display:none !important; }
+
+/* ── ifl-row status + dim (match database rows) v171 ── */
+.ifl-row-status{ font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px; background:rgba(15,42,74,.08); color:#0f2a4a; white-space:nowrap; flex-shrink:0; }
+.ifl-row-dim{ opacity:.5; }
+.ifl-row-dim .ifl-row-brief{ text-decoration:line-through; }
 </style>
 </head>
 <body>
@@ -58093,12 +58098,20 @@ function _iflBuildRow(m) {
   var safeBrief = escapeHtml((briefText || '').slice(0, 110));
   var safeIo = escapeHtml(ioName);
   
-  return '<div class="ifl-row" onclick="' + clickHandler + '">' +
+  var statusPill = '';
+  var dimClass = '';
+  if (!m._isCourt) {
+    var stLabel = (typeof getStatusLabel === 'function') ? getStatusLabel(row.case_status) : '';
+    if (stLabel) statusPill = '<span class="ifl-row-status">' + escapeHtml(stLabel) + '</span>';
+    if (typeof isEntryDimmed === 'function' && isEntryDimmed(row)) dimClass = ' ifl-row-dim';
+  }
+  return '<div class="ifl-row' + dimClass + '" onclick="' + clickHandler + '">' +
     '<span class="ifl-row-no">' + safeNo + '</span>' +
     '<div class="ifl-row-main">' +
       (safeBrief ? '<div class="ifl-row-brief">' + safeBrief + '</div>' : '') +
       (safeIo ? '<div class="ifl-row-io">👮 ' + safeIo + '</div>' : '') +
     '</div>' +
+    statusPill +
     '<span class="ifl-row-arrow">▾</span>' +
   '</div>';
 }
