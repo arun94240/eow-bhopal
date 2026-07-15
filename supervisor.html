@@ -22210,6 +22210,14 @@ body.role-staff header { margin-top: 30px; }
 #mydaily-box .mtx-grp-dir .mtx-gtab.is-on{ box-shadow:0 0 0 1.5px #a78bfa inset; }
 #mydaily-box .mtx-grp-work .mtx-gtab.is-on{ box-shadow:0 0 0 1.5px #f5b942 inset; }
 #mydaily-box .mtx-gtab-n{ background:rgba(255,255,255,.22); border-radius:999px; font-size:9.5px; padding:0 6px; }
+
+/* ── IO reporting staff assignment (v159) ── */
+.io-repstaff-hint{ font-size:11px; color:#6b7c93; margin:2px 0 8px; line-height:1.4; }
+.io-repstaff-list{ display:flex; flex-wrap:wrap; gap:7px; }
+.io-repstaff-chip{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 11px; border-radius:999px; border:1.5px solid #e6ecf3; background:#fff; cursor:pointer; color:#334155; }
+.io-repstaff-chip input{ margin:0; }
+.io-repstaff-chip.on{ background:rgba(6,42,82,.06); border-color:#062a52; color:#062a52; }
+.io-repstaff-empty{ font-size:11.5px; color:#8494a8; }
 </style>
 </head>
 <body>
@@ -27098,7 +27106,7 @@ body.role-staff header { margin-top: 30px; }
       </div>
       <div class="form-group full">
         <label class="io-checkbox-label">
-          <input type="checkbox" id="io-is-io" class="io-checkbox">
+          <input type="checkbox" id="io-is-io" class="io-checkbox" onchange="ioToggleRepStaff()">
           <span class="io-checkbox-content">
             <span class="io-checkbox-title">✓ Mark as IO</span>
             <span class="io-checkbox-desc">यह सदस्य Investigating Officer है — Complaints, RC, PE, STR, Court cases assign करने के लिए dropdowns में आएगा</span>
@@ -27112,6 +27120,11 @@ body.role-staff header { margin-top: 30px; }
          For IO members: Leaves matrix + Notice Tameeli summary (issued).
          For Other Staff: Notice Tameeli summary (received/served).
          ════════════════════════════════════════════════════════════ -->
+    <div class="form-group full" id="io-repstaff-group" style="display:none;">
+      <label class="form-label">📋 अधीनस्थ स्टाफ — नोटिस तामील हेतु</label>
+      <div class="io-repstaff-hint">इस IO को सौंपे गए आरक्षक / प्र.आर. / HC / ASI — प्रगति में notice तामील हेतु इन्हीं में से चुना जा सकेगा।</div>
+      <div id="io-repstaff-list" class="io-repstaff-list"></div>
+    </div>
     <div id="io-profile-panels" style="display:none;margin-top:18px;"></div>
   </div>
   <div class="modal-footer">
@@ -55827,6 +55840,24 @@ function refreshIODropdown(elId, includeAllStaff) {
   sel.innerHTML = '<option value="">— Select —</option>' + names.map(function(i){ return '<option'+(i===cur?' selected':'')+'>'+escapeHtml(i)+'</option>'; }).join('');
 }
 
+function renderIOReportingStaff(assignedIds){
+  var host=document.getElementById('io-repstaff-list'); if(!host) return;
+  assignedIds = assignedIds || [];
+  var staff = (state.ioMaster||[]).filter(function(s){ return s.is_io!==true && s.id!==editingIO; });
+  if(!staff.length){ host.innerHTML='<div class="io-repstaff-empty">कोई अन्य staff सदस्य नहीं — पहले Establishment में आरक्षक/HC/ASI जोड़ें।</div>'; return; }
+  host.innerHTML = staff.map(function(s){
+    var on = assignedIds.indexOf(s.id)>=0;
+    return '<label class="io-repstaff-chip'+(on?' on':'')+'"><input type="checkbox" value="'+s.id+'" '+(on?'checked':'')+' onchange="this.parentNode.classList.toggle(\'on\',this.checked)"><span>'+_mddEsc((s.rank?s.rank+' ':'')+(s.name||''))+'</span></label>';
+  }).join('');
+}
+function ioGetReportingStaff(){
+  var host=document.getElementById('io-repstaff-list'); if(!host) return [];
+  return Array.prototype.slice.call(host.querySelectorAll('input[type=checkbox]:checked')).map(function(c){ return c.value; });
+}
+function ioToggleRepStaff(){
+  var g=document.getElementById('io-repstaff-group'); var cb=document.getElementById('io-is-io');
+  if(g) g.style.display = (cb && cb.checked) ? 'block' : 'none';
+}
 function openIOModal(id) {
   editingIO = id || null;
   pendingIOPhoto = null;
@@ -55851,6 +55882,8 @@ function openIOModal(id) {
   document.getElementById('io-doj-eow').value = io.doj_eow || '';
   document.getElementById('io-pin').value = io.pin || '';
   document.getElementById('io-is-io').checked = (io.is_io === true);
+  renderIOReportingStaff(io.reporting_staff_ids || []);
+  ioToggleRepStaff();
   pendingIOPhoto = io.photo_url || null;
   updateIOPhotoArea();
   
@@ -56067,6 +56100,7 @@ async function saveIO() {
     doj_service: document.getElementById('io-doj-service').value || null,
     doj_eow: document.getElementById('io-doj-eow').value || null,
     pin: (document.getElementById('io-pin').value || '').trim() || null,
+    reporting_staff_ids: ioGetReportingStaff(),
     photo_url: (pendingIOPhoto && typeof pendingIOPhoto === 'string') ? pendingIOPhoto : null
   };
 
