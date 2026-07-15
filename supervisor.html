@@ -22218,6 +22218,12 @@ body.role-staff header { margin-top: 30px; }
 .io-repstaff-chip input{ margin:0; }
 .io-repstaff-chip.on{ background:rgba(6,42,82,.06); border-color:#062a52; color:#062a52; }
 .io-repstaff-empty{ font-size:11.5px; color:#8494a8; }
+
+/* ── Smart search: bolder clear button + white box (v160) ── */
+.global-search-clear{ background:#dc2626 !important; color:#fff !important; width:30px !important; height:30px !important; font-size:15px !important; font-weight:900 !important; box-shadow:0 2px 6px rgba(220,38,38,.35) !important; display:flex !important; align-items:center; justify-content:center; }
+.global-search-clear:hover{ background:#b91c1c !important; transform:scale(1.06); }
+.global-search-wrap{ background:#fff !important; }
+.global-search-box{ background:#fff !important; }
 </style>
 </head>
 <body>
@@ -59335,6 +59341,17 @@ function performGlobalSearch() {
   }
 }
 
+var _DEVMAP={'अ':'a','आ':'a','इ':'i','ई':'i','उ':'u','ऊ':'u','ए':'e','ऐ':'ai','ओ':'o','औ':'au','ऋ':'ri','ा':'a','ि':'i','ी':'i','ु':'u','ू':'u','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ं':'n','ँ':'n','ः':'h','्':'','क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'n','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'n','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l','ड़':'r','ढ़':'rh','फ़':'f','ज़':'z','क़':'q','ख़':'kh','ग़':'g','़':'','ॉ':'o','ॅ':'e','ऑ':'o'};
+function _devToRoman(s){ var o=''; for(var i=0;i<s.length;i++){ var c=s.charAt(i); o += (_DEVMAP.hasOwnProperty(c)? _DEVMAP[c] : c); } return o; }
+function _fuzzyKey(s){
+  if(s==null) return '';
+  s=_devToRoman(String(s).toLowerCase());
+  s=s.replace(/[^a-z0-9]+/g,'');
+  s=s.replace(/w/g,'v').replace(/z/g,'j').replace(/q/g,'k').replace(/x/g,'ks').replace(/c(?![h])/g,'k');
+  s=s.replace(/oo+/g,'u').replace(/aa+/g,'a').replace(/ii+/g,'i').replace(/uu+/g,'u').replace(/ee+/g,'i').replace(/o/g,'u');
+  s=s.replace(/([a-z0-9])\1+/g,'$1');
+  return s;
+}
 function matchEntry(r, q) {
   // Build searchable fields including formatted entry number
   // r.no = "354", r.entry_year = "2012" or 2012
@@ -59357,7 +59374,11 @@ function matchEntry(r, q) {
     r.serial, r.no, r.complainant, r.non_complainant, r.brief, r.io_name, r.keywords,
     formattedNo, noWithYear, noWithYearSlash, tagNames
   ];
-  return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+  var _exact = fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+  if (_exact) return true;
+  var _fkq = _fuzzyKey(q);
+  if (_fkq.length >= 2) { var _fkf = _fuzzyKey(fields.filter(function(v){ return v != null; }).join(' ')); if (_fkf.indexOf(_fkq) > -1) return true; }
+  return false;
 }
 
 function matchCourt(c, q) {
@@ -59383,12 +59404,20 @@ function matchCourt(c, q) {
     c.petitioner, c.respondent, c.incharge_officer, c.court,
     typeNoFormatted, noWithYear, noWithYearSlash
   , tagNames];
-  return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+  var _exact = fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+  if (_exact) return true;
+  var _fkq = _fuzzyKey(q);
+  if (_fkq.length >= 2) { var _fkf = _fuzzyKey(fields.filter(function(v){ return v != null; }).join(' ')); if (_fkf.indexOf(_fkq) > -1) return true; }
+  return false;
 }
 
 function matchLeave(l, q) {
   var fields = [l.serial, l.officer_name, l.leave_type, l.cause, String(l.days)];
-  return fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+  var _exact = fields.some(function(v){ return (v != null) && String(v).toLowerCase().indexOf(q) > -1; });
+  if (_exact) return true;
+  var _fkq = _fuzzyKey(q);
+  if (_fkq.length >= 2) { var _fkf = _fuzzyKey(fields.filter(function(v){ return v != null; }).join(' ')); if (_fkf.indexOf(_fkq) > -1) return true; }
+  return false;
 }
 
 var __gs_idx = 0;
