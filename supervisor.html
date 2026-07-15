@@ -22141,6 +22141,23 @@ body.role-staff header { margin-top: 30px; }
 .mbr-brief .mbr-weekbar .car{ margin-left:auto; }
 .mbr-brief .n-daylbl{ font-size:10.5px; font-weight:900; color:#ffd98a; margin:6px 2px 5px; letter-spacing:.3px; }
 .mbr-brief .mbr-more{ font-size:10.5px; color:#9ec5ff; padding:4px 7px; cursor:pointer; font-weight:700; }
+
+/* ── MyDaily 4 sections — darker, colour-coded, higher contrast (v153) ── */
+#mydaily-box .mydd-dg-tile{ background:linear-gradient(162deg,#041d3a,#072a52) !important; }
+#mydaily-box .mydd-dg-subrow{ padding:9px 11px !important; margin-bottom:3px !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-disc{ background:linear-gradient(90deg,rgba(13,148,136,0.30),rgba(13,148,136,0.12)) !important; border-left:4px solid #14b8a6 !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-dg{ background:linear-gradient(90deg,rgba(124,58,237,0.32),rgba(124,58,237,0.12)) !important; border-left:4px solid #a78bfa !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-review{ background:linear-gradient(90deg,rgba(245,185,66,0.30),rgba(245,185,66,0.10)) !important; border-left:4px solid #f5b942 !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-td{ background:linear-gradient(90deg,rgba(22,163,74,0.30),rgba(22,163,74,0.12)) !important; border-left:4px solid #22c55e !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-disc:hover{ background:linear-gradient(90deg,rgba(13,148,136,0.44),rgba(13,148,136,0.2)) !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-dg:hover{ background:linear-gradient(90deg,rgba(124,58,237,0.46),rgba(124,58,237,0.2)) !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-review:hover{ background:linear-gradient(90deg,rgba(245,185,66,0.44),rgba(245,185,66,0.18)) !important; }
+#mydaily-box .mydd-dg-subrow.mtx-blk-td:hover{ background:linear-gradient(90deg,rgba(22,163,74,0.44),rgba(22,163,74,0.2)) !important; }
+#mydaily-box .mtx-blk-disc .mydd-dg-subnum{ background:#14b8a6 !important; color:#042f2a !important; }
+#mydaily-box .mtx-blk-dg .mydd-dg-subnum{ background:#a78bfa !important; color:#1e1b4b !important; }
+#mydaily-box .mtx-blk-review .mydd-dg-subnum{ background:#f5b942 !important; color:#062a52 !important; }
+#mydaily-box .mtx-blk-td .mydd-dg-subnum{ background:#22c55e !important; color:#052e16 !important; }
+#mydaily-box .mydd-dg-sublabel{ font-size:13px !important; }
 </style>
 </head>
 <body>
@@ -45590,13 +45607,10 @@ function ovstatsRenderReportsSummary() {
 }
 
 function ovstatsRunReport(cat) {
-  if (cat === '__court') { if (typeof switchSection === 'function') switchSection('court'); return; }
-  if (cat === '__officers') { if (typeof switchSection === 'function') switchSection('officers'); return; }
-  // Open the report builder INLINE (in the Reports box) and apply the type filter — no section jump
-  try {
-    if (typeof _reportInlineOpen === 'function') _reportInlineOpen(true);
-    else if (typeof switchSection === 'function') switchSection('report');
-  } catch(e){ if (typeof switchSection === 'function') switchSection('report'); }
+  if (typeof switchSection !== 'function') return;
+  if (cat === '__court') { switchSection('court'); return; }
+  if (cat === '__officers') { switchSection('officers'); return; }
+  switchSection('report');
   setTimeout(function(){
     if (typeof rbToggleAllTypes === 'function') {
       rbToggleAllTypes(false);
@@ -45604,7 +45618,7 @@ function ovstatsRunReport(cat) {
       if (cb) cb.checked = true;
       if (typeof rbPreview === 'function') rbPreview();
     }
-  }, 140);
+  }, 120);
 }
 
 // ═══════════════════════════════════════════════════════════════════
