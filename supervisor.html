@@ -26566,7 +26566,7 @@ body.role-staff header { margin-top: 30px; }
     </div>
     <div class="form-group">
       <label class="form-label">जारी करता (IO) <span class="req">*</span></label>
-      <select class="form-select" id="nf-io"></select>
+      <select class="form-select" id="nf-io" onchange="nfSyncAssignedToIO()"></select>
     </div>
     <div class="form-group">
       <label class="form-label">Notice का प्रकार <span class="req">*</span></label>
@@ -49501,6 +49501,24 @@ function navStaffNotice(staffName, category) {
 }
 
 // ===== ADD / EDIT NOTICE MODAL =====
+function nfSyncAssignedToIO(preserve){
+  var ioSel=document.getElementById('nf-io'); var assignSel=document.getElementById('nf-assigned');
+  if(!ioSel || !assignSel) return;
+  var cur = (preserve!=null ? preserve : (assignSel.value||''));
+  var ioName = ioSel.value || '';
+  function nmeOf(x){ return x.rank ? (x.rank+' '+x.name) : x.name; }
+  var ioRec = (state.ioMaster||[]).find(function(x){ return nmeOf(x)===ioName; });
+  var ids = (ioRec && Array.isArray(ioRec.reporting_staff_ids)) ? ioRec.reporting_staff_ids : [];
+  var opts = '<option value="">— अभी allot नहीं —</option>';
+  var assignedNames = [];
+  if (ids.length){
+    ids.forEach(function(sid){ var s=(state.ioMaster||[]).find(function(x){ return x.id===sid; }); if(s){ var nm=nmeOf(s); assignedNames.push(nm); opts+='<option value="'+escapeHtml(nm)+'">'+escapeHtml(nm)+'</option>'; } });
+    if (cur && assignedNames.indexOf(cur)<0) opts+='<option value="'+escapeHtml(cur)+'">'+escapeHtml(cur)+' (अन्य)</option>';
+  } else {
+    (state.ioMaster||[]).forEach(function(io){ if(io.status && io.status!=='Active') return; var rk=(io.rank||'').toUpperCase(); if(rk==='DSP'||rk==='TI') return; var nm=nmeOf(io); opts+='<option value="'+escapeHtml(nm)+'">'+escapeHtml(nm)+'</option>'; });
+  }
+  assignSel.innerHTML=opts; assignSel.value=cur;
+}
 function openNoticeModal(noticeId) {
   // Populate IO + assign dropdowns
   var ioSel = document.getElementById('nf-io');
@@ -49531,6 +49549,7 @@ function openNoticeModal(noticeId) {
     nfUpdateCases();
     setTimeout(function(){ document.getElementById('nf-case-id').value = n.case_id || ''; }, 50);
     if (ioSel) ioSel.value = n.io_name || '';
+    nfSyncAssignedToIO(n.assigned_to || '');
     document.getElementById('nf-type').value = n.notice_type || 'Notice';
     document.getElementById('nf-detail').value = n.notice_detail || '';
     document.getElementById('nf-notice-date').value = n.notice_date || '';
