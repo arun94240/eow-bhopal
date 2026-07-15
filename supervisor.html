@@ -24612,7 +24612,7 @@ body.role-staff header { margin-top: 30px; }
                 <span class="ovstats-panel-icon">📊</span>
                 <span class="ovstats-panel-title">Reports by Types — Inquiries</span>
                 <span class="ovstats-panel-sub">category-wise quick reports</span>
-                <button class="ovstats-open-full" onclick="event.stopPropagation();_reportInlineOpenAt('reports-bytypes-panel')">Full Builder →</button>
+                <button class="ovstats-open-full" onclick="event.stopPropagation();_reportInlineOpenAt('ovstats-summary-wrap')">Full Builder →</button>
               </div>
               <div class="ovstats-panel-body">
                 <div id="ovstats-host-reports" class="ovstats-summary-host"></div>
@@ -45533,6 +45533,7 @@ function _reportInlineOpen(force){
 function openReportBuilderInline(){ _reportInlineOpen(false); }
 function _reportInlineOpenAt(containerId, forceOpen){
   var cont=document.getElementById(containerId); if(!cont) return;
+  if(cont.classList.contains('collapsed')) cont.classList.remove('collapsed');
   var host=cont.querySelector('.report-inline-host');
   if(!host){ host=document.createElement('div'); host.className='report-inline-host'; cont.appendChild(host); }
   var rep=document.getElementById('report');
@@ -45540,7 +45541,7 @@ function _reportInlineOpenAt(containerId, forceOpen){
   var isOpen = host.style.display==='block';
   var open = forceOpen ? true : !isOpen;
   host.style.display = open ? 'block' : 'none';
-  if(open){ try{ rbInit(); }catch(e){} try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+  if(open){ try{ rbInit(); }catch(e){} setTimeout(function(){ try{ host.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} }, 60); }
 }
 
 // ═══ Overview Stats — inline summary renderers (light, with 'open full' button in panel head) ═══
@@ -45720,7 +45721,7 @@ function ovstatsRunReport(cat) {
   if (typeof switchSection !== 'function') return;
   if (cat === '__court') { switchSection('court'); return; }
   if (cat === '__officers') { switchSection('officers'); return; }
-  if (typeof _reportInlineOpenAt === 'function') { _reportInlineOpenAt('reports-bytypes-panel', true); } else { switchSection('report'); }
+  if (typeof _reportInlineOpenAt === 'function') { _reportInlineOpenAt('ovstats-summary-wrap', true); } else { switchSection('report'); }
   setTimeout(function(){
     if (typeof rbToggleAllTypes === 'function') {
       rbToggleAllTypes(false);
