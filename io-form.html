@@ -792,7 +792,7 @@ async function loadInitialData() {
     courtsData = [];
     for (var _cp = 0; _cp < 30; _cp++) {
       var _cr = await supa.from('court_cases')
-        .select('id,case_type,case_no,court,cnr_no,incharge_officer,incharge_io_id,serial,petitioner,respondent')
+        .select('id,case_type,case_no,court,cnr_no,incharge_io_id,serial,petitioner,respondent')
         .range(_cp * _eps, (_cp + 1) * _eps - 1);
       var _crows = _cr.data || [];
       courtsData = courtsData.concat(_crows);
