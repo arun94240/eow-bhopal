@@ -25109,7 +25109,7 @@ body.role-staff header { margin-top: 30px; }
         <div class="form-grid pf-seq-form" style="grid-template-columns:1fr;">
           <div class="form-group pf-seq-step" data-step="1">
             <label class="form-label">IO का नाम <span class="req">*</span></label>
-            <select class="form-select" id="pf-io" onchange="pfUpdateTypes();pfSeqAdvance()"><option value="">— चुनें —</option></select>
+            <select class="form-select" id="pf-io" onchange="pfUpdateTypes();pfSeqAdvance();pfNoticeStaffSync()"><option value="">— चुनें —</option></select>
           </div>
           <div class="form-group pf-seq-step pf-seq-locked" data-step="2">
             <label class="form-label">प्रकरण का प्रकार <span class="req">*</span></label>
@@ -25226,6 +25226,11 @@ body.role-staff header { margin-top: 30px; }
                 <label class="form-label">📅 उपस्थिति / तामील की दिनांक <span class="req">*</span></label>
                 <input type="date" class="form-input" id="pf-notice-appearance">
                 <div style="font-size:11px;color:#92400e;margin-top:4px;">इस दिनांक पर यह pending सूची में दिखेगा</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">👮 तामील हेतु (Staff)</label>
+                <select class="form-select" id="pf-notice-assigned"><option value="">— अभी assign नहीं —</option></select>
+                <div style="font-size:11px;color:#92400e;margin-top:4px;">इस IO को सौंपे गए आरक्षक/HC/ASI — तामील हेतु चुनें (Establishment में assign)</div>
               </div>
             </div>
           </div>
@@ -58577,6 +58582,21 @@ function pfSeqResetLocks() {
   if (ioEl) ioEl.disabled = false;
 }
 
+function pfNoticeStaffSync(){
+  var sel=document.getElementById('pf-notice-assigned'); if(!sel) return;
+  var cur=sel.value||'';
+  var ioId=(document.getElementById('pf-io')||{}).value||'';
+  var ioRec=(state.ioMaster||[]).find(function(x){ return x.id===ioId; });
+  var ids=(ioRec && Array.isArray(ioRec.reporting_staff_ids))?ioRec.reporting_staff_ids:[];
+  function nmeOf(x){ return x.rank?(x.rank+' '+x.name):x.name; }
+  var opts='<option value="">— अभी assign नहीं —</option>';
+  if(ids.length){
+    ids.forEach(function(sid){ var s=(state.ioMaster||[]).find(function(x){return x.id===sid;}); if(s){ var nm=nmeOf(s); opts+='<option value="'+escapeHtml(nm)+'">'+escapeHtml(nm)+'</option>'; } });
+  } else {
+    (state.ioMaster||[]).forEach(function(io){ if(io.status && io.status!=='Active') return; if(io.is_io) return; var nm=nmeOf(io); opts+='<option value="'+escapeHtml(nm)+'">'+escapeHtml(nm)+'</option>'; });
+  }
+  sel.innerHTML=opts; sel.value=cur;
+}
 function pfActionChange() {
   var sel = document.getElementById('pf-action');
   var otherInput = document.getElementById('pf-action-other');
@@ -58593,6 +58613,7 @@ function pfActionChange() {
   if (noticeSection) {
     if (sel.value === 'सूचना/समन/नोटिस जारी किया') {
       noticeSection.style.display = 'block';
+      pfNoticeStaffSync();
       // Pre-fill notice date with the update date for convenience
       var nd = document.getElementById('pf-notice-date');
       var pd = document.getElementById('pf-date');
@@ -58654,6 +58675,7 @@ async function pfSubmit() {
     }
     noticeDate = document.getElementById('pf-notice-date').value;
     noticeAppearance = document.getElementById('pf-notice-appearance').value;
+    var noticeAssigned = (document.getElementById('pf-notice-assigned')||{}).value || '';
     if (!noticeType) { toast('कृपया नोटिस का प्रकार चुनें', true); return; }
     if (!noticeDetail) { toast('कृपया नोटिस का विवरण चुनें / लिखें', true); return; }
     if (!noticeDate) { toast('कृपया नोटिस जारी करने की दिनांक चुनें', true); return; }
@@ -58704,6 +58726,7 @@ async function pfSubmit() {
           pragati_date: updateDate,
           notice_date: noticeDate,
           appearance_date: noticeAppearance,
+          assigned_to: noticeAssigned || null,
           status: noticeStatus,
           tameel_result: noticeTameelResult,
           tameel_submitted_at: isBackDated ? new Date().toISOString() : null
