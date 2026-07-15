@@ -24905,7 +24905,7 @@ body.role-staff #mydaily-box{ display:none !important; }
 
   <!-- ESTABLISHMENT (formerly IO Master) -->
   <section id="iomaster" class="section">
-    <div class="section-header"><div><h2>🏢 Establishment</h2><div class="desc">SP EOW Office Bhopal — पूरा staff database</div></div><div><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
+    <div class="section-header"><div><h2>🏢 Establishment - Leaves</h2><div class="desc">SP EOW Office Bhopal — staff database व अवकाश</div></div><div><button class="btn" onclick="switchSection('leaves')">🏖 Leaves →</button><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
     <div class="toolbar"><input type="search" class="search-input" id="search-io" placeholder="Search name, rank, mobile…" oninput="renderIOMaster()"><select class="filter-select" id="filter-io-status" onchange="renderIOMaster()"><option value="">All</option><option value="io">IOs</option><option value="non-io">Other Staff</option></select></div>
     <div id="io-master-list"><div class="empty-state"><h3>कोई member नहीं — पहला member जोड़ें</h3></div></div>
   </section>
@@ -25097,7 +25097,7 @@ body.role-staff #mydaily-box{ display:none !important; }
 
   <!-- PRAGATI PRATIVEDAN (IO Daily Update Form embedded) -->
   <section id="pragati" class="section">
-    <div class="section-header"><div><h2>📋 Pragati Prativedan</h2><div class="desc">IO updates — daily progress reports across all cases</div></div></div>
+    <div class="section-header"><div><h2>📋 प्रगति - Notice प्रतिवेदन</h2><div class="desc">IO प्रगति व जारी notice/summons/warrant</div></div><div><button class="btn" onclick="gotoNotices()">📨 Notices →</button></div></div>
 
     <!-- ============ PRAGATI CONTAINER ============ -->
     <div id="pir-pragati-container">
@@ -27922,6 +27922,19 @@ function _staffLiveSetup(){
   if(dept && dept.parentNode!==host) host.appendChild(dept);
   try{ renderMyDailyBox(); }catch(e){}
   try{ mddAttStartLive(); }catch(e){}
+}
+function gotoNotices(){
+  try{ switchSection('overview'); }catch(e){}
+  setTimeout(function(){
+    var tile=document.querySelector('.hct-notice');
+    if(tile){ tile.style.display='flex'; }
+    try{
+      var car=document.getElementById('hct-car-notices');
+      var isOpen = car && car.textContent && car.textContent.indexOf('▴')>=0;
+      if(!isOpen && typeof hctToggle==='function') hctToggle('notices');
+    }catch(e){}
+    if(tile){ try{ tile.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} }
+  }, 240);
 }
 function doLogout() {
   if (!confirm('Logout karna confirm karen?')) return;
