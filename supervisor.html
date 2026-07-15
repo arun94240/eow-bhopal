@@ -22283,6 +22283,30 @@ body.role-staff #mydaily-box{ display:none !important; }
 .section-tab:not(.active)[data-section="knowledge-base"]{ background:linear-gradient(135deg,#8b5cf6,#7c3aed) !important; }
 .section-tab.active{ background:#ffffff !important; color:#062a52 !important; border:2px solid #f5b942 !important; box-shadow:0 3px 12px rgba(245,185,66,.45) !important; }
 .section-tab.active .count{ background:rgba(6,42,82,.12) !important; color:#062a52 !important; }
+
+/* ═══ Database box + विश्लेषण merge (v176) ═══ */
+.dbbox{ background:linear-gradient(160deg,#08203f,#0a2c56); border:1px solid rgba(255,255,255,.1); border-radius:16px; overflow:hidden; box-shadow:0 5px 20px rgba(6,42,82,.25); margin-bottom:14px; color:#fff; }
+.dbbox-hd{ display:flex; align-items:center; gap:11px; padding:13px 14px; }
+.dbbox-cal{ width:42px; border-radius:9px; overflow:hidden; text-align:center; background:#fff; flex-shrink:0; display:block; }
+.dbbox-cal .dbc-m{ display:block; background:#dc2626; color:#fff; font-size:7.5px; font-weight:900; padding:1px 0; letter-spacing:.5px; }
+.dbbox-cal .dbc-d{ display:block; color:#062a52; font-size:15px; font-weight:900; line-height:1.15; }
+.dbbox-cal .dbc-w{ display:block; color:#64748b; font-size:7px; font-weight:800; padding-bottom:2px; }
+.dbbox-tt{ flex:1; } .dbbox-t{ font-size:15.5px; font-weight:900; } .dbbox-s{ font-size:10.5px; color:#9db5d4; }
+.dbbox-gt{ text-align:center; } .dbbox-gn{ font-size:22px; font-weight:900; color:#f5b942; line-height:1; } .dbbox-gl{ font-size:8.5px; color:#9db5d4; }
+.dbgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:0 13px 11px; }
+.dbcard{ border-radius:12px; padding:10px 6px; text-align:center; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.28); cursor:pointer; transition:transform .12s; }
+.dbcard:hover{ transform:translateY(-2px); }
+.dbcard-ic{ font-size:14px; } .dbcard-nm{ font-size:9.5px; font-weight:800; margin-top:2px; opacity:.95; } .dbcard-ct{ font-size:16px; font-weight:900; }
+.db-an-row{ margin:0 13px 13px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:9px 10px; }
+.db-an-h{ font-size:10px; font-weight:900; color:#9db5d4; letter-spacing:.6px; margin-bottom:7px; }
+.db-an-chips{ display:flex; gap:6px; flex-wrap:wrap; }
+.db-an-chip{ font-size:10.5px; font-weight:800; padding:6px 12px; border-radius:999px; color:#fff; background:var(--c); box-shadow:0 2px 6px rgba(0,0,0,.25); cursor:pointer; }
+.db-an-chip.on{ box-shadow:0 0 0 2px #f5b942 inset, 0 2px 6px rgba(0,0,0,.25); }
+#db-an-host{ margin-top:9px; }
+#db-an-host .ovstats-panel{ background:#fff; border-radius:12px; color:#0f2238; padding:10px; }
+@media(max-width:380px){ .dbgrid{ grid-template-columns:repeat(2,1fr); } }
+/* ovstats slim → कार्यालय (प्रकरण tiles Database में गए) */
+#ovstats-tile-row .ovstats-tile-year, #ovstats-tile-row .ovstats-tile-enqtype, #ovstats-tile-row .ovstats-tile-io, #ovstats-tile-row .ovstats-tile-court{ display:none !important; }
 </style>
 </head>
 <body>
@@ -22676,7 +22700,7 @@ body.role-staff #mydaily-box{ display:none !important; }
           <div class="ov-section-titles">
             <div class="sup-title-row dgeow-title-row">
               <span class="sup-mini-cal" id="ovstats-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
-              <div class="ov-section-title">📊 Overview Stats</div>
+              <div class="ov-section-title">🏢 कार्यालय — Overview</div>
               <span class="dgeow-total-pill">Total: <strong id="ovstats-cnt-total">0</strong></span>
               <span class="ovstats-bday-chip" id="ovstats-bday-chip" style="display:none;" onclick="event.stopPropagation();" title="आज जन्मदिन"></span>
             </div>
@@ -51084,9 +51108,39 @@ function tcToggleSort() { _tcSortDir = (_tcSortDir === 'desc') ? 'asc' : 'desc';
 // Short category badge codes for the unified list
 var _tcShort = { complaints:'C', rcomplaints:'RC', rcs:'RC#', pes:'PE', strs:'STR', sutra:'SU' };
 
+function _dbAnRescue(){
+  ['year','enqtype','io','court'].forEach(function(k){
+    var p=document.getElementById('ovstats-panel-'+k);
+    if(p && p.closest && p.closest('#totalcases-content')){
+      if(p.__origParent) p.__origParent.appendChild(p);
+      p.style.display='none';
+    }
+  });
+}
+function dbAnalysisOpen(kind){
+  var host=document.getElementById('db-an-host'); var panel=document.getElementById('ovstats-panel-'+kind);
+  if(!host||!panel) return;
+  var wasOpen = (panel.parentNode===host && panel.style.display==='block');
+  Array.prototype.slice.call(host.children).forEach(function(c){ c.style.display='none'; });
+  document.querySelectorAll('.db-an-chip').forEach(function(c){ c.classList.remove('on'); });
+  if(wasOpen) return;
+  if(!panel.__origParent) panel.__origParent = panel.parentNode;
+  host.appendChild(panel);
+  try{ _ovstatsRelocateGrids(); }catch(e){}
+  panel.style.display='block';
+  var chip=document.querySelector('.db-an-chip[data-k="'+kind+'"]'); if(chip) chip.classList.add('on');
+  try{
+    if(kind==='year' && typeof renderYearCards==='function') renderYearCards();
+    else if(kind==='enqtype' && typeof renderEnqTypeCards==='function') renderEnqTypeCards();
+    else if(kind==='io' && typeof renderIOCards==='function') renderIOCards();
+    else if(kind==='court'){ if(typeof refreshCourtCounters==='function') refreshCourtCounters(); if(typeof _ovstatsMountCourtList==='function') _ovstatsMountCourtList(); if(typeof headYearFilter!=='undefined' && !headYearFilter.court) headYearFilter.court='all'; if(typeof renderCourtTable==='function') renderCourtTable(); }
+  }catch(e){}
+  try{ panel.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
+}
 function renderTotalCases() {
   var content = document.getElementById('totalcases-content');
   if (!content) return;
+  try{ _dbAnRescue(); }catch(e){}
   
   var enquiryHeads = ['complaints', 'rcomplaints', 'rcs', 'pes', 'strs', 'sutra'];
   var labels = {
@@ -51147,10 +51201,13 @@ function renderTotalCases() {
   });
   
   // Per-head compact stat cards
+  var DBMETA = { complaints:{ic:'📩',g:'linear-gradient(135deg,#2563eb,#1d4fc4)'}, rcomplaints:{ic:'📨',g:'linear-gradient(135deg,#7c3aed,#6527cc)'}, rcs:{ic:'📕',g:'linear-gradient(135deg,#dc2626,#b91c1c)'}, pes:{ic:'🔎',g:'linear-gradient(135deg,#ea580c,#c2410c)'}, strs:{ic:'🏦',g:'linear-gradient(135deg,#0891b2,#0e7490)'}, sutra:{ic:'🧭',g:'linear-gradient(135deg,#16a34a,#15803d)'} };
   var cards = enquiryHeads.map(function(h){
-    return '<div class="stat-card" onclick="switchSection(\'' + h + '\')">' +
-      '<div class="stat-label">' + escapeHtml(labels[h]) + '</div>' +
-      '<div class="stat-value">' + counts[h] + '</div>' +
+    var m = DBMETA[h] || {ic:'📁',g:'#0f2a4a'};
+    return '<div class="dbcard" style="background:'+m.g+'" onclick="switchSection(\'' + h + '\')">' +
+      '<div class="dbcard-ic">'+m.ic+'</div>' +
+      '<div class="dbcard-nm">' + escapeHtml(labels[h]) + '</div>' +
+      '<div class="dbcard-ct">' + counts[h] + '</div>' +
     '</div>';
   }).join('');
   
@@ -51189,8 +51246,26 @@ function renderTotalCases() {
       '</tbody></table></div></div>';
   }
   
-  content.innerHTML = '<div class="totalcases-grid">' + cards + '</div>' + grandCard + toolbar +
-    '<div class="tc-list-section">' + listHTML + '</div>';
+  var _dn = new Date();
+  var _dmo = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][_dn.getMonth()];
+  var _dwk = ['SUN','MON','TUE','WED','THU','FRI','SAT'][_dn.getDay()];
+  var dbbox = '<div class="dbbox">' +
+    '<div class="dbbox-hd">' +
+      '<span class="dbbox-cal"><span class="dbc-m">'+_dmo+'</span><span class="dbc-d">'+_dn.getDate()+'</span><span class="dbc-w">'+_dwk+'</span></span>' +
+      '<div class="dbbox-tt"><div class="dbbox-t">🗄️ Database</div><div class="dbbox-s">' + escapeHtml(contextLabel) + ' — सभी श्रेणियाँ</div></div>' +
+      '<div class="dbbox-gt"><div class="dbbox-gn">' + grandTotal + '</div><div class="dbbox-gl">कुल प्रकरण</div></div>' +
+    '</div>' +
+    '<div class="dbgrid">' + cards + '</div>' +
+    '<div class="db-an-row"><div class="db-an-h">📊 विश्लेषण — इसी DATA के दृश्य</div>' +
+      '<div class="db-an-chips">' +
+        '<span class="db-an-chip" data-k="year" style="--c:#1d4e89" onclick="dbAnalysisOpen(\'year\')">📅 Year-wise</span>' +
+        '<span class="db-an-chip" data-k="enqtype" style="--c:#2563eb" onclick="dbAnalysisOpen(\'enqtype\')">📂 Inquiries type</span>' +
+        '<span class="db-an-chip" data-k="io" style="--c:#9333ea" onclick="dbAnalysisOpen(\'io\')">👮 IOs</span>' +
+        '<span class="db-an-chip" data-k="court" style="--c:#4f46e5" onclick="dbAnalysisOpen(\'court\')">⚖️ Court</span>' +
+      '</div><div id="db-an-host"></div>' +
+    '</div>' +
+  '</div>';
+  content.innerHTML = dbbox + toolbar + '<div class="tc-list-section">' + listHTML + '</div>';
 }
 
 function renderTable(type) {
