@@ -22126,6 +22126,14 @@ body.role-staff header { margin-top: 30px; }
 .section.report-inlined{ display:block !important; padding:14px !important; margin:0 !important; background:#fff; border:1px solid #dbe6f2; border-radius:12px; }
 .section.report-inlined > .section-header{ margin-top:0; }
 .rep-pchip-reports.is-active{ box-shadow:0 0 0 2px #0d9488 inset; }
+
+.ef-head-new.cf-tier-supreme{ border-top:4px solid #7c3aed; }
+.ef-head-new.cf-tier-high{ border-top:4px solid #2563eb; }
+.ef-head-new.cf-tier-district{ border-top:4px solid #0d9488; }
+.cf-tierpill{ border-radius:999px; padding:1px 8px; font-size:9px; margin-left:6px; color:#fff; vertical-align:middle; font-weight:800; }
+.cf-tier-supreme .cf-tierpill{ background:#7c3aed; }
+.cf-tier-high .cf-tierpill{ background:#2563eb; }
+.cf-tier-district .cf-tierpill{ background:#0d9488; }
 </style>
 </head>
 <body>
@@ -26048,12 +26056,14 @@ body.role-staff header { margin-top: 30px; }
 </div></div>
 
 <div class="modal-overlay" id="courtModal"><div class="modal">
-  <div class="modal-header">
-    <div><div class="modal-eyebrow" id="court-eyebrow">New Court Case</div><div class="modal-title">🏛 Court Case</div></div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button class="modal-edit-toggle-btn" id="court-edit-toggle-btn" onclick="toggleCourtEditMode()" style="display:none;">✎ Edit</button>
-      <button class="modal-timeline-btn" id="court-modal-timeline-btn" onclick="openTimelineFromCourtModal()" title="Case Timeline" style="display:none;">📊 Timeline</button>
-      <button class="close-btn" onclick="closeModal('courtModal')">×</button>
+  <div class="modal-header ef-head-new" id="court-modal-header">
+    <button class="ef-close-new" onclick="closeModal('courtModal')" aria-label="Close">×</button>
+    <div class="modal-eyebrow" id="court-eyebrow">🏛 Court Case<span class="cf-tierpill" id="court-tierpill" style="display:none;"></span></div>
+    <div class="modal-title" id="court-title">🏛 Court Case</div>
+    <div class="ef-subtitle" id="court-subtitle" style="display:none;"></div>
+    <div class="ef-toolbar">
+      <button class="modal-edit-toggle-btn ef-edit-primary" id="court-edit-toggle-btn" onclick="toggleCourtEditMode()" style="display:none;">✎ Edit</button>
+      <button class="ef-ico-btn" id="court-modal-timeline-btn" onclick="openTimelineFromCourtModal()" title="Timeline" style="display:none;">📊</button>
     </div>
   </div>
   <div class="modal-body" id="court-modal-body"><div class="form-grid">
@@ -26334,11 +26344,11 @@ body.role-staff header { margin-top: 30px; }
       <div id="cf-directives-list"></div>
     </div>
   </div></div>
-  <div class="modal-footer">
-    <button class="btn btn-danger" id="cf-delete" onclick="deleteCourt()" style="display:none;">Delete</button>
+  <div class="modal-footer ef-foot-new">
+    <button class="btn btn-danger ef-del-new" id="cf-delete" onclick="deleteCourt()" style="display:none;">🗑 Delete</button>
     <div style="flex:1"></div>
-    <button class="btn" id="court-footer-close" onclick="closeModal('courtModal')">Close</button>
-    <button class="btn btn-primary" id="court-footer-save" onclick="saveCourt()" style="display:none;">💾 Save</button>
+    <button class="btn ef-close-btn2" id="court-footer-close" onclick="closeModal('courtModal')">Close</button>
+    <button class="btn btn-primary ef-save-new" id="court-footer-save" onclick="saveCourt()" style="display:none;">💾 Save</button>
   </div>
 </div></div>
 
@@ -53192,14 +53202,12 @@ function openCourtModal(id) {
   if (id) {
     c = state.courts.find(function(x){ return x.id === id; });
     if (!c) { toast('Not found'); return; }
-    document.getElementById('court-eyebrow').textContent = 'Edit Court Case';
     document.getElementById('cf-delete').style.display = 'inline-flex';
     // Show Case Timeline button
     var ctBtn = document.getElementById('court-modal-timeline-btn');
     if (ctBtn) ctBtn.style.display = 'inline-flex';
   } else {
     c = {};
-    document.getElementById('court-eyebrow').textContent = 'New Court Case';
     document.getElementById('cf-delete').style.display = 'none';
     // Hide Case Timeline button
     var ctBtn2 = document.getElementById('court-modal-timeline-btn');
@@ -53212,6 +53220,24 @@ function openCourtModal(id) {
     var courtObj = (state.courtsMaster || []).find(function(cm){ return cm.id === c.court_id; });
     if (courtObj) tier = courtObj.tier;
   }
+  // header: tier accent + big case-no title + court subtitle
+  try {
+    var _hdr = document.getElementById('court-modal-header');
+    if (_hdr) { _hdr.classList.remove('cf-tier-supreme','cf-tier-high','cf-tier-district'); if (tier) _hdr.classList.add('cf-tier-'+tier); }
+    var _pill = document.getElementById('court-tierpill');
+    var _tl = {supreme:'Supreme Court', high:'High Court', district:'District Court'}[tier] || '';
+    if (_pill) { _pill.textContent = _tl; _pill.style.display = _tl ? 'inline-block' : 'none'; }
+    var _cType = (c.case_type === 'Other') ? (c.case_type_other || '') : (c.case_type || '');
+    var _noYr = c.case_no || '';
+    if (c.case_year && _noYr && String(_noYr).indexOf('/') < 0) _noYr = _noYr + '/' + c.case_year;
+    var _cno = (typeof formatTypeNo === 'function') ? (formatTypeNo(_cType, _noYr) || '') : ((_cType+' '+(c.case_no||'')).trim());
+    var _titleEl = document.getElementById('court-title');
+    if (_titleEl) _titleEl.textContent = (id && _cno) ? _cno : (id ? '🏛 Court Case' : 'नया Court Case');
+    var _courtName = '';
+    if (c.court_id) { var _cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; }); if (_cm) _courtName = _cm.name || _cm.court_name || ''; }
+    var _subEl = document.getElementById('court-subtitle');
+    if (_subEl) { _subEl.textContent = id ? _courtName : ''; _subEl.style.display = (id && _courtName) ? 'block' : 'none'; }
+  } catch(e){}
   
   // Set tier radio
   var tierRadios = document.getElementsByName('cf-tier');
