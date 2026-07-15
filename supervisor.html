@@ -22224,6 +22224,22 @@ body.role-staff header { margin-top: 30px; }
 .global-search-clear:hover{ background:#b91c1c !important; transform:scale(1.06); }
 .global-search-wrap{ background:#fff !important; }
 .global-search-box{ background:#fff !important; }
+
+/* ── case-type section header accents (v165) ── */
+#complaints .section-header{ border-left-color:#2563eb !important; background:linear-gradient(90deg,rgba(37,99,235,.055),#fff 55%) !important; }
+#rcomplaints .section-header{ border-left-color:#7c3aed !important; background:linear-gradient(90deg,rgba(124,58,237,.055),#fff 55%) !important; }
+#rcs .section-header{ border-left-color:#dc2626 !important; background:linear-gradient(90deg,rgba(220,38,38,.055),#fff 55%) !important; }
+#pes .section-header{ border-left-color:#ea580c !important; background:linear-gradient(90deg,rgba(234,88,12,.055),#fff 55%) !important; }
+#strs .section-header{ border-left-color:#0891b2 !important; background:linear-gradient(90deg,rgba(8,145,178,.055),#fff 55%) !important; }
+#sutra .section-header{ border-left-color:#16a34a !important; background:linear-gradient(90deg,rgba(22,163,74,.055),#fff 55%) !important; }
+/* ── control polish: lighter year-tabs + tighter spacing ── */
+.year-tabs-row{ background:#f4f7fb !important; border:1px solid #e6ecf3 !important; box-shadow:none !important; padding:6px !important; margin-bottom:8px !important; flex-wrap:nowrap !important; overflow-x:auto !important; }
+.year-tab-btn{ background:#fff !important; border:1px solid #e0e7f0 !important; color:#334155 !important; text-shadow:none !important; padding:6px 13px !important; border-radius:999px !important; font-size:11.5px !important; }
+.year-tab-btn.active{ background:#062a52 !important; color:#f5b942 !important; border-color:#062a52 !important; }
+.year-tab-btn:hover{ background:#eef2f7 !important; }
+.enq-view-toggle{ margin-bottom:8px !important; }
+.toolbar{ margin-bottom:8px !important; }
+.smart-chips{ padding:2px 0 6px !important; }
 </style>
 </head>
 <body>
@@ -24643,7 +24659,7 @@ body.role-staff header { margin-top: 30px; }
   </section>
 
   <section id="complaints" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('complaints')"><span class="collapse-arrow" id="complaints-arrow">▼</span> Complaints</h2></div><div><button class="btn btn-primary" data-action="add" data-type="complaints">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('complaints')"><span class="collapse-arrow" id="complaints-arrow">▼</span> 📩 Complaints</h2><div class="desc">प्राप्त शिकायतें — श्रेणी-वार</div></div><div><button class="btn btn-primary" data-action="add" data-type="complaints">+ Add Entry</button></div></div>
     <div class="section-collapse" id="complaints-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -24659,7 +24675,7 @@ body.role-staff header { margin-top: 30px; }
   </div></section>
 
   <section id="rcomplaints" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcomplaints')"><span class="collapse-arrow" id="rcomplaints-arrow">▼</span> R-Complaints</h2></div><div><button class="btn btn-primary" data-action="add" data-type="rcomplaints">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcomplaints')"><span class="collapse-arrow" id="rcomplaints-arrow">▼</span> 📨 R-Complaints</h2><div class="desc">पुनः / स्थानांतरित शिकायतें</div></div><div><button class="btn btn-primary" data-action="add" data-type="rcomplaints">+ Add Entry</button></div></div>
     <div class="section-collapse" id="rcomplaints-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -24675,7 +24691,7 @@ body.role-staff header { margin-top: 30px; }
   </div></section>
 
   <section id="rcs" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcs')"><span class="collapse-arrow" id="rcs-arrow">▼</span> RCs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="rcs">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcs')"><span class="collapse-arrow" id="rcs-arrow">▼</span> 📕 RCs</h2><div class="desc">पंजीबद्ध अपराध (RC)</div></div><div><button class="btn btn-primary" data-action="add" data-type="rcs">+ Add Entry</button></div></div>
     <div class="section-collapse" id="rcs-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -24691,7 +24707,7 @@ body.role-staff header { margin-top: 30px; }
   </div></section>
 
   <section id="pes" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('pes')"><span class="collapse-arrow" id="pes-arrow">▼</span> PEs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="pes">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('pes')"><span class="collapse-arrow" id="pes-arrow">▼</span> 🔎 PEs</h2><div class="desc">प्रारंभिक जाँच (PE)</div></div><div><button class="btn btn-primary" data-action="add" data-type="pes">+ Add Entry</button></div></div>
     <div class="section-collapse" id="pes-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -24707,7 +24723,7 @@ body.role-staff header { margin-top: 30px; }
   </div></section>
 
   <section id="strs" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('strs')"><span class="collapse-arrow" id="strs-arrow">▼</span> STRs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="strs">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('strs')"><span class="collapse-arrow" id="strs-arrow">▼</span> 🏦 STRs</h2><div class="desc">संदिग्ध लेन-देन प्रतिवेदन</div></div><div><button class="btn btn-primary" data-action="add" data-type="strs">+ Add Entry</button></div></div>
     <div class="section-collapse" id="strs-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -24723,7 +24739,7 @@ body.role-staff header { margin-top: 30px; }
   </div></section>
 
   <section id="sutra" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('sutra')"><span class="collapse-arrow" id="sutra-arrow">▼</span> Sutra Suchna</h2></div><div><button class="btn btn-primary" data-action="add" data-type="sutra">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('sutra')"><span class="collapse-arrow" id="sutra-arrow">▼</span> 🧭 Sutra Suchna</h2><div class="desc">सूत्र सूचना</div></div><div><button class="btn btn-primary" data-action="add" data-type="sutra">+ Add Entry</button></div></div>
     <div class="section-collapse" id="sutra-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
