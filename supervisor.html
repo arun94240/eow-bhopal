@@ -22255,6 +22255,10 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ifl-row-status{ font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px; background:rgba(15,42,74,.08); color:#0f2a4a; white-space:nowrap; flex-shrink:0; }
 .ifl-row-dim{ opacity:.5; }
 .ifl-row-dim .ifl-row-brief{ text-decoration:line-through; }
+
+/* Staff panel → Leaves quick-link (v172) */
+.ovstats-leaves-link{ margin-left:auto; background:rgba(180,120,20,.12); color:#8a5a00; border:1px solid rgba(180,120,20,.3); border-radius:8px; font-size:11px; font-weight:800; padding:5px 11px; cursor:pointer; white-space:nowrap; }
+.ovstats-leaves-link:hover{ background:rgba(180,120,20,.2); }
 </style>
 </head>
 <body>
@@ -22915,6 +22919,7 @@ body.role-staff #mydaily-box{ display:none !important; }
                 <span class="ovstats-panel-title">Staff</span>
                 <span class="ovstats-grand-total" id="estab-roster-summary">0 staff</span>
                 <span class="ovstats-panel-sub">Status + profile — tap any staff to expand</span>
+                <button class="ovstats-leaves-link" onclick="event.stopPropagation();switchSection('leaves')">🏖 Leaves →</button>
               </div>
               <div class="ovstats-panel-body">
                 <!-- Status tiles (merged from Staff Pulse) -->
