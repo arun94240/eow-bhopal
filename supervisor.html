@@ -22260,24 +22260,35 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ovstats-leaves-link{ margin-left:auto; background:rgba(180,120,20,.12); color:#8a5a00; border:1px solid rgba(180,120,20,.3); border-radius:8px; font-size:11px; font-weight:800; padding:5px 11px; cursor:pointer; white-space:nowrap; }
 .ovstats-leaves-link:hover{ background:rgba(180,120,20,.2); }
 
-/* ═══ Colourful section tabs (v173) — accents like Overview/MyDaily ═══ */
-.section-tab:not(.active)[data-section]{ border-left-width:3px !important; border-left-style:solid !important; }
-.section-tab:not(.active)[data-section="overview"]{ border-left-color:#f5b942 !important; background:linear-gradient(90deg,rgba(245,185,66,.16),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="totalcases"]{ border-left-color:#0f2a4a !important; background:linear-gradient(90deg,rgba(15,42,74,.10),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="complaints"]{ border-left-color:#2563eb !important; background:linear-gradient(90deg,rgba(37,99,235,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="rcomplaints"]{ border-left-color:#7c3aed !important; background:linear-gradient(90deg,rgba(124,58,237,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="rcs"]{ border-left-color:#dc2626 !important; background:linear-gradient(90deg,rgba(220,38,38,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="pes"]{ border-left-color:#ea580c !important; background:linear-gradient(90deg,rgba(234,88,12,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="strs"]{ border-left-color:#0891b2 !important; background:linear-gradient(90deg,rgba(8,145,178,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="sutra"]{ border-left-color:#16a34a !important; background:linear-gradient(90deg,rgba(22,163,74,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="court"]{ border-left-color:#4f46e5 !important; background:linear-gradient(90deg,rgba(79,70,229,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="officers"]{ border-left-color:#9333ea !important; background:linear-gradient(90deg,rgba(147,51,234,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="pragati"]{ border-left-color:#0d9488 !important; background:linear-gradient(90deg,rgba(13,148,136,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="iomaster"]{ border-left-color:#6366f1 !important; background:linear-gradient(90deg,rgba(99,102,241,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="tags"]{ border-left-color:#06b6d4 !important; background:linear-gradient(90deg,rgba(6,182,212,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="leaves"]{ border-left-color:#d97706 !important; background:linear-gradient(90deg,rgba(217,119,6,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="links"]{ border-left-color:#64748b !important; background:linear-gradient(90deg,rgba(100,116,139,.12),#eef2f7 62%) !important; }
-.section-tab:not(.active)[data-section="knowledge-base"]{ border-left-color:#8b5cf6 !important; background:linear-gradient(90deg,rgba(139,92,246,.12),#eef2f7 62%) !important; }
+/* ═══ Section tabs v174 — clean solid chips, coloured bar + pill ═══ */
+.section-tab:not(.active)[data-section]{ background:#f5f8fc !important; border:1px solid #dfe7f0 !important; border-left-width:4px !important; border-left-style:solid !important; color:#16324f !important; text-shadow:none !important; font-weight:800 !important; }
+.section-tab:not(.active)[data-section]:hover{ background:#eaf0f7 !important; }
+.section-tab:not(.active)[data-section] .count{ background:rgba(15,42,74,.08) !important; color:#0f2a4a !important; }
+.section-tab.active{ background:#f5b942 !important; color:#062a52 !important; border-color:#f5b942 !important; box-shadow:0 3px 10px rgba(245,185,66,.35) !important; }
+.section-tab.active .count{ background:rgba(6,42,82,.16) !important; color:#062a52 !important; }
+.section-tab:not(.active)[data-section="overview"]{ border-left-color:#f5b942 !important; }
+.section-tab:not(.active)[data-section="totalcases"]{ border-left-color:#0f2a4a !important; }
+.section-tab:not(.active)[data-section="complaints"]{ border-left-color:#2563eb !important; }
+.section-tab:not(.active)[data-section="complaints"] .count{ background:rgba(37,99,235,.14) !important; color:#1d4ed8 !important; }
+.section-tab:not(.active)[data-section="rcomplaints"]{ border-left-color:#7c3aed !important; }
+.section-tab:not(.active)[data-section="rcomplaints"] .count{ background:rgba(124,58,237,.14) !important; color:#6d28d9 !important; }
+.section-tab:not(.active)[data-section="rcs"]{ border-left-color:#dc2626 !important; }
+.section-tab:not(.active)[data-section="rcs"] .count{ background:rgba(220,38,38,.13) !important; color:#b91c1c !important; }
+.section-tab:not(.active)[data-section="pes"]{ border-left-color:#ea580c !important; }
+.section-tab:not(.active)[data-section="pes"] .count{ background:rgba(234,88,12,.14) !important; color:#c2410c !important; }
+.section-tab:not(.active)[data-section="strs"]{ border-left-color:#0891b2 !important; }
+.section-tab:not(.active)[data-section="strs"] .count{ background:rgba(8,145,178,.14) !important; color:#0e7490 !important; }
+.section-tab:not(.active)[data-section="sutra"]{ border-left-color:#16a34a !important; }
+.section-tab:not(.active)[data-section="sutra"] .count{ background:rgba(22,163,74,.14) !important; color:#15803d !important; }
+.section-tab:not(.active)[data-section="court"]{ border-left-color:#4f46e5 !important; }
+.section-tab:not(.active)[data-section="court"] .count{ background:rgba(79,70,229,.14) !important; color:#4338ca !important; }
+.section-tab:not(.active)[data-section="officers"]{ border-left-color:#9333ea !important; }
+.section-tab:not(.active)[data-section="pragati"]{ border-left-color:#0d9488 !important; }
+.section-tab:not(.active)[data-section="iomaster"]{ border-left-color:#6366f1 !important; }
+.section-tab:not(.active)[data-section="tags"]{ border-left-color:#06b6d4 !important; }
+.section-tab:not(.active)[data-section="leaves"]{ border-left-color:#d97706 !important; }
+.section-tab:not(.active)[data-section="links"]{ border-left-color:#64748b !important; }
+.section-tab:not(.active)[data-section="knowledge-base"]{ border-left-color:#8b5cf6 !important; }
 </style>
 </head>
 <body>
