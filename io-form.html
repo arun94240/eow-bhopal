@@ -506,7 +506,7 @@ body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-sy
 
         <div class="form-group">
           <label class="form-label">IO का नाम <span class="req">*</span></label>
-          <select class="form-select" id="iof-io" onchange="iofIOChange()">
+          <select class="form-select" id="iof-io" onchange="iofIOChange();iofNoticeStaffSync()">
             <option value="">— चुनें —</option>
           </select>
         </div>
@@ -624,6 +624,12 @@ body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-sy
             <label class="form-label">उपस्थिति दिनांक (Appearance Date) <span class="req">*</span></label>
             <input type="date" class="form-input" id="iof-notice-appearance" onclick="if(this.showPicker){try{this.showPicker()}catch(e){}}">
           </div>
+
+          <div class="form-group">
+            <label class="form-label">तामील हेतु (Staff)</label>
+            <select class="form-select" id="iof-notice-assigned"><option value="">— अभी assign नहीं —</option></select>
+            <div class="iof-recipient-hint">आपको सौंपे गए आरक्षक/HC/ASI — तामील हेतु चुनें</div>
+          </div>
         </div>
 
         <!-- विवरण aur आगे क्या करना है — HIDDEN per Sir's spec (future mein jaroorat padegi to show karenge) -->
@@ -715,6 +721,7 @@ if (IS_TEST_MODE) {
 }
 
 var allIOs = [];
+var allMembers = [];
 var enquiriesData = { complaints: [], rcomplaints: [], rcs: [], pes: [], strs: [], sutra: [] };
 var courtsData = [];
 
@@ -757,8 +764,9 @@ function sortIOsByRank(ios) {
 async function loadInitialData() {
   try {
     // Fetch IO master with id + rank for proper joining
-    var ioRes = await supa.from('io_master').select('id,name,rank,is_io,status').eq('status', 'Active').eq('is_io', true);
-    allIOs = sortIOsByRank(ioRes.data || []);
+    var ioRes = await supa.from('io_master').select('id,name,rank,is_io,status,reporting_staff_ids').eq('status', 'Active');
+    allMembers = ioRes.data || [];
+    allIOs = sortIOsByRank(allMembers.filter(function(x){ return x.is_io === true; }));
     var sel = document.getElementById('iof-io');
     // value=id (for backend match), text=display name (Rank + Name)
     sel.innerHTML = '<option value="">— चुनें —</option>' + allIOs.map(function(io){ 
@@ -1424,6 +1432,21 @@ async function iofCheckDuplicateToday(ioId, caseId) {
   } catch(e) { return false; }
 }
 
+function iofNoticeStaffSync(){
+  var sel=document.getElementById('iof-notice-assigned'); if(!sel) return;
+  var cur=sel.value||'';
+  var ioId=(document.getElementById('iof-io')||{}).value||'';
+  var ioRec=(allMembers||[]).find(function(x){ return x.id===ioId; });
+  var ids=(ioRec && Array.isArray(ioRec.reporting_staff_ids))?ioRec.reporting_staff_ids:[];
+  function nmeOf(x){ return x.rank?(x.rank+' '+x.name):x.name; }
+  var opts='<option value="">— अभी assign नहीं —</option>';
+  if(ids.length){
+    ids.forEach(function(sid){ var s=(allMembers||[]).find(function(x){return x.id===sid;}); if(s){ var nm=nmeOf(s); opts+='<option value="'+escapeHtml(nm)+'">'+escapeHtml(nm)+'</option>'; } });
+  } else {
+    (allMembers||[]).forEach(function(m){ if(m.is_io) return; var nm=nmeOf(m); opts+='<option value="'+escapeHtml(nm)+'">'+escapeHtml(nm)+'</option>'; });
+  }
+  sel.innerHTML=opts; sel.value=cur;
+}
 async function submitUpdate() {
   var ioId = document.getElementById('iof-io').value;
   var type = document.getElementById('iof-type').value;
@@ -1437,6 +1460,7 @@ async function submitUpdate() {
   // Notice fields (only relevant if notice action)
   var isNoticeAction = (action === IOF_NOTICE_ACTION);
   var noticeType = '', noticeRecipient = '', noticeAppearance = '';
+  var noticeAssigned = '';
   if (isNoticeAction) {
     noticeType = document.getElementById('iof-notice-type').value;
     var recSel = document.getElementById('iof-notice-recipient').value;
@@ -1444,6 +1468,7 @@ async function submitUpdate() {
       ? document.getElementById('iof-notice-recipient-other').value.trim()
       : recSel;
     noticeAppearance = document.getElementById('iof-notice-appearance').value;
+    noticeAssigned = (document.getElementById('iof-notice-assigned')||{}).value || '';
   }
 
   // ============ VALIDATIONS ============
@@ -1535,6 +1560,7 @@ async function submitUpdate() {
         pragati_date: updateDate,
         notice_date: updateDate,
         appearance_date: noticeAppearance,
+        assigned_to: noticeAssigned || null,
         status: 'Pending',                      // active → shows in Issued + For Taameeli + जारी करता IOs
         is_test: IS_TEST_MODE
       });
