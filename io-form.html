@@ -774,14 +774,30 @@ async function loadInitialData() {
       return '<option value="' + io.id + '">' + escapeHtml(displayName) + '</option>'; 
     }).join('');
 
-    // Fetch enquiries — io_id is the new linkable field; io_name is fallback for old data
-    var enqRes = await supa.from('enquiries').select('id,category,no,entry_year,date,io_name,io_id,brief,serial,complainant,non_complainant');
-    var allEnq = enqRes.data || [];
+    // Fetch enquiries — PAGINATED (Supabase caps a single select at 1000 rows;
+    // there are >1000 enquiries, so without paging many IOs' cases were missing).
+    var allEnq = [];
+    var _eps = 1000;
+    for (var _ep = 0; _ep < 30; _ep++) {
+      var _er = await supa.from('enquiries')
+        .select('id,category,no,entry_year,date,io_name,io_id,brief,serial,complainant,non_complainant')
+        .range(_ep * _eps, (_ep + 1) * _eps - 1);
+      var _erows = _er.data || [];
+      allEnq = allEnq.concat(_erows);
+      if (_erows.length < _eps) break;
+    }
     Object.keys(ENQ_LABELS).forEach(function(t){ enquiriesData[t] = allEnq.filter(function(e){ return e.category === t; }); });
 
-    // Fetch court cases with incharge_io_id
-    var courtRes = await supa.from('court_cases').select('id,case_type,case_no,court,cnr_no,incharge_officer,incharge_io_id,serial,petitioner,respondent');
-    courtsData = courtRes.data || [];
+    // Fetch court cases — PAGINATED too
+    courtsData = [];
+    for (var _cp = 0; _cp < 30; _cp++) {
+      var _cr = await supa.from('court_cases')
+        .select('id,case_type,case_no,court,cnr_no,incharge_officer,incharge_io_id,serial,petitioner,respondent')
+        .range(_cp * _eps, (_cp + 1) * _eps - 1);
+      var _crows = _cr.data || [];
+      courtsData = courtsData.concat(_crows);
+      if (_crows.length < _eps) break;
+    }
   } catch(e) {
     showError('Connection error: ' + (e.message || 'check your link'));
   }
