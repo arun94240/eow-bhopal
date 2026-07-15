@@ -22260,35 +22260,29 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ovstats-leaves-link{ margin-left:auto; background:rgba(180,120,20,.12); color:#8a5a00; border:1px solid rgba(180,120,20,.3); border-radius:8px; font-size:11px; font-weight:800; padding:5px 11px; cursor:pointer; white-space:nowrap; }
 .ovstats-leaves-link:hover{ background:rgba(180,120,20,.2); }
 
-/* ═══ Section tabs v174 — clean solid chips, coloured bar + pill ═══ */
-.section-tab:not(.active)[data-section]{ background:#f5f8fc !important; border:1px solid #dfe7f0 !important; border-left-width:4px !important; border-left-style:solid !important; color:#16324f !important; text-shadow:none !important; font-weight:800 !important; }
-.section-tab:not(.active)[data-section]:hover{ background:#eaf0f7 !important; }
-.section-tab:not(.active)[data-section] .count{ background:rgba(15,42,74,.08) !important; color:#0f2a4a !important; }
-.section-tab.active{ background:#f5b942 !important; color:#062a52 !important; border-color:#f5b942 !important; box-shadow:0 3px 10px rgba(245,185,66,.35) !important; }
-.section-tab.active .count{ background:rgba(6,42,82,.16) !important; color:#062a52 !important; }
-.section-tab:not(.active)[data-section="overview"]{ border-left-color:#f5b942 !important; }
-.section-tab:not(.active)[data-section="totalcases"]{ border-left-color:#0f2a4a !important; }
-.section-tab:not(.active)[data-section="complaints"]{ border-left-color:#2563eb !important; }
-.section-tab:not(.active)[data-section="complaints"] .count{ background:rgba(37,99,235,.14) !important; color:#1d4ed8 !important; }
-.section-tab:not(.active)[data-section="rcomplaints"]{ border-left-color:#7c3aed !important; }
-.section-tab:not(.active)[data-section="rcomplaints"] .count{ background:rgba(124,58,237,.14) !important; color:#6d28d9 !important; }
-.section-tab:not(.active)[data-section="rcs"]{ border-left-color:#dc2626 !important; }
-.section-tab:not(.active)[data-section="rcs"] .count{ background:rgba(220,38,38,.13) !important; color:#b91c1c !important; }
-.section-tab:not(.active)[data-section="pes"]{ border-left-color:#ea580c !important; }
-.section-tab:not(.active)[data-section="pes"] .count{ background:rgba(234,88,12,.14) !important; color:#c2410c !important; }
-.section-tab:not(.active)[data-section="strs"]{ border-left-color:#0891b2 !important; }
-.section-tab:not(.active)[data-section="strs"] .count{ background:rgba(8,145,178,.14) !important; color:#0e7490 !important; }
-.section-tab:not(.active)[data-section="sutra"]{ border-left-color:#16a34a !important; }
-.section-tab:not(.active)[data-section="sutra"] .count{ background:rgba(22,163,74,.14) !important; color:#15803d !important; }
-.section-tab:not(.active)[data-section="court"]{ border-left-color:#4f46e5 !important; }
-.section-tab:not(.active)[data-section="court"] .count{ background:rgba(79,70,229,.14) !important; color:#4338ca !important; }
-.section-tab:not(.active)[data-section="officers"]{ border-left-color:#9333ea !important; }
-.section-tab:not(.active)[data-section="pragati"]{ border-left-color:#0d9488 !important; }
-.section-tab:not(.active)[data-section="iomaster"]{ border-left-color:#6366f1 !important; }
-.section-tab:not(.active)[data-section="tags"]{ border-left-color:#06b6d4 !important; }
-.section-tab:not(.active)[data-section="leaves"]{ border-left-color:#d97706 !important; }
-.section-tab:not(.active)[data-section="links"]{ border-left-color:#64748b !important; }
-.section-tab:not(.active)[data-section="knowledge-base"]{ border-left-color:#8b5cf6 !important; }
+/* ═══ Section tabs v175 — full colour chips (bright like MyDaily) ═══ */
+.section-tab:not(.active)[data-section]{ border:none !important; border-left:none !important; color:#fff !important; font-weight:800 !important; text-shadow:none !important; box-shadow:0 2px 7px rgba(0,0,0,.22) !important; }
+.section-tab:not(.active)[data-section]:hover{ filter:brightness(1.1); }
+.section-tab:not(.active)[data-section] .count{ background:rgba(255,255,255,.24) !important; color:#fff !important; }
+.section-tab:not(.active)[data-section="overview"]{ background:linear-gradient(135deg,#f5b942,#e8a82e) !important; color:#062a52 !important; }
+.section-tab:not(.active)[data-section="overview"] .count{ background:rgba(6,42,82,.16) !important; color:#062a52 !important; }
+.section-tab:not(.active)[data-section="totalcases"]{ background:linear-gradient(135deg,#1d4e89,#163c6b) !important; }
+.section-tab:not(.active)[data-section="complaints"]{ background:linear-gradient(135deg,#2563eb,#1d4fc4) !important; }
+.section-tab:not(.active)[data-section="rcomplaints"]{ background:linear-gradient(135deg,#7c3aed,#6527cc) !important; }
+.section-tab:not(.active)[data-section="rcs"]{ background:linear-gradient(135deg,#dc2626,#b91c1c) !important; }
+.section-tab:not(.active)[data-section="pes"]{ background:linear-gradient(135deg,#ea580c,#c2410c) !important; }
+.section-tab:not(.active)[data-section="strs"]{ background:linear-gradient(135deg,#0891b2,#0e7490) !important; }
+.section-tab:not(.active)[data-section="sutra"]{ background:linear-gradient(135deg,#16a34a,#15803d) !important; }
+.section-tab:not(.active)[data-section="court"]{ background:linear-gradient(135deg,#4f46e5,#4338ca) !important; }
+.section-tab:not(.active)[data-section="officers"]{ background:linear-gradient(135deg,#9333ea,#7e22ce) !important; }
+.section-tab:not(.active)[data-section="pragati"]{ background:linear-gradient(135deg,#0d9488,#0f766e) !important; }
+.section-tab:not(.active)[data-section="iomaster"]{ background:linear-gradient(135deg,#6366f1,#4f46e5) !important; }
+.section-tab:not(.active)[data-section="tags"]{ background:linear-gradient(135deg,#06b6d4,#0891b2) !important; }
+.section-tab:not(.active)[data-section="leaves"]{ background:linear-gradient(135deg,#d97706,#b45309) !important; }
+.section-tab:not(.active)[data-section="links"]{ background:linear-gradient(135deg,#64748b,#475569) !important; }
+.section-tab:not(.active)[data-section="knowledge-base"]{ background:linear-gradient(135deg,#8b5cf6,#7c3aed) !important; }
+.section-tab.active{ background:#ffffff !important; color:#062a52 !important; border:2px solid #f5b942 !important; box-shadow:0 3px 12px rgba(245,185,66,.45) !important; }
+.section-tab.active .count{ background:rgba(6,42,82,.12) !important; color:#062a52 !important; }
 </style>
 </head>
 <body>
