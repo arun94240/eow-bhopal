@@ -22224,21 +22224,6 @@ body.role-staff header { margin-top: 30px; }
 .global-search-clear:hover{ background:#b91c1c !important; transform:scale(1.06); }
 .global-search-wrap{ background:#fff !important; }
 .global-search-box{ background:#fff !important; }
-
-/* ── Uniform Database box (v161) ── */
-.dbbox{ background:#fff; border-radius:16px; box-shadow:0 4px 20px rgba(6,42,82,.07); overflow:hidden; border:1px solid #e6ecf3; margin-bottom:14px; }
-.dbbox-hd{ display:flex; align-items:center; gap:11px; padding:14px 15px; background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; }
-.dbbox-ic{ width:38px; height:38px; border-radius:11px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; font-size:19px; }
-.dbbox-tt{ flex:1; } .dbbox-t{ font-size:16px; font-weight:900; letter-spacing:.3px; } .dbbox-s{ font-size:11px; opacity:.8; }
-.dbbox-gt{ text-align:center; } .dbbox-gn{ font-size:22px; font-weight:900; color:#f5b942; line-height:1; } .dbbox-gl{ font-size:9px; opacity:.85; }
-.dbgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; padding:13px; }
-.dbcard{ border:1px solid #e6ecf3; border-radius:13px; padding:12px 8px 11px; text-align:center; background:#fff; position:relative; overflow:hidden; cursor:pointer; transition:transform .12s, box-shadow .12s; }
-.dbcard:hover{ transform:translateY(-2px); box-shadow:0 5px 14px rgba(6,42,82,.12); }
-.dbcard::before{ content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--ac); }
-.dbcard-bd{ width:30px; height:30px; border-radius:9px; margin:2px auto 7px; display:flex; align-items:center; justify-content:center; font-size:15px; background:var(--ac); color:#fff; }
-.dbcard-nm{ font-size:11px; font-weight:800; color:#062a52; }
-.dbcard-ct{ font-size:19px; font-weight:900; color:var(--ac); line-height:1.1; margin-top:2px; }
-@media(max-width:380px){ .dbgrid{ grid-template-columns:repeat(2,1fr); } }
 </style>
 </head>
 <body>
@@ -24611,7 +24596,7 @@ body.role-staff header { margin-top: 30px; }
                 <span class="ovstats-panel-icon">📊</span>
                 <span class="ovstats-panel-title">Reports by Types — Inquiries</span>
                 <span class="ovstats-panel-sub">category-wise quick reports</span>
-                <button class="ovstats-open-full" onclick="event.stopPropagation();switchSection('report')">Full Builder →</button>
+                <button class="ovstats-open-full" onclick="event.stopPropagation();_reportInlineOpenAt('reports-bytypes-panel')">Full Builder →</button>
               </div>
               <div class="ovstats-panel-body">
                 <div id="ovstats-host-reports" class="ovstats-summary-host"></div>
@@ -45525,6 +45510,17 @@ function _reportInlineOpen(force){
 }
 // Report builder now opens INLINE inside the Reports box (no section jump)
 function openReportBuilderInline(){ _reportInlineOpen(false); }
+function _reportInlineOpenAt(containerId, forceOpen){
+  var cont=document.getElementById(containerId); if(!cont) return;
+  var host=cont.querySelector('.report-inline-host');
+  if(!host){ host=document.createElement('div'); host.className='report-inline-host'; cont.appendChild(host); }
+  var rep=document.getElementById('report');
+  if(rep && rep.parentNode!==host){ host.appendChild(rep); rep.classList.add('report-inlined'); }
+  var isOpen = host.style.display==='block';
+  var open = forceOpen ? true : !isOpen;
+  host.style.display = open ? 'block' : 'none';
+  if(open){ try{ rbInit(); }catch(e){} try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+}
 
 // ═══ Overview Stats — inline summary renderers (light, with 'open full' button in panel head) ═══
 function ovstatsRenderTagsSummary() {
@@ -45703,7 +45699,7 @@ function ovstatsRunReport(cat) {
   if (typeof switchSection !== 'function') return;
   if (cat === '__court') { switchSection('court'); return; }
   if (cat === '__officers') { switchSection('officers'); return; }
-  switchSection('report');
+  if (typeof _reportInlineOpenAt === 'function') { _reportInlineOpenAt('reports-bytypes-panel', true); } else { switchSection('report'); }
   setTimeout(function(){
     if (typeof rbToggleAllTypes === 'function') {
       rbToggleAllTypes(false);
@@ -51030,14 +51026,11 @@ function renderTotalCases() {
     return _tcSortDir === 'asc' ? cmp : -cmp;
   });
   
-  // Uniform Database-box category cards
-  var DBMETA = { complaints:{ic:'📩',ac:'#2563eb'}, rcomplaints:{ic:'📨',ac:'#7c3aed'}, rcs:{ic:'📕',ac:'#dc2626'}, pes:{ic:'🔎',ac:'#ea580c'}, strs:{ic:'🏦',ac:'#0891b2'}, sutra:{ic:'🧭',ac:'#16a34a'} };
-  var dbcards = enquiryHeads.map(function(h){
-    var m = DBMETA[h] || {ic:'📁',ac:'#062a52'};
-    return '<div class="dbcard" style="--ac:'+m.ac+'" onclick="switchSection(\'' + h + '\')">' +
-      '<div class="dbcard-bd">'+m.ic+'</div>' +
-      '<div class="dbcard-nm">' + escapeHtml(labels[h]) + '</div>' +
-      '<div class="dbcard-ct">' + counts[h] + '</div>' +
+  // Per-head compact stat cards
+  var cards = enquiryHeads.map(function(h){
+    return '<div class="stat-card" onclick="switchSection(\'' + h + '\')">' +
+      '<div class="stat-label">' + escapeHtml(labels[h]) + '</div>' +
+      '<div class="stat-value">' + counts[h] + '</div>' +
     '</div>';
   }).join('');
   
@@ -51076,14 +51069,8 @@ function renderTotalCases() {
       '</tbody></table></div></div>';
   }
   
-  var dbbox = '<div class="dbbox">' +
-    '<div class="dbbox-hd"><div class="dbbox-ic">🗄️</div>' +
-      '<div class="dbbox-tt"><div class="dbbox-t">Database</div><div class="dbbox-s">' + escapeHtml(contextLabel) + ' — सभी श्रेणियाँ</div></div>' +
-      '<div class="dbbox-gt"><div class="dbbox-gn">' + grandTotal + '</div><div class="dbbox-gl">कुल प्रकरण</div></div>' +
-    '</div>' +
-    '<div class="dbgrid">' + dbcards + '</div>' +
-  '</div>';
-  content.innerHTML = dbbox + toolbar + '<div class="tc-list-section">' + listHTML + '</div>';
+  content.innerHTML = '<div class="totalcases-grid">' + cards + '</div>' + grandCard + toolbar +
+    '<div class="tc-list-section">' + listHTML + '</div>';
 }
 
 function renderTable(type) {
