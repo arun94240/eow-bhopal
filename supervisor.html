@@ -22244,6 +22244,12 @@ body.role-staff header { margin-top: 30px; }
 /* Search tile in Settings box (v168) */
 .rep-pchip-search{ background:linear-gradient(90deg,rgba(15,42,74,.07),#fff 62%) !important; border-left:3px solid #0f2a4a !important; }
 .rep-pchip-search .rep-ic{ filter:none; }
+
+/* ── Staff (PA/Steno) live boxes host (v169) ── */
+.staff-live-host{ display:none; }
+body.role-staff .staff-live-host{ display:block; margin-bottom:16px; }
+.staff-live-host .slh-head{ font-size:15px; font-weight:900; color:#0f2a4a; padding:2px 2px 10px; }
+body.role-staff #mydaily-box{ display:none !important; }
 </style>
 </head>
 <body>
@@ -22947,6 +22953,7 @@ body.role-staff header { margin-top: 30px; }
       <!-- ════════════════════════════════════════════════════════════ -->
       <!-- 📋 My Daily Dashboard — below Overview Stats (4 daily tiles)  -->
       <!-- ════════════════════════════════════════════════════════════ -->
+      <div id="staff-live-host" class="staff-live-host"><div class="slh-head">📋 आज की जानकारी — Live</div></div>
       <div class="mydd-box" id="mydaily-box">
         <div id="mydd-brief"></div>
         <div id="mydd-reminder-panel" class="mydd-toppanel" style="display:none;"></div>
@@ -27900,12 +27907,22 @@ function applyRoleBasedUI() {
   // Apply role-based class to body for CSS targeting
   document.body.classList.remove('role-admin', 'role-staff');
   document.body.classList.add('role-' + currentUser.role);
+  if (currentUser.role === 'staff') { setTimeout(function(){ try{ _staffLiveSetup(); }catch(e){} }, 350); }
   
   // Initialize view toggle button text based on current view mode
   var currentView = document.body.classList.contains('view-mobile') ? 'mobile' : 'desktop';
   updateViewToggleButton(currentView);
 }
 
+function _staffLiveSetup(){
+  var host=document.getElementById('staff-live-host'); if(!host) return;
+  var att=document.getElementById('mydd-att-strip');
+  var dept=document.getElementById('mydd-dept-matrix');
+  if(att && att.parentNode!==host) host.appendChild(att);
+  if(dept && dept.parentNode!==host) host.appendChild(dept);
+  try{ renderMyDailyBox(); }catch(e){}
+  try{ mddAttStartLive(); }catch(e){}
+}
 function doLogout() {
   if (!confirm('Logout karna confirm karen?')) return;
   localStorage.removeItem('eow_user');
