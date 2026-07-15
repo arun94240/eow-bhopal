@@ -22194,6 +22194,22 @@ body.role-staff header { margin-top: 30px; }
 .toolbar .search-input:focus, .toolbar .filter-select:focus, .toolbar input[type="search"]:focus{
   border-color:#f5b942 !important; box-shadow:0 0 0 3px rgba(245,185,66,.12) !important; outline:none !important;
 }
+
+/* ── MyDaily Option B — 2 merged groups (v158) ── */
+#mydaily-box .mtx-group{ background:linear-gradient(160deg,#08203f,#0a2c56); border:1px solid rgba(255,255,255,.08); border-radius:13px; padding:11px 12px; margin-bottom:10px; border-left:4px solid; }
+#mydaily-box .mtx-grp-dir{ border-left-color:#a78bfa; }
+#mydaily-box .mtx-grp-work{ border-left-color:#f5b942; }
+#mydaily-box .mtx-grp-hd{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:900; color:#eaf1fb; }
+#mydaily-box .mtx-grp-ico{ font-size:14px; }
+#mydaily-box .mtx-grp-lbl{ flex:1; }
+#mydaily-box .mtx-grp-tot{ font-size:10.5px; font-weight:900; background:rgba(255,255,255,.14); border-radius:999px; padding:1px 9px; color:#fff; }
+#mydaily-box .mtx-grp-tabs{ display:flex; gap:6px; margin-top:9px; }
+#mydaily-box .mtx-gtab{ flex:1; display:flex; align-items:center; justify-content:center; gap:5px; font-size:11px; font-weight:800; padding:7px 9px; border-radius:8px; background:rgba(255,255,255,.08); color:#dbe7f5; border:1px solid rgba(255,255,255,.1); cursor:pointer; }
+#mydaily-box .mtx-gtab:hover{ background:rgba(255,255,255,.15); }
+#mydaily-box .mtx-gtab.is-on{ background:rgba(255,255,255,.2); color:#fff; }
+#mydaily-box .mtx-grp-dir .mtx-gtab.is-on{ box-shadow:0 0 0 1.5px #a78bfa inset; }
+#mydaily-box .mtx-grp-work .mtx-gtab.is-on{ box-shadow:0 0 0 1.5px #f5b942 inset; }
+#mydaily-box .mtx-gtab-n{ background:rgba(255,255,255,.22); border-radius:999px; font-size:9.5px; padding:0 6px; }
 </style>
 </head>
 <body>
@@ -22942,30 +22958,26 @@ body.role-staff header { margin-top: 30px; }
               <span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span>
             </div>
             <div class="mtx-list" id="mtx-agenda-panel"></div>
-            <div class="mydd-dg-subrow mtx-blk-disc" onclick="event.stopPropagation();mtxToggle('disc');">
-              <span class="mtx-ico mtx-ico-disc">💬</span><span class="mydd-dg-sublabel">Discussion Note</span>
-              <span class="mydd-dg-subnum" id="mtx-cnt-disc">0</span>
-              <span class="mydd-dg-subcaret" id="mtx-caret-disc">▾</span>
+            <div class="mtx-group mtx-grp-dir">
+              <div class="mtx-grp-hd"><span class="mtx-grp-ico">🏛</span><span class="mtx-grp-lbl">निर्देश व चर्चा</span><span class="mtx-grp-tot" id="mtx-grp-tot-dir">0</span></div>
+              <div class="mtx-grp-tabs">
+                <button type="button" class="mtx-gtab" data-w="dg" onclick="event.stopPropagation();mtxGroupTab('dg','disc');">🏛 DG EOW <span class="mtx-gtab-n" id="mtx-cnt-dg">0</span></button>
+                <button type="button" class="mtx-gtab" data-w="disc" onclick="event.stopPropagation();mtxGroupTab('disc','dg');">💬 चर्चा <span class="mtx-gtab-n" id="mtx-cnt-disc">0</span></button>
+              </div>
+              <span id="mtx-caret-dg" style="display:none;"></span><span id="mtx-caret-disc" style="display:none;"></span>
+              <div class="mtx-list" id="mtx-list-dg"></div>
+              <div class="mtx-list" id="mtx-list-disc"></div>
             </div>
-            <div class="mtx-list" id="mtx-list-disc"></div>
-            <div class="mydd-dg-subrow mtx-blk-dg" onclick="event.stopPropagation();mtxToggle('dg');">
-              <span class="mtx-ico mtx-ico-dg">🏛</span><span class="mydd-dg-sublabel">DG EOW</span>
-              <span class="mydd-dg-subnum" id="mtx-cnt-dg">0</span>
-              <span class="mydd-dg-subcaret" id="mtx-caret-dg">▾</span>
+            <div class="mtx-group mtx-grp-work">
+              <div class="mtx-grp-hd"><span class="mtx-grp-ico">⭐</span><span class="mtx-grp-lbl">समीक्षा व कार्य</span><span class="mtx-grp-tot" id="mtx-grp-tot-work">0</span></div>
+              <div class="mtx-grp-tabs">
+                <button type="button" class="mtx-gtab" data-w="rv" onclick="event.stopPropagation();mtxGroupTab('rv','td');">⭐ समीक्षा <span class="mtx-gtab-n" id="mtx-cnt-rv">0</span></button>
+                <button type="button" class="mtx-gtab" data-w="td" onclick="event.stopPropagation();mtxGroupTab('td','rv');">📝 To-Do <span class="mtx-gtab-n" id="mtx-cnt-td">0</span></button>
+              </div>
+              <span id="mtx-caret-rv" style="display:none;"></span><span id="mtx-caret-td" style="display:none;"></span>
+              <div class="mtx-list" id="mtx-list-rv"></div>
+              <div class="mtx-list" id="mtx-list-td"></div>
             </div>
-            <div class="mtx-list" id="mtx-list-dg"></div>
-            <div class="mydd-dg-subrow mtx-blk-review" onclick="event.stopPropagation();mtxToggle('rv');">
-              <span class="mtx-ico mtx-ico-rv">⭐</span><span class="mydd-dg-sublabel">प्रकरण समीक्षा</span>
-              <span class="mydd-dg-subnum" id="mtx-cnt-rv">0</span>
-              <span class="mydd-dg-subcaret" id="mtx-caret-rv">▾</span>
-            </div>
-            <div class="mtx-list" id="mtx-list-rv"></div>
-            <div class="mydd-dg-subrow mtx-blk-td" onclick="event.stopPropagation();mtxToggle('td');">
-              <span class="mtx-ico mtx-ico-td">📝</span><span class="mydd-dg-sublabel">To-Dos / Office</span>
-              <span class="mydd-dg-subnum" id="mtx-cnt-td">0</span>
-              <span class="mydd-dg-subcaret" id="mtx-caret-td">▾</span>
-            </div>
-            <div class="mtx-list" id="mtx-list-td"></div>
             <div class="mtx-subttl" id="mtx-name-title" style="display:none;">References — @name</div>
             <div id="mtx-name-rows"></div>
             <div class="mtx-subttl" id="mtx-io-title" style="display:none;">👮 IO अनुसार</div>
@@ -32895,11 +32907,11 @@ function mddRenderBrief(){
   }
   // ── header ──
   var html='<div class="mbr-brief"><div class="n-top">'+cal+'<div class="n-hd"><div class="n-t">📋 आज का Brief</div>'+
-    '<div class="n-pills"><span class="n-pill a">आज '+todayItems.length+'</span>'+(overdue.length?'<span class="n-pill o">अतिदेय '+overdue.length+'</span>':'')+'<span class="n-pill w">सप्ताह '+weekArr.length+'</span></div>'+
+    '<div class="n-pills"><span class="n-pill a">आज '+todayItems.length+'</span>'+(overdue.length?'<span class="n-pill o">Overdue '+overdue.length+'</span>':'')+'<span class="n-pill w">सप्ताह '+weekArr.length+'</span></div>'+
   '</div></div>';
   // ── overdue: one collapsible red bar ──
   if(overdue.length){
-    html+='<div class="mbr-overbar" onclick="_mbrBoxToggleNext(this)">⚠ '+overdue.length+' अतिदेय — देखने हेतु tap<span class="car">▾</span></div>'+
+    html+='<div class="mbr-overbar" onclick="_mbrBoxToggleNext(this)">⚠ '+overdue.length+' Overdue — देखने हेतु tap<span class="car">▾</span></div>'+
       '<div style="display:none;">'+listOf(overdue)+'</div>';
   }
   // ── today (cap 4 + more) ──
@@ -33275,6 +33287,7 @@ function mtxRefresh() {
   var nameTotal = tagIds.reduce(function(s,tid){ return s + byTag[tid].length; }, 0);
   function setN(id,v){ var e=_mtxEl(id); if (e) e.textContent = v; }
   setN('mtx-cnt-dg', dg); setN('mtx-cnt-rv', rv); setN('mtx-cnt-td', td); setN('mtx-cnt-disc', disc);
+  setN('mtx-grp-tot-dir', dg + disc); setN('mtx-grp-tot-work', rv + td);
   setN('mydd-cnt-mytask', dg + rv + td + disc + nameTotal);
   // dynamic @name rows (preserve open lists)
   var host = _mtxEl('mtx-name-rows'); var title = _mtxEl('mtx-name-title');
@@ -33364,6 +33377,16 @@ function mtxAgendaToggle() {
     '</div>';
   });
   p.innerHTML = html;
+}
+function mtxGroupTab(which, other){
+  var lw=document.getElementById('mtx-list-'+which);
+  var lo=document.getElementById('mtx-list-'+other);
+  var tw=document.querySelector('.mtx-gtab[data-w="'+which+'"]');
+  var to=document.querySelector('.mtx-gtab[data-w="'+other+'"]');
+  var isOpen = lw && lw.style.display==='block';
+  if(lo) lo.style.display='none'; if(to) to.classList.remove('is-on');
+  if(isOpen){ if(lw) lw.style.display='none'; if(tw) tw.classList.remove('is-on'); }
+  else { if(lw){ lw.style.display='block'; if(typeof mtxRenderList==='function') mtxRenderList(which); } if(tw) tw.classList.add('is-on'); }
 }
 function mtxToggle(which) {
   var l = _mtxEl('mtx-list-' + which); if (!l) return;
