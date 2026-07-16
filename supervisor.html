@@ -22365,7 +22365,6 @@ body.role-staff #mydaily-box{ display:none !important; }
 .pn-nt.active{ background:#dc2626; color:#fff; border-color:#dc2626; }
 .pn-nt-add{ margin-left:auto; font-size:11.5px; font-weight:800; padding:7px 13px; border-radius:999px; border:none; background:#16a34a; color:#fff; cursor:pointer; }
 
-/* ═══ Establishment-Leaves 2-half banner (v182) ═══ */
 .estl-banner{ display:flex; gap:9px; margin-bottom:13px; grid-column:1/-1; }
 .estl-half{ flex:1; border-radius:13px; padding:12px; color:#fff; box-shadow:0 3px 11px rgba(0,0,0,.16); }
 .estl-estab{ background:linear-gradient(135deg,#6366f1,#4f46e5); }
@@ -22377,6 +22376,16 @@ body.role-staff #mydaily-box{ display:none !important; }
 .estl-stat span{ flex:1; background:rgba(255,255,255,.17); border-radius:9px; padding:7px 3px; text-align:center; font-size:9.5px; font-weight:800; }
 .estl-stat span b{ display:block; font-size:16px; line-height:1.1; }
 @media(max-width:420px){ .estl-banner{ flex-direction:column; } }
+
+/* ═══ Tags sleek cloud (v183) ═══ */
+.tags-cloud-host{ margin:0 0 14px; }
+.tgcloud-head{ background:linear-gradient(135deg,#06b6d4,#0891b2); color:#fff; border-radius:12px 12px 0 0; padding:10px 13px; font-size:13px; font-weight:900; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.tgcloud-sub{ font-size:9.5px; font-weight:700; opacity:.9; }
+.tgcloud-wrap{ background:linear-gradient(160deg,#08203f,#0a2c56); border-radius:0 0 12px 12px; padding:12px; display:flex; gap:7px; flex-wrap:wrap; }
+.tgcloud-pill{ font-size:11px; font-weight:800; padding:6px 12px; border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,.25); transition:transform .1s; }
+.tgcloud-pill:hover{ transform:translateY(-2px); }
+.tgcloud-n{ background:rgba(255,255,255,.3); border-radius:999px; padding:0 7px; font-size:10px; font-weight:900; }
+.tgcloud-empty{ color:#9db5d4; font-size:11px; }
 </style>
 </head>
 <body>
@@ -25075,6 +25084,7 @@ body.role-staff #mydaily-box{ display:none !important; }
 
     <!-- Stats summary -->
     <div class="tags-stats-bar" id="tags-stats-bar"></div>
+    <div class="tags-cloud-host" id="tags-cloud-host"></div>
 
     <!-- Grid of tag cards -->
     <div class="tags-grid" id="tags-grid"></div>
@@ -56458,7 +56468,6 @@ function renderIOMaster() {
   });
   if (sf === 'io') list = list.filter(function(io){ return io.is_io === true; });
   else if (sf === 'non-io') list = list.filter(function(io){ return io.is_io !== true; });
-  // 2-half stats banner (Establishment | Leaves) — v182
   var _allM = state.ioMaster || [];
   var _ios = _allM.filter(function(m){ return m.is_io===true; }).length;
   var _staff = _allM.filter(function(m){ return m.is_io!==true; }).length;
@@ -56470,14 +56479,8 @@ function renderIOMaster() {
   var _lvMonth = _lv.filter(function(l){ return String(l.from_date||l.start_date||'').slice(0,7)===_mo; }).length;
   var _lvPend = _lv.filter(function(l){ return (l.status==='Pending'||l.status==='pending'); }).length;
   var _bannerHTML = '<div class="estl-banner">' +
-    '<div class="estl-half estl-estab">' +
-      '<div class="estl-h">🏢 Establishment</div>' +
-      '<div class="estl-stat"><span><b>'+_ios+'</b>IO</span><span><b>'+_staff+'</b>Staff</span><span><b>'+_tot+'</b>कुल</span></div>' +
-    '</div>' +
-    '<div class="estl-half estl-leaves" onclick="switchSection(\'leaves\')">' +
-      '<div class="estl-h">🏖 Leaves <span class="estl-arrow">→</span></div>' +
-      '<div class="estl-stat"><span><b>'+_lvToday+'</b>आज</span><span><b>'+_lvMonth+'</b>माह</span><span><b>'+_lvPend+'</b>pending</span></div>' +
-    '</div>' +
+    '<div class="estl-half estl-estab"><div class="estl-h">🏢 Establishment</div><div class="estl-stat"><span><b>'+_ios+'</b>IO</span><span><b>'+_staff+'</b>Staff</span><span><b>'+_tot+'</b>कुल</span></div></div>' +
+    '<div class="estl-half estl-leaves" onclick="switchSection(\'leaves\')"><div class="estl-h">🏖 Leaves <span class="estl-arrow">→</span></div><div class="estl-stat"><span><b>'+_lvToday+'</b>आज</span><span><b>'+_lvMonth+'</b>माह</span><span><b>'+_lvPend+'</b>pending</span></div></div>' +
   '</div>';
   var c = document.getElementById('io-master-list');
   if (!list.length) { c.className = ''; c.innerHTML = _bannerHTML + '<div class="empty-state"><h3>कोई member नहीं मिला</h3></div>'; return; }
@@ -57060,6 +57063,12 @@ function _tagUsageBreakdown(tagId) {
 }
 
 // ─── Main renderer ───
+function _isLightColor(hex){
+  if(!hex||hex[0]!=='#') return false;
+  var c=hex.substring(1); if(c.length===3) c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+  var r=parseInt(c.substr(0,2),16), g=parseInt(c.substr(2,2),16), b=parseInt(c.substr(4,2),16);
+  return (0.299*r+0.587*g+0.114*b) > 165;
+}
 function renderTagsManagement() {
   var grid = document.getElementById('tags-grid');
   var statsBar = document.getElementById('tags-stats-bar');
@@ -57087,6 +57096,19 @@ function renderTagsManagement() {
       '<div class="tgs-stat"><div class="tgs-stat-label">System / Custom</div><div class="tgs-stat-val">' + systemCount + '<small> / ' + customCount + '</small></div></div>' +
       '<div class="tgs-stat"><div class="tgs-stat-label">Total Usages</div><div class="tgs-stat-val">' + totalUsages + '</div></div>' +
       '<div class="tgs-stat"><div class="tgs-stat-label">Most Used</div><div class="tgs-stat-val" style="font-size:14px;">' + (mostUsed ? escapeHtml(mostUsed.name) + ' <small>(' + mostUsedCount + ')</small>' : '—') + '</div></div>';
+  }
+  // Sleek colourful tag-cloud (v183) — tap a pill → its cases (openTagUsage)
+  var cloudHost = document.getElementById('tags-cloud-host');
+  if (cloudHost) {
+    var cloudTags = allTags.slice().sort(function(a,b){ return _tagUsageCount(b.id) - _tagUsageCount(a.id); });
+    var pills = cloudTags.map(function(t){
+      var cnt = _tagUsageCount(t.id);
+      var col = t.color || '#64748b';
+      var txt = _isLightColor(col) ? '#0f2a4a' : '#fff';
+      return '<span class="tgcloud-pill" style="background:'+col+';color:'+txt+'" onclick="openTagUsage(\''+t.id+'\')">'+escapeHtml(t.name)+'<span class="tgcloud-n">'+cnt+'</span></span>';
+    }).join('');
+    cloudHost.innerHTML = '<div class="tgcloud-head">🏷 सभी Tags <span class="tgcloud-sub">'+allTags.length+' tags · '+systemCount+' system · tap → प्रकरण</span></div>' +
+      '<div class="tgcloud-wrap">' + (pills || '<span class="tgcloud-empty">कोई tag नहीं</span>') + '</div>';
   }
   
   // Filters
