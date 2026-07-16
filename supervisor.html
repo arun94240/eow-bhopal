@@ -22649,6 +22649,26 @@ body.role-staff #mydaily-box{ display:none !important; }
 #mydaily-box .mydd-craftsync-top{ margin:0 12px 10px !important; }
 #mydaily-box .mydd-craftsync-top .mydd-craftsync,
 #mydaily-box .mydd-craftsync-top > div{ border-radius:11px !important; }
+
+/* ═══ Agenda A+2 restructure (v211) ═══ */
+#mydaily-box .mydd-tlabel-agenda{ font-size:14px !important; font-weight:900 !important; color:#fff !important; text-transform:none !important; }
+#mydaily-box .mydd-dg-toprow{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+#mydaily-box .mtx-search-inline{ margin-left:auto !important; }
+#mydaily-box .mtx-tool-btn{ width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,.18); font-size:15px; cursor:pointer; flex:0 0 auto; }
+#mydaily-box .mtx-tool-sub{ background:rgba(37,99,235,.24); }
+#mydaily-box .mtx-tool-craft{ background:rgba(13,148,136,.26); }
+#mydaily-box .mtx-tool-btn:hover{ filter:brightness(1.12); }
+/* 2×2 group chips */
+#mydaily-box .mtx-chip-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:6px; }
+#mydaily-box .mtx-chip{ display:flex; align-items:center; gap:9px; border-radius:12px; padding:11px 12px; cursor:pointer; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); }
+#mydaily-box .mtx-chip-ic{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; color:#fff; }
+#mydaily-box .mtx-chip-lbl{ font-size:12px; font-weight:800; color:#eaf1fb; } #mydaily-box .mtx-chip-n{ margin-left:auto; font-size:16px; font-weight:900; color:#fff; }
+#mydaily-box .mtx-chip-dg{ background:rgba(124,58,237,.16); border-color:rgba(124,58,237,.35); } #mydaily-box .mtx-chip-dg .mtx-chip-ic{ background:#7c3aed; }
+#mydaily-box .mtx-chip-disc{ background:rgba(13,148,136,.16); border-color:rgba(13,148,136,.35); } #mydaily-box .mtx-chip-disc .mtx-chip-ic{ background:#0d9488; }
+#mydaily-box .mtx-chip-rv{ background:rgba(245,185,66,.18); border-color:rgba(245,185,66,.4); } #mydaily-box .mtx-chip-rv .mtx-chip-ic{ background:#f5b942; color:#3d2705; }
+#mydaily-box .mtx-chip-td{ background:rgba(22,163,74,.16); border-color:rgba(22,163,74,.35); } #mydaily-box .mtx-chip-td .mtx-chip-ic{ background:#16a34a; }
+#mydaily-box .mtx-chip.mtx-gtab-active,#mydaily-box .mtx-chip.active{ outline:2px solid rgba(255,255,255,.5); }
+#mydaily-box .mtx-chip-grid + .mtx-list{ margin-top:8px; }
 </style>
 </head>
 <body>
@@ -23343,7 +23363,7 @@ body.role-staff #mydaily-box{ display:none !important; }
         <div class="mydd-tiles">
           <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleBox();">
-              <span class="mydd-tlabel mydd-tlabel-sub">🔍 खोजें व Add</span>
+              <span class="mydd-tlabel mydd-tlabel-agenda">🗓️ Agenda</span>
               <span class="mydd-tcal" style="display:none;"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
               <span class="mydd-tnum" id="mydd-cnt-mytask" style="display:none;">0</span>
               <div class="mtx-search mtx-blk-keyword mtx-search-inline" onclick="event.stopPropagation();">
@@ -23352,6 +23372,8 @@ body.role-staff #mydaily-box{ display:none !important; }
                 <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
               </div>
               <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddMenu();">＋ Add</button>
+              <button class="mtx-tool-btn mtx-tool-sub" onclick="event.stopPropagation();openAgendaSubscribeModal();" title="Subscribe (Apple/Google Calendar)">📆</button>
+              <button class="mtx-tool-btn mtx-tool-craft" onclick="event.stopPropagation();craftOpenTaskList();" title="Craft Agenda (live)">🔄</button>
               <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;">
                 <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';vcOpen();" style="color:#062a52;font-weight:800;">🎤 Voice command</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';mddAddMenuPick('reminder');">⏰ Reminder</div>
@@ -23370,32 +23392,21 @@ body.role-staff #mydaily-box{ display:none !important; }
             <div class="mddq-host" id="mydd-addhost-disc"></div>
             <div class="mddq-host" id="mydd-addhost-review"></div>
             <div id="mtx-body">
-            <div class="mtx-agenda mtx-agenda-slim">
-              <button class="mtx-craft-push mtx-sub-btn" onclick="event.stopPropagation();openAgendaSubscribeModal();" title="Agenda को Apple/Google Calendar में subscribe करें (8 बजे reminder)">📆 Subscribe</button>
-              <button class="mtx-craft-push mtx-craftbtn" onclick="event.stopPropagation();craftOpenTaskList();" title="Craft Agenda (live) खोलें">🔄 Craft</button>
-              <button class="mtx-craft-push mtx-ag-expand" onclick="event.stopPropagation();mtxAgendaToggle();" title="Agenda आइटम देखें"><span id="mtx-ag-today" style="display:none;">0</span><span id="mtx-ag-week" style="display:none;">0</span>📋 आइटम<span class="mydd-dg-subcaret" id="mtx-ag-caret">▾</span></button>
+            <span id="mtx-ag-today" style="display:none;">0</span><span id="mtx-ag-week" style="display:none;">0</span><span id="mtx-ag-caret" style="display:none;"></span>
+            <div class="mtx-list" id="mtx-agenda-panel" style="display:none;"></div>
+            <div class="mtx-chip-grid">
+              <button type="button" class="mtx-chip mtx-chip-dg" data-w="dg" onclick="event.stopPropagation();mtxGroupTab('dg','disc');"><span class="mtx-chip-ic">🏛</span><span class="mtx-chip-lbl">DG EOW</span><span class="mtx-chip-n" id="mtx-cnt-dg">0</span></button>
+              <button type="button" class="mtx-chip mtx-chip-disc" data-w="disc" onclick="event.stopPropagation();mtxGroupTab('disc','dg');"><span class="mtx-chip-ic">💬</span><span class="mtx-chip-lbl">चर्चा</span><span class="mtx-chip-n" id="mtx-cnt-disc">0</span></button>
+              <button type="button" class="mtx-chip mtx-chip-rv" data-w="rv" onclick="event.stopPropagation();mtxGroupTab('rv','td');"><span class="mtx-chip-ic">⭐</span><span class="mtx-chip-lbl">समीक्षा</span><span class="mtx-chip-n" id="mtx-cnt-rv">0</span></button>
+              <button type="button" class="mtx-chip mtx-chip-td" data-w="td" onclick="event.stopPropagation();mtxGroupTab('td','rv');"><span class="mtx-chip-ic">📝</span><span class="mtx-chip-lbl">To-Do</span><span class="mtx-chip-n" id="mtx-cnt-td">0</span></button>
             </div>
-            <div class="mtx-list" id="mtx-agenda-panel"></div>
-            <div class="mtx-group mtx-grp-dir">
-              <div class="mtx-grp-hd"><span class="mtx-grp-ico">🏛</span><span class="mtx-grp-lbl">निर्देश व चर्चा</span><span class="mtx-grp-tot" id="mtx-grp-tot-dir">0</span></div>
-              <div class="mtx-grp-tabs">
-                <button type="button" class="mtx-gtab" data-w="dg" onclick="event.stopPropagation();mtxGroupTab('dg','disc');">🏛 DG EOW <span class="mtx-gtab-n" id="mtx-cnt-dg">0</span></button>
-                <button type="button" class="mtx-gtab" data-w="disc" onclick="event.stopPropagation();mtxGroupTab('disc','dg');">💬 चर्चा <span class="mtx-gtab-n" id="mtx-cnt-disc">0</span></button>
-              </div>
-              <span id="mtx-caret-dg" style="display:none;"></span><span id="mtx-caret-disc" style="display:none;"></span>
-              <div class="mtx-list" id="mtx-list-dg"></div>
-              <div class="mtx-list" id="mtx-list-disc"></div>
-            </div>
-            <div class="mtx-group mtx-grp-work">
-              <div class="mtx-grp-hd"><span class="mtx-grp-ico">⭐</span><span class="mtx-grp-lbl">समीक्षा व कार्य</span><span class="mtx-grp-tot" id="mtx-grp-tot-work">0</span></div>
-              <div class="mtx-grp-tabs">
-                <button type="button" class="mtx-gtab" data-w="rv" onclick="event.stopPropagation();mtxGroupTab('rv','td');">⭐ समीक्षा <span class="mtx-gtab-n" id="mtx-cnt-rv">0</span></button>
-                <button type="button" class="mtx-gtab" data-w="td" onclick="event.stopPropagation();mtxGroupTab('td','rv');">📝 To-Do <span class="mtx-gtab-n" id="mtx-cnt-td">0</span></button>
-              </div>
-              <span id="mtx-caret-rv" style="display:none;"></span><span id="mtx-caret-td" style="display:none;"></span>
-              <div class="mtx-list" id="mtx-list-rv"></div>
-              <div class="mtx-list" id="mtx-list-td"></div>
-            </div>
+            <span id="mtx-grp-tot-dir" style="display:none;">0</span><span id="mtx-grp-tot-work" style="display:none;">0</span>
+            <span id="mtx-caret-dg" style="display:none;"></span><span id="mtx-caret-disc" style="display:none;"></span>
+            <span id="mtx-caret-rv" style="display:none;"></span><span id="mtx-caret-td" style="display:none;"></span>
+            <div class="mtx-list" id="mtx-list-dg"></div>
+            <div class="mtx-list" id="mtx-list-disc"></div>
+            <div class="mtx-list" id="mtx-list-rv"></div>
+            <div class="mtx-list" id="mtx-list-td"></div>
             <div class="mtx-subttl" id="mtx-name-title" style="display:none;">References — @name</div>
             <div id="mtx-name-rows"></div>
             <div class="mtx-subttl" id="mtx-io-title" style="display:none;">👮 IO अनुसार</div>
