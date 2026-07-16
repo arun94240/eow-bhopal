@@ -22610,6 +22610,18 @@ body.role-staff #mydaily-box{ display:none !important; }
 .mas-pc-actions{ display:flex; gap:6px; margin-top:9px; }
 .mas-pc-btn{ flex:1; border:none; border-radius:8px; padding:7px; font-size:10.5px; font-weight:800; cursor:pointer; }
 .mas-pc-view{ background:#eef4fa; color:#1e5aa8; } .mas-pc-approve{ background:#16a34a; color:#fff; } .mas-pc-reject{ background:#dc2626; color:#fff; }
+
+/* pr-* search UI (v208) — प्रगति/Notices repurposed tiles */
+.pr-hd{ background:linear-gradient(135deg,rgba(0,0,0,.02),rgba(0,0,0,0)); padding:11px 13px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #eef2f7; border-top:3px solid var(--acc); }
+.pr-ic{ font-size:16px; } .pr-ttl{ font-size:13px; font-weight:900; color:#334155; flex:1; } .pr-cnt{ background:#eef4fa; color:#1e3a5f; border-radius:999px; padding:2px 10px; font-size:10.5px; font-weight:900; }
+.pr-close{ background:#f1f5f9; border:none; border-radius:8px; width:28px; height:28px; cursor:pointer; color:#64748b; font-weight:900; }
+.pr-filt{ display:flex; gap:7px; padding:11px 13px; background:#f8fbfe; flex-wrap:wrap; }
+.pr-inp{ flex:1; min-width:86px; background:#fff; border:1.5px solid #dbe7f2; border-radius:9px; padding:8px 9px; font-size:11px; color:#1e3a5f; }
+.pr-list{ padding:4px 13px 13px; max-height:420px; overflow-y:auto; }
+.pr-row{ background:#fff; border:1px solid #eef2f7; border-left:3px solid #7c3aed; border-radius:10px; padding:8px 11px; margin-top:8px; box-shadow:0 1px 4px rgba(30,58,95,.05); }
+.pr-r1{ display:flex; gap:8px; align-items:center; } .pr-io{ font-size:11px; font-weight:800; color:#334155; } .pr-dt{ font-size:9.5px; color:#94a3b8; margin-left:auto; }
+.pr-r2{ font-size:10.5px; color:#475569; margin-top:3px; }
+.pr-empty{ padding:16px; text-align:center; color:#94a3b8; font-size:11.5px; }
 </style>
 </head>
 <body>
@@ -24868,11 +24880,11 @@ body.role-staff #mydaily-box{ display:none !important; }
               <div class="hdr-counter rep-pchip rep-pchip-reports" onclick="event.stopPropagation();openReportBuilderInline()">
                 <span class="rep-ic">📊</span><span class="rep-lbl">Reports</span><span class="rep-sub-n">↗</span>
               </div>
-              <div class="hdr-counter rep-pchip rep-pchip-summons" onclick="event.stopPropagation();openNoticeSearch('Summons')">
-                <span class="rep-ic">📨</span><span class="rep-lbl">Summons</span><span class="rep-sub-n" id="ns-cnt-summons">0</span>
+              <div class="hdr-counter rep-pchip rep-pchip-summons" onclick="event.stopPropagation();openPrSearch('notices')">
+                <span class="rep-ic">📨</span><span class="rep-lbl">Notices</span><span class="rep-sub-n" id="ns-cnt-summons">0</span>
               </div>
-              <div class="hdr-counter rep-pchip rep-pchip-warrant" onclick="event.stopPropagation();openNoticeSearch('Warrant')">
-                <span class="rep-ic">⚠️</span><span class="rep-lbl">Warrants</span><span class="rep-sub-n" id="ns-cnt-warrant">0</span>
+              <div class="hdr-counter rep-pchip rep-pchip-warrant" onclick="event.stopPropagation();openPrSearch('pragati')">
+                <span class="rep-ic">📋</span><span class="rep-lbl">प्रगति</span><span class="rep-sub-n" id="ns-cnt-warrant">0</span>
               </div>
             </div>
             <!-- Department matrix — collapsible, tap the tile above -->
@@ -35071,10 +35083,42 @@ function _ovccNoticeBar(){
     ((_ovccNoticeFilt.io||_ovccNoticeFilt.from||_ovccNoticeFilt.to)?'<button class="ovcc-nclr" onclick="_ovccNoticeFilt={io:\'\',from:\'\',to:\'\'};ovccRenderList(\'notice\')">✕</button>':'')+
   '</div>';
 }
+var _ovccNotActiveSection = 'taameeli';
+function _ovccNotInit(){
+  var el = document.getElementById('ovcc-list'); if (!el) return;
+  var tot = document.getElementById('ovcc-total');
+  if (tot) tot.textContent = '';
+  el.innerHTML =
+    '<div class="pn-not-tabs ovcc-not-tabs">' +
+      '<button class="pn-nt' + (_ovccNotActiveSection==='issued'?' active':'') + '" data-s="issued" onclick="event.stopPropagation();_ovccNotSetSection(\'issued\')">📤 जारी</button>' +
+      '<button class="pn-nt' + (_ovccNotActiveSection==='taameeli'?' active':'') + '" data-s="taameeli" onclick="event.stopPropagation();_ovccNotSetSection(\'taameeli\')">⏳ तामीली हेतु</button>' +
+      '<button class="pn-nt' + (_ovccNotActiveSection==='served'?' active':'') + '" data-s="served" onclick="event.stopPropagation();_ovccNotSetSection(\'served\')">✅ तामील</button>' +
+      '<button class="pn-nt' + (_ovccNotActiveSection==='adam'?' active':'') + '" data-s="adam" onclick="event.stopPropagation();_ovccNotSetSection(\'adam\')">❌ अदम-तामील</button>' +
+      '<button class="pn-nt-add" onclick="event.stopPropagation();(typeof openNoticeModal===\'function\')&&openNoticeModal();">＋ नया Notice</button>' +
+    '</div>' +
+    '<div id="ovcc-not-content"></div>';
+  _ovccNotRender(_ovccNotActiveSection);
+}
+function _ovccNotSetSection(section){
+  _ovccNotActiveSection = section;
+  document.querySelectorAll('#ovcc-list .pn-nt').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-s')===section); });
+  _ovccNotRender(section);
+}
+function _ovccNotRender(section){
+  var host=document.getElementById('ovcc-not-content'); if(!host) return;
+  // reuse renderNoticesList by temporarily pointing notices-content at our host (same trick as pnNotSection)
+  var real=document.getElementById('notices-content');
+  var savedId=null;
+  if(real && real!==host){ savedId=real.id; real.id='notices-content-real2'; }
+  host.id='notices-content';
+  try{ if(typeof renderNoticesList==='function') renderNoticesList(section); }catch(e){}
+  host.id='ovcc-not-content';
+  if(savedId){ document.getElementById('notices-content-real2').id=savedId; }
+}
 function ovccRenderList(which) {
+  if(which==='notice'){ _ovccNotInit(); return; }
   var el = document.getElementById('ovcc-list'); if (!el) return;
   var rows = _ovccRows(which);
-  if(which==='notice'){ rows=_ovccNoticeApply(rows); }
   var tot = document.getElementById('ovcc-total'); if (tot) tot.textContent = 'Total: ' + rows.length;
   if (!rows.length) {
     el.innerHTML = (which==='notice'?_ovccNoticeBar():'') + '<div class="mydd-empty" style="color:#64748b;">' + (which === 'notice' ? 'कोई (filter अनुसार) notice नहीं' : (which === 'pending' ? 'कोई लंबित आवेदन नहीं' : 'कोई अवकाश नहीं')) + '</div>';
@@ -60200,61 +60244,66 @@ function _dsExportPDF(){
 }
 
 
-/* ═══ Notice / Summons / Warrant search (v198) ═══ */
-var _nsFilt = { type:'', io:'', from:'', to:'', status:'' };
-function openNoticeSearch(type){
+/* ═══ प्रगति / Notices search — repurposed tiles (v208) ═══ */
+var _prState = { kind:'notices', io:'', cat:'', from:'', to:'' };
+function _prCatOptions(sel){
+  var labels = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs:'RCs', pes:'PEs', strs:'STRs', sutra:'Sutra Suchna', court:'Court' };
+  return '<option value="">— सभी प्रकार —</option>' + Object.keys(labels).map(function(k){ return '<option value="'+k+'"'+(sel===k?' selected':'')+'>'+labels[k]+'</option>'; }).join('');
+}
+function openPrSearch(kind){
   var host=document.getElementById('notice-search-wrap'); if(!host) return;
-  var same = (_nsFilt.type===type) && host.style.display==='block';
+  var same = (_prState.kind===kind) && host.style.display==='block';
   document.querySelectorAll('.rep-pchip-summons,.rep-pchip-warrant').forEach(function(t){ t.classList.remove('is-active'); });
   if(same){ host.style.display='none'; return; }
-  _nsFilt = { type:type, io:'', from:'', to:'', status:'' };
+  _prState = { kind:kind, io:'', cat:'', from:'', to:'' };
   host.style.display='block';
-  var cls = type==='Summons' ? 'rep-pchip-summons' : 'rep-pchip-warrant';
+  var cls = kind==='notices' ? 'rep-pchip-summons' : 'rep-pchip-warrant';
   var tile=document.querySelector('.'+cls); if(tile) tile.classList.add('is-active');
-  _nsRender();
+  _prRender();
   try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
 }
-function _nsAll(){ return (state.notices||[]).filter(function(n){ return !_nsFilt.type || n.notice_type===_nsFilt.type; }); }
-function _nsFiltered(){
-  return _nsAll().filter(function(n){
-    if(_nsFilt.io && n.io_name!==_nsFilt.io && n.assigned_to!==_nsFilt.io) return false;
-    var d=String(n.notice_date||n.appearance_date||'').slice(0,10);
-    if(_nsFilt.from && d && d<_nsFilt.from) return false;
-    if(_nsFilt.to && d && d>_nsFilt.to) return false;
-    if(_nsFilt.status==='served' && !_noticeIsServed(n)) return false;
-    if(_nsFilt.status==='adam' && !_noticeIsAdam(n)) return false;
-    if(_nsFilt.status==='pending' && (_noticeIsServed(n)||_noticeIsAdam(n))) return false;
+function _prRows(){ return _prState.kind==='pragati' ? (state.ioUpdates||[]).slice() : (state.notices||[]).slice(); }
+function _prFiltered(){
+  var f=_prState;
+  return _prRows().filter(function(r){
+    if(f.io && r.io_name!==f.io && r.assigned_to!==f.io) return false;
+    if(f.cat && (r.case_type||'')!==f.cat) return false;
+    var d = String(r.update_date||r.notice_date||r.created_at||'').slice(0,10);
+    if(f.from && d && d<f.from) return false;
+    if(f.to && d && d>f.to) return false;
     return true;
   });
 }
-function _nsRender(){
+function _prRender(){
   var host=document.getElementById('notice-search-wrap'); if(!host) return;
-  var type=_nsFilt.type; var rows=_nsFiltered();
-  var accent = type==='Summons' ? '#7c3aed' : '#dc2626';
-  var listHTML = rows.length ? rows.slice(0,120).map(function(n){
-    var st = _noticeIsServed(n) ? '<span class="ns-st ns-st-ok">✅ तामील</span>' : (_noticeIsAdam(n) ? '<span class="ns-st ns-st-no">⚠ अदम</span>' : '<span class="ns-st ns-st-pend">⏳ लंबित</span>');
-    var who = escapeHtml(n.assigned_to||n.io_name||'—');
-    var dt = escapeHtml(String(n.notice_date||'').slice(0,10));
-    var det = escapeHtml(n.notice_detail || ((n.case_type||'')+' '+(n.case_id||'')) || '—');
-    var appr = n.appearance_date ? ' · पेशी '+escapeHtml(String(n.appearance_date).slice(0,10)) : '';
-    return '<div class="ns-row" style="border-left-color:'+accent+'"><div class="ns-r1"><span class="ns-io">👮 '+who+'</span><span class="ns-dt">'+dt+'</span></div><div class="ns-r2">'+det+appr+' '+st+'</div></div>';
-  }).join('') : '<div class="ns-empty">कोई '+escapeHtml(type)+' नहीं मिला</div>';
+  var kind=_prState.kind; var rows=_prFiltered();
+  var accent = kind==='pragati' ? '#0d9488' : '#7c3aed';
+  var title = kind==='pragati' ? 'प्रगति — Search' : 'Notices — Search';
+  var icon = kind==='pragati' ? '📋' : '📨';
+  var CAT_LBL = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs:'RCs', pes:'PEs', strs:'STRs', sutra:'Sutra Suchna', court:'Court' };
+  var listHTML = rows.length ? rows.slice(0,150).map(function(r){
+    var who = escapeHtml(r.io_name||r.assigned_to||'—');
+    var dt = escapeHtml(String(r.update_date||r.notice_date||'').slice(0,10));
+    var cat = escapeHtml(CAT_LBL[r.case_type]||r.case_type||'—');
+    var det = escapeHtml(r.update_text || r.brief || r.notice_detail || '—');
+    return '<div class="pr-row" style="border-left-color:'+accent+'"><div class="pr-r1"><span class="pr-io">👮 '+who+'</span><span class="pr-dt">'+dt+'</span></div><div class="pr-r2">'+cat+' · '+det+'</div></div>';
+  }).join('') : '<div class="pr-empty">कोई रिकॉर्ड नहीं मिला</div>';
   host.innerHTML =
-    '<div class="ns-hd" style="--acc:'+accent+'"><span class="ns-ic">'+(type==='Summons'?'📨':'⚠️')+'</span><span class="ns-ttl">'+escapeHtml(type)+' — तामील खोजें</span><span class="ns-cnt">'+rows.length+'</span><button class="ns-close" onclick="event.stopPropagation();document.getElementById(\'notice-search-wrap\').style.display=\'none\';document.querySelectorAll(\'.rep-pchip-summons,.rep-pchip-warrant\').forEach(function(t){t.classList.remove(\'is-active\')});">✕</button></div>'+
-    '<div class="ns-filt">'+
-      '<select class="ns-inp" onchange="_nsFilt.io=this.value;_nsRender()">'+_mddIoFilterOptions(_nsFilt.io)+'</select>'+
-      '<input type="date" class="ns-inp" value="'+_nsFilt.from+'" onchange="_nsFilt.from=this.value;_nsRender()">'+
-      '<input type="date" class="ns-inp" value="'+_nsFilt.to+'" onchange="_nsFilt.to=this.value;_nsRender()">'+
-      '<select class="ns-inp" onchange="_nsFilt.status=this.value;_nsRender()"><option value="">— सभी —</option><option value="pending">⏳ लंबित</option><option value="served">✅ तामील</option><option value="adam">⚠ अदम</option></select>'+
+    '<div class="pr-hd" style="--acc:'+accent+'"><span class="pr-ic">'+icon+'</span><span class="pr-ttl">'+title+'</span><span class="pr-cnt">'+rows.length+'</span><button class="pr-close" onclick="event.stopPropagation();document.getElementById(\'notice-search-wrap\').style.display=\'none\';document.querySelectorAll(\'.rep-pchip-summons,.rep-pchip-warrant\').forEach(function(t){t.classList.remove(\'is-active\')});">✕</button></div>'+
+    '<div class="pr-filt">'+
+      '<select class="pr-inp" onchange="_prState.io=this.value;_prRender()">'+_mddIoFilterOptions(_prState.io)+'</select>'+
+      '<select class="pr-inp" onchange="_prState.cat=this.value;_prRender()">'+_prCatOptions(_prState.cat)+'</select>'+
+      '<input type="date" class="pr-inp" value="'+_prState.from+'" onchange="_prState.from=this.value;_prRender()">'+
+      '<input type="date" class="pr-inp" value="'+_prState.to+'" onchange="_prState.to=this.value;_prRender()">'+
     '</div>'+
-    '<div class="ns-list">'+listHTML+'</div>';
+    '<div class="pr-list">'+listHTML+'</div>';
 }
 function _nsRefreshCounts(){
   try{
-    var s=(state.notices||[]).filter(function(n){return n.notice_type==='Summons';}).length;
-    var w=(state.notices||[]).filter(function(n){return n.notice_type==='Warrant';}).length;
-    var se=document.getElementById('ns-cnt-summons'); if(se) se.textContent=s;
-    var we=document.getElementById('ns-cnt-warrant'); if(we) we.textContent=w;
+    var n=(state.notices||[]).length;
+    var p=(state.ioUpdates||[]).length;
+    var se=document.getElementById('ns-cnt-summons'); if(se) se.textContent=n;
+    var we=document.getElementById('ns-cnt-warrant'); if(we) we.textContent=p;
   }catch(e){}
 }
 
