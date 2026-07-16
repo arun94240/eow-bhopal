@@ -22301,7 +22301,8 @@ body.role-staff #mydaily-box{ display:none !important; }
 .db-an-row{ margin:0 13px 13px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:9px 10px; }
 .db-an-h{ font-size:10px; font-weight:900; color:#9db5d4; letter-spacing:.6px; margin-bottom:7px; }
 .db-an-chips{ display:flex; gap:6px; flex-wrap:wrap; }
-.db-an-chip{ font-size:10.5px; font-weight:800; padding:6px 12px; border-radius:999px; color:#fff; background:var(--c); box-shadow:0 2px 6px rgba(0,0,0,.25); cursor:pointer; }
+.db-an-chip{ font-size:12px; font-weight:800; padding:11px 10px; border-radius:12px; color:#fff; background:var(--c); box-shadow:0 3px 9px rgba(0,0,0,.22); cursor:pointer; flex:1; min-width:calc(50% - 4px); text-align:center; transition:transform .12s; }
+.db-an-chip:hover{ transform:translateY(-2px); }
 .db-an-chip.on{ box-shadow:0 0 0 2px #f5b942 inset, 0 2px 6px rgba(0,0,0,.25); }
 #db-an-host{ margin-top:9px; }
 #db-an-host .ovstats-panel{ background:#fff; border-radius:12px; color:#0f2238; padding:10px; }
@@ -22387,15 +22388,10 @@ body.role-staff #mydaily-box{ display:none !important; }
 .tgcloud-n{ background:rgba(255,255,255,.3); border-radius:999px; padding:0 7px; font-size:10px; font-weight:900; }
 .tgcloud-empty{ color:#9db5d4; font-size:11px; }
 
-/* ═══ Establishment-Leaves segment split (v184) ═══ */
 .el-seg{ display:flex; gap:8px; margin-bottom:12px; }
 .el-seg-b{ flex:1; text-align:center; padding:11px; border-radius:12px; font-weight:900; font-size:13.5px; cursor:pointer; color:#fff; border:none; box-shadow:0 3px 9px rgba(0,0,0,.18); opacity:.5; transition:opacity .15s,transform .12s; }
-.el-seg-b:hover{ transform:translateY(-1px); }
-.el-seg-estab{ background:linear-gradient(135deg,#6366f1,#4f46e5); }
-.el-seg-leaves{ background:linear-gradient(135deg,#d97706,#b45309); }
-.el-seg-b.active{ opacity:1; }
-.el-seg-s{ display:block; font-size:9.5px; font-weight:700; opacity:.9; margin-top:2px; }
-.estl-half{ cursor:pointer; }
+.el-seg-b:hover{ transform:translateY(-1px); } .el-seg-estab{ background:linear-gradient(135deg,#6366f1,#4f46e5); } .el-seg-leaves{ background:linear-gradient(135deg,#d97706,#b45309); }
+.el-seg-b.active{ opacity:1; } .el-seg-s{ display:block; font-size:9.5px; font-weight:700; opacity:.9; margin-top:2px; } .estl-half{ cursor:pointer; }
 </style>
 </head>
 <body>
@@ -22638,7 +22634,7 @@ body.role-staff #mydaily-box{ display:none !important; }
     <button class="section-tab" data-section="pes">PEs <span class="count" id="cnt-pes">0</span></button>
     <button class="section-tab" data-section="strs">STRs <span class="count" id="cnt-strs">0</span></button>
     <button class="section-tab" data-section="sutra" data-mobile-priority="secondary">Sutra Suchna <span class="count" id="cnt-sutra">0</span></button>
-    <button class="section-tab" data-section="officers-nav" onclick="switchSection('officers')">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
+    <button class="section-tab" data-section="officers-nav" onclick="switchSection('totalcases');setTimeout(function(){try{dbAnalysisOpen('io')}catch(e){}},250)">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
     <button class="section-tab" data-section="court">Court Cases <span class="count" id="cnt-court">0</span></button>
     <button class="section-tab" data-section="officers" style="display:none;">🔍 Tag Based Search <span class="count" id="cnt-officers">0</span></button>
     <button class="section-tab" data-section="pragati">📋 प्रगति-Notice</button>
@@ -51393,6 +51389,7 @@ function renderTotalCases() {
       '<div class="db-an-chips">' +
         '<span class="db-an-chip" data-k="year" style="--c:#1d4e89" onclick="dbAnalysisOpen(\'year\')">📅 Year-wise</span>' +
         '<span class="db-an-chip" data-k="enqtype" style="--c:#2563eb" onclick="dbAnalysisOpen(\'enqtype\')">📂 Inquiries type</span>' +
+        '<span class="db-an-chip" data-k="io" style="--c:#9333ea" onclick="dbAnalysisOpen(\'io\')">👮 IOs</span>' +
         '<span class="db-an-chip" data-k="court" style="--c:#4f46e5" onclick="dbAnalysisOpen(\'court\')">⚖️ Court</span>' +
       '</div><div id="db-an-host"></div>' +
     '</div>' +
@@ -56478,8 +56475,7 @@ var _elLeavesHome=null;
 function estabLeavesSwitch(which){
   var ep=document.getElementById('el-estab-part'), lp=document.getElementById('el-leaves-part');
   var be=document.getElementById('el-seg-estab'), bl=document.getElementById('el-seg-leaves');
-  var lc=document.getElementById('leaves-collapse');
-  var host=document.getElementById('el-leaves-host');
+  var lc=document.getElementById('leaves-collapse'); var host=document.getElementById('el-leaves-host');
   if(which==='leaves'){
     if(ep)ep.style.display='none'; if(lp)lp.style.display='block';
     if(be)be.classList.remove('active'); if(bl)bl.classList.add('active');
@@ -56490,7 +56486,6 @@ function estabLeavesSwitch(which){
   } else {
     if(lp)lp.style.display='none'; if(ep)ep.style.display='block';
     if(bl)bl.classList.remove('active'); if(be)be.classList.add('active');
-    // return leaves-collapse to its own section so the Leaves tab still works standalone
     if(lc && _elLeavesHome && lc.parentNode!==_elLeavesHome){ _elLeavesHome.appendChild(lc); }
   }
 }
