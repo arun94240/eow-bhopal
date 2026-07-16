@@ -22588,6 +22588,13 @@ body.role-staff #mydaily-box{ display:none !important; }
 #reports-summary-wrap .rep-pchip-warrant .rep-lbl,#reports-summary-wrap .rep-pchip-warrant .rep-ic,#reports-summary-wrap .rep-pchip-warrant .rep-sub-n{ color:#fff !important; }
 #reports-summary-wrap .rep-pchip-search .rep-lbl,#reports-summary-wrap .rep-pchip-search .rep-ic,#reports-summary-wrap .rep-pchip-search .rep-sub-n{ color:#fff !important; }
 .ds-hint{ padding:26px 16px; text-align:center; color:#94a3b8; font-size:12px; }
+
+/* Attendance permanent box above कार्यालय + notice collapsed summary (v205) */
+.att-live-box{ margin:0 0 12px; }
+.att-live-box .mydd-att-strip{ box-shadow:0 5px 18px rgba(0,0,0,.22); }
+.ovcc-nsum{ background:linear-gradient(135deg,#fff7ed,#fffbf5); border:1px solid #fdba74; border-radius:11px; padding:11px 13px; font-size:12px; font-weight:800; color:#9a3412; cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:9px; }
+.ovcc-nsum .car{ margin-left:auto; color:#ea580c; font-weight:900; }
+.ovcc-nsum.open{ background:#fff; border-style:dashed; }
 </style>
 </head>
 <body>
@@ -22977,6 +22984,9 @@ body.role-staff #mydaily-box{ display:none !important; }
       
       <!-- Command box REMOVED — merged into My Dashboard (review/pragati/court/tasks/leave/notice all there now) -->
 
+      <div class="att-live-box" id="att-live-box">
+        <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
+      </div>
       <div class="ov-section collapsed" id="ovstats-summary-wrap">
         <div class="ov-section-header" onclick="toggleOvStatsSection(event)">
           <div class="ov-section-titles">
@@ -23102,7 +23112,6 @@ body.role-staff #mydaily-box{ display:none !important; }
           <div class="ovstats-content">
 
             <!-- Help message when no tile is selected -->
-            <div id="mydd-att-strip" class="mydd-att-strip-host" style="margin-bottom:10px;"></div>
             <div class="ovstats-help" id="ovstats-help">
               💡 Upar kisi tile par tap karein — matrix neeche khulega
             </div>
@@ -34967,6 +34976,7 @@ function ovTileToggle(which, evt) {
   _ovccHighlight(which);
 }
 function _ovccHighlight(which) {
+  if(which==='notice'){ _ovccNoticeListOpen=false; }
   ['leave','notice','pending'].forEach(function(s){
     var t = document.querySelector('.ovstats-tile-' + s);
     if (t) t.classList.toggle('ovstats-tile-open', s === which);
@@ -35022,6 +35032,8 @@ function _ovccNoticeApply(rows){
     return true;
   });
 }
+var _ovccNoticeListOpen=false;
+function _ovccNoticeToggleList(){ _ovccNoticeListOpen=!_ovccNoticeListOpen; ovccRenderList('notice'); }
 function _ovccNoticeBar(){
   return '<div class="ovcc-nfilt" onclick="event.stopPropagation();">'+
     '<select class="ovcc-ninp" onchange="_ovccNoticeFilt.io=this.value;ovccRenderList(\'notice\')">'+_mddIoFilterOptions(_ovccNoticeFilt.io)+'</select>'+
@@ -35039,7 +35051,12 @@ function ovccRenderList(which) {
     el.innerHTML = (which==='notice'?_ovccNoticeBar():'') + '<div class="mydd-empty" style="color:#64748b;">' + (which === 'notice' ? 'कोई (filter अनुसार) notice नहीं' : (which === 'pending' ? 'कोई लंबित आवेदन नहीं' : 'कोई अवकाश नहीं')) + '</div>';
     return;
   }
-  el.innerHTML = (which==='notice'?_ovccNoticeBar():'') + rows.slice(0, 80).map(function(r){
+  if(which==='notice' && !_ovccNoticeListOpen){
+    el.innerHTML = _ovccNoticeBar() +
+      '<div class="ovcc-nsum" onclick="event.stopPropagation();_ovccNoticeToggleList()">📜 '+rows.length+' लंबित notice — सूची देखने हेतु tap<span class="car">▾</span></div>';
+    return;
+  }
+  el.innerHTML = (which==='notice'?_ovccNoticeBar()+'<div class="ovcc-nsum open" onclick="event.stopPropagation();_ovccNoticeToggleList()">📜 '+rows.length+' लंबित notice — बंद करें<span class="car">▴</span></div>':'') + rows.slice(0, 80).map(function(r){
     var title, meta, brief, oe;
     if (which === 'notice') {
       var plabel = (typeof _cmdFormatNoticePrakaran === 'function') ? _cmdFormatNoticePrakaran(r) : (r.notice_type || 'Notice');
@@ -51042,6 +51059,7 @@ function renderOverview() {
   var cntIoNav = document.getElementById('cnt-io-nav');
   if (cntIoNav) cntIoNav.textContent = ioCount;
   try{ _nsRefreshCounts(); }catch(e){}
+  try{ if(typeof mddRenderAttStrip==='function') mddRenderAttStrip(); if(typeof mddAttStartLive==='function') mddAttStartLive(); }catch(e){}
   var ovIOTotal = document.getElementById('ov-iomaster-total');
   if (ovIOTotal) ovIOTotal.textContent = state.ioMaster.length + ' total establishment';
   var today = todayISO();
