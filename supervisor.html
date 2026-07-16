@@ -7434,13 +7434,13 @@ body.view-mobile .cao-matrix-tile .caom-num {
   text-overflow: ellipsis;
 }
 .ifl-header-count {
-  background: rgba(255,255,255,0.18);
-  color: #f5b942;
-  padding: 3px 10px;
+  background: #062a52;
+  color: #ffffff;
+  padding: 3px 11px;
   border-radius: 12px;
   font-size: 11px;
-  font-weight: 800;
-  border: 1.5px solid rgba(245,185,66,0.4);
+  font-weight: 900;
+  border: 1.5px solid rgba(255,255,255,0.25);
   flex-shrink: 0;
 }
 .ifl-close-btn {
@@ -51244,14 +51244,16 @@ function _dbAnRescue(){
     }
   });
 }
+var _pendingDbAnalysis=null;
+function _flushPendingDbAnalysis(){
+  if(!_pendingDbAnalysis) return;
+  var k=_pendingDbAnalysis; _pendingDbAnalysis=null;
+  setTimeout(function(){ try{ dbAnalysisOpen(k); }catch(e){} },30);
+}
 function openIOMatrix(){
-  switchSection('totalcases');
-  var tries=0;
-  (function _try(){
-    var host=document.getElementById('db-an-host');
-    if(host && typeof dbAnalysisOpen==='function'){ dbAnalysisOpen('io'); return; }
-    if(tries++<20) setTimeout(_try,80);
-  })();
+  _pendingDbAnalysis='io';
+  if(typeof _switchSectionInternal==='function'){ _switchSectionInternal('totalcases'); if(typeof renderHomeButton==='function') renderHomeButton(); }
+  else { switchSection('totalcases'); }
 }
 function dbAnalysisOpen(kind){
   var host=document.getElementById('db-an-host'); var panel=document.getElementById('ovstats-panel-'+kind);
@@ -51409,6 +51411,7 @@ function renderTotalCases() {
     '</div>' +
   '</div>';
   content.innerHTML = dbbox + toolbar + '<div class="tc-list-section">' + listHTML + '</div>';
+  _flushPendingDbAnalysis();
 }
 
 function renderTable(type) {
