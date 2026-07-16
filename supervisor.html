@@ -22569,6 +22569,14 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ovcc-nfilt{ display:flex; gap:6px; margin-bottom:9px; flex-wrap:wrap; }
 .ovcc-ninp{ flex:1; min-width:84px; background:#fff; border:1.5px solid #dbe7f2; border-radius:9px; padding:7px 9px; font-size:11px; color:#1e3a5f; }
 .ovcc-nclr{ background:#eef4fa; border:1px solid #dbe7f2; border-radius:9px; padding:0 11px; cursor:pointer; color:#64748b; font-weight:900; }
+
+/* Remove "Upar kisi tile par tap karein" help boxes + empty white tile (v201) */
+.ovstats-help{ display:none !important; }
+
+/* bottom-box tiles — solid readable backgrounds (v201) */
+#reports-summary-wrap .rep-pchip-search{ background:#1e5aa8 !important; }
+#reports-summary-wrap .rep-pchip-search .rep-lbl,#reports-summary-wrap .rep-pchip-search .rep-ic,#reports-summary-wrap .rep-pchip-search .rep-sub-n{ color:#fff !important; }
+.ds-hint{ padding:26px 16px; text-align:center; color:#94a3b8; font-size:12px; }
 </style>
 </head>
 <body>
@@ -46573,8 +46581,6 @@ function toggleSearchSection(evt) {
   if (typeof toggleSearchMatrices === 'function') toggleSearchMatrices(evt);
 }
 function openMatricesFromSettings(){
-  var box=document.getElementById('unified-search-box');
-  if(box){ try{ box.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} }
   try{ openDeepSearch(); }catch(e){}
 }
 function toggleSearchMatrices(evt) {
@@ -49471,7 +49477,7 @@ function navNoticesSection(section, evt) {
   if (wasActive) {
     _noticesActiveSection = null;
     document.getElementById('notices-content').innerHTML =
-      '<div class="empty-state"><h3>कोई section selected नहीं</h3><p>Upar kisi tile par tap karein</p></div>';
+      '<div class="empty-state"><h3>कोई section चुना नहीं</h3></div>';
     return;
   }
 
@@ -49512,7 +49518,7 @@ function _navNoticesByEntity(kind, value, tileSelector, evt) {
     _noticesActiveFilter = null;
     if (_noticesActiveSection) renderNoticesList(_noticesActiveSection);
     else document.getElementById('notices-content').innerHTML =
-      '<div class="empty-state"><h3>Filter cleared</h3><p>Upar kisi tile par tap karein</p></div>';
+      '<div class="empty-state"><h3>Filter हटाया गया</h3></div>';
     return;
   }
 
@@ -59932,13 +59938,16 @@ function lvForm3Remove() {
 var _dsState = { q:'', mode:'smart', types:{}, io:'', status:'', from:'', to:'', dateMode:'range', extra:{} };
 function openDeepSearch(){
   var p=document.getElementById('deep-search-panel'); if(!p) return;
+  // relocate the panel to sit inline inside the bottom Search/Settings/Reports box (no jump to the top search bar)
+  var anchor=document.getElementById('notice-search-wrap');
+  if(anchor && anchor.parentNode && p.parentNode!==anchor.parentNode){ anchor.parentNode.insertBefore(p, anchor.nextSibling); }
   var gsr=document.getElementById('global-search-results'); if(gsr) gsr.innerHTML='';
-  var mc=document.getElementById('search-matrices-collapse'); if(mc) mc.style.display='none';
+  var toggleOpen = p.style.display==='block';
+  if(toggleOpen){ p.style.display='none'; return; } // re-tap closes
   p.style.display='block';
   _dsRenderShell();
   _dsRun();
-  try{ p.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
-  setTimeout(function(){ var i=document.getElementById('ds-q'); if(i) try{ i.focus(); }catch(e){} },200);
+  setTimeout(function(){ try{ p.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} var i=document.getElementById('ds-q'); if(i) try{ i.focus({preventScroll:true}); }catch(e){} },120);
 }
 function _dsTypeCounts(){
   var c={}; Object.keys(ENQ_LABELS).forEach(function(t){ c[t]=(state.enquiries[t]||[]).length; }); c.court=(state.courts||[]).length; return c;
@@ -60065,8 +60074,21 @@ function _dsCollect(){
   }
   return out;
 }
+function _dsHasCriteria(){
+  var s=_dsState; if(s.q && s.q.trim()) return true;
+  if(s.io || s.status || s.from || s.to) return true;
+  if(Object.keys(s.types||{}).some(function(k){return s.types[k];})) return true;
+  var e=s.extra||{}; if(e.comp||e.ncomp||e.cnr||e.sec) return true;
+  return false;
+}
 function _dsRun(){
   var host=document.getElementById('ds-results'); if(!host) return;
+  if(!_dsHasCriteria()){
+    _dsLast=[];
+    var rc0=document.getElementById('ds-rescount'); if(rc0) rc0.textContent='खोजना शुरू करें';
+    host.innerHTML='<div class="ds-hint">🔎 ऊपर कुछ लिखें या filter चुनें — परिणाम यहाँ दिखेंगे</div>';
+    return;
+  }
   var res=_dsCollect(); _dsLast=res;
   var rc=document.getElementById('ds-rescount'); if(rc) rc.textContent='📋 '+res.length+' परिणाम';
   if(!res.length){ host.innerHTML='<div class="ds-empty">कोई परिणाम नहीं — filters/शब्द बदलें</div>'; return; }
