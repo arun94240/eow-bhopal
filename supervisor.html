@@ -22394,7 +22394,7 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ycc-heads{ gap:5px !important; padding:9px !important; }
 .ycc-head-badge{ color:#0f2a4a !important; background:rgba(15,42,74,.06) !important; border:1px solid rgba(15,42,74,.14) !important; border-radius:999px !important; padding:4px 10px !important; font-size:11px !important; font-weight:800 !important; transition:all .12s !important; }
 .ycc-head-badge:hover{ background:#f5b942 !important; border-color:#f5b942 !important; color:#062a52 !important; transform:translateY(-1px); }
-.ycc-hb-count{ opacity:.85; font-weight:900; }
+.ycc-hb-count{ opacity:1 !important; font-weight:900 !important; color:#c1121f !important; text-shadow:none !important; }
 </style>
 </head>
 <body>
@@ -22637,7 +22637,7 @@ body.role-staff #mydaily-box{ display:none !important; }
     <button class="section-tab" data-section="pes">PEs <span class="count" id="cnt-pes">0</span></button>
     <button class="section-tab" data-section="strs">STRs <span class="count" id="cnt-strs">0</span></button>
     <button class="section-tab" data-section="sutra" data-mobile-priority="secondary">Sutra Suchna <span class="count" id="cnt-sutra">0</span></button>
-    <button class="section-tab" data-section="officers-nav" onclick="openIOMatrix()">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
+    <button class="section-tab" data-section="officers-nav">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
     <button class="section-tab" data-section="court">Court Cases <span class="count" id="cnt-court">0</span></button>
     <button class="section-tab" data-section="officers" style="display:none;">🔍 Tag Based Search <span class="count" id="cnt-officers">0</span></button>
     <button class="section-tab" data-section="pragati">📋 प्रगति-Notice</button>
@@ -34899,6 +34899,15 @@ function navGoBack() {
 }
 
 function switchSection(id) {
+  // 👮 IOs tab → open the IO matrix inline on Total Cases (single routing point)
+  if (id === 'officers-nav') {
+    openIOMatrix();
+    document.querySelectorAll('.section-tab').forEach(function(t){ t.classList.remove('active'); });
+    var _iot = document.querySelector('.section-tab[data-section="officers-nav"]');
+    if (_iot) _iot.classList.add('active');
+    if (typeof renderHomeButton === 'function') renderHomeButton();
+    return;
+  }
   // 📊 Reports is now an INLINE panel on Home — route the tab there smoothly
   if (id === 'report') {
     _switchSectionInternal('overview');
