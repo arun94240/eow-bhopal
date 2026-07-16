@@ -22564,6 +22564,11 @@ body.role-staff #mydaily-box{ display:none !important; }
 #mydd-brief .mbr-more{ color:#1e5aa8 !important; font-weight:700 !important; margin:6px 15px !important; font-size:11px !important; }
 #mydd-brief .mbr-empty{ margin:14px 15px !important; color:#94a3b8 !important; font-size:11.5px !important; text-align:center; }
 #mydd-brief .mbr-foot{ padding:10px 15px 14px !important; font-size:9px !important; color:#b6c3d4 !important; text-align:center !important; border-top:none !important; background:transparent !important; }
+
+/* notice inline filter bar (v200) */
+.ovcc-nfilt{ display:flex; gap:6px; margin-bottom:9px; flex-wrap:wrap; }
+.ovcc-ninp{ flex:1; min-width:84px; background:#fff; border:1.5px solid #dbe7f2; border-radius:9px; padding:7px 9px; font-size:11px; color:#1e3a5f; }
+.ovcc-nclr{ background:#eef4fa; border:1px solid #dbe7f2; border-radius:9px; padding:0 11px; cursor:pointer; color:#64748b; font-weight:900; }
 </style>
 </head>
 <body>
@@ -34986,15 +34991,35 @@ async function ovccApprove(id){
 function ovccReject(id){
   if (typeof estabOpenApproval === 'function') estabOpenApproval(id, true);   // modal खुलेगा — कारण लिखकर Reject
 }
+var _ovccNoticeFilt = { io:'', from:'', to:'' };
+function _ovccNoticeApply(rows){
+  var f=_ovccNoticeFilt;
+  return rows.filter(function(n){
+    if(f.io && n.io_name!==f.io && n.assigned_to!==f.io) return false;
+    var d=String(n.notice_date||n.appearance_date||'').slice(0,10);
+    if(f.from && d && d<f.from) return false;
+    if(f.to && d && d>f.to) return false;
+    return true;
+  });
+}
+function _ovccNoticeBar(){
+  return '<div class="ovcc-nfilt" onclick="event.stopPropagation();">'+
+    '<select class="ovcc-ninp" onchange="_ovccNoticeFilt.io=this.value;ovccRenderList(\'notice\')">'+_mddIoFilterOptions(_ovccNoticeFilt.io)+'</select>'+
+    '<input type="date" class="ovcc-ninp" value="'+_ovccNoticeFilt.from+'" onchange="_ovccNoticeFilt.from=this.value;ovccRenderList(\'notice\')">'+
+    '<input type="date" class="ovcc-ninp" value="'+_ovccNoticeFilt.to+'" onchange="_ovccNoticeFilt.to=this.value;ovccRenderList(\'notice\')">'+
+    ((_ovccNoticeFilt.io||_ovccNoticeFilt.from||_ovccNoticeFilt.to)?'<button class="ovcc-nclr" onclick="_ovccNoticeFilt={io:\'\',from:\'\',to:\'\'};ovccRenderList(\'notice\')">✕</button>':'')+
+  '</div>';
+}
 function ovccRenderList(which) {
   var el = document.getElementById('ovcc-list'); if (!el) return;
   var rows = _ovccRows(which);
+  if(which==='notice'){ rows=_ovccNoticeApply(rows); }
   var tot = document.getElementById('ovcc-total'); if (tot) tot.textContent = 'Total: ' + rows.length;
   if (!rows.length) {
-    el.innerHTML = '<div class="mydd-empty" style="color:#64748b;">' + (which === 'notice' ? 'कोई notice नहीं' : (which === 'pending' ? 'कोई लंबित आवेदन नहीं' : 'कोई अवकाश नहीं')) + '</div>';
+    el.innerHTML = (which==='notice'?_ovccNoticeBar():'') + '<div class="mydd-empty" style="color:#64748b;">' + (which === 'notice' ? 'कोई (filter अनुसार) notice नहीं' : (which === 'pending' ? 'कोई लंबित आवेदन नहीं' : 'कोई अवकाश नहीं')) + '</div>';
     return;
   }
-  el.innerHTML = rows.slice(0, 80).map(function(r){
+  el.innerHTML = (which==='notice'?_ovccNoticeBar():'') + rows.slice(0, 80).map(function(r){
     var title, meta, brief, oe;
     if (which === 'notice') {
       var plabel = (typeof _cmdFormatNoticePrakaran === 'function') ? _cmdFormatNoticePrakaran(r) : (r.notice_type || 'Notice');
