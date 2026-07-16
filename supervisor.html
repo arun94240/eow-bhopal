@@ -22538,32 +22538,39 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ns-st-ok{ background:#dcfce7; color:#15803d; } .ns-st-no{ background:#fee2e2; color:#b91c1c; } .ns-st-pend{ background:#fef3c7; color:#92400e; }
 .ns-empty{ padding:16px; text-align:center; color:#94a3b8; font-size:11.5px; }
 
-/* ═══ Daily Briefing minimalist reskin (v199) ═══ */
-#mydd-brief .mbr-brief{ background:#fff !important; border:1px solid #e7eef6 !important; border-radius:16px !important; box-shadow:0 5px 20px rgba(30,58,95,.08) !important; overflow:hidden; padding:0 !important; }
-#mydd-brief .n-top{ display:flex !important; align-items:center !important; gap:11px !important; padding:14px 15px !important; background:linear-gradient(135deg,#f6faff,#eef5fd) !important; border-bottom:1px solid #eef2f7 !important; margin:0 !important; }
-#mydd-brief .n-cal{ background:linear-gradient(135deg,#1e5aa8,#164a8f) !important; color:#fff !important; border-radius:11px !important; width:46px !important; min-width:46px; height:46px !important; display:flex !important; flex-direction:column; align-items:center; justify-content:center; line-height:1; padding:0 !important; box-shadow:none !important; }
-#mydd-brief .n-cal .m{ font-size:8.5px !important; font-weight:700 !important; opacity:.9; }
-#mydd-brief .n-cal .d{ font-size:18px !important; font-weight:900 !important; margin:1px 0; }
-#mydd-brief .n-cal .w{ font-size:8px !important; opacity:.85; }
+/* ═══ Daily Brief v2 — high-contrast colourful minimal (v202) ═══ */
+#mydd-brief .mbr-brief{ background:linear-gradient(165deg,#12325c,#0a2342) !important; border:1px solid rgba(125,211,252,.18) !important; border-radius:18px !important; box-shadow:0 8px 28px rgba(0,0,0,.32) !important; overflow:hidden; padding:0 !important; }
+#mydd-brief .n-top{ display:flex !important; align-items:center !important; gap:12px !important; padding:15px 16px 4px !important; background:transparent !important; border:none !important; margin:0 !important; }
+#mydd-brief .n-cal{ background:#fff !important; color:#0a2342 !important; border-radius:12px !important; width:48px !important; min-width:48px; height:48px !important; display:flex !important; flex-direction:column; align-items:center; justify-content:center; line-height:1; padding:0 !important; box-shadow:0 3px 10px rgba(0,0,0,.25) !important; }
+#mydd-brief .n-cal .m{ font-size:8.5px !important; font-weight:900 !important; color:#dc2626 !important; letter-spacing:.5px; }
+#mydd-brief .n-cal .d{ font-size:20px !important; font-weight:900 !important; color:#0a2342 !important; margin:1px 0; }
+#mydd-brief .n-cal .w{ font-size:8px !important; color:#64748b !important; font-weight:700; }
 #mydd-brief .n-hd{ flex:1; }
-#mydd-brief .n-t{ font-size:14px !important; font-weight:900 !important; color:#1e3a5f !important; }
-#mydd-brief .n-pills{ display:flex !important; gap:6px !important; margin-top:8px !important; }
-#mydd-brief .n-pill{ flex:1; text-align:center; border-radius:10px !important; padding:7px 6px !important; font-size:11px !important; font-weight:800 !important; border:none !important; }
-#mydd-brief .n-pill.a{ background:#e0edfb !important; color:#1e5aa8 !important; }
-#mydd-brief .n-pill.o{ background:#fee2e2 !important; color:#b91c1c !important; }
-#mydd-brief .n-pill.w{ background:#dcfce7 !important; color:#15803d !important; }
-#mydd-brief .n-daylbl{ font-size:9.5px !important; font-weight:900 !important; color:#94a3b8 !important; letter-spacing:.4px; text-transform:uppercase; margin:12px 15px 4px !important; }
-#mydd-brief .mbr-item{ margin:0 15px !important; border-bottom:1px solid #f4f7fb !important; padding:2px 0 !important; background:transparent !important; }
-#mydd-brief .mbr-item .n-it{ padding:9px 0 !important; display:flex; align-items:flex-start; gap:8px; }
-#mydd-brief .mbr-item .n-it::before{ content:""; width:8px; height:8px; border-radius:50%; background:#1e5aa8; margin-top:5px; flex-shrink:0; }
+#mydd-brief .n-t{ font-size:15px !important; font-weight:900 !important; color:#fff !important; }
+#mydd-brief .n-pills{ display:flex !important; gap:8px !important; margin-top:10px !important; padding:0 !important; }
+#mydd-brief .n-pill{ flex:1; text-align:center; border-radius:12px !important; padding:10px 6px !important; font-size:12px !important; font-weight:800 !important; color:#fff !important; border:none !important; }
+#mydd-brief .n-pill.a{ background:linear-gradient(135deg,#2563eb,#1d4fc4) !important; }
+#mydd-brief .n-pill.o{ background:linear-gradient(135deg,#dc2626,#b91c1c) !important; box-shadow:0 3px 12px rgba(220,38,38,.4) !important; }
+#mydd-brief .n-pill.w{ background:linear-gradient(135deg,#0d9488,#0f766e) !important; }
+#mydd-brief .mbr-body{ background:#f7fafd !important; border-radius:16px !important; margin:12px !important; padding:14px 14px 6px !important; }
+#mydd-brief .n-daylbl{ font-size:9.5px !important; font-weight:900 !important; color:#94a3b8 !important; letter-spacing:.4px; text-transform:uppercase; margin:14px 2px 6px !important; }
+#mydd-brief .mbr-item{ margin:0 !important; border-bottom:1px solid #eef2f7 !important; padding:0 !important; background:transparent !important; }
+#mydd-brief .mbr-item .n-it{ padding:10px 2px !important; display:flex; align-items:flex-start; gap:9px; }
+#mydd-brief .mbr-item .n-it::before{ content:""; width:9px; height:9px; border-radius:50%; background:#1e5aa8; margin-top:5px; flex-shrink:0; }
+#mydd-brief .mbr-item .n-it .d{ font-size:13px; }
+#mydd-brief .mbr-item .n-it .t{ font-size:12.5px !important; font-weight:700 !important; color:#1e293b !important; }
 #mydd-brief .mbr-caret{ color:#cbd5e1 !important; }
-#mydd-brief .mbr-bb{ background:#f8fbfe !important; border-radius:10px !important; margin:0 0 8px !important; padding:9px 11px !important; }
+#mydd-brief .mbr-cnum{ background:#eef4fb !important; color:#1e5aa8 !important; border-radius:6px; padding:1px 7px; font-size:10px; font-weight:800; }
+#mydd-brief .mbr-bb{ background:#eef4fb !important; border-radius:10px !important; margin:0 0 8px !important; padding:9px 11px !important; }
+#mydd-brief .mbr-bmeta,#mydd-brief .mbr-bmeta2{ color:#475569 !important; font-size:10.5px !important; }
 #mydd-brief .mbr-oe{ background:linear-gradient(135deg,#1e5aa8,#164a8f) !important; color:#fff !important; border:none !important; border-radius:8px !important; }
-#mydd-brief .mbr-overbar{ background:#fef2f2 !important; color:#b91c1c !important; border:1px solid #fecaca !important; border-radius:11px !important; margin:10px 15px 2px !important; padding:9px 12px !important; font-weight:800 !important; }
-#mydd-brief .mbr-weekbar{ background:#f8fbfe !important; border:1px solid #eef2f7 !important; border-radius:11px !important; margin:10px 15px 2px !important; padding:10px 12px !important; font-size:11px !important; font-weight:700 !important; color:#475569 !important; }
-#mydd-brief .mbr-more{ color:#1e5aa8 !important; font-weight:700 !important; margin:6px 15px !important; font-size:11px !important; }
-#mydd-brief .mbr-empty{ margin:14px 15px !important; color:#94a3b8 !important; font-size:11.5px !important; text-align:center; }
-#mydd-brief .mbr-foot{ padding:10px 15px 14px !important; font-size:9px !important; color:#b6c3d4 !important; text-align:center !important; border-top:none !important; background:transparent !important; }
+#mydd-brief .mbr-overbar{ background:linear-gradient(135deg,#fee2e2,#fef2f2) !important; color:#b91c1c !important; border:1px solid #fca5a5 !important; border-radius:12px !important; margin:0 0 2px !important; padding:11px 13px !important; font-weight:800 !important; }
+#mydd-brief .mbr-weekbar{ background:#eef4fb !important; border:1px solid #d7e5f5 !important; border-radius:12px !important; margin:8px 0 2px !important; padding:11px 13px !important; font-size:12px !important; font-weight:800 !important; color:#1e5aa8 !important; }
+#mydd-brief .mbr-empty{ text-align:center; color:#16a34a !important; font-size:12px !important; font-weight:700 !important; padding:18px 10px !important; margin:0 !important; }
+#mydd-brief .mbr-more{ color:#1e5aa8 !important; font-weight:700 !important; margin:6px 2px !important; font-size:11px !important; }
+#mydd-brief .n-db.over{ background:#dc2626 !important; color:#fff !important; border-radius:8px !important; padding:4px 10px !important; font-size:10px !important; font-weight:800 !important; display:inline-block; margin:10px 0 4px !important; }
+#mydd-brief .n-db.week{ color:#94a3b8 !important; font-size:9.5px !important; font-weight:900 !important; text-transform:uppercase; margin:10px 0 4px !important; }
+#mydd-brief .mbr-foot{ padding:2px 15px 14px !important; font-size:9px !important; color:#9fb3cc !important; text-align:center !important; border-top:none !important; background:transparent !important; }
 
 /* notice inline filter bar (v200) */
 .ovcc-nfilt{ display:flex; gap:6px; margin-bottom:9px; flex-wrap:wrap; }
@@ -33350,6 +33357,7 @@ function mddRenderBrief(){
   var html='<div class="mbr-brief"><div class="n-top">'+cal+'<div class="n-hd"><div class="n-t">📋 आज का Brief</div>'+
     '<div class="n-pills"><span class="n-pill a">आज '+todayItems.length+'</span>'+(overdue.length?'<span class="n-pill o">Overdue '+overdue.length+'</span>':'')+'<span class="n-pill w">सप्ताह '+weekArr.length+'</span></div>'+
   '</div></div>';
+  html+='<div class="mbr-body">';
   // ── overdue: one collapsible red bar ──
   if(overdue.length){
     html+='<div class="mbr-overbar" onclick="_mbrBoxToggleNext(this)">⚠ '+overdue.length+' Overdue — देखने हेतु tap<span class="car">▾</span></div>'+
@@ -33372,7 +33380,7 @@ function mddRenderBrief(){
     html+='<div class="mbr-weekbar" onclick="_mbrBoxToggleNext(this)">🗓️ इस सप्ताह · '+weekArr.length+' काम<span class="car">▾</span></div>'+
       '<div style="display:none;">'+listOf(weekArr)+'</div>';
   }
-  html+='<div class="mbr-foot">↻ Home खोलने पर अपने-आप अद्यतन · Craft (📆 Subscribe) में भी live</div></div>';
+  html+='<div class="mbr-foot">↻ Home खोलने पर अपने-आप अद्यतन · Craft (📆 Subscribe) में भी live</div></div></div>';
   host.innerHTML=html;
 }
 function hctOpenReports(){
