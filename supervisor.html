@@ -22325,6 +22325,19 @@ body.role-staff #mydaily-box{ display:none !important; }
 .nflow-step::after{ content:""; position:absolute; top:10px; left:calc(50% + 12px); width:calc(100% - 24px); height:2px; background:#e2e8f0; }
 .nflow-step.done::after{ background:#0d9488; }
 .nflow-step:last-child::after{ display:none; }
+
+/* ── Compact case-type list rows (v179): hide action buttons until row active ── */
+.enq-tr .nd-no .ctc-btn-full,
+.enq-tr .no-date-cell .ctc-btn-full,
+.enq-tr .no-date-cell .rev-row-ribbon{ display:none !important; }
+.enq-tr.active .no-date-cell .ctc-btn-full{ display:inline-flex !important; margin-top:5px; }
+.enq-tr.active .no-date-cell .rev-row-ribbon{ display:block !important; }
+.enq-tr td{ padding-top:8px !important; padding-bottom:8px !important; }
+.enq-tr .no-date-cell{ line-height:1.35; }
+.enq-tr .nd-date{ font-size:11px; color:#64748b; }
+.enq-tr .ctc-btn-full{ padding:4px 9px !important; font-size:10.5px !important; }
+/* row hover subtle */
+.enq-tr:hover td{ background:rgba(37,99,235,.04); }
 </style>
 </head>
 <body>
