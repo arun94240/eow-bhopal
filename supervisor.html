@@ -22623,20 +22623,20 @@ body.role-staff #mydaily-box{ display:none !important; }
 .pr-r2{ font-size:10.5px; color:#475569; margin-top:3px; }
 .pr-empty{ padding:16px; text-align:center; color:#94a3b8; font-size:11.5px; }
 
-/* ═══ Agenda merge — one seamless card (v209) ═══ */
-#mydaily-box{ display:block; }
-#mydaily-box #mydd-brief .mbr-brief{ border-radius:18px 18px 0 0 !important; box-shadow:0 8px 20px rgba(0,0,0,.28) !important; margin-bottom:0 !important; }
+
+/* ═══ Agenda TRUE seamless merge + minimalist bars (v213) ═══ */
+#mydaily-box #mydd-brief .mbr-brief{ background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; margin:0 !important; padding:0 !important; }
 #mydaily-box .mydd-tiles{ margin-top:0 !important; }
-#mydaily-box .mydd-tile-mytask{ background:linear-gradient(165deg,#12325c,#0a2342) !important; border-radius:0 0 18px 18px !important; box-shadow:0 4px 16px rgba(0,0,0,.22) !important; border-top:1px solid rgba(125,211,252,.15) !important; }
-#mydaily-box .mydd-tlabel-sub{ font-size:10.5px !important; font-weight:800 !important; color:#9fbbdd !important; text-transform:none !important; }
-#mydaily-box .mydd-dg-toprow{ padding-top:12px !important; }
-/* group cards — more colourful + bigger fonts */
-#mydaily-box .mtx-grp-dir{ background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(124,58,237,.05)) !important; border:1px solid rgba(124,58,237,.35) !important; border-left:4px solid #a78bfa !important; border-radius:12px !important; padding:11px 12px !important; }
-#mydaily-box .mtx-grp-work{ background:linear-gradient(135deg,rgba(245,185,66,.18),rgba(245,185,66,.05)) !important; border:1px solid rgba(245,185,66,.4) !important; border-left:4px solid #f5b942 !important; border-radius:12px !important; padding:11px 12px !important; }
-#mydaily-box .mtx-grp-hd{ font-size:13.5px !important; color:#fff !important; margin-bottom:8px !important; }
-#mydaily-box .mtx-grp-tot{ background:rgba(255,255,255,.2) !important; border-radius:999px; padding:2px 10px; font-size:11px; font-weight:900; color:#fff; }
-#mydaily-box .mtx-gtab{ font-size:12px !important; padding:9px 8px !important; border-radius:10px !important; }
-#mydaily-box .mtx-gtab.active{ background:#fff !important; color:#1e293b !important; }
+#mydaily-box .mydd-tile-mytask{ background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; border-top:1px solid rgba(125,211,252,.14) !important; margin-top:12px !important; padding-top:6px !important; }
+#mydaily-box #mydd-brief .n-top{ padding:2px 0 4px !important; }
+#mydaily-box #mydd-brief .mbr-body{ background:#f7fafd !important; border-radius:14px !important; margin:10px 0 4px !important; padding:13px 14px 6px !important; }
+#mydaily-box #mydd-brief .mbr-foot{ padding:6px 0 2px !important; }
+/* minimalist overdue + week bars */
+#mydaily-box #mydd-brief .mbr-overbar{ background:#fef2f2 !important; color:#b91c1c !important; border:1px solid #fecaca !important; border-radius:10px !important; padding:9px 12px !important; font-weight:700 !important; font-size:12px !important; box-shadow:none !important; }
+#mydaily-box #mydd-brief .mbr-weekbar{ background:#f1f6fc !important; border:1px solid #e2ecf7 !important; border-radius:10px !important; padding:9px 12px !important; font-size:12px !important; font-weight:700 !important; color:#1e5aa8 !important; box-shadow:none !important; }
+#mydaily-box #mydd-brief .mbr-item .n-it{ padding:9px 0 !important; }
+/* craft sync pill sits cleanly under pills */
+#mydaily-box .mydd-craftsync-top{ margin:8px 0 0 !important; }
 
 /* ═══ Agenda merge polish (v210): slim Subscribe/Craft row + Craft Sync on top ═══ */
 #mydaily-box .mtx-agenda-slim{ background:transparent !important; border:none !important; box-shadow:none !important; padding:10px 2px 4px !important; display:flex !important; gap:8px !important; align-items:center !important; }
@@ -22683,6 +22683,16 @@ body.role-staff #mydaily-box{ display:none !important; }
 /* bottom Reports box — kill empty white body when collapsed (v212) */
 #reports-summary-wrap.collapsed .ov-section-body{ display:none !important; padding:0 !important; border-width:0 !important; margin:0 !important; }
 .reports-home-preview:empty{ display:none !important; }
+
+/* bottom Reports box — no white ever (v213 definitive) */
+#reports-summary-wrap .ov-section-body{ background:transparent !important; border:none !important; box-shadow:none !important; }
+#reports-summary-wrap.collapsed .ov-section-body{ display:none !important; padding:0 !important; margin:0 !important; }
+.reports-home-content:empty,.reports-home-preview:empty{ display:none !important; }
+#global-search-results:empty{ display:none !important; }
+
+/* pr list — ensure clickable (v213) */
+#notice-search-wrap .pr-summary,#notice-search-wrap .pr-row{ cursor:pointer !important; -webkit-tap-highlight-color:rgba(37,99,235,.15); }
+#notice-search-wrap .pr-row:active{ background:#eef4fb !important; }
 </style>
 </head>
 <body>
