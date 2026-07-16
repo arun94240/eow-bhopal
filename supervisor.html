@@ -22286,9 +22286,6 @@ body.role-staff #mydaily-box{ display:none !important; }
 .db-an-row{ margin:0 13px 13px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:9px 10px; }
 .db-an-h{ font-size:10px; font-weight:900; color:#9db5d4; letter-spacing:.6px; margin-bottom:7px; }
 .db-an-chips{ display:flex; gap:6px; flex-wrap:wrap; }
-.db-an-chip{ font-size:12px; font-weight:800; padding:11px 10px; border-radius:12px; color:#fff; background:var(--c); box-shadow:0 3px 9px rgba(0,0,0,.22); cursor:pointer; flex:1; min-width:calc(50% - 4px); text-align:center; transition:transform .12s; }
-.db-an-chip:hover{ transform:translateY(-2px); }
-.db-an-chip.on{ box-shadow:0 0 0 2px #f5b942 inset, 0 2px 6px rgba(0,0,0,.25); }
 #db-an-host{ margin-top:9px; }
 #db-an-host .ovstats-panel{ background:#fff; border-radius:12px; color:#0f2238; padding:10px; }
 @media(max-width:380px){ .dbgrid{ grid-template-columns:repeat(2,1fr); } }
@@ -22377,6 +22374,14 @@ body.role-staff #mydaily-box{ display:none !important; }
 .el-seg-b{ flex:1; text-align:center; padding:11px; border-radius:12px; font-weight:900; font-size:13.5px; cursor:pointer; color:#fff; border:none; box-shadow:0 3px 9px rgba(0,0,0,.18); opacity:.5; transition:opacity .15s,transform .12s; }
 .el-seg-b:hover{ transform:translateY(-1px); } .el-seg-estab{ background:linear-gradient(135deg,#6366f1,#4f46e5); } .el-seg-leaves{ background:linear-gradient(135deg,#d97706,#b45309); }
 .el-seg-b.active{ opacity:1; } .el-seg-s{ display:block; font-size:9.5px; font-weight:700; opacity:.9; margin-top:2px; } .estl-half{ cursor:pointer; }
+
+/* db-an tiles (v187) — refined gradient analysis tiles */
+.db-an-chips{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.db-an-tile{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:12px 8px; border-radius:12px; background:var(--g); color:#fff; box-shadow:0 3px 10px rgba(0,0,0,.22); cursor:pointer; transition:transform .12s; }
+.db-an-tile:hover{ transform:translateY(-2px); }
+.db-an-tile .dat-ic{ font-size:17px; }
+.db-an-tile .dat-lb{ font-size:11px; font-weight:800; letter-spacing:.2px; }
+.db-an-tile.on{ box-shadow:0 0 0 2px #f5b942, 0 3px 10px rgba(0,0,0,.22); }
 </style>
 </head>
 <body>
@@ -22619,7 +22624,7 @@ body.role-staff #mydaily-box{ display:none !important; }
     <button class="section-tab" data-section="pes">PEs <span class="count" id="cnt-pes">0</span></button>
     <button class="section-tab" data-section="strs">STRs <span class="count" id="cnt-strs">0</span></button>
     <button class="section-tab" data-section="sutra" data-mobile-priority="secondary">Sutra Suchna <span class="count" id="cnt-sutra">0</span></button>
-    <button class="section-tab" data-section="officers-nav" onclick="switchSection('totalcases');setTimeout(function(){try{dbAnalysisOpen('io')}catch(e){}},250)">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
+    <button class="section-tab" data-section="officers-nav" onclick="openIOMatrix()">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
     <button class="section-tab" data-section="court">Court Cases <span class="count" id="cnt-court">0</span></button>
     <button class="section-tab" data-section="officers" style="display:none;">🔍 Tag Based Search <span class="count" id="cnt-officers">0</span></button>
     <button class="section-tab" data-section="pragati">📋 प्रगति-Notice</button>
@@ -51224,18 +51229,27 @@ function _dbAnRescue(){
     }
   });
 }
+function openIOMatrix(){
+  switchSection('totalcases');
+  var tries=0;
+  (function _try(){
+    var host=document.getElementById('db-an-host');
+    if(host && typeof dbAnalysisOpen==='function'){ dbAnalysisOpen('io'); return; }
+    if(tries++<20) setTimeout(_try,80);
+  })();
+}
 function dbAnalysisOpen(kind){
   var host=document.getElementById('db-an-host'); var panel=document.getElementById('ovstats-panel-'+kind);
   if(!host||!panel) return;
   var wasOpen = (panel.parentNode===host && panel.style.display==='block');
   Array.prototype.slice.call(host.children).forEach(function(c){ c.style.display='none'; });
-  document.querySelectorAll('.db-an-chip').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.db-an-tile').forEach(function(c){ c.classList.remove('on'); });
   if(wasOpen) return;
   if(!panel.__origParent) panel.__origParent = panel.parentNode;
   host.appendChild(panel);
   try{ _ovstatsRelocateGrids(); }catch(e){}
   panel.style.display='block';
-  var chip=document.querySelector('.db-an-chip[data-k="'+kind+'"]'); if(chip) chip.classList.add('on');
+  var chip=document.querySelector('.db-an-tile[data-k="'+kind+'"]'); if(chip) chip.classList.add('on');
   try{
     if(kind==='year' && typeof renderYearCards==='function') renderYearCards();
     else if(kind==='enqtype' && typeof renderEnqTypeCards==='function') renderEnqTypeCards();
@@ -51372,10 +51386,10 @@ function renderTotalCases() {
     '<div class="dbgrid">' + cards + '</div>' +
     '<div class="db-an-row"><div class="db-an-h">📊 विश्लेषण — इसी DATA के दृश्य</div>' +
       '<div class="db-an-chips">' +
-        '<span class="db-an-chip" data-k="year" style="--c:#1d4e89" onclick="dbAnalysisOpen(\'year\')">📅 Year-wise</span>' +
-        '<span class="db-an-chip" data-k="enqtype" style="--c:#2563eb" onclick="dbAnalysisOpen(\'enqtype\')">📂 Inquiries type</span>' +
-        '<span class="db-an-chip" data-k="io" style="--c:#9333ea" onclick="dbAnalysisOpen(\'io\')">👮 IOs</span>' +
-        '<span class="db-an-chip" data-k="court" style="--c:#4f46e5" onclick="dbAnalysisOpen(\'court\')">⚖️ Court</span>' +
+        '<span class="db-an-tile" data-k="year" style="--g:linear-gradient(135deg,#1d4e89,#12355f)" onclick="dbAnalysisOpen(\'year\')"><span class="dat-ic">📅</span><span class="dat-lb">Year-wise</span></span>' +
+        '<span class="db-an-tile" data-k="enqtype" style="--g:linear-gradient(135deg,#2563eb,#1d4fc4)" onclick="dbAnalysisOpen(\'enqtype\')"><span class="dat-ic">📂</span><span class="dat-lb">Inquiries type</span></span>' +
+        '<span class="db-an-tile" data-k="io" style="--g:linear-gradient(135deg,#9333ea,#7e22ce)" onclick="dbAnalysisOpen(\'io\')"><span class="dat-ic">👮</span><span class="dat-lb">IOs</span></span>' +
+        '<span class="db-an-tile" data-k="court" style="--g:linear-gradient(135deg,#4f46e5,#4338ca)" onclick="dbAnalysisOpen(\'court\')"><span class="dat-ic">⚖️</span><span class="dat-lb">Court</span></span>' +
       '</div><div id="db-an-host"></div>' +
     '</div>' +
   '</div>';
