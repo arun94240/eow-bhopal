@@ -22336,8 +22336,21 @@ body.role-staff #mydaily-box{ display:none !important; }
 .enq-tr .no-date-cell{ line-height:1.35; }
 .enq-tr .nd-date{ font-size:11px; color:#64748b; }
 .enq-tr .ctc-btn-full{ padding:4px 9px !important; font-size:10.5px !important; }
-/* row hover subtle */
 .enq-tr:hover td{ background:rgba(37,99,235,.04); }
+
+/* ═══ Notice master-architecture (v180) — uniform card everywhere ═══ */
+.narch-card{ background:#fff; color:#0f2a4a; border-radius:13px; margin-bottom:9px; border-left:5px solid var(--nst,#d97706); box-shadow:0 3px 12px rgba(6,42,82,.12); overflow:hidden; }
+.narch-head{ padding:11px 12px; cursor:pointer; }
+.narch-card.is-open{ box-shadow:0 5px 18px rgba(6,42,82,.2); }
+.narch-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.narch-chip{ font-size:10px; font-weight:900; background:rgba(6,42,82,.07); border-radius:6px; padding:2px 8px; color:#062a52; white-space:nowrap; }
+.narch-t{ flex:1; font-size:12.5px; font-weight:800; min-width:120px; }
+.narch-badge{ font-size:9.5px; font-weight:900; color:#fff; background:var(--nst,#d97706); border-radius:999px; padding:3px 10px; white-space:nowrap; }
+.narch-un{ color:#b45309; font-weight:800; }
+.narch-grid{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:9px; font-size:10.5px; }
+.narch-cell{ background:#f5f8fc; border-radius:8px; padding:6px 9px; } .narch-cell b{ color:#062a52; }
+.narch-card .ntc-flow{ margin:9px 0 2px; }
+.narch-card .ntc-card-brief{ padding:0 12px 12px; }
 </style>
 </head>
 <body>
@@ -49299,25 +49312,29 @@ function _buildNoticeCard(n, today) {
 
   var _fsrv = _noticeIsServed(n), _fadm = _noticeIsAdam(n), _fasg = !!n.assigned_to;
   function _stp(st, ic, lb){ return '<div class="nflow-step '+st+'"><div class="nfs-dot">'+ic+'</div><div class="nfs-lb">'+lb+'</div></div>'; }
+  // status → accent colour + label (uniform master-card)
+  var _st = _fsrv ? {c:'#16a34a',l:'तामील'} : (_fadm ? {c:'#dc2626',l:'अदम-तामील'} : (_fasg ? {c:'#d97706',l:'तामीली हेतु'} : {c:'#64748b',l:'Assign बाकी'}));
   var flowStrip = '<div class="ntc-flow">' +
     _stp('done','✓','जारी') +
     _stp(_fasg?'done':'cur', _fasg?'✓':'👮', _fasg? escapeHtml(String(n.assigned_to).split(' ').slice(0,2).join(' ')) : 'Assign') +
     _stp(_fsrv?'done':(_fadm?'fail':(_fasg?'cur':'')), _fsrv?'✓':(_fadm?'✕':'📩'), _fadm?'अदम-तामील':'तामील') +
     _stp(_fsrv?'cur':'', '📊', 'Report') +
   '</div>';
-  return '<div class="ntc-card" id="ntc-card-' + n.id + '">' +
-    '<div class="ntc-card-head" onclick="event.stopPropagation();toggleNoticeCardBrief(\'' + n.id + '\')">' +
-      '<div class="ntc-card-top">' +
-        '<span class="ntc-card-prakaran">' + escapeHtml(prakaranLabel) + '</span>' +
-        '<span class="ntc-card-type">' + escapeHtml(n.notice_type || 'Notice') + '</span>' +
+  var _asgCell = n.assigned_to ? escapeHtml(n.assigned_to) : '<span class="narch-un">⚠️ Assign बाकी</span>';
+  return '<div class="narch-card" id="ntc-card-' + n.id + '" style="--nst:'+_st.c+'">' +
+    '<div class="narch-head" onclick="event.stopPropagation();toggleNoticeCardBrief(\'' + n.id + '\')">' +
+      '<div class="narch-top">' +
+        '<span class="narch-chip">' + escapeHtml(prakaranLabel) + '</span>' +
+        '<span class="narch-t">' + escapeHtml(n.notice_type || 'Notice') + (n.notice_detail? ' — '+escapeHtml(n.notice_detail) : '') + '</span>' +
+        '<span class="narch-badge">' + _st.l + (urgent?' ⚡':'') + '</span>' +
       '</div>' +
-      '<div class="ntc-card-detail">' + escapeHtml(n.notice_detail || '—') + '</div>' +
-      '<div class="ntc-card-meta">' +
-        '<span>👤 ' + renderIOInlineCell(n.io_name) + '</span>' +
-        '<span>📅 उपस्थिति: <b>' + fmtDateShort(n.appearance_date) + '</b></span>' +
-      '</div>' +
-      '<div class="ntc-card-chips">' + statusChip + urgent + ' <span class="ntc-card-assigned">' + assignedLine + '</span></div>' +
       flowStrip +
+      '<div class="narch-grid">' +
+        '<div class="narch-cell"><b>👮 IO:</b> ' + renderIOInlineCell(n.io_name) + '</div>' +
+        '<div class="narch-cell"><b>📅 जारी:</b> ' + fmtDateShort(n.notice_date) + '</div>' +
+        '<div class="narch-cell"><b>⏰ पेशी:</b> ' + fmtDateShort(n.appearance_date) + '</div>' +
+        '<div class="narch-cell"><b>📍 तामील:</b> ' + _asgCell + '</div>' +
+      '</div>' +
     '</div>' +
     '<div class="ntc-card-brief" id="ntc-brief-' + n.id + '" style="display:none;"></div>' +
   '</div>';
@@ -49331,7 +49348,7 @@ function toggleNoticeCardBrief(id) {
   if (!brief) return;
   // Close others
   document.querySelectorAll('.ntc-card-brief').forEach(function(b){ if (b.id !== brief.id) b.style.display = 'none'; });
-  document.querySelectorAll('.ntc-card.is-open').forEach(function(c){ if (c.id !== ('ntc-card-' + id)) c.classList.remove('is-open'); });
+  document.querySelectorAll('.ntc-card.is-open, .narch-card.is-open').forEach(function(c){ if (c.id !== ('ntc-card-' + id)) c.classList.remove('is-open'); });
 
   if (_noticeCardOpenId === id) {
     brief.style.display = 'none';
