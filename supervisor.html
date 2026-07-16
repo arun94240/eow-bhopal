@@ -22410,6 +22410,53 @@ body.role-staff #mydaily-box{ display:none !important; }
 #mydd-dept-matrix{ display:none !important; }
 /* wide-screen: keep case list from stretching so Open/Edit sits near the parties (gap fix) */
 .enq-list-wrap .table-wrap > table{ max-width:1000px; }
+
+/* ═══ Deep Search UI (v194) — light soothing ═══ */
+.deep-search-panel{ background:#fff; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 6px 22px rgba(30,58,95,.10); margin-top:10px; color:#334155; }
+.ds-hd{ background:linear-gradient(135deg,#eaf2fb,#f5f9fd); padding:13px 15px; display:flex; align-items:center; gap:9px; border-bottom:1px solid #eef2f7; }
+.ds-ttl{ font-size:15px; font-weight:900; flex:1; color:#1e3a5f; }
+.ds-cnt{ background:#e0edfb; color:#1e5aa8; font-size:11px; font-weight:900; padding:3px 11px; border-radius:999px; }
+.ds-close{ background:#f1f5f9; border:none; border-radius:8px; width:30px; height:30px; cursor:pointer; color:#64748b; font-weight:900; }
+.ds-main{ padding:14px; }
+.ds-bar{ display:flex; align-items:center; gap:8px; background:#f4f8fc; border:1.5px solid #dbe7f2; border-radius:13px; padding:4px 6px 4px 13px; }
+.ds-bar input{ flex:1; border:none; outline:none; font-size:14px; padding:10px 0; color:#1e3a5f; background:transparent; }
+.ds-mic{ width:38px; height:38px; border-radius:10px; background:#fde8e8; color:#dc2626; border:none; font-size:16px; cursor:pointer; }
+.ds-mic.rec{ animation:dspulse 1s infinite; background:#dc2626; color:#fff; }
+@keyframes dspulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,.4);} 50%{ box-shadow:0 0 0 6px rgba(220,38,38,0);} }
+.ds-clear{ width:34px; height:38px; border-radius:10px; background:#eef2f7; color:#64748b; border:none; font-size:13px; cursor:pointer; }
+.ds-modes{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.ds-mchip{ font-size:10.5px; font-weight:800; padding:6px 12px; border-radius:999px; background:#f1f5f9; border:1px solid #e2e8f0; color:#475569; cursor:pointer; }
+.ds-mchip.on{ background:#e0edfb; color:#1e5aa8; border-color:#bcd8f5; }
+.ds-fh{ font-size:9.5px; font-weight:900; color:#94a3b8; letter-spacing:.6px; margin:14px 0 7px; text-transform:uppercase; }
+.ds-facs{ display:flex; gap:6px; flex-wrap:wrap; }
+.ds-fac{ font-size:10.5px; font-weight:800; padding:6px 11px; border-radius:9px; background:#f4f7fb; border:1px solid #e6edf5; color:#475569; cursor:pointer; }
+.ds-fac.on{ color:#fff; border-color:transparent; background:var(--c,#2563eb); }
+.ds-n{ opacity:.7; margin-left:4px; }
+.ds-cal{ background:#f8fbfe; border:1px solid #e6eef7; border-radius:13px; padding:11px; }
+.ds-range{ display:flex; gap:8px; align-items:center; }
+.ds-cin{ flex:1; background:#fff; border:1.5px solid #dbe7f2; border-radius:9px; padding:6px 9px; font-size:11px; color:#1e3a5f; font-weight:700; display:flex; flex-direction:column; gap:2px; }
+.ds-cin span{ font-size:8.5px; color:#94a3b8; } .ds-cin input{ border:none; outline:none; font-size:12px; color:#1e3a5f; font-weight:700; background:transparent; }
+.ds-arrow{ color:#94a3b8; font-weight:900; }
+.ds-quick{ display:flex; gap:6px; flex-wrap:wrap; margin-top:9px; }
+.ds-cq{ font-size:9.5px; font-weight:800; padding:5px 10px; border-radius:999px; background:#eef4fa; color:#1e5aa8; cursor:pointer; border:1px solid #dbe7f2; }
+.ds-cq:hover{ background:#dbeafe; }
+.ds-selrow{ display:flex; gap:8px; } .ds-sel{ flex:1; background:#fff; border:1.5px solid #dbe7f2; border-radius:9px; padding:9px 10px; font-size:12px; color:#1e3a5f; }
+.ds-inp{ background:#f4f7fb; border:1px solid #e6edf5; border-radius:9px; padding:5px 9px; font-size:10.5px; display:flex; flex-direction:column; gap:2px; min-width:calc(50% - 3px); flex:1; }
+.ds-inp span{ font-size:8.5px; color:#94a3b8; font-weight:800; } .ds-inp input{ border:none; outline:none; font-size:12px; color:#1e3a5f; background:transparent; }
+.ds-reshd{ display:flex; align-items:center; gap:8px; padding:12px 14px; border-top:1px solid #eef2f7; background:#f8fbfe; }
+.ds-rc{ flex:1; font-size:12px; font-weight:900; color:#1e3a5f; }
+.ds-csv{ background:#eef4fa; color:#1e5aa8; border:1px solid #dbe7f2; border-radius:9px; font-size:11px; font-weight:800; padding:8px 11px; cursor:pointer; }
+.ds-pdf{ background:#dc2626; color:#fff; border:none; border-radius:9px; font-size:11px; font-weight:800; padding:8px 12px; cursor:pointer; }
+.ds-results{ padding:6px 14px 14px; max-height:520px; overflow-y:auto; }
+.ds-row{ background:#fff; margin-top:8px; border-radius:11px; padding:9px 11px; border-left:4px solid #2563eb; box-shadow:0 1px 5px rgba(30,58,95,.07); cursor:pointer; }
+.ds-row:hover{ box-shadow:0 3px 11px rgba(30,58,95,.13); }
+.ds-row.ds-dim{ opacity:.55; } .ds-row.ds-dim .ds-rt{ text-decoration:line-through; }
+.ds-row-top{ display:flex; align-items:center; gap:8px; }
+.ds-rn{ font-size:10px; font-weight:900; background:#eef4fa; color:#1e3a5f; border-radius:6px; padding:1px 7px; }
+.ds-rst{ font-size:9.5px; font-weight:800; background:#dcfce7; color:#15803d; border-radius:999px; padding:2px 9px; margin-left:auto; }
+.ds-rt{ font-size:12px; font-weight:700; margin-top:4px; color:#334155; } .ds-vs{ color:#b91c1c; font-weight:800; font-size:9.5px; }
+.ds-rm{ font-size:10px; color:#94a3b8; margin-top:3px; }
+.ds-empty,.ds-more{ padding:16px; text-align:center; color:#94a3b8; font-size:11.5px; }
 </style>
 </head>
 <body>
@@ -22559,6 +22606,7 @@ body.role-staff #mydaily-box{ display:none !important; }
       </div>
     </div>
     <div id="global-search-results" class="global-search-results"></div>
+    <div id="deep-search-panel" class="deep-search-panel" style="display:none;"></div>
     <!-- matrices (collapsible, moved from old Search box) -->
     <div id="search-matrices-collapse" style="display:none;">
           <div id="search-content" class="search-content">
@@ -46382,9 +46430,7 @@ function toggleSearchSection(evt) {
 function openMatricesFromSettings(){
   var box=document.getElementById('unified-search-box');
   if(box){ try{ box.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} }
-  var coll=document.getElementById('search-matrices-collapse');
-  if(coll){ coll.style.display='block'; if(typeof renderSearchMatrices==='function'){ try{ renderSearchMatrices(); }catch(e){} } }
-  setTimeout(function(){ var inp=document.getElementById('global-search'); if(inp){ try{ inp.focus(); }catch(e){} } }, 350);
+  try{ openDeepSearch(); }catch(e){}
 }
 function toggleSearchMatrices(evt) {
   if (evt && evt.stopPropagation) evt.stopPropagation();
@@ -59695,6 +59741,195 @@ function lvForm3Remove() {
 }
 
 // ============ GLOBAL SEARCH ============
+
+/* ═══════════ DEEP SEARCH (v194) ═══════════ */
+var _dsState = { q:'', mode:'smart', types:{}, io:'', status:'', from:'', to:'', dateMode:'range', extra:{} };
+function openDeepSearch(){
+  var p=document.getElementById('deep-search-panel'); if(!p) return;
+  var gsr=document.getElementById('global-search-results'); if(gsr) gsr.innerHTML='';
+  var mc=document.getElementById('search-matrices-collapse'); if(mc) mc.style.display='none';
+  p.style.display='block';
+  _dsRenderShell();
+  _dsRun();
+  try{ p.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
+  setTimeout(function(){ var i=document.getElementById('ds-q'); if(i) try{ i.focus(); }catch(e){} },200);
+}
+function _dsTypeCounts(){
+  var c={}; Object.keys(ENQ_LABELS).forEach(function(t){ c[t]=(state.enquiries[t]||[]).length; }); c.court=(state.courts||[]).length; return c;
+}
+function _dsRenderShell(){
+  var p=document.getElementById('deep-search-panel'); if(!p) return;
+  var tc=_dsTypeCounts();
+  var total=Object.keys(ENQ_LABELS).reduce(function(s,t){return s+(state.enquiries[t]||[]).length;},0)+(state.courts||[]).length;
+  var ios=(state.ioMaster||[]).filter(function(m){return m.is_io===true;});
+  var ioOpts='<option value="">— सभी IO —</option>'+ios.map(function(m){var nm=(m.rank?m.rank+' ':'')+m.name; return '<option value="'+escapeHtml(nm)+'">'+escapeHtml(nm)+'</option>';}).join('');
+  function tfac(k,lbl,col){ var on=_dsState.types[k]?' on':''; return '<span class="ds-fac'+on+'" style="--c:'+col+'" onclick="_dsToggleType(\''+k+'\')">'+lbl+'<span class="ds-n">'+(tc[k]||0)+'</span></span>'; }
+  p.innerHTML =
+  '<div class="ds-hd"><span style="font-size:18px;">🔍</span><span class="ds-ttl">Deep Search</span><span class="ds-cnt">'+total+' प्रकरण</span><button class="ds-close" onclick="closeDeepSearch()">✕</button></div>'+
+  '<div class="ds-main">'+
+    '<div class="ds-bar">'+
+      '<span style="font-size:15px;color:#94a3b8;">🔎</span>'+
+      '<input id="ds-q" placeholder="कुछ भी लिखें — नाम, नंबर, धारा, ब्रीफ, विभाग…" value="'+escapeHtml(_dsState.q)+'" oninput="_dsState.q=this.value;_dsRun()">'+
+      '<button class="ds-mic" title="बोलकर खोजें" onclick="_dsVoice()">🎙</button>'+
+      '<button class="ds-clear" title="साफ़ करें" onclick="_dsReset()">✕</button>'+
+    '</div>'+
+    '<div class="ds-modes">'+
+      ['smart|🧠 Smart','literal|🔤 अक्षरशः','translit|🌐 हिं⇄Eng','number|#️⃣ सटीक नंबर'].map(function(m){var k=m.split('|')[0],l=m.split('|')[1];return '<span class="ds-mchip'+(_dsState.mode===k?' on':'')+'" onclick="_dsState.mode=\''+k+'\';_dsRenderShell();_dsRun()">'+l+'</span>';}).join('')+
+    '</div>'+
+    '<div class="ds-fh">📂 प्रकार</div>'+
+    '<div class="ds-facs">'+
+      tfac('complaints','Complaints','#2563eb')+tfac('rcomplaints','R-Comp','#7c3aed')+tfac('rcs','RCs','#dc2626')+
+      tfac('pes','PEs','#ea580c')+tfac('strs','STRs','#0891b2')+tfac('sutra','Sutra','#16a34a')+tfac('court','Court','#4f46e5')+
+    '</div>'+
+    '<div class="ds-fh">📅 दिनांक — किस तारीख से किस तक</div>'+
+    '<div class="ds-cal">'+
+      '<div class="ds-range">'+
+        '<label class="ds-cin"><span>📅 से</span><input type="date" id="ds-from" value="'+_dsState.from+'" onchange="_dsState.from=this.value;_dsRun()"></label>'+
+        '<span class="ds-arrow">→</span>'+
+        '<label class="ds-cin"><span>📅 तक</span><input type="date" id="ds-to" value="'+_dsState.to+'" onchange="_dsState.to=this.value;_dsRun()"></label>'+
+      '</div>'+
+      '<div class="ds-quick">'+
+        ['today|आज','week|इस सप्ताह','month|इस माह','year|इस वर्ष','d30|पिछले 30 दिन','all|सम्पूर्ण'].map(function(q){var k=q.split('|')[0],l=q.split('|')[1];return '<span class="ds-cq" onclick="_dsQuickDate(\''+k+'\')">'+l+'</span>';}).join('')+
+      '</div>'+
+    '</div>'+
+    '<div class="ds-fh">👮 IO / अधिकारी · स्थिति</div>'+
+    '<div class="ds-selrow">'+
+      '<select id="ds-io" class="ds-sel" onchange="_dsState.io=this.value;_dsRun()">'+ioOpts+'</select>'+
+      '<select id="ds-status" class="ds-sel" onchange="_dsState.status=this.value;_dsRun()"><option value="">— सभी स्थिति —</option><option value="Active">जाँच में</option><option value="Closed">नस्तीबद्ध</option><option value="Converted to RC">RC में परिवर्तित</option></select>'+
+    '</div>'+
+    '<div class="ds-fh">⚙️ और parameters</div>'+
+    '<div class="ds-facs">'+
+      '<label class="ds-inp"><span>शिकायतकर्ता</span><input id="ds-x-comp" oninput="_dsState.extra.comp=this.value;_dsRun()" placeholder="नाम"></label>'+
+      '<label class="ds-inp"><span>अनावेदक/विभाग</span><input id="ds-x-ncomp" oninput="_dsState.extra.ncomp=this.value;_dsRun()" placeholder="नाम/विभाग"></label>'+
+      '<label class="ds-inp"><span>CNR / केस नं.</span><input id="ds-x-cnr" oninput="_dsState.extra.cnr=this.value;_dsRun()" placeholder="CNR/नं."></label>'+
+      '<label class="ds-inp"><span>धारा/keyword</span><input id="ds-x-sec" oninput="_dsState.extra.sec=this.value;_dsRun()" placeholder="420…"></label>'+
+    '</div>'+
+  '</div>'+
+  '<div class="ds-reshd"><span class="ds-rc" id="ds-rescount">…</span><button class="ds-csv" onclick="_dsExportCSV()">⬇ CSV</button><button class="ds-pdf" onclick="_dsExportPDF()">📄 PDF निकालें</button></div>'+
+  '<div id="ds-results" class="ds-results"></div>';
+}
+function _dsToggleType(k){ _dsState.types[k]=!_dsState.types[k]; _dsRenderShell(); _dsRun(); }
+function _dsReset(){ _dsState={q:'',mode:_dsState.mode,types:{},io:'',status:'',from:'',to:'',dateMode:'range',extra:{}}; _dsRenderShell(); _dsRun(); }
+function closeDeepSearch(){ var p=document.getElementById('deep-search-panel'); if(p) p.style.display='none'; }
+function _dsQuickDate(k){
+  var now=new Date(); function iso(d){return d.toISOString().slice(0,10);}
+  var to=iso(now), from='';
+  if(k==='today') from=to;
+  else if(k==='week'){ var d=new Date(now); d.setDate(d.getDate()-d.getDay()); from=iso(d); }
+  else if(k==='month') from=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+  else if(k==='year') from=now.getFullYear()+'-01-01';
+  else if(k==='d30'){ var d2=new Date(now); d2.setDate(d2.getDate()-30); from=iso(d2); }
+  else if(k==='all'){ from=''; to=''; }
+  _dsState.from=from; _dsState.to=to;
+  var fEl=document.getElementById('ds-from'), tEl=document.getElementById('ds-to'); if(fEl)fEl.value=from; if(tEl)tEl.value=to;
+  _dsRun();
+}
+function _dsVoice(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ showToast('इस ब्राउज़र में voice-search उपलब्ध नहीं','error'); return; }
+  var rec=new SR(); rec.lang='hi-IN'; rec.interimResults=false; rec.maxAlternatives=1;
+  var mic=document.querySelector('.ds-mic'); if(mic) mic.classList.add('rec');
+  rec.onresult=function(e){ var t=e.results[0][0].transcript; var i=document.getElementById('ds-q'); if(i){ i.value=t; _dsState.q=t; _dsRun(); } };
+  rec.onerror=function(){ if(mic) mic.classList.remove('rec'); };
+  rec.onend=function(){ if(mic) mic.classList.remove('rec'); };
+  try{ rec.start(); }catch(e){}
+}
+function _dsInDateRange(d){
+  if(!_dsState.from && !_dsState.to) return true;
+  var ds=String(d||'').slice(0,10); if(!ds) return false;
+  if(_dsState.from && ds<_dsState.from) return false;
+  if(_dsState.to && ds>_dsState.to) return false;
+  return true;
+}
+function _dsTextMatch(r,q){
+  if(!q) return true;
+  if(_dsState.mode==='number'){ var no=String(r.no||r.case_no||'').toLowerCase(); return no===q.toLowerCase()||no.indexOf(q.toLowerCase())>-1; }
+  if(_dsState.mode==='literal'){ var hay=[r.no,r.io_name,r.complainant,r.non_complainant,r.brief,r.petitioner,r.respondent,r.court,r.cnr_no,r.case_no].filter(Boolean).join(' ').toLowerCase(); return hay.indexOf(q.toLowerCase())>-1; }
+  return matchEntry(r,q.toLowerCase()); /* smart + translit both use fuzzy matchEntry */
+}
+function _dsExtraMatch(r,isCourt){
+  var e=_dsState.extra||{};
+  if(e.comp && String(r.complainant||r.petitioner||'').toLowerCase().indexOf(e.comp.toLowerCase())<0) return false;
+  if(e.ncomp && String(r.non_complainant||r.respondent||'').toLowerCase().indexOf(e.ncomp.toLowerCase())<0) return false;
+  if(e.cnr){ var cv=String(r.cnr_no||r.case_no||r.no||'').toLowerCase(); if(cv.indexOf(e.cnr.toLowerCase())<0) return false; }
+  if(e.sec){ var sv=[r.brief,r.non_complainant,r.complainant].filter(Boolean).join(' ').toLowerCase(); if(sv.indexOf(e.sec.toLowerCase())<0) return false; }
+  return true;
+}
+function _dsCollect(){
+  var out=[]; var anyType=Object.keys(_dsState.types).some(function(k){return _dsState.types[k];});
+  Object.keys(ENQ_LABELS).forEach(function(t){
+    if(anyType && !_dsState.types[t]) return;
+    (state.enquiries[t]||[]).forEach(function(r){
+      if(!_dsTextMatch(r,_dsState.q)) return;
+      if(_dsState.io && r.io_name!==_dsState.io) return;
+      if(_dsState.status && (r.case_status||'Active')!==_dsState.status) return;
+      if(!_dsInDateRange(r.created_at||r.date)) return;
+      if(!_dsExtraMatch(r,false)) return;
+      out.push({kind:'enq',type:t,r:r});
+    });
+  });
+  if(!anyType || _dsState.types.court){
+    (state.courts||[]).forEach(function(c){
+      if(!_dsTextMatch(c,_dsState.q)) return;
+      if(_dsState.status) return; /* court has no enq-status */
+      if(!_dsInDateRange(c.created_at||c.filing_date||c.date)) return;
+      if(!_dsExtraMatch(c,true)) return;
+      out.push({kind:'court',type:'court',c:c});
+    });
+  }
+  return out;
+}
+function _dsRun(){
+  var host=document.getElementById('ds-results'); if(!host) return;
+  var res=_dsCollect(); _dsLast=res;
+  var rc=document.getElementById('ds-rescount'); if(rc) rc.textContent='📋 '+res.length+' परिणाम';
+  if(!res.length){ host.innerHTML='<div class="ds-empty">कोई परिणाम नहीं — filters/शब्द बदलें</div>'; return; }
+  host.innerHTML=res.slice(0,300).map(function(m){
+    if(m.kind==='enq'){
+      var r=m.r; var no=r.no?formatEntryNo(m.type,r.no,r.entry_year):(r.serial||'—');
+      var st=getStatusLabel(r.case_status); var dim=(r.case_status==='Closed'||r.case_status==='Converted to RC')?' ds-dim':'';
+      var col=({complaints:'#2563eb',rcomplaints:'#7c3aed',rcs:'#dc2626',pes:'#ea580c',strs:'#0891b2',sutra:'#16a34a'})[m.type]||'#2563eb';
+      return '<div class="ds-row'+dim+'" style="border-left-color:'+col+'" onclick="inlineExpandEnquiry(\''+m.type+'\',\''+r.id+'\',event)">'+
+        '<div class="ds-row-top"><span class="ds-rn">'+escapeHtml(no)+'</span><span class="ds-rst">'+escapeHtml(st)+'</span></div>'+
+        '<div class="ds-rt">'+escapeHtml((r.complainant||'—'))+(r.non_complainant?' <span class="ds-vs">Vs</span> '+escapeHtml(r.non_complainant):'')+'</div>'+
+        '<div class="ds-rm">👮 '+escapeHtml(r.io_name||'—')+' · '+escapeHtml(ENQ_LABELS[m.type]||'')+(r.entry_year?' · '+r.entry_year:'')+'</div>'+
+      '</div>';
+    } else {
+      var c=m.c; var cno=(c.case_type||'')+' '+(c.case_no||'');
+      return '<div class="ds-row" style="border-left-color:#4f46e5" onclick="inlineExpandCourt(\''+c.id+'\',event)">'+
+        '<div class="ds-row-top"><span class="ds-rn">'+escapeHtml(cno)+'</span><span class="ds-rst" style="background:#eef2ff;color:#4338ca">Court</span></div>'+
+        '<div class="ds-rt">'+escapeHtml((c.petitioner||'—'))+(c.respondent?' <span class="ds-vs">Vs</span> '+escapeHtml(c.respondent):'')+'</div>'+
+        '<div class="ds-rm">'+escapeHtml(c.court||'')+(c.cnr_no?' · CNR '+escapeHtml(c.cnr_no):'')+'</div>'+
+      '</div>';
+    }
+  }).join('') + (res.length>300?'<div class="ds-more">… '+(res.length-300)+' और — filters से सीमित करें</div>':'');
+}
+var _dsLast=[];
+function _dsExportRows(){
+  return _dsLast.map(function(m){
+    if(m.kind==='enq'){ var r=m.r; return {no:(r.no?formatEntryNo(m.type,r.no,r.entry_year):(r.serial||'')),type:ENQ_LABELS[m.type]||'',complainant:r.complainant||'',non_complainant:r.non_complainant||'',io:r.io_name||'',status:getStatusLabel(r.case_status),year:r.entry_year||''}; }
+    var c=m.c; return {no:(c.case_type||'')+' '+(c.case_no||''),type:'Court',complainant:c.petitioner||'',non_complainant:c.respondent||'',io:'',status:c.court||'',year:c.case_year||''};
+  });
+}
+function _dsExportCSV(){
+  var rows=_dsExportRows(); if(!rows.length){ showToast('कोई परिणाम नहीं','error'); return; }
+  var head=['No','Type','Complainant','Non-Complainant/Respondent','IO','Status/Court','Year'];
+  var csv=head.join(',')+'\n'+rows.map(function(r){ return [r.no,r.type,r.complainant,r.non_complainant,r.io,r.status,r.year].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(','); }).join('\n');
+  var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}); var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='EOW-Search-'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); URL.revokeObjectURL(url);
+}
+function _dsExportPDF(){
+  var rows=_dsExportRows(); if(!rows.length){ showToast('कोई परिणाम नहीं','error'); return; }
+  var when=new Date().toLocaleString('en-IN');
+  var body='<html><head><meta charset="utf-8"><title>EOW Search</title><style>body{font-family:Arial,\"Noto Sans Devanagari\",sans-serif;padding:24px;color:#1e293b}h2{color:#1e3a5f;margin:0 0 4px}.sub{color:#64748b;font-size:12px;margin-bottom:14px}table{width:100%;border-collapse:collapse;font-size:11px}th{background:#1e3a5f;color:#fff;padding:7px;text-align:left}td{padding:6px 7px;border-bottom:1px solid #e2e8f0}tr:nth-child(even){background:#f8fafc}</style></head><body>'+
+    '<h2>EOW भोपाल — Search Results</h2><div class="sub">'+rows.length+' प्रकरण · निकाला गया: '+when+'</div>'+
+    '<table><thead><tr><th>क्र.</th><th>No</th><th>प्रकार</th><th>शिकायतकर्ता</th><th>अनावेदक</th><th>IO</th><th>स्थिति</th><th>वर्ष</th></tr></thead><tbody>'+
+    rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td>'+escapeHtml(r.no)+'</td><td>'+escapeHtml(r.type)+'</td><td>'+escapeHtml(r.complainant)+'</td><td>'+escapeHtml(r.non_complainant)+'</td><td>'+escapeHtml(r.io)+'</td><td>'+escapeHtml(r.status)+'</td><td>'+escapeHtml(r.year)+'</td></tr>';}).join('')+
+    '</tbody></table></body></html>';
+  var w=window.open('','_blank'); if(!w){ showToast('Popup blocked — allow popups','error'); return; }
+  w.document.write(body); w.document.close(); setTimeout(function(){ try{ w.print(); }catch(e){} },400);
+}
+
 function performGlobalSearch() {
   var q = (document.getElementById('global-search').value || '').trim().toLowerCase();
   var clearBtn = document.getElementById('global-search-clear');
