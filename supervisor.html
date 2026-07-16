@@ -22516,6 +22516,27 @@ body.role-staff #mydaily-box{ display:none !important; }
 
 /* प्रगति live widget removed from homepage — now merged into कार्यालय प्रगति tile (v197) */
 #mydd-pragati-feed{ display:none !important; }
+
+/* ═══ Summons/Warrant tiles + notice search (v198) ═══ */
+.rep-pchip-summons{ background:linear-gradient(135deg,#7c3aed,#6527cc) !important; border-color:#7c3aed !important; }
+.rep-pchip-warrant{ background:linear-gradient(135deg,#dc2626,#b91c1c) !important; border-color:#dc2626 !important; }
+.rep-pchip-summons .rep-ic,.rep-pchip-summons .rep-lbl,.rep-pchip-summons .rep-sub-n,
+.rep-pchip-warrant .rep-ic,.rep-pchip-warrant .rep-lbl,.rep-pchip-warrant .rep-sub-n{ color:#fff !important; }
+.rep-pchip-summons.is-active{ box-shadow:0 0 0 2px #7c3aed inset; } .rep-pchip-warrant.is-active{ box-shadow:0 0 0 2px #dc2626 inset; }
+#mydd-notice-strip{ display:none !important; }
+.notice-search-strip{ background:#fff; border:1px solid #e2e8f0; border-radius:13px; overflow:hidden; box-shadow:0 5px 18px rgba(30,58,95,.10); margin-top:10px; }
+.ns-hd{ background:linear-gradient(135deg,rgba(0,0,0,.02),rgba(0,0,0,0)); padding:11px 13px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #eef2f7; border-top:3px solid var(--acc); }
+.ns-ic{ font-size:16px; } .ns-ttl{ font-size:13px; font-weight:900; color:#334155; flex:1; } .ns-cnt{ background:#eef4fa; color:#1e3a5f; border-radius:999px; padding:2px 10px; font-size:10.5px; font-weight:900; }
+.ns-close{ background:#f1f5f9; border:none; border-radius:8px; width:28px; height:28px; cursor:pointer; color:#64748b; font-weight:900; }
+.ns-filt{ display:flex; gap:7px; padding:11px 13px; background:#f8fbfe; flex-wrap:wrap; }
+.ns-inp{ flex:1; min-width:86px; background:#fff; border:1.5px solid #dbe7f2; border-radius:9px; padding:8px 9px; font-size:11px; color:#1e3a5f; }
+.ns-list{ padding:4px 13px 13px; max-height:420px; overflow-y:auto; }
+.ns-row{ background:#fff; border:1px solid #eef2f7; border-left:3px solid #7c3aed; border-radius:10px; padding:8px 11px; margin-top:8px; box-shadow:0 1px 4px rgba(30,58,95,.05); }
+.ns-r1{ display:flex; gap:8px; align-items:center; } .ns-io{ font-size:11px; font-weight:800; color:#334155; } .ns-dt{ font-size:9.5px; color:#94a3b8; margin-left:auto; }
+.ns-r2{ font-size:10.5px; color:#475569; margin-top:3px; }
+.ns-st{ font-size:9px; font-weight:800; padding:1px 8px; border-radius:999px; margin-left:5px; }
+.ns-st-ok{ background:#dcfce7; color:#15803d; } .ns-st-no{ background:#fee2e2; color:#b91c1c; } .ns-st-pend{ background:#fef3c7; color:#92400e; }
+.ns-empty{ padding:16px; text-align:center; color:#94a3b8; font-size:11.5px; }
 </style>
 </head>
 <body>
@@ -24794,9 +24815,16 @@ body.role-staff #mydaily-box{ display:none !important; }
               <div class="hdr-counter rep-pchip rep-pchip-reports" onclick="event.stopPropagation();openReportBuilderInline()">
                 <span class="rep-ic">📊</span><span class="rep-lbl">Reports</span><span class="rep-sub-n">↗</span>
               </div>
+              <div class="hdr-counter rep-pchip rep-pchip-summons" onclick="event.stopPropagation();openNoticeSearch('Summons')">
+                <span class="rep-ic">📨</span><span class="rep-lbl">Summons</span><span class="rep-sub-n" id="ns-cnt-summons">0</span>
+              </div>
+              <div class="hdr-counter rep-pchip rep-pchip-warrant" onclick="event.stopPropagation();openNoticeSearch('Warrant')">
+                <span class="rep-ic">⚠️</span><span class="rep-lbl">Warrants</span><span class="rep-sub-n" id="ns-cnt-warrant">0</span>
+              </div>
             </div>
             <!-- Department matrix — collapsible, tap the tile above -->
             <div class="rep-dept-strip" id="rep-dept-wrap" style="display:none;" onclick="event.stopPropagation();"></div>
+            <div class="notice-search-strip" id="notice-search-wrap" style="display:none;" onclick="event.stopPropagation();"></div>
             <!-- CAO chips — collapsible, tap the tile above -->
             <div class="cao-strip cao-strip-collapsible" id="cao-chips-wrap" style="display:none;" onclick="event.stopPropagation();">
                       <div class="cao-strip-tiles">
@@ -33188,7 +33216,7 @@ function mddAttPill(which){
 var _mddAttTimer = null; var _masOpenGroup = null; var _masTableOpen = false; var _masTableSort = 'status';
 async function mddAttLiveTick(){
   try { var r = await supa.from('attendance_log').select('*').eq('is_test', false).order('att_date', { ascending:false }); if (r && !r.error) state.attendance = r.data || []; } catch(e){}
-  mddRenderAttStrip(); try { mddRenderNoticeStrip(); } catch(e){}
+  mddRenderAttStrip();
 }
 function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval(mddAttLiveTick, 60000); }
 function _mddBriefItem(dot, text, tag){
@@ -33318,7 +33346,7 @@ function hctOpenReports(){
   } catch(e){}
 }
 function renderMyDailyBox() {
-  try { mddRenderBrief(); mddRenderAttStrip(); mddRenderNoticeStrip(); mddAttStartLive(); hctOpenReports(); } catch(e){}
+  try { mddRenderBrief(); mddRenderAttStrip(); mddAttStartLive(); hctOpenReports(); } catch(e){}
   try { renderDeptMatrix(); } catch(e){}
   try { renderCraftSyncBtn(); } catch(e){}
   var box = document.getElementById('mydaily-box');
@@ -50943,6 +50971,7 @@ function renderOverview() {
   if (ovIO) ovIO.textContent = ioCount;
   var cntIoNav = document.getElementById('cnt-io-nav');
   if (cntIoNav) cntIoNav.textContent = ioCount;
+  try{ _nsRefreshCounts(); }catch(e){}
   var ovIOTotal = document.getElementById('ov-iomaster-total');
   if (ovIOTotal) ovIOTotal.textContent = state.ioMaster.length + ' total establishment';
   var today = todayISO();
@@ -60033,6 +60062,65 @@ function _dsExportPDF(){
     '</tbody></table></body></html>';
   var w=window.open('','_blank'); if(!w){ showToast('Popup blocked — allow popups','error'); return; }
   w.document.write(body); w.document.close(); setTimeout(function(){ try{ w.print(); }catch(e){} },400);
+}
+
+
+/* ═══ Notice / Summons / Warrant search (v198) ═══ */
+var _nsFilt = { type:'', io:'', from:'', to:'', status:'' };
+function openNoticeSearch(type){
+  var host=document.getElementById('notice-search-wrap'); if(!host) return;
+  var same = (_nsFilt.type===type) && host.style.display==='block';
+  document.querySelectorAll('.rep-pchip-summons,.rep-pchip-warrant').forEach(function(t){ t.classList.remove('is-active'); });
+  if(same){ host.style.display='none'; return; }
+  _nsFilt = { type:type, io:'', from:'', to:'', status:'' };
+  host.style.display='block';
+  var cls = type==='Summons' ? 'rep-pchip-summons' : 'rep-pchip-warrant';
+  var tile=document.querySelector('.'+cls); if(tile) tile.classList.add('is-active');
+  _nsRender();
+  try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
+}
+function _nsAll(){ return (state.notices||[]).filter(function(n){ return !_nsFilt.type || n.notice_type===_nsFilt.type; }); }
+function _nsFiltered(){
+  return _nsAll().filter(function(n){
+    if(_nsFilt.io && n.io_name!==_nsFilt.io && n.assigned_to!==_nsFilt.io) return false;
+    var d=String(n.notice_date||n.appearance_date||'').slice(0,10);
+    if(_nsFilt.from && d && d<_nsFilt.from) return false;
+    if(_nsFilt.to && d && d>_nsFilt.to) return false;
+    if(_nsFilt.status==='served' && !_noticeIsServed(n)) return false;
+    if(_nsFilt.status==='adam' && !_noticeIsAdam(n)) return false;
+    if(_nsFilt.status==='pending' && (_noticeIsServed(n)||_noticeIsAdam(n))) return false;
+    return true;
+  });
+}
+function _nsRender(){
+  var host=document.getElementById('notice-search-wrap'); if(!host) return;
+  var type=_nsFilt.type; var rows=_nsFiltered();
+  var accent = type==='Summons' ? '#7c3aed' : '#dc2626';
+  var listHTML = rows.length ? rows.slice(0,120).map(function(n){
+    var st = _noticeIsServed(n) ? '<span class="ns-st ns-st-ok">✅ तामील</span>' : (_noticeIsAdam(n) ? '<span class="ns-st ns-st-no">⚠ अदम</span>' : '<span class="ns-st ns-st-pend">⏳ लंबित</span>');
+    var who = escapeHtml(n.assigned_to||n.io_name||'—');
+    var dt = escapeHtml(String(n.notice_date||'').slice(0,10));
+    var det = escapeHtml(n.notice_detail || ((n.case_type||'')+' '+(n.case_id||'')) || '—');
+    var appr = n.appearance_date ? ' · पेशी '+escapeHtml(String(n.appearance_date).slice(0,10)) : '';
+    return '<div class="ns-row" style="border-left-color:'+accent+'"><div class="ns-r1"><span class="ns-io">👮 '+who+'</span><span class="ns-dt">'+dt+'</span></div><div class="ns-r2">'+det+appr+' '+st+'</div></div>';
+  }).join('') : '<div class="ns-empty">कोई '+escapeHtml(type)+' नहीं मिला</div>';
+  host.innerHTML =
+    '<div class="ns-hd" style="--acc:'+accent+'"><span class="ns-ic">'+(type==='Summons'?'📨':'⚠️')+'</span><span class="ns-ttl">'+escapeHtml(type)+' — तामील खोजें</span><span class="ns-cnt">'+rows.length+'</span><button class="ns-close" onclick="event.stopPropagation();document.getElementById(\'notice-search-wrap\').style.display=\'none\';document.querySelectorAll(\'.rep-pchip-summons,.rep-pchip-warrant\').forEach(function(t){t.classList.remove(\'is-active\')});">✕</button></div>'+
+    '<div class="ns-filt">'+
+      '<select class="ns-inp" onchange="_nsFilt.io=this.value;_nsRender()">'+_mddIoFilterOptions(_nsFilt.io)+'</select>'+
+      '<input type="date" class="ns-inp" value="'+_nsFilt.from+'" onchange="_nsFilt.from=this.value;_nsRender()">'+
+      '<input type="date" class="ns-inp" value="'+_nsFilt.to+'" onchange="_nsFilt.to=this.value;_nsRender()">'+
+      '<select class="ns-inp" onchange="_nsFilt.status=this.value;_nsRender()"><option value="">— सभी —</option><option value="pending">⏳ लंबित</option><option value="served">✅ तामील</option><option value="adam">⚠ अदम</option></select>'+
+    '</div>'+
+    '<div class="ns-list">'+listHTML+'</div>';
+}
+function _nsRefreshCounts(){
+  try{
+    var s=(state.notices||[]).filter(function(n){return n.notice_type==='Summons';}).length;
+    var w=(state.notices||[]).filter(function(n){return n.notice_type==='Warrant';}).length;
+    var se=document.getElementById('ns-cnt-summons'); if(se) se.textContent=s;
+    var we=document.getElementById('ns-cnt-warrant'); if(we) we.textContent=w;
+  }catch(e){}
 }
 
 function performGlobalSearch() {
