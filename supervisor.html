@@ -22275,6 +22275,7 @@ body.role-staff #mydaily-box{ display:none !important; }
 .section-tab:not(.active)[data-section="sutra"]{ background:linear-gradient(135deg,#16a34a,#15803d) !important; }
 .section-tab:not(.active)[data-section="court"]{ background:linear-gradient(135deg,#4f46e5,#4338ca) !important; }
 .section-tab:not(.active)[data-section="officers"]{ background:linear-gradient(135deg,#9333ea,#7e22ce) !important; }
+.section-tab:not(.active)[data-section="officers-nav"]{ background:linear-gradient(135deg,#9333ea,#7e22ce) !important; }
 .section-tab:not(.active)[data-section="pragati"]{ background:linear-gradient(135deg,#0d9488,#0f766e) !important; }
 .section-tab:not(.active)[data-section="iomaster"]{ background:linear-gradient(135deg,#6366f1,#4f46e5) !important; }
 .section-tab:not(.active)[data-section="tags"]{ background:linear-gradient(135deg,#06b6d4,#0891b2) !important; }
@@ -22458,7 +22459,6 @@ body.role-staff #mydaily-box{ display:none !important; }
       <span class="sup-mini-cal" id="search-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
       <div class="usb-title">🔍 Search</div>
       <span class="dgeow-total-pill">DB: <strong id="search-cnt-total">0</strong></span>
-      <button type="button" class="usb-adv-toggle" id="usb-adv-toggle" onclick="toggleSearchMatrices(event)">▾ matrices</button>
     </div>
     <div class="search-controls">
       <div class="global-search-box">
@@ -22567,12 +22567,12 @@ body.role-staff #mydaily-box{ display:none !important; }
     <button class="section-tab" data-section="pes">PEs <span class="count" id="cnt-pes">0</span></button>
     <button class="section-tab" data-section="strs">STRs <span class="count" id="cnt-strs">0</span></button>
     <button class="section-tab" data-section="sutra" data-mobile-priority="secondary">Sutra Suchna <span class="count" id="cnt-sutra">0</span></button>
+    <button class="section-tab" data-section="officers-nav" onclick="switchSection('officers')">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
     <button class="section-tab" data-section="court">Court Cases <span class="count" id="cnt-court">0</span></button>
     <button class="section-tab" data-section="officers" style="display:none;">🔍 Tag Based Search <span class="count" id="cnt-officers">0</span></button>
-    <button class="section-tab" data-section="pragati">📋 Pragati</button>
-    <button class="section-tab" data-section="iomaster" data-mobile-priority="secondary">Establishment <span class="count" id="cnt-iomaster">0</span></button>
+    <button class="section-tab" data-section="pragati">📋 प्रगति-Notice</button>
+    <button class="section-tab" data-section="iomaster" data-mobile-priority="secondary">Establishment-Leaves <span class="count" id="cnt-iomaster">0</span></button>
     <button class="section-tab" data-section="tags" data-mobile-priority="secondary">🏷 Tags <span class="count" id="cnt-tags">0</span></button>
-    <button class="section-tab" data-section="leaves">Leaves</button>
     <button class="section-tab kb-section-tab" data-section="links" data-mobile-priority="secondary">🔗 Links &amp; Forms <span class="count" id="cnt-links-sec">0</span></button>
     <button class="section-tab kb-section-tab" data-section="knowledge-base" data-mobile-priority="secondary">📚 Knowledge Base &amp; Files <span class="count" id="cnt-kb">0</span></button>
     <button class="section-tab mobile-more-tab" onclick="toggleMobileMore()" title="More tabs" type="button">⋯ More</button>
@@ -51287,15 +51287,12 @@ function renderTotalCases() {
     '</div>' +
     '<div class="dbx-live">' +
       '<div class="dbx-pill" style="background:linear-gradient(135deg,#16a34a,#15803d)"><span class="n">+' + _tAdd + '</span>आज जुड़े</div>' +
-      '<div class="dbx-pill" style="background:linear-gradient(135deg,#0d9488,#0f766e)" onclick="switchSection(\'pragati\')"><span class="n">' + _tPrag + '</span>आज प्रगति</div>' +
-      '<div class="dbx-pill" style="background:linear-gradient(135deg,#d97706,#b45309)" onclick="gotoNotices()"><span class="n">' + _tNot + '</span>Notice pending</div>' +
     '</div>' +
     '<div class="dbgrid">' + cards + '</div>' +
     '<div class="db-an-row"><div class="db-an-h">📊 विश्लेषण — इसी DATA के दृश्य</div>' +
       '<div class="db-an-chips">' +
         '<span class="db-an-chip" data-k="year" style="--c:#1d4e89" onclick="dbAnalysisOpen(\'year\')">📅 Year-wise</span>' +
         '<span class="db-an-chip" data-k="enqtype" style="--c:#2563eb" onclick="dbAnalysisOpen(\'enqtype\')">📂 Inquiries type</span>' +
-        '<span class="db-an-chip" data-k="io" style="--c:#9333ea" onclick="dbAnalysisOpen(\'io\')">👮 IOs</span>' +
         '<span class="db-an-chip" data-k="court" style="--c:#4f46e5" onclick="dbAnalysisOpen(\'court\')">⚖️ Court</span>' +
       '</div><div id="db-an-host"></div>' +
     '</div>' +
