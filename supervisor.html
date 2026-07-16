@@ -22364,6 +22364,19 @@ body.role-staff #mydaily-box{ display:none !important; }
 .pn-nt{ font-size:11.5px; font-weight:800; padding:7px 13px; border-radius:999px; border:1.5px solid #fecaca; background:#fff; color:#b91c1c; cursor:pointer; }
 .pn-nt.active{ background:#dc2626; color:#fff; border-color:#dc2626; }
 .pn-nt-add{ margin-left:auto; font-size:11.5px; font-weight:800; padding:7px 13px; border-radius:999px; border:none; background:#16a34a; color:#fff; cursor:pointer; }
+
+/* ═══ Establishment-Leaves 2-half banner (v182) ═══ */
+.estl-banner{ display:flex; gap:9px; margin-bottom:13px; grid-column:1/-1; }
+.estl-half{ flex:1; border-radius:13px; padding:12px; color:#fff; box-shadow:0 3px 11px rgba(0,0,0,.16); }
+.estl-estab{ background:linear-gradient(135deg,#6366f1,#4f46e5); }
+.estl-leaves{ background:linear-gradient(135deg,#d97706,#b45309); cursor:pointer; transition:transform .12s; }
+.estl-leaves:hover{ transform:translateY(-2px); }
+.estl-h{ font-size:13px; font-weight:900; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.estl-arrow{ margin-left:auto; opacity:.85; }
+.estl-stat{ display:flex; gap:6px; }
+.estl-stat span{ flex:1; background:rgba(255,255,255,.17); border-radius:9px; padding:7px 3px; text-align:center; font-size:9.5px; font-weight:800; }
+.estl-stat span b{ display:block; font-size:16px; line-height:1.1; }
+@media(max-width:420px){ .estl-banner{ flex-direction:column; } }
 </style>
 </head>
 <body>
@@ -56445,10 +56458,31 @@ function renderIOMaster() {
   });
   if (sf === 'io') list = list.filter(function(io){ return io.is_io === true; });
   else if (sf === 'non-io') list = list.filter(function(io){ return io.is_io !== true; });
+  // 2-half stats banner (Establishment | Leaves) — v182
+  var _allM = state.ioMaster || [];
+  var _ios = _allM.filter(function(m){ return m.is_io===true; }).length;
+  var _staff = _allM.filter(function(m){ return m.is_io!==true; }).length;
+  var _tot = _allM.length;
+  var _lv = state.leaves || [];
+  var _tY = new Date().toISOString().slice(0,10);
+  var _lvToday = _lv.filter(function(l){ var s=(l.from_date||l.start_date||'').slice(0,10), e=(l.to_date||l.end_date||l.from_date||'').slice(0,10); return s && s<=_tY && (e||s)>=_tY && (l.status==='Approved'||l.status==='approved'||!l.status); }).length;
+  var _mo = _tY.slice(0,7);
+  var _lvMonth = _lv.filter(function(l){ return String(l.from_date||l.start_date||'').slice(0,7)===_mo; }).length;
+  var _lvPend = _lv.filter(function(l){ return (l.status==='Pending'||l.status==='pending'); }).length;
+  var _bannerHTML = '<div class="estl-banner">' +
+    '<div class="estl-half estl-estab">' +
+      '<div class="estl-h">🏢 Establishment</div>' +
+      '<div class="estl-stat"><span><b>'+_ios+'</b>IO</span><span><b>'+_staff+'</b>Staff</span><span><b>'+_tot+'</b>कुल</span></div>' +
+    '</div>' +
+    '<div class="estl-half estl-leaves" onclick="switchSection(\'leaves\')">' +
+      '<div class="estl-h">🏖 Leaves <span class="estl-arrow">→</span></div>' +
+      '<div class="estl-stat"><span><b>'+_lvToday+'</b>आज</span><span><b>'+_lvMonth+'</b>माह</span><span><b>'+_lvPend+'</b>pending</span></div>' +
+    '</div>' +
+  '</div>';
   var c = document.getElementById('io-master-list');
-  if (!list.length) { c.className = ''; c.innerHTML = '<div class="empty-state"><h3>कोई member नहीं मिला</h3></div>'; return; }
+  if (!list.length) { c.className = ''; c.innerHTML = _bannerHTML + '<div class="empty-state"><h3>कोई member नहीं मिला</h3></div>'; return; }
   c.className = 'io-master-grid';
-  c.innerHTML = list.map(function(io){
+  c.innerHTML = _bannerHTML + list.map(function(io){
     var displayName = getDisplayIOName(io);
     var bd = io.is_io ? getCasesBreakdown(io) : { total: 0, breakdown: [] };
     var photoHTML = io.photo_url ? '<img src="'+io.photo_url+'">' : '<span>'+getInitials(displayName || io.name)+'</span>';
