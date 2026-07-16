@@ -22988,7 +22988,7 @@ body.role-staff #mydaily-box{ display:none !important; }
         <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
       </div>
       <div class="ov-section collapsed" id="ovstats-summary-wrap">
-        <div class="ov-section-header" onclick="toggleOvStatsSection(event)">
+        <div class="ov-section-header">
           <div class="ov-section-titles">
             <div class="sup-title-row dgeow-title-row">
               <span class="sup-mini-cal" id="ovstats-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
@@ -23071,35 +23071,13 @@ body.role-staff #mydaily-box{ display:none !important; }
                 </div>
                 <div class="cmd-chips" id="ovstats-chips-pragati"></div>
               </div>
-              <!-- MOVED from My Dashboard: अवकाश पर -->
-              <div class="cmd-metric ovstats-tile ovstats-tile-leave ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovTileToggle('leave',event)">
-                <div class="cmd-metric-top">
-                  <div class="cmd-metric-icon" id="cc-cal-leave"></div>
-                  <div class="cmd-metric-body">
-                    <div class="cmd-metric-label">अवकाश पर</div>
-                    <div class="cmd-metric-num" id="ov-cnt-leave">0</div>
-                  </div>
-                </div>
-                <div class="cmd-chips"></div>
-              </div>
               <!-- MOVED from My Dashboard: Notice लंबित -->
               <div class="cmd-metric ovstats-tile ovstats-tile-notice ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovTileToggle('notice',event)">
                 <div class="cmd-metric-top">
                   <div class="cmd-metric-icon" id="cc-cal-notice"></div>
                   <div class="cmd-metric-body">
-                    <div class="cmd-metric-label">Notice लंबित</div>
+                    <div class="cmd-metric-label">Notice</div>
                     <div class="cmd-metric-num" id="ov-cnt-notice">0</div>
-                  </div>
-                </div>
-                <div class="cmd-chips"></div>
-              </div>
-              <!-- MOVED from My Dashboard: Pending Approvals -->
-              <div class="cmd-metric ovstats-tile ovstats-tile-pending ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovTileToggle('pending',event)">
-                <div class="cmd-metric-top">
-                  <div class="cmd-metric-icon" id="cc-cal-pending"></div>
-                  <div class="cmd-metric-body">
-                    <div class="cmd-metric-label">Pending Approvals</div>
-                    <div class="cmd-metric-num" id="cc-cnt-pending">0</div>
                   </div>
                 </div>
                 <div class="cmd-chips"></div>
@@ -24846,7 +24824,7 @@ body.role-staff #mydaily-box{ display:none !important; }
       <!-- ═══════════════════════════════════════════════════════════ -->
       <!-- 📑 REPORTS BOX — Quick preset reports + custom builder      -->
       <!-- ═══════════════════════════════════════════════════════════ -->
-      <div class="ov-section" id="reports-summary-wrap">
+      <div class="ov-section collapsed" id="reports-summary-wrap">
         <div class="ov-section-header reports-static-header">
           <div class="ov-section-titles">
             <div class="sup-title-row dgeow-title-row">
@@ -34957,6 +34935,7 @@ function ovTileToggle(which, evt) {
     panel.style.display = 'none';
     var help0 = document.getElementById('ovstats-help'); if (help0) help0.style.display = '';
     _ovccHighlight(null);
+    if (wrap) wrap.classList.add('collapsed');
     return;
   }
   _ovccActive = which;
