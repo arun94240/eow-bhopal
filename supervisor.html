@@ -22351,6 +22351,19 @@ body.role-staff #mydaily-box{ display:none !important; }
 .narch-cell{ background:#f5f8fc; border-radius:8px; padding:6px 9px; } .narch-cell b{ color:#062a52; }
 .narch-card .ntc-flow{ margin:9px 0 2px; }
 .narch-card .ntc-card-brief{ padding:0 12px 12px; }
+
+/* ═══ प्रगति-Notice segment split (v181) ═══ */
+.pn-seg{ display:flex; gap:8px; margin-bottom:12px; }
+.pn-seg-b{ flex:1; text-align:center; padding:11px; border-radius:12px; font-weight:900; font-size:13.5px; cursor:pointer; color:#fff; border:none; box-shadow:0 3px 9px rgba(0,0,0,.2); opacity:.5; transition:opacity .15s, transform .12s; }
+.pn-seg-b:hover{ transform:translateY(-1px); }
+.pn-seg-prag{ background:linear-gradient(135deg,#0d9488,#0f766e); }
+.pn-seg-not{ background:linear-gradient(135deg,#dc2626,#b91c1c); }
+.pn-seg-b.active{ opacity:1; }
+.pn-seg-s{ display:block; font-size:9.5px; font-weight:700; opacity:.9; margin-top:2px; }
+.pn-not-tabs{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:11px; }
+.pn-nt{ font-size:11.5px; font-weight:800; padding:7px 13px; border-radius:999px; border:1.5px solid #fecaca; background:#fff; color:#b91c1c; cursor:pointer; }
+.pn-nt.active{ background:#dc2626; color:#fff; border-color:#dc2626; }
+.pn-nt-add{ margin-left:auto; font-size:11.5px; font-weight:800; padding:7px 13px; border-radius:999px; border:none; background:#16a34a; color:#fff; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -25201,6 +25214,12 @@ body.role-staff #mydaily-box{ display:none !important; }
 
     <!-- ============ PRAGATI CONTAINER ============ -->
     <div id="pir-pragati-container">
+    <!-- प्रगति / Notice segment split (v181) -->
+    <div class="pn-seg">
+      <button class="pn-seg-b pn-seg-prag active" id="pn-seg-prag" onclick="pnSwitch('prag')">📋 प्रगति<span class="pn-seg-s">IO updates · timeline</span></button>
+      <button class="pn-seg-b pn-seg-not" id="pn-seg-not" onclick="pnSwitch('not')">📨 Notice<span class="pn-seg-s">जारी · तामील · report</span></button>
+    </div>
+    <div id="pn-prag-part">
     <!-- View Toggle Buttons -->
     <div class="pragati-toggle">
       <button class="pragati-tab active" id="pragati-tab-feed" onclick="switchPragatiView('feed')">📋 Latest Submissions</button>
@@ -25391,7 +25410,18 @@ body.role-staff #mydaily-box{ display:none !important; }
       <div id="cal-day-details" class="cal-day-details"></div>
     </div>
     </div><!-- /pir-pragati-container -->
-  </section>
+      </div><!-- /pn-prag-part -->
+    <div id="pn-not-part" style="display:none;">
+      <div class="pn-not-tabs">
+        <button class="pn-nt active" data-s="issued" onclick="pnNotSection('issued')">📤 जारी</button>
+        <button class="pn-nt" data-s="taameeli" onclick="pnNotSection('taameeli')">⏳ तामीली हेतु</button>
+        <button class="pn-nt" data-s="served" onclick="pnNotSection('served')">✅ तामील</button>
+        <button class="pn-nt" data-s="adam" onclick="pnNotSection('adam')">❌ अदम-तामील</button>
+        <button class="pn-nt-add" onclick="openNoticeModal()">＋ नया Notice</button>
+      </div>
+      <div id="pn-not-content"></div>
+    </div>
+</section>
 
   <!-- IO Review section removed — feature retired pending future redesign -->
 
@@ -60134,6 +60164,26 @@ var calCurrentYear = new Date().getFullYear();
 var calSelectedDate = null;
 
 // ============ PRAGATI + IO REVIEW MEGA TOGGLE ============
+var _pnNotSection='issued';
+function pnSwitch(which){
+  var pp=document.getElementById('pn-prag-part'), np=document.getElementById('pn-not-part');
+  var bp=document.getElementById('pn-seg-prag'), bn=document.getElementById('pn-seg-not');
+  if(which==='not'){ if(pp)pp.style.display='none'; if(np)np.style.display='block'; if(bp)bp.classList.remove('active'); if(bn)bn.classList.add('active'); pnNotSection(_pnNotSection); }
+  else { if(pp)pp.style.display='block'; if(np)np.style.display='none'; if(bn)bn.classList.remove('active'); if(bp)bp.classList.add('active'); }
+}
+function pnNotSection(section){
+  _pnNotSection=section;
+  document.querySelectorAll('#pn-not-part .pn-nt').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-s')===section); });
+  var host=document.getElementById('pn-not-content'); if(!host) return;
+  // reuse renderNoticesList by temporarily pointing notices-content at our host
+  var real=document.getElementById('notices-content');
+  var savedId=null;
+  if(real && real!==host){ savedId=real.id; real.id='notices-content-real'; }
+  host.id='notices-content';
+  try{ if(typeof renderNoticesList==='function') renderNoticesList(section); }catch(e){}
+  host.id='pn-not-content';
+  if(savedId){ document.getElementById('notices-content-real').id=savedId; }
+}
 function switchPragatiView(view) {
   var feedView = document.getElementById('pragati-feed-view');
   var ioView = document.getElementById('pragati-ioview-view');
