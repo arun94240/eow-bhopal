@@ -9178,6 +9178,7 @@ body.view-mobile .cao-matrix-tile .caom-num {
 .mas-pill.is-open{ box-shadow:0 0 0 2px #fff inset, 0 3px 8px rgba(0,0,0,0.25); }
 .mp-present{ background:rgba(34,197,94,0.92); } .mp-out{ background:rgba(59,130,246,0.92); }
 .mp-leave{ background:rgba(245,158,11,0.92); } .mp-absent{ background:rgba(239,68,68,0.92); }
+.mp-pending{ background:rgba(234,88,12,0.92); }
 .mas-bar{ display:flex; height:7px; border-radius:5px; overflow:hidden; margin-top:9px; background:rgba(255,255,255,0.14); }
 .mas-bar>div{ height:100%; }
 .mas-detail{ margin-top:10px; border-top:1px solid rgba(255,255,255,0.14); padding-top:9px; }
@@ -33036,6 +33037,7 @@ function mddRenderAttStrip(){
   var host = document.getElementById('mydd-att-strip'); if (!host) return;
   var c = _mddAttCompute();
   var p=c.present.length, o=c.out.length, l=c.leave.length, ab=c.absent.length, t=c.total||1;
+  var pend=((typeof state!=='undefined' && state.pendingApprovals)?state.pendingApprovals.length:0);
   function pct(n){ return t ? (n/t*100) : 0; }
   var tm = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
   function act(k){ return _masOpenGroup===k ? ' is-open' : ''; }
@@ -33053,6 +33055,7 @@ function mddRenderAttStrip(){
         '<div class="mas-pill mp-present' + act('present') + '" onclick="event.stopPropagation();mddAttPill(\'present\');"><div class="n">' + p + '</div><div class="l">उपस्थित ▾</div></div>' +
         '<div class="mas-pill mp-out' + act('out') + '" onclick="event.stopPropagation();mddAttPill(\'out\');"><div class="n">' + o + '</div><div class="l">जा चुके ▾</div></div>' +
         '<div class="mas-pill mp-leave' + act('leave') + '" onclick="event.stopPropagation();mddAttPill(\'leave\');"><div class="n">' + l + '</div><div class="l">अवकाश ▾</div></div>' +
+        '<div class="mas-pill mp-pending" onclick="event.stopPropagation();mddAttPending();"><div class="n">' + pend + '</div><div class="l">Pending ▾</div></div>' +
         '<div class="mas-pill mp-absent' + act('absent') + '" onclick="event.stopPropagation();mddAttPill(\'absent\');"><div class="n">' + ab + '</div><div class="l">अनुपस्थित ▾</div></div>' +
       '</div>' +
       '<div class="mas-bar">' +
@@ -39490,6 +39493,12 @@ function refreshEstabTileCounts() {
 // ─── Matrix 1: Attendance — real check-in/check-out tracking ───
 var _estabAttFilter = null;  // null | 'present' | 'out' | 'absent'
 
+function mddAttPending(){
+  try{ switchSection('iomaster'); }catch(e){}
+  setTimeout(function(){ try{ if(typeof estabLeavesSwitch==='function') estabLeavesSwitch('leaves'); }catch(e){}
+    setTimeout(function(){ var ap=document.getElementById('approvals-panel')||document.getElementById('leaves-approvals'); if(ap){ try{ ap.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} } },300);
+  },120);
+}
 function renderEstabAttendance() {
   var body = document.getElementById('estab-attendance-body');
   if (!body) return;
@@ -46374,9 +46383,8 @@ function openMatricesFromSettings(){
   var box=document.getElementById('unified-search-box');
   if(box){ try{ box.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} }
   var coll=document.getElementById('search-matrices-collapse');
-  var btn=document.getElementById('usb-adv-toggle');
-  if(coll && (coll.style.display==='none' || coll.style.display==='') && btn){ try{ btn.click(); }catch(e){} }
-  setTimeout(function(){ var inp=document.getElementById('global-search'); if(inp){ try{ inp.focus(); }catch(e){} } }, 450);
+  if(coll){ coll.style.display='block'; if(typeof renderSearchMatrices==='function'){ try{ renderSearchMatrices(); }catch(e){} } }
+  setTimeout(function(){ var inp=document.getElementById('global-search'); if(inp){ try{ inp.focus(); }catch(e){} } }, 350);
 }
 function toggleSearchMatrices(evt) {
   if (evt && evt.stopPropagation) evt.stopPropagation();
