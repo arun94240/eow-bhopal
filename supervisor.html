@@ -22482,6 +22482,37 @@ body.role-staff #mydaily-box{ display:none !important; }
 .cc-actions{ margin-left:auto; display:flex; gap:6px; align-items:center; }
 .cc-lnk{ background:#eef4fa; border:1px solid #dbe7f2; border-radius:8px; padding:4px 8px; cursor:pointer; font-size:11px; }
 .cc-oe{ background:linear-gradient(135deg,#1e5aa8,#164a8f); color:#fff; border:none; border-radius:8px; padding:6px 11px; font-size:10.5px; font-weight:800; cursor:pointer; }
+
+/* ═══ Reports Builder reskin (v196) — light + teal, Deep-Search style ═══ */
+#report.rp-skin{ background:#fff !important; border:1px solid #e2e8f0 !important; border-radius:16px !important; box-shadow:0 6px 22px rgba(30,58,95,.10) !important; padding:0 !important; overflow:hidden; }
+#report.rp-skin > .section-header{ background:linear-gradient(135deg,#ecfdf7,#f0fbf6); border-bottom:1px solid #e5f2ec; padding:13px 15px !important; margin:0 !important; border-radius:0 !important; }
+#report.rp-skin > .section-header h2{ color:#0f5c4e !important; font-size:15px !important; }
+#report.rp-skin > .section-header .desc{ color:#5f8a80 !important; }
+#report.rp-skin > .section-header .btn{ border-radius:9px !important; font-size:12px !important; }
+#report.rp-skin > .section-header .btn-primary{ background:linear-gradient(135deg,#0d9488,#0f766e) !important; border:none !important; }
+/* body padding */
+#report.rp-skin .rb-presets, #report.rp-skin .rb-step{ margin:0 14px 12px !important; }
+#report.rp-skin .rb-presets{ margin-top:14px !important; display:flex; gap:6px; flex-wrap:wrap; align-items:center; background:transparent !important; border:none !important; padding:0 !important; }
+#report.rp-skin .rb-preset-label{ font-size:9.5px !important; font-weight:900 !important; color:#94a3b8 !important; letter-spacing:.6px; text-transform:uppercase; width:100%; margin-bottom:2px; }
+#report.rp-skin .rb-preset-btn{ font-size:10.5px !important; font-weight:800 !important; padding:7px 12px !important; border-radius:10px !important; background:#f0fbf6 !important; border:1px solid #cfeee2 !important; color:#0f766e !important; }
+#report.rp-skin .rb-preset-btn:hover{ background:#dcf5ec !important; }
+#report.rp-skin .rb-step{ background:#f8fbfe !important; border:1px solid #e6eef7 !important; border-radius:13px !important; padding:12px !important; }
+#report.rp-skin .rb-step-title{ font-size:9.5px !important; font-weight:900 !important; color:#94a3b8 !important; letter-spacing:.6px; text-transform:uppercase; margin-bottom:9px !important; }
+#report.rp-skin .rb-step-actions .btn{ border-radius:8px !important; font-size:10.5px !important; background:#eef4fa !important; color:#1e5aa8 !important; border:1px solid #dbe7f2 !important; }
+#report.rp-skin .rb-checkbox-grid{ display:flex !important; gap:6px !important; flex-wrap:wrap !important; }
+#report.rp-skin .rb-check{ margin:0 !important; }
+#report.rp-skin .rb-chip{ font-size:10.5px !important; font-weight:800 !important; padding:6px 11px !important; border-radius:9px !important; border:1px solid #e6edf5 !important; }
+#report.rp-skin .rb-check input:checked + .rb-chip{ box-shadow:0 0 0 2px #0d9488 !important; }
+#report.rp-skin .rb-date-grid, #report.rp-skin .rb-date-options{ gap:8px !important; }
+#report.rp-skin .rb-quick, #report.rp-skin .rb-quick-row .btn{ font-size:9.5px !important; border-radius:999px !important; background:#eef4fa !important; color:#1e5aa8 !important; border:1px solid #dbe7f2 !important; }
+#report.rp-skin .form-input{ border:1.5px solid #dbe7f2 !important; border-radius:9px !important; }
+#report.rp-skin .form-label{ font-size:9.5px !important; color:#94a3b8 !important; font-weight:800 !important; }
+#report.rp-skin .rb-officer-list{ display:flex; gap:6px; flex-wrap:wrap; }
+#report.rp-skin .rb-officer-chip{ font-size:10.5px !important; padding:6px 10px !important; border-radius:9px !important; border:1px solid #e6edf5 !important; background:#f4f7fb !important; }
+#report.rp-skin .rb-actions-row{ padding:14px !important; margin:0 !important; border-top:1px solid #eef2f7; background:#f8fbfe; display:flex; gap:9px; }
+#report.rp-skin .rb-actions-row .btn{ flex:1; border-radius:11px !important; padding:12px !important; font-size:12.5px !important; font-weight:800 !important; }
+#report.rp-skin .rb-actions-row .btn-primary{ background:linear-gradient(135deg,#dc2626,#b91c1c) !important; border:none !important; }
+#report.rp-skin #rb-preview-area{ margin:0 14px 14px !important; }
 </style>
 </head>
 <body>
@@ -45861,11 +45892,13 @@ function _reportInlineHost(){
 function _reportInlineOpen(force){
   var host=_reportInlineHost(); if(!host) return;
   var chip=document.querySelector('.rep-pchip-reports');
-  var isOpen = host.style.display!=='none' && host.style.display!=='';
+  var isOpen = host.style.display==='block';
   var open = force ? true : !isOpen;
   host.style.display = open ? 'block' : 'none';
   if(chip) chip.classList.toggle('is-active', open);
-  if(open){ try{ rbInit(); }catch(e){} try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+  var rep=document.getElementById('report');
+  if(rep){ rep.classList.add('report-inlined','rp-skin'); }
+  if(open){ try{ rbInit(); }catch(e){} setTimeout(function(){ try{ host.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){} }, 80); }
 }
 // Report builder now opens INLINE inside the Reports box (no section jump)
 function openReportBuilderInline(){ _reportInlineOpen(false); }
