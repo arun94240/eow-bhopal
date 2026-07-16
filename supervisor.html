@@ -22386,6 +22386,16 @@ body.role-staff #mydaily-box{ display:none !important; }
 .tgcloud-pill:hover{ transform:translateY(-2px); }
 .tgcloud-n{ background:rgba(255,255,255,.3); border-radius:999px; padding:0 7px; font-size:10px; font-weight:900; }
 .tgcloud-empty{ color:#9db5d4; font-size:11px; }
+
+/* ═══ Establishment-Leaves segment split (v184) ═══ */
+.el-seg{ display:flex; gap:8px; margin-bottom:12px; }
+.el-seg-b{ flex:1; text-align:center; padding:11px; border-radius:12px; font-weight:900; font-size:13.5px; cursor:pointer; color:#fff; border:none; box-shadow:0 3px 9px rgba(0,0,0,.18); opacity:.5; transition:opacity .15s,transform .12s; }
+.el-seg-b:hover{ transform:translateY(-1px); }
+.el-seg-estab{ background:linear-gradient(135deg,#6366f1,#4f46e5); }
+.el-seg-leaves{ background:linear-gradient(135deg,#d97706,#b45309); }
+.el-seg-b.active{ opacity:1; }
+.el-seg-s{ display:block; font-size:9.5px; font-weight:700; opacity:.9; margin-top:2px; }
+.estl-half{ cursor:pointer; }
 </style>
 </head>
 <body>
@@ -25040,9 +25050,16 @@ body.role-staff #mydaily-box{ display:none !important; }
 
   <!-- ESTABLISHMENT (formerly IO Master) -->
   <section id="iomaster" class="section">
-    <div class="section-header"><div><h2>🏢 Establishment - Leaves</h2><div class="desc">SP EOW Office Bhopal — staff database व अवकाश</div></div><div><button class="btn" onclick="switchSection('leaves')">🏖 Leaves →</button><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
-    <div class="toolbar"><input type="search" class="search-input" id="search-io" placeholder="Search name, rank, mobile…" oninput="renderIOMaster()"><select class="filter-select" id="filter-io-status" onchange="renderIOMaster()"><option value="">All</option><option value="io">IOs</option><option value="non-io">Other Staff</option></select></div>
-    <div id="io-master-list"><div class="empty-state"><h3>कोई member नहीं — पहला member जोड़ें</h3></div></div>
+    <div class="section-header"><div><h2>🏢 Establishment - Leaves</h2><div class="desc">SP EOW Office Bhopal — staff database व अवकाश</div></div><div><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
+    <div class="el-seg">
+      <button class="el-seg-b el-seg-estab active" id="el-seg-estab" onclick="estabLeavesSwitch('estab')">🏢 Establishment<span class="el-seg-s">staff · IO database</span></button>
+      <button class="el-seg-b el-seg-leaves" id="el-seg-leaves" onclick="estabLeavesSwitch('leaves')">🏖 Leaves<span class="el-seg-s">अवकाश · approvals</span></button>
+    </div>
+    <div id="el-estab-part">
+      <div class="toolbar"><input type="search" class="search-input" id="search-io" placeholder="Search name, rank, mobile…" oninput="renderIOMaster()"><select class="filter-select" id="filter-io-status" onchange="renderIOMaster()"><option value="">All</option><option value="io">IOs</option><option value="non-io">Other Staff</option></select></div>
+      <div id="io-master-list"><div class="empty-state"><h3>कोई member नहीं — पहला member जोड़ें</h3></div></div>
+    </div>
+    <div id="el-leaves-part" style="display:none;"><div id="el-leaves-host"></div></div>
   </section>
 
   <!-- ════════════════════════════════════════════════════════════
@@ -56457,6 +56474,26 @@ async function deleteIO() {
   } catch(e) { showError('Delete Member', e); }
 }
 
+var _elLeavesHome=null;
+function estabLeavesSwitch(which){
+  var ep=document.getElementById('el-estab-part'), lp=document.getElementById('el-leaves-part');
+  var be=document.getElementById('el-seg-estab'), bl=document.getElementById('el-seg-leaves');
+  var lc=document.getElementById('leaves-collapse');
+  var host=document.getElementById('el-leaves-host');
+  if(which==='leaves'){
+    if(ep)ep.style.display='none'; if(lp)lp.style.display='block';
+    if(be)be.classList.remove('active'); if(bl)bl.classList.add('active');
+    if(lc && host && lc.parentNode!==host){ if(!_elLeavesHome) _elLeavesHome=lc.parentNode; host.appendChild(lc); }
+    if(lc) lc.style.display='block';
+    try{ if(typeof renderLeaves==='function') renderLeaves(); else if(typeof renderLeaveTable==='function') renderLeaveTable(); }catch(e){}
+    try{ if(typeof renderApprovals==='function') renderApprovals(); }catch(e){}
+  } else {
+    if(lp)lp.style.display='none'; if(ep)ep.style.display='block';
+    if(bl)bl.classList.remove('active'); if(be)be.classList.add('active');
+    // return leaves-collapse to its own section so the Leaves tab still works standalone
+    if(lc && _elLeavesHome && lc.parentNode!==_elLeavesHome){ _elLeavesHome.appendChild(lc); }
+  }
+}
 function renderIOMaster() {
   var search = (document.getElementById('search-io').value || '').toLowerCase();
   var sf = document.getElementById('filter-io-status').value;
@@ -56479,8 +56516,8 @@ function renderIOMaster() {
   var _lvMonth = _lv.filter(function(l){ return String(l.from_date||l.start_date||'').slice(0,7)===_mo; }).length;
   var _lvPend = _lv.filter(function(l){ return (l.status==='Pending'||l.status==='pending'); }).length;
   var _bannerHTML = '<div class="estl-banner">' +
-    '<div class="estl-half estl-estab"><div class="estl-h">🏢 Establishment</div><div class="estl-stat"><span><b>'+_ios+'</b>IO</span><span><b>'+_staff+'</b>Staff</span><span><b>'+_tot+'</b>कुल</span></div></div>' +
-    '<div class="estl-half estl-leaves" onclick="switchSection(\'leaves\')"><div class="estl-h">🏖 Leaves <span class="estl-arrow">→</span></div><div class="estl-stat"><span><b>'+_lvToday+'</b>आज</span><span><b>'+_lvMonth+'</b>माह</span><span><b>'+_lvPend+'</b>pending</span></div></div>' +
+    '<div class="estl-half estl-estab" onclick="estabLeavesSwitch(\'estab\')"><div class="estl-h">🏢 Establishment</div><div class="estl-stat"><span><b>'+_ios+'</b>IO</span><span><b>'+_staff+'</b>Staff</span><span><b>'+_tot+'</b>कुल</span></div></div>' +
+    '<div class="estl-half estl-leaves" onclick="estabLeavesSwitch(\'leaves\')"><div class="estl-h">🏖 Leaves <span class="estl-arrow">→</span></div><div class="estl-stat"><span><b>'+_lvToday+'</b>आज</span><span><b>'+_lvMonth+'</b>माह</span><span><b>'+_lvPend+'</b>pending</span></div></div>' +
   '</div>';
   var c = document.getElementById('io-master-list');
   if (!list.length) { c.className = ''; c.innerHTML = _bannerHTML + '<div class="empty-state"><h3>कोई member नहीं मिला</h3></div>'; return; }
