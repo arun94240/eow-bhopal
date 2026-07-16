@@ -22400,6 +22400,15 @@ body.role-staff #mydaily-box{ display:none !important; }
 .io-nav-inline{ margin:10px 0 4px; }
 .io-nav-inline .ovstats-panel{ background:linear-gradient(160deg,#08203f,#0a2c56); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:12px; box-shadow:0 5px 20px rgba(6,42,82,.22); }
 .io-nav-inline #io-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:9px; }
+
+/* ═══ कार्यालय Overview + MyDaily cleanup (v192) ═══ */
+/* Staff (roster) + Tags tiles removed from कार्यालय Overview (Establishment-Leaves + Tags sections handle these now) */
+.ovstats-tile-roster{ display:none !important; }
+.ovstats-tile-tags{ display:none !important; }
+/* विभाग-वार लंबित प्रकरण removed from My Daily (available in Search & Settings) */
+#mydd-dept-matrix{ display:none !important; }
+/* wide-screen: keep case list from stretching so Open/Edit sits near the parties (gap fix) */
+.enq-list-wrap .table-wrap > table{ max-width:1000px; }
 </style>
 </head>
 <body>
