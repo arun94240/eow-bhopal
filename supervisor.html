@@ -22457,6 +22457,31 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ds-rt{ font-size:12px; font-weight:700; margin-top:4px; color:#334155; } .ds-vs{ color:#b91c1c; font-weight:800; font-size:9.5px; }
 .ds-rm{ font-size:10px; color:#94a3b8; margin-top:3px; }
 .ds-empty,.ds-more{ padding:16px; text-align:center; color:#94a3b8; font-size:11.5px; }
+
+/* ═══ Court cards (v195) — tier-accented compact ═══ */
+#court-list-wrap thead{ display:none; }
+#court-list-wrap > table, #court-list-wrap table{ width:100%; }
+#court-body .crt-card-tr td{ background:transparent; }
+.cc{ background:#fff; border-radius:13px; box-shadow:0 2px 9px rgba(30,58,95,.08); border-left:5px solid var(--tier); overflow:hidden; cursor:pointer; transition:box-shadow .13s; }
+.cc:hover{ box-shadow:0 4px 14px rgba(30,58,95,.15); }
+.cc.cc-disp{ opacity:.55; } .cc.cc-disp .cc-parties{ text-decoration:line-through; }
+.cc-hd{ padding:11px 13px; }
+.cc-top{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.cc-tier{ font-size:9px; font-weight:900; color:#fff; border-radius:6px; padding:2px 8px; letter-spacing:.4px; }
+.cc-no{ font-size:12.5px; font-weight:900; color:#1e3a5f; cursor:pointer; }
+.cc-court{ font-size:10px; color:#64748b; margin-left:auto; text-align:right; }
+.cc-parties{ margin-top:8px; font-size:12px; font-weight:700; color:#334155; line-height:1.35; }
+.cc-vs{ color:#b91c1c; font-weight:800; font-size:9.5px; }
+.cc-rel{ margin-top:5px; }
+.cc-meta{ display:flex; gap:7px; margin-top:9px; flex-wrap:wrap; align-items:center; }
+.cc-chip{ font-size:9.5px; font-weight:700; background:#f4f7fb; border:1px solid #e6edf5; border-radius:7px; padding:3px 8px; color:#475569; }
+.cc-chip.hear{ background:#fef3c7; border-color:#fcd34d; color:#92400e; }
+.cc-chip.cnr{ background:#eef4fa; border-color:#dbe7f2; color:#1e5aa8; }
+.cc-chip.io{ background:#f3e8ff; border-color:#e9d5ff; color:#6b21a8; }
+.cc-ecourts{ text-decoration:none; }
+.cc-actions{ margin-left:auto; display:flex; gap:6px; align-items:center; }
+.cc-lnk{ background:#eef4fa; border:1px solid #dbe7f2; border-radius:8px; padding:4px 8px; cursor:pointer; font-size:11px; }
+.cc-oe{ background:linear-gradient(135deg,#1e5aa8,#164a8f); color:#fff; border:none; border-radius:8px; padding:6px 11px; font-size:10.5px; font-weight:800; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -55152,10 +55177,50 @@ function renderCourtTable() {
     // Look up court name from courts_master
     var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
     var courtDisplay = cm ? cm.name : '— Unassigned —';
+    var tier = cm ? (cm.tier || '') : '';
+    var tierMap = { supreme:{c:'#7c3aed',l:'SUPREME',ic:'🏛'}, high:{c:'#2563eb',l:'HIGH',ic:'⚖️'}, district:{c:'#0d9488',l:'DISTRICT',ic:'🏢'} };
+    var tinfo = tierMap[tier] || {c:'#64748b',l:'—',ic:'⚖️'};
     // Look up officer from io_master
     var ioObj = (state.ioMaster || []).find(function(x){ return x.id === c.incharge_io_id; });
     var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : (ioObj ? ((ioObj.rank ? ioObj.rank + ' ' : '') + ioObj.name) : '');
-    // Uniform "-" separator (no space) for all tiers — clean professional look
+    var typeDisplay = (c.case_type || '') + '-' + (c.case_no || '');
+    var rowId = 'crt-row-' + c.id;
+    var cardId = 'crt-exp-' + c.id;
+    // ═══ Card layout (v195) ═══
+    var isDisp = (c.case_status && /dispos|निरस्त|खारिज|withdraw/i.test(c.case_status)) || c.disposed === true;
+    var hearChip='';
+    if(c.next_hearing){ var nh=String(c.next_hearing).slice(0,10); var d=new Date(nh); var lbl=isNaN(d)?nh:(d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]); hearChip='<span class="cc-chip hear">📅 अगली: '+escapeHtml(lbl)+'</span>'; }
+    var cnrChip='';
+    if(c.cnr_no){ cnrChip='<span class="cc-chip cnr">🔗 '+escapeHtml(c.cnr_no)+ (c.cnr_no.indexOf('SN-')===-1 ? ' <a href="javascript:void(0)" class="cc-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\''+c.id+'\', event)" title="court site पर खोलें">🔍</a>' : '') +'</span>'; }
+    else { cnrChip='<span class="cc-chip cnr" style="opacity:.6">🔗 CNR: —</span>'; }
+    var ioChip = officerDisplay ? '<span class="cc-chip io" title="'+escapeHtml(officerDisplay)+'">👮 '+escapeHtml(officerDisplay)+'</span>' : '';
+    var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
+    var partiesHTML = escapeHtml(c.petitioner || '—') + ((c.petitioner && c.respondent) ? ' <span class="cc-vs">Vs</span> ' : (c.respondent?' ':'')) + (c.respondent ? escapeHtml(c.respondent) : '');
+    var card = '<div class="cc'+(isDisp?' cc-disp':'')+'" style="--tier:'+tinfo.c+'" id="'+rowId+'" onclick="toggleCourtExpand(\''+c.id+'\')">'+
+      '<div class="cc-hd">'+
+        '<div class="cc-top"><span class="cc-tier" style="background:'+tinfo.c+'">'+tinfo.l+'</span>'+
+          '<span class="cc-no" onclick="event.stopPropagation();openCourtStatusSite(\''+c.id+'\', event)" title="court site + details copy">'+escapeHtml(typeDisplay)+'</span>'+
+          renderEnquiryIcon(c)+renderSupTagBadges(c)+renderCourtLinkBadge(c)+
+          '<span class="cc-court">'+tinfo.ic+' '+escapeHtml(courtDisplay)+'</span></div>'+
+        '<div class="cc-parties">'+partiesHTML+'</div>'+
+        (relCell ? '<div class="cc-rel">'+relCell+'</div>' : '')+
+        '<div class="cc-meta">'+hearChip+cnrChip+ioChip+
+          '<span class="cc-actions">'+
+            '<button class="cc-lnk" onclick="event.stopPropagation();openCourtLinkPicker(\''+c.id+'\')" title="अन्य court case से link करें">🔗</button>'+
+            '<button class="cc-oe" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">Open / Edit ›</button>'+
+          '</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+    return '<tr class="crt-card-tr"><td colspan="7" style="padding:0 0 9px;border:none;">'+card+'</td></tr>'+
+      '<tr class="crt-expand-row" id="' + cardId + '" style="display:none;"><td colspan="7" style="padding:0;border:none;"></td></tr>';
+  }).join('');
+  var _oldMapDone=true; if(_oldMapDone) return;
+  tbody.innerHTML = rows.map(function(c, i){
+    var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
+    var courtDisplay = cm ? cm.name : '— Unassigned —';
+    var ioObj = (state.ioMaster || []).find(function(x){ return x.id === c.incharge_io_id; });
+    var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : (ioObj ? ((ioObj.rank ? ioObj.rank + ' ' : '') + ioObj.name) : '');
     var typeDisplay = (c.case_type || '') + '-' + (c.case_no || '');
     var rowId = 'crt-row-' + c.id;
     var cardId = 'crt-exp-' + c.id;
