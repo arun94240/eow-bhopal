@@ -22595,6 +22595,21 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ovcc-nsum{ background:linear-gradient(135deg,#fff7ed,#fffbf5); border:1px solid #fdba74; border-radius:11px; padding:11px 13px; font-size:12px; font-weight:800; color:#9a3412; cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:9px; }
 .ovcc-nsum .car{ margin-left:auto; color:#ea580c; font-weight:900; }
 .ovcc-nsum.open{ background:#fff; border-style:dashed; }
+
+/* ═══ Pending Approvals inline board — attendance box (v207) ═══ */
+#mas-pending-inline{ margin-top:10px; }
+.mas-pending-hd{ display:flex; align-items:center; gap:8px; background:#fff7ed; border:1px solid #fdba74; border-radius:11px; padding:10px 13px; margin-bottom:9px; }
+.mas-pending-title{ font-size:12.5px; font-weight:900; color:#9a3412; flex:1; }
+.mas-pending-cnt{ background:#fde3c8; color:#9a3412; border-radius:999px; padding:2px 10px; font-size:10.5px; font-weight:900; }
+.mas-pending-empty{ background:#fff; border:1px solid #d1fae5; border-radius:11px; padding:14px; text-align:center; color:#15803d; font-weight:700; font-size:12px; }
+.mas-pending-card{ background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:11px 13px; margin-bottom:8px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.mas-pc-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.mas-pc-name-t{ font-size:12.5px; font-weight:800; color:#1e293b; } .mas-pc-name-m{ font-size:10px; color:#94a3b8; margin-top:2px; }
+.mas-pc-dates{ text-align:right; } .mas-pc-range{ display:block; font-size:11px; font-weight:700; color:#1e5aa8; } .mas-pc-days{ font-size:10px; color:#94a3b8; }
+.mas-pc-cause{ font-size:10.5px; color:#475569; background:#f8fafc; border-radius:8px; padding:6px 9px; margin-top:7px; }
+.mas-pc-actions{ display:flex; gap:6px; margin-top:9px; }
+.mas-pc-btn{ flex:1; border:none; border-radius:8px; padding:7px; font-size:10.5px; font-weight:800; cursor:pointer; }
+.mas-pc-view{ background:#eef4fa; color:#1e5aa8; } .mas-pc-approve{ background:#16a34a; color:#fff; } .mas-pc-reject{ background:#dc2626; color:#fff; }
 </style>
 </head>
 <body>
@@ -33230,7 +33245,7 @@ function mddRenderAttStrip(){
         '<div class="mas-pill mp-present' + act('present') + '" onclick="event.stopPropagation();mddAttPill(\'present\');"><div class="n">' + p + '</div><div class="l">उपस्थित ▾</div></div>' +
         '<div class="mas-pill mp-out' + act('out') + '" onclick="event.stopPropagation();mddAttPill(\'out\');"><div class="n">' + o + '</div><div class="l">जा चुके ▾</div></div>' +
         '<div class="mas-pill mp-leave' + act('leave') + '" onclick="event.stopPropagation();mddAttPill(\'leave\');"><div class="n">' + l + '</div><div class="l">अवकाश ▾</div></div>' +
-        '<div class="mas-pill mp-pending" onclick="event.stopPropagation();mddAttPending();"><div class="n">' + pend + '</div><div class="l">Pending ▾</div></div>' +
+        '<div class="mas-pill mp-pending" onclick="event.stopPropagation();masPendingToggle();"><div class="n">' + pend + '</div><div class="l">Pending ▾</div></div>' +
         '<div class="mas-pill mp-absent' + act('absent') + '" onclick="event.stopPropagation();mddAttPill(\'absent\');"><div class="n">' + ab + '</div><div class="l">अनुपस्थित ▾</div></div>' +
       '</div>' +
       '<div class="mas-bar">' +
@@ -33242,10 +33257,45 @@ function mddRenderAttStrip(){
       '<div class="mas-detail' + (g ? ' hct-anim' : '') + '" id="mas-detail" style="display:' + (g ? 'block' : 'none') + ';">' +
         (g ? _masGroup(g.lbl, g.arr, g.col) : '') +
       '</div>' +
+      '<div id="mas-pending-inline" style="display:' + (_masPendingOpen ? 'block' : 'none') + ';"></div>' +
       '<div id="mas-table-wrap" style="display:' + (_masTableOpen ? 'block' : 'none') + ';">' +
         (_masTableOpen ? _masTable(c) : '') +
       '</div>' +
     '</div>';
+  if (_masPendingOpen) { try{ _masPendingRender(); }catch(e){} }
+}
+var _masPendingOpen=false;
+function masPendingToggle(){
+  _masPendingOpen = !_masPendingOpen;
+  var host=document.getElementById('mas-pending-inline'); if(!host) return;
+  host.style.display = _masPendingOpen ? 'block' : 'none';
+  if(_masPendingOpen){ _masPendingRender(); try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+}
+function _masPendingRender(){
+  var host=document.getElementById('mas-pending-inline'); if(!host) return;
+  var pending=(state.pendingApprovals||[]).slice().sort(function(a,b){ return (a.from_date||'').localeCompare(b.from_date||''); });
+  var head='<div class="mas-pending-hd"><span class="mas-pending-title">⏳ Pending Leave Approvals</span><span class="mas-pending-cnt">'+pending.length+' pending</span></div>';
+  if(!pending.length){ host.innerHTML=head+'<div class="mas-pending-empty">✅ All Clear — कोई pending approval नहीं</div>'; return; }
+  var today=(typeof _estabTodayISO==='function')?_estabTodayISO():new Date().toISOString().slice(0,10);
+  var cards=pending.map(function(l){
+    var fmtRange=(l.from_date===l.to_date)?l.from_date:(l.from_date+' → '+l.to_date);
+    var daysUntil='';
+    if(l.from_date){ var d=new Date(l.from_date); var t=new Date(today); var diff=Math.round((d-t)/86400000);
+      if(diff<0) daysUntil='⚠️ Started '+(-diff)+'d ago'; else if(diff===0) daysUntil='🔥 Starts today'; else if(diff<=3) daysUntil='⚡ Starts in '+diff+'d'; else daysUntil='Starts in '+diff+'d'; }
+    return '<div class="mas-pending-card">'+
+      '<div class="mas-pc-top">'+
+        '<div class="mas-pc-name"><div class="mas-pc-name-t">'+escapeHtml(l.officer_name||'—')+'</div><div class="mas-pc-name-m">'+escapeHtml(l.leave_type||'Leave')+' · '+daysUntil+'</div></div>'+
+        '<div class="mas-pc-dates"><span class="mas-pc-range">'+escapeHtml(fmtRange)+'</span><span class="mas-pc-days">'+(l.days||'?')+' days</span></div>'+
+      '</div>'+
+      (l.cause?'<div class="mas-pc-cause">📝 '+escapeHtml(l.cause)+(l.cause_other?' — '+escapeHtml(l.cause_other):'')+'</div>':'')+
+      '<div class="mas-pc-actions">'+
+        '<button class="mas-pc-btn mas-pc-view" onclick="event.stopPropagation();estabOpenApproval(\''+l.id+'\')">👁️ View Full</button>'+
+        '<button class="mas-pc-btn mas-pc-approve" onclick="event.stopPropagation();estabQuickApprove(\''+l.id+'\');">✅ Approve</button>'+
+        '<button class="mas-pc-btn mas-pc-reject" onclick="event.stopPropagation();estabOpenApproval(\''+l.id+'\',true)">❌ Reject</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  host.innerHTML = head + cards;
 }
 function mddAttPill(which){
   _masOpenGroup = (_masOpenGroup === which) ? null : which;
@@ -40218,6 +40268,8 @@ async function estabQuickApprove(id) {
     await loadAllFromCloud();
     if (_estabActiveTile === 'pending') renderEstabPending();
     refreshEstabTileCounts();
+    try{ if(typeof _masPendingRender==='function') _masPendingRender(); }catch(e){}
+    try{ if(typeof mddRenderAttStrip==='function') mddRenderAttStrip(); }catch(e){}
   } catch(e) {
     console.error('quick approve error', e);
     toast('Approve failed: ' + (e.message || e), true);
