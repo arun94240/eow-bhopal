@@ -22669,6 +22669,20 @@ body.role-staff #mydaily-box{ display:none !important; }
 #mydaily-box .mtx-chip-td{ background:rgba(22,163,74,.16); border-color:rgba(22,163,74,.35); } #mydaily-box .mtx-chip-td .mtx-chip-ic{ background:#16a34a; }
 #mydaily-box .mtx-chip.mtx-gtab-active,#mydaily-box .mtx-chip.active{ outline:2px solid rgba(255,255,255,.5); }
 #mydaily-box .mtx-chip-grid + .mtx-list{ margin-top:8px; }
+
+/* pr collapsible + inline rows (v212) */
+.pr-summary{ background:linear-gradient(135deg,#f0f7ff,#f8fbff); border:1px solid #cfe0f3; border-radius:11px; padding:11px 13px; font-size:12px; font-weight:800; color:#1e3a5f; cursor:pointer; display:flex; align-items:center; gap:8px; }
+.pr-summary .pr-scar{ margin-left:auto; color:#2563eb; font-weight:900; }
+.pr-summary.open{ background:#fff; border-style:dashed; margin-bottom:8px; }
+.pr-row{ cursor:pointer; transition:background .15s; }
+.pr-row .pr-rcar{ margin-left:6px; color:#cbd5e1; font-weight:900; }
+.pr-row-open{ background:#f8fbff; }
+.pr-detail{ margin-top:7px; font-size:11px; color:#334155; background:#f1f6fc; border-radius:8px; padding:8px 10px; }
+.pr-detail-meta{ margin-top:5px; font-size:10px; color:#64748b; font-weight:700; }
+
+/* bottom Reports box — kill empty white body when collapsed (v212) */
+#reports-summary-wrap.collapsed .ov-section-body{ display:none !important; padding:0 !important; border-width:0 !important; margin:0 !important; }
+.reports-home-preview:empty{ display:none !important; }
 </style>
 </head>
 <body>
@@ -60281,6 +60295,7 @@ function _dsExportPDF(){
 
 /* ═══ प्रगति / Notices search — repurposed tiles (v208) ═══ */
 var _prState = { kind:'notices', io:'', cat:'', from:'', to:'' };
+var _prListOpen=false; var _prRowOpen=null;
 function _prCatOptions(sel){
   var labels = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs:'RCs', pes:'PEs', strs:'STRs', sutra:'Sutra Suchna', court:'Court' };
   return '<option value="">— सभी प्रकार —</option>' + Object.keys(labels).map(function(k){ return '<option value="'+k+'"'+(sel===k?' selected':'')+'>'+labels[k]+'</option>'; }).join('');
@@ -60291,6 +60306,7 @@ function openPrSearch(kind){
   document.querySelectorAll('.rep-pchip-summons,.rep-pchip-warrant').forEach(function(t){ t.classList.remove('is-active'); });
   if(same){ host.style.display='none'; return; }
   _prState = { kind:kind, io:'', cat:'', from:'', to:'' };
+  _prListOpen=false; _prRowOpen=null;
   host.style.display='block';
   var cls = kind==='notices' ? 'rep-pchip-summons' : 'rep-pchip-warrant';
   var tile=document.querySelector('.'+cls); if(tile) tile.classList.add('is-active');
@@ -60316,23 +60332,43 @@ function _prRender(){
   var title = kind==='pragati' ? 'प्रगति — Search' : 'Notices — Search';
   var icon = kind==='pragati' ? '📋' : '📨';
   var CAT_LBL = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs:'RCs', pes:'PEs', strs:'STRs', sutra:'Sutra Suchna', court:'Court' };
-  var listHTML = rows.length ? rows.slice(0,150).map(function(r){
-    var who = escapeHtml(r.io_name||r.assigned_to||'—');
-    var dt = escapeHtml(String(r.update_date||r.notice_date||'').slice(0,10));
-    var cat = escapeHtml(CAT_LBL[r.case_type]||r.case_type||'—');
-    var det = escapeHtml(r.update_text || r.brief || r.notice_detail || '—');
-    return '<div class="pr-row" style="border-left-color:'+accent+'"><div class="pr-r1"><span class="pr-io">👮 '+who+'</span><span class="pr-dt">'+dt+'</span></div><div class="pr-r2">'+cat+' · '+det+'</div></div>';
-  }).join('') : '<div class="pr-empty">कोई रिकॉर्ड नहीं मिला</div>';
+  var listInner;
+  if(!rows.length){
+    listInner = '<div class="pr-empty">कोई रिकॉर्ड नहीं मिला</div>';
+  } else if(!_prListOpen){
+    listInner = '<div class="pr-summary" onclick="event.stopPropagation();_prToggleList()">📋 '+rows.length+' रिकॉर्ड — सूची देखने हेतु tap<span class="pr-scar">▾</span></div>';
+  } else {
+    listInner = '<div class="pr-summary open" onclick="event.stopPropagation();_prToggleList()">📋 '+rows.length+' रिकॉर्ड — बंद करें<span class="pr-scar">▴</span></div>' +
+    rows.slice(0,150).map(function(r,idx){
+      var who = escapeHtml(r.io_name||r.assigned_to||'—');
+      var dt = escapeHtml(String(r.update_date||r.notice_date||'').slice(0,10));
+      var cat = escapeHtml(CAT_LBL[r.case_type]||r.case_type||'—');
+      var det = escapeHtml(r.update_text || r.brief || r.notice_detail || '—');
+      var open = (_prRowOpen===idx);
+      var extra = '';
+      if(open){
+        var more = [];
+        if(r.appearance_date) more.push('पेशी: '+escapeHtml(String(r.appearance_date).slice(0,10)));
+        if(r.notice_type) more.push('प्रकार: '+escapeHtml(r.notice_type));
+        if(r.case_id) more.push('केस: '+escapeHtml(String(r.case_id)));
+        if(r.tameel_result) more.push('तामील: '+escapeHtml(r.tameel_result));
+        extra = '<div class="pr-detail">'+escapeHtml(det)+(more.length?'<div class="pr-detail-meta">'+more.join(' · ')+'</div>':'')+'</div>';
+      }
+      return '<div class="pr-row'+(open?' pr-row-open':'')+'" style="border-left-color:'+accent+'" onclick="event.stopPropagation();_prRowToggle('+idx+')"><div class="pr-r1"><span class="pr-io">👮 '+who+'</span><span class="pr-dt">'+dt+'</span><span class="pr-rcar">'+(open?'▴':'▾')+'</span></div><div class="pr-r2">'+cat+' · '+(open?'':det)+'</div>'+extra+'</div>';
+    }).join('');
+  }
   host.innerHTML =
     '<div class="pr-hd" style="--acc:'+accent+'"><span class="pr-ic">'+icon+'</span><span class="pr-ttl">'+title+'</span><span class="pr-cnt">'+rows.length+'</span><button class="pr-close" onclick="event.stopPropagation();document.getElementById(\'notice-search-wrap\').style.display=\'none\';document.querySelectorAll(\'.rep-pchip-summons,.rep-pchip-warrant\').forEach(function(t){t.classList.remove(\'is-active\')});">✕</button></div>'+
     '<div class="pr-filt">'+
-      '<select class="pr-inp" onchange="_prState.io=this.value;_prRender()">'+_mddIoFilterOptions(_prState.io)+'</select>'+
-      '<select class="pr-inp" onchange="_prState.cat=this.value;_prRender()">'+_prCatOptions(_prState.cat)+'</select>'+
-      '<input type="date" class="pr-inp" value="'+_prState.from+'" onchange="_prState.from=this.value;_prRender()">'+
-      '<input type="date" class="pr-inp" value="'+_prState.to+'" onchange="_prState.to=this.value;_prRender()">'+
+      '<select class="pr-inp" onchange="_prState.io=this.value;_prRowOpen=null;_prRender()">'+_mddIoFilterOptions(_prState.io)+'</select>'+
+      '<select class="pr-inp" onchange="_prState.cat=this.value;_prRowOpen=null;_prRender()">'+_prCatOptions(_prState.cat)+'</select>'+
+      '<input type="date" class="pr-inp" value="'+_prState.from+'" onchange="_prState.from=this.value;_prRowOpen=null;_prRender()">'+
+      '<input type="date" class="pr-inp" value="'+_prState.to+'" onchange="_prState.to=this.value;_prRowOpen=null;_prRender()">'+
     '</div>'+
-    '<div class="pr-list">'+listHTML+'</div>';
+    '<div class="pr-list">'+listInner+'</div>';
 }
+function _prToggleList(){ _prListOpen=!_prListOpen; _prRowOpen=null; _prRender(); }
+function _prRowToggle(idx){ _prRowOpen=(_prRowOpen===idx)?null:idx; _prRender(); }
 function _nsRefreshCounts(){
   try{
     var n=(state.notices||[]).length;
