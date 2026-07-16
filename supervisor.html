@@ -22513,6 +22513,9 @@ body.role-staff #mydaily-box{ display:none !important; }
 #report.rp-skin .rb-actions-row .btn{ flex:1; border-radius:11px !important; padding:12px !important; font-size:12.5px !important; font-weight:800 !important; }
 #report.rp-skin .rb-actions-row .btn-primary{ background:linear-gradient(135deg,#dc2626,#b91c1c) !important; border:none !important; }
 #report.rp-skin #rb-preview-area{ margin:0 14px 14px !important; }
+
+/* प्रगति live widget removed from homepage — now merged into कार्यालय प्रगति tile (v197) */
+#mydd-pragati-feed{ display:none !important; }
 </style>
 </head>
 <body>
@@ -33080,8 +33083,10 @@ function _mddPragatiItemHTML(u){
       '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div></div>' +
   '</div>';
 }
-function mddRenderPragatiFeed(){
-  var host = document.getElementById('mydd-pragati-feed'); if (!host) return;
+var _pragatiFeedHost='ovstats-host-pragati';
+function mddRenderPragatiFeed(hostId){
+  if(hostId) _pragatiFeedHost=hostId;
+  var host = document.getElementById(_pragatiFeedHost) || document.getElementById('ovstats-host-pragati') || document.getElementById('mydd-pragati-feed'); if (!host) return;
   var cToday = _mddPragatiPeriodList('today').length;
   var cY = _mddPragatiPeriodList('yesterday').length;
   var c7 = _mddPragatiPeriodList('7d').length;
@@ -33183,7 +33188,7 @@ function mddAttPill(which){
 var _mddAttTimer = null; var _masOpenGroup = null; var _masTableOpen = false; var _masTableSort = 'status';
 async function mddAttLiveTick(){
   try { var r = await supa.from('attendance_log').select('*').eq('is_test', false).order('att_date', { ascending:false }); if (r && !r.error) state.attendance = r.data || []; } catch(e){}
-  mddRenderAttStrip(); try { mddRenderNoticeStrip(); mddRenderPragatiFeed(); } catch(e){}
+  mddRenderAttStrip(); try { mddRenderNoticeStrip(); } catch(e){}
 }
 function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval(mddAttLiveTick, 60000); }
 function _mddBriefItem(dot, text, tag){
@@ -33313,7 +33318,7 @@ function hctOpenReports(){
   } catch(e){}
 }
 function renderMyDailyBox() {
-  try { mddRenderBrief(); mddRenderAttStrip(); mddRenderNoticeStrip(); mddRenderPragatiFeed(); mddAttStartLive(); hctOpenReports(); } catch(e){}
+  try { mddRenderBrief(); mddRenderAttStrip(); mddRenderNoticeStrip(); mddAttStartLive(); hctOpenReports(); } catch(e){}
   try { renderDeptMatrix(); } catch(e){}
   try { renderCraftSyncBtn(); } catch(e){}
   var box = document.getElementById('mydaily-box');
@@ -45984,6 +45989,8 @@ function pgOpenAddForm() {
 function ovstatsRenderPragatiSummary() {
   var host = document.getElementById('ovstats-host-pragati');
   if (!host) return;
+  try{ mddRenderPragatiFeed('ovstats-host-pragati'); }catch(e){}
+  return;
   
   var range = _pgDateRange();
   var all = (state.ioUpdates || []).slice();
