@@ -51723,9 +51723,23 @@ function _noprCases(){
   out.sort(function(a,b){ if(a.bucket==='never'&&b.bucket!=='never')return -1; if(b.bucket==='never'&&a.bucket!=='never')return 1; return (b.gap||0)-(a.gap||0); });
   return out;
 }
+function _noprTileCount(){
+  // tile की संख्या = केवल 30 दिन से ज़्यादा वाले (30+ bucket + बहुत पुराने never); 7/15 दिन वाले नहीं
+  var today=todayISO();
+  return _noprCases().filter(function(x){
+    if(x.bucket==='30') return true;
+    if(x.bucket==='never'){
+      var e=((state.enquiries[x.type]||[]).find(function(y){return y.id===x.id;}));
+      var asg=(e && e.io_assigned_date) ? String(e.io_assigned_date).slice(0,10) : null;
+      if(!asg) return true;                       // assign-तिथि नहीं (पुराना legacy) → गिनें
+      return _noprDaysBetween(asg, today) >= 30;   // assign को 30+ दिन हुए तभी गिनें
+    }
+    return false;                                  // 7+ / 15+ (30 दिन से कम) → नहीं गिनें
+  }).length;
+}
 function renderNoPragati(){
   // Tile count only — full panel rendered by ovstatsRenderNoPragati()
-  try{ var all=_noprCases(); var el=document.getElementById('ovstats-cnt-nopr'); if(el) el.textContent=all.length; }catch(e){}
+  try{ var el=document.getElementById('ovstats-cnt-nopr'); if(el) el.textContent=_noprTileCount(); }catch(e){}
 }
 // ── filter state ──
 var _noprIoSel=null, _noprFrom='', _noprTo='', _noprBucketOpen={}, _noprRowOpen={};
@@ -51751,7 +51765,7 @@ function ovstatsRenderNoPragati(){
   var host=document.getElementById('nopr-panel-content'); if(!host) return;
   var list=_noprFiltered();
   var gt=document.getElementById('nopr-grand-total'); if(gt) gt.textContent='Total: '+list.length;
-  try{ var el=document.getElementById('ovstats-cnt-nopr'); if(el) el.textContent=_noprCases().length; }catch(e){}
+  try{ var el=document.getElementById('ovstats-cnt-nopr'); if(el) el.textContent=_noprTileCount(); }catch(e){}
   var buckets={ '7':[], '15':[], '30':[], 'never':[] };
   list.forEach(function(x){ (buckets[x.bucket]=buckets[x.bucket]||[]).push(x); });
   var meta={ '7':{ic:'🟡',lbl:'7+ दिन',cls:'d7'}, '15':{ic:'🟠',lbl:'15+ दिन',cls:'d15'}, '30':{ic:'🔴',lbl:'30+ दिन',cls:'d30'}, 'never':{ic:'⚫',lbl:'कभी नहीं',cls:'never'} };
