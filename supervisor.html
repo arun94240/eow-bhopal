@@ -22893,6 +22893,36 @@ body.role-staff #mydaily-box{ display:none !important; }
 .reports-uni-stack .rep-pchip{ overflow:hidden !important; }
 .reports-uni-stack .rep-pchip .rep-lbl{ min-width:0 !important; overflow:hidden !important; }
 .reports-uni-stack .rep-pchip .rep-sub-n{ flex:0 0 auto !important; margin-left:auto !important; }
+
+/* ═══ Top Search — Navy hero band (Option A · v230) ═══ */
+#unified-search-box{ background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; border-left:none !important; margin-bottom:22px; }
+.usb-hero{ background:linear-gradient(135deg,#0a2342 0%,#12325c 58%,#143a6b 100%); border-radius:16px; padding:18px 20px; box-shadow:0 10px 30px rgba(6,42,82,.26); position:relative; overflow:hidden; }
+.usb-hero::after{ content:"🔍"; position:absolute; right:-12px; top:-16px; font-size:120px; opacity:.05; pointer-events:none; }
+.usb-hero-top{ display:flex; align-items:center; gap:12px; margin-bottom:14px; position:relative; z-index:1; }
+.usb-hero-cal{ background:#fff !important; border-radius:10px !important; width:44px; height:44px; min-width:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; }
+.usb-hero-cal .smc-mo{ font-size:8px; font-weight:900; color:#dc2626; } .usb-hero-cal .smc-dy{ font-size:18px; font-weight:900; color:#0a2342; }
+.usb-hero-ttl{ font-size:17px; font-weight:900; color:#fff; }
+.usb-hero-sub{ font-size:10.5px; color:#9db8dc; margin-top:1px; }
+.usb-hero-score{ margin-left:auto; display:flex; gap:8px; }
+.usb-stat{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:11px; padding:7px 13px; text-align:center; min-width:62px; }
+.usb-stat-n{ font-size:19px; font-weight:900; color:#f5b942; line-height:1; }
+.usb-stat-l{ font-size:8.5px; font-weight:700; color:#c3d5ee; margin-top:2px; text-transform:uppercase; letter-spacing:.03em; }
+.usb-hero-row{ display:flex; gap:10px; position:relative; z-index:1; }
+.usb-hero-search{ flex:1; display:flex; align-items:center; gap:10px; background:#fff; border-radius:11px; padding:12px 15px; min-width:0; }
+.usb-hero-sic{ font-size:17px; opacity:.75; flex:0 0 auto; }
+.usb-hero-search input{ flex:1; border:none; outline:none; font-size:13.5px; background:transparent; color:#0f2542; min-width:0; font-family:inherit; }
+.usb-hero-clear{ background:#eef2f7 !important; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:12px; color:#64748b; font-weight:700; flex:0 0 auto; }
+.usb-hero-io{ flex:0 0 210px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:11px; padding:0 12px; }
+.usb-hero-ioic{ font-size:14px; flex:0 0 auto; }
+.usb-hero-select{ flex:1; background:transparent !important; border:none !important; outline:none; color:#fff !important; font-size:12.5px; font-weight:700; padding:12px 0 !important; box-shadow:none !important; min-height:auto !important; -webkit-appearance:none; appearance:none; cursor:pointer; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3'><polyline points='6 9 12 15 18 9'/></svg>") !important; background-repeat:no-repeat !important; background-position:right center !important; padding-right:20px !important; }
+.usb-hero-select option{ color:#0f2542; }
+/* results / matrices below the hero — give breathing space on the page surface */
+#unified-search-box #global-search-results,#unified-search-box #deep-search-panel,#unified-search-box #search-matrices-collapse{ margin-top:14px; }
+@media (max-width:640px){
+  .usb-hero-row{ flex-direction:column; }
+  .usb-hero-io{ flex:1 1 auto; }
+  .usb-hero-score{ gap:6px; } .usb-stat{ min-width:54px; padding:6px 10px; } .usb-stat-n{ font-size:16px; }
+}
 </style>
 </head>
 <body>
@@ -23023,22 +23053,30 @@ body.role-staff #mydaily-box{ display:none !important; }
   <!-- GLOBAL SEARCH -->
   <!-- 🔍 UNIFIED SEARCH BOX (merged: quick search + matrices) -->
   <div class="global-search-wrap" id="unified-search-box">
-    <div class="usb-header">
-      <span class="sup-mini-cal" id="search-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
-      <div class="usb-title">🔍 Search</div>
-      <span class="dgeow-total-pill">DB: <strong id="search-cnt-total">0</strong></span>
-    </div>
-    <div class="search-controls">
-      <div class="global-search-box">
-        <span class="global-search-icon">🔎</span>
-        <input type="text" id="global-search" placeholder="कोई number, नाम, serial, keyword, tag, या IO खोजें..." oninput="performGlobalSearch()" autocomplete="off">
-        <button class="global-search-clear" onclick="clearGlobalSearch()" id="global-search-clear" style="display:none;">✕</button>
+    <div class="usb-hero">
+      <div class="usb-hero-top">
+        <span class="sup-mini-cal usb-hero-cal" id="search-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
+        <div class="usb-hero-tt">
+          <div class="usb-hero-ttl">🔍 Search</div>
+          <div class="usb-hero-sub">पूरे database में खोजें — number, नाम, tag, IO</div>
+        </div>
+        <div class="usb-hero-score">
+          <div class="usb-stat"><div class="usb-stat-n" id="search-cnt-total">0</div><div class="usb-stat-l">Total DB</div></div>
+          <div class="usb-stat"><div class="usb-stat-n" id="search-cnt-officers">0</div><div class="usb-stat-l">Officers</div></div>
+        </div>
       </div>
-      <div class="io-search-box">
-        <label class="io-search-label">👮 Search by IO</label>
-        <select class="io-search-select" id="io-search-select" onchange="performIOSearch()">
-          <option value="">— Select IO —</option>
-        </select>
+      <div class="usb-hero-row">
+        <div class="usb-hero-search">
+          <span class="usb-hero-sic">🔎</span>
+          <input type="text" id="global-search" placeholder="कोई number, नाम, serial, keyword, tag खोजें..." oninput="performGlobalSearch()" autocomplete="off">
+          <button class="global-search-clear usb-hero-clear" onclick="clearGlobalSearch()" id="global-search-clear" style="display:none;">✕</button>
+        </div>
+        <div class="usb-hero-io">
+          <span class="usb-hero-ioic">👮</span>
+          <select class="io-search-select usb-hero-select" id="io-search-select" onchange="performIOSearch()">
+            <option value="">Search by IO</option>
+          </select>
+        </div>
       </div>
     </div>
     <div id="global-search-results" class="global-search-results"></div>
@@ -50449,6 +50487,7 @@ function openNoticeModal(noticeId) {
   });
   if (ioSel) ioSel.innerHTML = ioOpts;
   if (assignSel) assignSel.innerHTML = assignOpts;
+  try{ var _oc=document.getElementById('search-cnt-officers'); if(_oc){ _oc.textContent = (state.ioMaster||[]).filter(function(x){return x.is_io;}).length; } }catch(e){}
 
   var delBtn = document.getElementById('nf-delete');
 
