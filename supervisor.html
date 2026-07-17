@@ -33386,7 +33386,7 @@ function _mddPragatiPeriodYMDs(){
   };
 }
 function _mddPragatiByIo(){
-  return (state.ioUpdates || []).filter(function(u){ return !_mddPragatiFilt.io || u.io_name === _mddPragatiFilt.io; });
+  return (state.ioUpdates || []).filter(function(u){ return !_mddPragatiFilt.io || _prIoMatch(u, _mddPragatiFilt.io); });
 }
 function _mddPragatiPeriodList(which){
   var P = _mddPragatiPeriodYMDs();
@@ -60507,10 +60507,20 @@ function openPrSearch(kind){
   try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
 }
 function _prRows(){ return _prState.kind==='pragati' ? (state.ioUpdates||[]).slice() : (state.notices||[]).slice(); }
+function _prStripRank(s){ return String(s||'').replace(/^(SI|ASI|HC|Insp(ector)?|Inspector|Constable|CT|TI|SUBEDAR|Sub[- ]?Insp(ector)?|DSP|DYSP|Dy\.?\s*SP|SDOP|SP|ADDL\.?\s*SP|ADDITIONAL\s+SP|Addl\.?\s*SP|ASP|DIG|IG|ADG)\s+/i,'').trim(); }
+function _prIoMatch(r, sel){
+  if(!sel) return true;
+  var a=String(r.io_name||''), b=String(r.assigned_to||'');
+  if(a===sel||b===sel) return true;
+  if(a.endsWith(sel)||b.endsWith(sel)) return true;
+  var ss=_prStripRank(sel);
+  if(_prStripRank(a)===ss || _prStripRank(b)===ss) return true;
+  return false;
+}
 function _prFiltered(){
   var f=_prState;
   return _prRows().filter(function(r){
-    if(f.io && r.io_name!==f.io && r.assigned_to!==f.io) return false;
+    if(f.io && !_prIoMatch(r,f.io)) return false;
     if(f.cat && (r.case_type||'')!==f.cat) return false;
     var d = String(r.update_date||r.notice_date||r.created_at||'').slice(0,10);
     if(f.from && d && d<f.from) return false;
