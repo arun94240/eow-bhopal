@@ -22861,6 +22861,12 @@ body.role-staff #mydaily-box{ display:none !important; }
 #reports-home-content{ overflow:hidden; transition:max-height .32s ease, opacity .28s ease, padding .28s ease; }
 #reports-home-content.rh-anim-in{ animation:rhSlideIn .34s ease; }
 @keyframes rhSlideIn{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:translateY(0); } }
+
+/* #4 agenda case rows — clearly clickable → brief → open/edit → modal */
+#mydaily-box .mbr-item-case .n-it{ cursor:pointer; }
+#mydaily-box .mbr-item-case .mbr-cnum{ background:rgba(37,99,235,.16); border:1px solid rgba(37,99,235,.3); color:#93c5fd; border-radius:7px; padding:1px 7px; font-size:10.5px; font-weight:800; margin-left:6px; white-space:nowrap; }
+#mydaily-box .mbr-item-case .n-it:active{ background:rgba(255,255,255,.05); }
+#mydaily-box .mbr-cbrief .mbr-oe{ margin-top:8px; }
 </style>
 </head>
 <body>
@@ -33594,6 +33600,7 @@ function _briefEnqToggleRow(k){
   var open=(b.style.display==='none'||!b.style.display);
   if(open && !b.getAttribute('data-filled')){ b.innerHTML=_briefEnqCard(b.getAttribute('data-type'),b.getAttribute('data-id')); b.setAttribute('data-filled','1'); }
   b.style.display=open?'block':'none';
+  var row=b.previousElementSibling; if(row){ var c=row.querySelector('.mbr-caret'); if(c) c.textContent=open?'\u25b4':'\u25be'; }
 }
 var _briefPill=null;
 function _briefPillTap(k){ _briefPill=(_briefPill===k)?null:k; try{ mddRenderBrief(); }catch(e){} }
@@ -33612,15 +33619,24 @@ function mddRenderBrief(){
   var _bk=0;
   function item(a){
     var openJs=a.open||'';
-    var k=++_bk; var chip=''; var cont='';
-    if(a.caseType && a.caseId && a.caseType!=='court'){
-      chip=' <span class="mbr-cnum" onclick="event.stopPropagation();_briefEnqToggleRow('+k+')">📋 '+_mddEsc(_briefEnqLabel(a.caseType,a.caseId))+'</span>';
-      cont='<div class="mbr-cbrief" id="mbr-cb-'+k+'" data-type="'+_mddEsc(a.caseType)+'" data-id="'+_mddEsc(a.caseId)+'" style="display:none;"></div>';
+    var k=++_bk;
+    var isCase=(a.caseType && a.caseId && a.caseType!=='court');
+    if(isCase){
+      // WHOLE row is clickable → opens the case brief inline (brief → ✎ Open/Edit → modal form)
+      return '<div class="mbr-item mbr-item-case">'+
+        '<div class="n-it mbr-click mbr-caserow" onclick="event.stopPropagation();_briefEnqToggleRow('+k+')">'+
+          '<span class="d">'+(a.ico||'📋')+'</span>'+
+          '<span class="t">'+_mddEsc(String(a.lbl||''))+' <span class="mbr-cnum">📋 '+_mddEsc(_briefEnqLabel(a.caseType,a.caseId))+'</span></span>'+
+          '<span class="mbr-caret car">▾</span>'+
+        '</div>'+
+        '<div class="mbr-cbrief" id="mbr-cb-'+k+'" data-type="'+_mddEsc(a.caseType)+'" data-id="'+_mddEsc(a.caseId)+'" style="display:none;"></div>'+
+      '</div>';
     }
+    // non-case item → meta toggle (+ open/edit if provided)
     return '<div class="mbr-item">'+
       '<div class="n-it mbr-click" onclick="event.stopPropagation();mbrToggle(this)">'+
         '<span class="d">'+(a.ico||'•')+'</span>'+
-        '<span class="t">'+_mddEsc(String(a.lbl||''))+chip+'</span>'+
+        '<span class="t">'+_mddEsc(String(a.lbl||''))+'</span>'+
         '<span class="mbr-caret car">▾</span>'+
       '</div>'+
       '<div class="mbr-bb" style="display:none;">'+
@@ -33628,7 +33644,7 @@ function mddRenderBrief(){
         '<div class="mbr-bmeta2">'+_mddEsc(a.kind||'')+' · '+_briefEnDate(a.date)+'</div>'+
         (a.craftLink ? '<a class="mbr-craftlink" href="'+_mddEsc(a.craftLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation();">🔗 Craft note</a>' : '')+
         (openJs?'<button class="mbr-oe" onclick="event.stopPropagation();(function(){try{'+openJs+';}catch(e){}})();">✎ Open / Edit</button>':'')+
-      '</div>'+cont+
+      '</div>'+
     '</div>';
   }
   function dateBlock(ds){
