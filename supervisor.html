@@ -34815,7 +34815,8 @@ function mddTaskFormOpen(hostId, task) {
     date: task ? (String(task.task_date || today).slice(0,10)) : today,
     priority: task ? (task.priority || 'Normal') : 'Normal',
     io: task ? (task.io_name || '') : '',
-    remDate: '', remTime: ''
+    remDate: '', remTime: '',
+    refTid: (function(){ try{ if(task && task.tag_ids){ var ids=(typeof task.tag_ids==='string')?JSON.parse(task.tag_ids):task.tag_ids; var nt=(state.tags||[]).filter(function(t){return typeof _isNameTag==='function'&&_isNameTag(t);}); var hit=(ids||[]).find(function(id){ return nt.some(function(t){return t.id===id;}); }); return hit||''; } }catch(e){} return ''; })()
   };
   if (task && task.reminder_at) { var rd = new Date(task.reminder_at); if (!isNaN(rd.getTime())) {
     v.remDate = rd.getFullYear()+'-'+String(rd.getMonth()+1).padStart(2,'0')+'-'+String(rd.getDate()).padStart(2,'0');
@@ -34827,6 +34828,9 @@ function mddTaskFormOpen(hostId, task) {
       '<div class="mddq-formttl">' + (_mddTaskEditId ? '✎ To-Do संपादित करें' : '📝 नया To-Do / Office task') + '</div>' +
       '<div class="mddq-voice-row"><input type="text" id="mddq-title" class="mddq-inp" placeholder="📋 विषय / Subject (क्या करना है)..." value="' + _mddEsc(v.title) + '"><button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-title\',this);" title="बोलकर लिखें">🎤</button></div>' +
       '<input type="text" id="mddq-ref" class="mddq-inp" placeholder="👤 किसके संदर्भ में / किसके लिए (नाम/अनुभाग/पत्र क्र.)..." value="' + _mddEsc(v.ref) + '">' +
+      '<label class="mddq-lbl" style="width:100%;font-size:11px;color:#0d9488;font-weight:800;">📎 Reference (@name) — व्यक्ति/tag (optional)' +
+        '<select id="mddq-refname" class="mddq-inp" style="margin-top:4px;"><option value="">— @name चुनें —</option>' + _mtxNameTags().map(function(t){ return '<option value="' + t.id + '"' + (v.refTid===t.id?' selected':'') + '>' + _mddEsc(_nameTagClean(t.name||'')) + '</option>'; }).join('') + '</select></label>' +
+      '<div class="mddq-row2"><input type="text" id="mddq-newref" class="mddq-inp" placeholder="＋ नया @name बनाएँ (e.g. @Gupta)"><button type="button" class="mddq-cancel" style="flex:0 0 auto;" onclick="event.stopPropagation();mddTaskRefCreate();">बनाएँ</button></div>' +
       '<select id="mddq-io" class="mddq-inp">' + _mddIoOptionsHTML(v.io) + '</select>' +
       '<div class="mddq-voice-row"><textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="📝 विवरण / Detail (optional)...">' + _mddEsc(v.detail) + '</textarea><button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-detail\',this);" title="बोलकर लिखें">🎤</button></div>' +
       '<div class="mddq-row2">' +
@@ -34859,6 +34863,25 @@ function mddTaskFormOpen(hostId, task) {
   var ti = document.getElementById('mddq-title'); if (ti) { try { ti.focus(); } catch(e){} }
   try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
+async function mddTaskRefCreate() {
+  var inp = document.getElementById('mddq-newref'); if (!inp) return;
+  var v = (inp.value || '').trim();
+  if (!v) { if (typeof toast === 'function') toast('नया @name लिखें', true); return; }
+  if (v.charAt(0) !== '@') v = '@' + v;
+  var clean = _nameTagClean(v).toLowerCase();
+  var dup = _mtxNameTags().find(function(t){ return _nameTagClean(t.name || '').toLowerCase() === clean; });
+  var sel = document.getElementById('mddq-refname');
+  if (dup) { if (sel) sel.value = dup.id; inp.value = ''; if (typeof toast === 'function') toast('"' + _nameTagClean(dup.name) + '" पहले से है — select कर दिया'); return; }
+  try {
+    var r = await supa.from('tags').insert({ name: v, color: 'gray', is_system: false }).select().single();
+    if (r.error) throw r.error;
+    if (!state.tags) state.tags = [];
+    state.tags.push(r.data);
+    if (sel) { var opt = document.createElement('option'); opt.value = r.data.id; opt.textContent = _nameTagClean(r.data.name || v); sel.appendChild(opt); sel.value = r.data.id; }
+    inp.value = '';
+    if (typeof toast === 'function') toast('✓ "' + _nameTagClean(v) + '" @name बना — selected');
+  } catch(e) { if (typeof toast === 'function') toast('Tag बनाना विफल: ' + (e.message || e), true); }
+}
 async function mddTaskFormSave(hostId) {
   var title = ((document.getElementById('mddq-title') || {}).value || '').trim();
   if (!title) { if (typeof toast === 'function') toast('विषय (Subject) लिखें', true); return; }
@@ -34875,12 +34898,16 @@ async function mddTaskFormSave(hostId) {
     var _cobj = ((state.enquiries && state.enquiries[_ctype]) || []).find(function(x){ return x.id === _cid; });
     if (_cobj) { caseType = _ctype; caseId = _cid; caseDisplay = (typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(_cobj, _ctype) : (_cobj.no || ''); }
   }
+  var _refTid = (document.getElementById('mddq-refname') || {}).value || '';
+  var _tagIds = null;
+  if (_refTid) { _tagIds = [_refTid]; try { var _rt = (typeof getTagByName === 'function') ? getTagByName('Reference') : null; if (_rt && _rt.id) _tagIds.push(_rt.id); } catch(e){} }
   var payload = {
     task_title: title, task_detail: detail || null, remarks: ref || null, io_name: ioName,
     priority: priority, reminder_at: remAt, updated_at: new Date().toISOString(),
     case_type: caseType, case_id: caseId, case_display: caseDisplay,
     task_date: date
   };
+  if (_tagIds) payload.tag_ids = _tagIds;
   try {
     if (_mddTaskEditId) {
       var ru = await supa.from('my_office_tasks').update(payload).eq('id', _mddTaskEditId).select().single();
