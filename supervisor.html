@@ -22961,6 +22961,26 @@ body.role-staff #mydaily-box{ display:none !important; }
 .late-bar{ height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden; margin-top:4px; width:90px; } .late-barf{ height:100%; background:linear-gradient(90deg,#f59e0b,#dc2626); }
 .late-log{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; flex-basis:100%; }
 .late-logchip{ background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:7px; padding:2px 8px; font-size:10.5px; font-weight:700; }
+
+/* 🔕 प्रगति नहीं — कार्यालय Overview panel (v234) */
+.ovstats-tile-nopr .cmd-metric-num{ color:#b91c1c; }
+.nopr-filters{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:4px 2px 12px; }
+.nopr-io-sel{ flex:1; min-width:150px; padding:8px 11px; border:1.5px solid #cfdcec; border-radius:9px; font-family:inherit; font-size:12.5px; font-weight:700; color:#12325c; background:#fff; cursor:pointer; }
+.nopr-daterange{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.nopr-daterange label{ font-size:11px; font-weight:800; color:#64748b; }
+.nopr-date{ padding:6px 9px; border:1.5px solid #cfdcec; border-radius:8px; font-family:inherit; font-size:12px; color:#12325c; background:#fff; }
+.nopr-clear{ background:#fee2e2; color:#b91c1c; border:none; border-radius:8px; padding:6px 11px; font-size:11px; font-weight:800; cursor:pointer; }
+.nopr-sec{ margin-bottom:8px; }
+.nopr-sechd{ display:flex; align-items:center; gap:9px; padding:11px 13px; border-radius:10px; cursor:pointer; border:1px solid #eef2f7; border-left:4px solid #dc2626; background:#fff; }
+.nopr-sechd.d7{ border-left-color:#eab308; background:#fefce8; } .nopr-sechd.d15{ border-left-color:#ea580c; background:#fff7ed; }
+.nopr-sechd.d30{ border-left-color:#dc2626; background:#fef2f2; } .nopr-sechd.never{ border-left-color:#7c3aed; background:#faf5ff; }
+.nopr-sechd.open{ border-bottom-left-radius:0; border-bottom-right-radius:0; }
+.nopr-secic{ font-size:16px; } .nopr-seclbl{ font-size:13px; font-weight:900; color:#12325c; flex:1; }
+.nopr-seccnt{ background:#12325c; color:#fff; border-radius:999px; padding:1px 10px; font-size:12px; font-weight:900; }
+.nopr-sechd.d7 .nopr-seccnt{ background:#a16207; } .nopr-sechd.d15 .nopr-seccnt{ background:#c2410c; } .nopr-sechd.d30 .nopr-seccnt{ background:#b91c1c; } .nopr-sechd.never .nopr-seccnt{ background:#6d28d9; }
+.nopr-seccar{ font-size:11px; color:#94a3b8; font-weight:900; }
+.nopr-sec .nopr-rows{ border:1px solid #eef2f7; border-top:none; border-radius:0 0 10px 10px; padding:9px; display:flex; flex-direction:column; gap:7px; background:#fafbfc; }
+.nopr-secempty{ text-align:center; color:#94a3b8; font-size:12px; padding:8px; }
 </style>
 </head>
 <body>
@@ -23456,6 +23476,17 @@ body.role-staff #mydaily-box{ display:none !important; }
                 </div>
                 <div class="cmd-chips"></div>
               </div>
+              <!-- NEW: जिन प्रकरणों में प्रगति नहीं (progress-gap) tile → inline panel -->
+              <div class="cmd-metric ovstats-tile ovstats-tile-nopr ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovstatsNavTile('nopr',event)">
+                <div class="cmd-metric-top">
+                  <div class="cmd-metric-icon" id="ovstats-nopr-cal"></div>
+                  <div class="cmd-metric-body">
+                    <div class="cmd-metric-label">प्रगति नहीं</div>
+                    <div class="cmd-metric-num" id="ovstats-cnt-nopr">0</div>
+                  </div>
+                </div>
+                <div class="cmd-chips"></div>
+              </div>
             </div>
           </div>
           <div class="ov-section-toggle">▼</div>
@@ -23590,6 +23621,16 @@ body.role-staff #mydaily-box{ display:none !important; }
             </div>
 
             <!-- NEW: Pragati inline summary panel -->
+            <div class="ovstats-panel" id="ovstats-panel-nopr" style="display:none;">
+              <div class="ovstats-panel-head">
+                <span class="ovstats-panel-icon">🔕</span>
+                <span class="ovstats-panel-title">जिन प्रकरणों में प्रगति नहीं</span>
+                <span class="ovstats-grand-total" id="nopr-grand-total">Total: 0</span>
+              </div>
+              <div class="ovstats-panel-body">
+                <div id="nopr-panel-content"></div>
+              </div>
+            </div>
             <div class="ovstats-panel" id="ovstats-panel-pragati" style="display:none;">
               <div class="ovstats-panel-head">
                 <span class="ovstats-panel-icon">📋</span>
@@ -23742,25 +23783,6 @@ body.role-staff #mydaily-box{ display:none !important; }
       <div id="home-compact-host"></div>
 
       <!-- DG EOW SECTION -->
-      <div class="ov-section collapsed" id="nopragati-summary-wrap">
-        <div class="ov-section-header" onclick="toggleNoPragatiSection(event)">
-          <div class="ov-section-titles">
-            <span class="sup-mini-cal" id="nopr-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
-            <div class="ov-section-title">🔕 जिन प्रकरणों में प्रगति नहीं</div>
-            <span class="dgeow-total-pill">Total: <strong id="nopr-cnt-total">0</strong></span>
-          </div>
-          <div class="hdr-counter-stack" id="nopr-counter-stack">
-            <div class="hdr-counter nopr-tile nopr-t7" onclick="event.stopPropagation();noprFilter('7',event)"><span class="hcc-icon">🟡</span><span class="hcc-label">7+ दिन</span><span class="hcc-num" id="nopr-cnt-7">0</span></div>
-            <div class="hdr-counter nopr-tile nopr-t15" onclick="event.stopPropagation();noprFilter('15',event)"><span class="hcc-icon">🟠</span><span class="hcc-label">15+ दिन</span><span class="hcc-num" id="nopr-cnt-15">0</span></div>
-            <div class="hdr-counter nopr-tile nopr-t30" onclick="event.stopPropagation();noprFilter('30',event)"><span class="hcc-icon">🔴</span><span class="hcc-label">30+ दिन</span><span class="hcc-num" id="nopr-cnt-30">0</span></div>
-            <div class="hdr-counter nopr-tile nopr-tnever" onclick="event.stopPropagation();noprFilter('never',event)"><span class="hcc-icon">⚫</span><span class="hcc-label">कभी नहीं</span><span class="hcc-num" id="nopr-cnt-never">0</span></div>
-          </div>
-          <div class="ov-section-toggle">▼</div>
-        </div>
-        <div class="ov-section-body">
-          <div id="nopragati-content"><div class="empty-state"><h3>✅ सभी सक्रिय प्रकरणों में हाल ही प्रगति दर्ज है</h3></div></div>
-        </div>
-      </div>
       <div class="ov-section collapsed" id="dgeow-summary-wrap">
         <div class="ov-section-header" onclick="toggleDgEowSection(event)">
           <div class="ov-section-titles">
@@ -39664,7 +39686,8 @@ function ovstatsNavTile(tile, evt) {
     leaves: '.ovstats-tile-leaves',
     tags: '.ovstats-tile-tags',
     pragati: '.ovstats-tile-pragati',
-    roster: '.ovstats-tile-roster'
+    roster: '.ovstats-tile-roster',
+    nopr: '.ovstats-tile-nopr'
   };
   var tileEl = document.querySelector('#ovstats-tile-row ' + tileMap[tile]);
   if (tileEl) tileEl.classList.add('is-active');
@@ -39692,6 +39715,7 @@ function ovstatsNavTile(tile, evt) {
   // NEW: inline summary panels
   else if (tile === 'tags' && typeof ovstatsRenderTagsSummary === 'function') ovstatsRenderTagsSummary();
   else if (tile === 'pragati' && typeof ovstatsRenderPragatiSummary === 'function') ovstatsRenderPragatiSummary();
+  else if (tile === 'nopr' && typeof ovstatsRenderNoPragati === 'function') ovstatsRenderNoPragati();
   else if (tile === 'roster') { if (typeof refreshStaffPulse === 'function') refreshStaffPulse(); if (typeof renderEstabRoster === 'function') renderEstabRoster(); }
   
   // Smart scroll — bring panel into view
@@ -51609,57 +51633,75 @@ function _noprCases(){
   return out;
 }
 function renderNoPragati(){
+  // Tile count only — full panel rendered by ovstatsRenderNoPragati()
+  try{ var all=_noprCases(); var el=document.getElementById('ovstats-cnt-nopr'); if(el) el.textContent=all.length; }catch(e){}
+}
+// ── filter state ──
+var _noprIoSel=null, _noprFrom='', _noprTo='', _noprBucketOpen={}, _noprRowOpen={};
+function _noprFiltered(){
   var all=_noprCases();
-  var c7=all.filter(function(x){return x.bucket==='7';}).length;
-  var c15=all.filter(function(x){return x.bucket==='15';}).length;
-  var c30=all.filter(function(x){return x.bucket==='30';}).length;
-  var cn=all.filter(function(x){return x.bucket==='never';}).length;
-  var set=function(id,v){ var el=document.getElementById(id); if(el)el.textContent=v; };
-  set('nopr-cnt-total',all.length); set('nopr-cnt-7',c7); set('nopr-cnt-15',c15); set('nopr-cnt-30',c30); set('nopr-cnt-never',cn);
-  try{ var mc=document.getElementById('nopr-mini-cal'); if(mc){ var d=new Date(); mc.querySelector('.smc-mo').textContent=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()]; mc.querySelector('.smc-dy').textContent=d.getDate(); } }catch(e){}
-  var host=document.getElementById('nopragati-content'); if(!host) return;
-  var list = _noprFilter ? all.filter(function(x){return x.bucket===_noprFilter;}) : all;
-  if(!all.length){ host.innerHTML='<div class="empty-state"><h3>✅ सभी सक्रिय प्रकरणों में हाल ही प्रगति दर्ज है</h3></div>'; return; }
-  // IO-wise summary
-  var ioMap={}; all.forEach(function(x){ ioMap[x.io]=(ioMap[x.io]||0)+1; });
-  var ioArr=Object.keys(ioMap).map(function(k){return {io:k,n:ioMap[k]};}).sort(function(a,b){return b.n-a.n;}).slice(0,8);
-  var ioHtml='<div class="nopr-iowrap"><div class="nopr-iolbl">IO-वार सर्वाधिक</div><div class="nopr-iochips">'+
-    ioArr.map(function(o){ return '<span class="nopr-iochip'+(_noprIoSel===o.io?' on':'')+'" onclick="event.stopPropagation();noprIoTap(\''+String(o.io).replace(/'/g,"\\'")+'\')">'+_mddEsc(o.io)+' <b>'+o.n+'</b></span>'; }).join('')+'</div></div>';
-  if(_noprIoSel) list=list.filter(function(x){return x.io===_noprIoSel;});
-  var rowsHtml = list.slice(0,200).map(function(x,idx){
-    var bcls = x.bucket==='never'?'never':(x.bucket==='30'?'d30':(x.bucket==='15'?'d15':'d7'));
-    var gtxt = x.bucket==='never' ? 'कभी नहीं' : (x.gap+' दिन');
-    return '<div class="nopr-row nopr-'+bcls+'" onclick="event.stopPropagation();_noprRowToggle('+idx+',\''+x.type+'\',\''+x.id+'\')">'+
-      '<div class="nopr-rmain"><div class="nopr-rc">📋 '+_mddEsc(x.label)+'</div><div class="nopr-rio">IO: '+_mddEsc(x.io)+(x.last?(' · अंतिम प्रगति: '+_mddEsc(x.last)):'')+'</div></div>'+
-      '<span class="nopr-rg">'+gtxt+'</span>'+
-      '<div class="nopr-rbrief" id="nopr-cb-'+idx+'" style="display:none;"></div>'+
+  if(_noprIoSel) all=all.filter(function(x){return x.io===_noprIoSel;});
+  if(_noprFrom||_noprTo){
+    all=all.filter(function(x){
+      if(!x.last) return false; // date-range set → 'never' (no date) बाहर
+      if(_noprFrom && x.last<_noprFrom) return false;
+      if(_noprTo && x.last>_noprTo) return false;
+      return true;
+    });
+  }
+  return all;
+}
+function _noprIoOptions(){
+  var names={}; _noprCases().forEach(function(x){ if(x.io && x.io!=='—') names[x.io]=true; });
+  var arr=Object.keys(names).sort();
+  return '<option value="">— सभी IO —</option>'+arr.map(function(n){ return '<option'+(_noprIoSel===n?' selected':'')+'>'+_mddEsc(n)+'</option>'; }).join('');
+}
+function ovstatsRenderNoPragati(){
+  var host=document.getElementById('nopr-panel-content'); if(!host) return;
+  var list=_noprFiltered();
+  var gt=document.getElementById('nopr-grand-total'); if(gt) gt.textContent='Total: '+list.length;
+  try{ var el=document.getElementById('ovstats-cnt-nopr'); if(el) el.textContent=_noprCases().length; }catch(e){}
+  var buckets={ '7':[], '15':[], '30':[], 'never':[] };
+  list.forEach(function(x){ (buckets[x.bucket]=buckets[x.bucket]||[]).push(x); });
+  var meta={ '7':{ic:'🟡',lbl:'7+ दिन',cls:'d7'}, '15':{ic:'🟠',lbl:'15+ दिन',cls:'d15'}, '30':{ic:'🔴',lbl:'30+ दिन',cls:'d30'}, 'never':{ic:'⚫',lbl:'कभी नहीं',cls:'never'} };
+  // filters row
+  var filt='<div class="nopr-filters">'+
+    '<select class="nopr-io-sel" onchange="event.stopPropagation();noprSetIo(this.value)">'+_noprIoOptions()+'</select>'+
+    '<div class="nopr-daterange"><label>अंतिम प्रगति:</label>'+
+      '<input type="date" class="nopr-date" value="'+_mddEsc(_noprFrom)+'" onchange="event.stopPropagation();noprSetDate(\'from\',this.value)">'+
+      '<span>→</span>'+
+      '<input type="date" class="nopr-date" value="'+_mddEsc(_noprTo)+'" onchange="event.stopPropagation();noprSetDate(\'to\',this.value)">'+
+      ((_noprIoSel||_noprFrom||_noprTo)?'<button class="nopr-clear" onclick="event.stopPropagation();noprClearFilters()">✕ clear</button>':'')+
+    '</div>'+
+  '</div>';
+  if(!list.length){ host.innerHTML=filt+'<div class="empty-state" style="padding:16px;"><h3>✅ इस filter में कोई प्रकरण नहीं</h3></div>'; return; }
+  // 4 collapsible bucket sections (inline, default collapsed)
+  var secs=['7','15','30','never'].map(function(bk){
+    var arr=buckets[bk]||[]; var m=meta[bk]; var open=!!_noprBucketOpen[bk];
+    var rows = open ? arr.map(function(x){
+      var rk=bk+'|'+x.id; var ro=!!_noprRowOpen[rk];
+      var gtxt = bk==='never'?'कभी नहीं':(x.gap+' दिन');
+      var brief = ro ? ('<div class="nopr-rbrief">'+_briefEnqCard(x.type,x.id)+'</div>') : '';
+      return '<div class="nopr-row nopr-'+m.cls+(ro?' open':'')+'" onclick="event.stopPropagation();noprRowToggle(\''+rk+'\',\''+x.type+'\',\''+x.id+'\')">'+
+        '<div class="nopr-rmain"><div class="nopr-rc">📋 '+_mddEsc(x.label)+'</div><div class="nopr-rio">IO: '+_mddEsc(x.io)+(x.last?(' · अंतिम प्रगति: '+_mddEsc(x.last)):'')+'</div></div>'+
+        '<span class="nopr-rg">'+gtxt+'</span>'+brief+
+      '</div>';
+    }).join('') : '';
+    return '<div class="nopr-sec">'+
+      '<div class="nopr-sechd nopr-'+m.cls+(open?' open':'')+'" onclick="event.stopPropagation();noprBucketToggle(\''+bk+'\')">'+
+        '<span class="nopr-secic">'+m.ic+'</span><span class="nopr-seclbl">'+m.lbl+'</span>'+
+        '<span class="nopr-seccnt">'+arr.length+'</span><span class="nopr-seccar">'+(open?'▴':'▾')+'</span>'+
+      '</div>'+
+      (open?('<div class="nopr-rows">'+(arr.length?rows:'<div class="nopr-secempty">— कोई नहीं —</div>')+'</div>'):'')+
     '</div>';
   }).join('');
-  host.innerHTML = ioHtml + '<div class="nopr-rows">'+rowsHtml+'</div>';
+  host.innerHTML=filt+secs;
 }
-var _noprIoSel=null;
-function noprIoTap(io){ _noprIoSel=(_noprIoSel===io)?null:io; renderNoPragati(); }
-function _noprRowToggle(idx,type,id){
-  var b=document.getElementById('nopr-cb-'+idx); if(!b) return;
-  var open=(b.style.display==='none'||!b.style.display);
-  if(open && !b.getAttribute('data-filled')){ b.innerHTML=_briefEnqCard(type,id); b.setAttribute('data-filled','1'); }
-  b.style.display=open?'block':'none';
-}
-function noprFilter(bucket,evt){
-  if(evt){ try{ evt.stopPropagation(); }catch(e){} }
-  window._matrixClickActive=true; setTimeout(function(){window._matrixClickActive=false;},50);
-  _noprFilter=(_noprFilter===bucket)?null:bucket;
-  var wrap=document.getElementById('nopragati-summary-wrap'); if(wrap) wrap.classList.remove('collapsed');
-  document.querySelectorAll('.nopr-tile').forEach(function(t){t.classList.remove('is-active');});
-  if(_noprFilter){ var map={'7':'nopr-t7','15':'nopr-t15','30':'nopr-t30','never':'nopr-tnever'}; var el=document.querySelector('.'+map[_noprFilter]); if(el)el.classList.add('is-active'); }
-  renderNoPragati();
-}
-function toggleNoPragatiSection(evt){
-  if(window._matrixClickActive) return;
-  var wrap=document.getElementById('nopragati-summary-wrap'); if(!wrap) return;
-  wrap.classList.toggle('collapsed');
-  if(!wrap.classList.contains('collapsed')) renderNoPragati();
-}
+function noprSetIo(v){ _noprIoSel=v||null; _noprRowOpen={}; ovstatsRenderNoPragati(); }
+function noprSetDate(which,v){ if(which==='from')_noprFrom=v||''; else _noprTo=v||''; _noprRowOpen={}; ovstatsRenderNoPragati(); }
+function noprClearFilters(){ _noprIoSel=null; _noprFrom=''; _noprTo=''; _noprRowOpen={}; ovstatsRenderNoPragati(); }
+function noprBucketToggle(bk){ _noprBucketOpen[bk]=!_noprBucketOpen[bk]; ovstatsRenderNoPragati(); }
+function noprRowToggle(rk,type,id){ _noprRowOpen[rk]=!_noprRowOpen[rk]; ovstatsRenderNoPragati(); }
 
 function renderOverview() {
   Object.keys(ENQ_LABELS).forEach(function(t){
