@@ -22942,6 +22942,25 @@ body.role-staff #mydaily-box{ display:none !important; }
 .nopr-rbrief{ flex-basis:100%; margin-top:8px; background:#f7fafd; border:1px solid #dbe7f5; border-radius:9px; padding:9px 11px; }
 .nopr-rbrief .mbr-cb-row{ font-size:12px; color:#1e293b; margin:2px 0; }
 .nopr-rbrief .mbr-oe{ margin-top:8px; display:inline-block; background:#2563eb; color:#fff; border:none; border-radius:8px; padding:6px 13px; font-size:12px; font-weight:800; cursor:pointer; }
+
+/* 🕥 देर से आगमन (v233) */
+.mas-late-toggle{ background:#fef3c7; color:#92400e; border:none; border-radius:8px; padding:4px 10px; font-size:11px; font-weight:800; cursor:pointer; margin-left:6px; }
+.mas-late-toggle:hover{ filter:brightness(.97); }
+#mas-late-wrap{ margin-top:10px; }
+.late-cfg{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; padding:9px 11px; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; margin-bottom:10px; }
+.late-cfg-lbl{ font-size:10.5px; font-weight:800; color:#92400e; }
+.late-cfg-btn{ background:#fff; border:1px solid #fcd34d; color:#92400e; border-radius:7px; padding:3px 9px; font-size:11px; font-weight:800; cursor:pointer; }
+.late-cfg-btn.on{ background:#f59e0b; color:#fff; border-color:#f59e0b; }
+.late-cfg-note{ margin-left:auto; font-size:10px; font-weight:700; color:#b45309; }
+.late-empty{ text-align:center; color:#16a34a; font-weight:700; font-size:12.5px; padding:14px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; }
+.late-rows{ display:flex; flex-direction:column; gap:7px; }
+.late-row{ display:flex; align-items:center; gap:11px; padding:10px 12px; background:#fff; border:1px solid #eef2f7; border-left:3px solid #f59e0b; border-radius:9px; cursor:pointer; flex-wrap:wrap; }
+.late-av{ width:34px; height:34px; border-radius:9px; background:#fef3c7; color:#92400e; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; flex:0 0 auto; }
+.late-main{ min-width:0; flex:1; } .late-nm{ font-size:12.5px; font-weight:800; color:#12325c; } .late-sub{ font-size:10.5px; color:#64748b; margin-top:1px; }
+.late-badge{ text-align:right; flex:0 0 auto; } .late-pct{ font-size:15px; font-weight:900; color:#b45309; line-height:1; } .late-pl{ font-size:9px; color:#94a3b8; font-weight:700; }
+.late-bar{ height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden; margin-top:4px; width:90px; } .late-barf{ height:100%; background:linear-gradient(90deg,#f59e0b,#dc2626); }
+.late-log{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; flex-basis:100%; }
+.late-logchip{ background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:7px; padding:2px 8px; font-size:10.5px; font-weight:700; }
 </style>
 </head>
 <body>
@@ -33587,6 +33606,77 @@ function mddLiveToggle(){
   b.style.display = open ? 'block' : 'none'; if (c) c.textContent = open ? '▴' : '▾';
 }
 
+
+/* ══════════ 🕥 देर से आगमन — habitual late-comers (v233) ══════════ */
+var _masLateOpen=false, _lateCutoff=630 /*10:30*/, _lateLookback=30, _lateThreshold=40, _lateRowOpen=null;
+function _lateArrivalMin(t){
+  if(!t) return null;
+  var s=String(t);
+  var m=s.match(/^(\d{1,2}):(\d{2})/);
+  if(m) return parseInt(m[1],10)*60+parseInt(m[2],10);
+  var d=new Date(s); if(isNaN(d.getTime())) return null;
+  return d.getHours()*60+d.getMinutes();
+}
+function _lateMinToStr(mm){ if(mm==null) return '—'; var hh=Math.floor(mm/60), mn=mm%60; return (hh<10?'0':'')+hh+':'+(mn<10?'0':'')+mn; }
+function _lateComers(){
+  var today=new Date(); var cutISO=new Date(today.getTime()-(_lateLookback-1)*86400000).toISOString().slice(0,10);
+  var by={};  // officer → {days:[{date,min}]}
+  (state.attendance||[]).forEach(function(a){
+    if(!a.check_in_time) return;
+    var d=String(a.att_date||'').slice(0,10); if(!d || d<cutISO) return;
+    var nm=a.officer_name||a.staff_name||a.name; if(!nm) return;
+    var mn=_lateArrivalMin(a.check_in_time); if(mn==null) return;
+    if(!by[nm]) by[nm]={days:[]};
+    by[nm].days.push({date:d,min:mn});
+  });
+  var out=[];
+  Object.keys(by).forEach(function(nm){
+    var days=by[nm].days.slice().sort(function(a,b){return a.date<b.date?-1:1;});
+    var total=days.length; if(total<3) return;   // कम-से-कम 3 दिन का data
+    var lateDays=days.filter(function(x){return x.min>_lateCutoff;});
+    var lp=Math.round(lateDays.length/total*100);
+    var avg=Math.round(days.reduce(function(s,x){return s+x.min;},0)/total);
+    // streak: सबसे हाल के दिनों से लगातार देर
+    var streak=0; for(var i=days.length-1;i>=0;i--){ if(days[i].min>_lateCutoff) streak++; else break; }
+    if(lp>=_lateThreshold){ out.push({ name:nm, total:total, late:lateDays.length, pct:lp, avg:avg, streak:streak, lateList:lateDays }); }
+  });
+  out.sort(function(a,b){ return b.pct-a.pct || b.late-a.late; });
+  return out;
+}
+function _lateInitials(nm){ var p=_prStripRank?_prStripRank(nm):nm; var w=String(p||'').trim().split(/\s+/); return ((w[0]||' ')[0]+((w[1]||'')[0]||'')).toUpperCase(); }
+function _lateRenderHTML(){
+  var arr=_lateComers();
+  var cfg='<div class="late-cfg">'+
+    '<span class="late-cfg-lbl">Lean cutoff:</span>'+
+    ['10:15','10:30','10:45'].map(function(c){ var mm=parseInt(c.split(":")[0],10)*60+parseInt(c.split(":")[1],10); return '<button class="late-cfg-btn'+(_lateCutoff===mm?' on':'')+'" onclick="event.stopPropagation();lateSetCutoff('+mm+')">'+c+'</button>'; }).join('')+
+    '<span class="late-cfg-lbl" style="margin-left:8px;">अवधि:</span>'+
+    [7,30].map(function(n){ return '<button class="late-cfg-btn'+(_lateLookback===n?' on':'')+'" onclick="event.stopPropagation();lateSetLookback('+n+')">'+n+'d</button>'; }).join('')+
+    '<span class="late-cfg-note">≥'+_lateThreshold+'% दिन देर = habitual</span>'+
+  '</div>';
+  if(!arr.length) return cfg+'<div class="late-empty">✅ चुनी अवधि में कोई habitual देर-आगमन नहीं</div>';
+  var rows=arr.map(function(o,idx){
+    var open=(_lateRowOpen===idx);
+    var log = open ? '<div class="late-log">'+o.lateList.slice().reverse().map(function(x){ return '<span class="late-logchip">'+_mddEsc(x.date)+' · '+_lateMinToStr(x.min)+'</span>'; }).join('')+'</div>' : '';
+    return '<div class="late-row'+(open?' open':'')+'" onclick="event.stopPropagation();lateRowToggle('+idx+')">'+
+      '<div class="late-av">'+_mddEsc(_lateInitials(o.name))+'</div>'+
+      '<div class="late-main"><div class="late-nm">'+_mddEsc(o.name)+'</div>'+
+        '<div class="late-sub">'+o.total+' में '+o.late+' दिन देर · औसत आगमन '+_lateMinToStr(o.avg)+(o.streak>=2?(' · लगातार '+o.streak+' दिन'):'')+'</div>'+log+
+      '</div>'+
+      '<div class="late-badge"><div class="late-pct">'+o.pct+'%</div><div class="late-pl">देर</div><div class="late-bar"><div class="late-barf" style="width:'+o.pct+'%;"></div></div></div>'+
+    '</div>';
+  }).join('');
+  return cfg+'<div class="late-rows">'+rows+'</div>';
+}
+function _lateRerender(){ var w=document.getElementById('mas-late-wrap'); if(w && _masLateOpen) w.innerHTML=_lateRenderHTML(); }
+function mddAttLateToggle(){
+  _masLateOpen=!_masLateOpen;
+  if(typeof mddRenderAttStrip==='function') mddRenderAttStrip();
+  if(_masLateOpen){ var w=document.getElementById('mas-late-wrap'); if(w){ try{ w.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} } }
+}
+function lateSetCutoff(mm){ _lateCutoff=mm; _lateRowOpen=null; _lateRerender(); }
+function lateSetLookback(n){ _lateLookback=n; _lateRowOpen=null; _lateRerender(); }
+function lateRowToggle(idx){ _lateRowOpen=(_lateRowOpen===idx)?null:idx; _lateRerender(); }
+
 function mddRenderAttStrip(){
   var host = document.getElementById('mydd-att-strip'); if (!host) return;
   var c = _mddAttCompute();
@@ -33604,6 +33694,7 @@ function mddRenderAttStrip(){
         '<span class="mas-ttl">अभी उपस्थिति — Live</span>' +
         '<span class="mas-time">अद्यतन ' + tm + '</span>' +
         '<button class="mas-table-toggle" onclick="event.stopPropagation();mddAttTableToggle();">' + (_masTableOpen ? '✕ Table' : '📋 Table') + '</button>' +
+        '<button class="mas-late-toggle" onclick="event.stopPropagation();mddAttLateToggle();">' + (_masLateOpen ? '\u2715 \u0926\u0947\u0930 \u0938\u0947' : '\ud83d\udd65 \u0926\u0947\u0930 \u0938\u0947') + '</button>' +
       '</div>' +
       '<div class="mas-pills">' +
         '<div class="mas-pill mp-present' + act('present') + '" onclick="event.stopPropagation();mddAttPill(\'present\');"><div class="n">' + p + '</div><div class="l">उपस्थित ▾</div></div>' +
@@ -33624,6 +33715,9 @@ function mddRenderAttStrip(){
       '<div id="mas-pending-inline" style="display:' + (_masPendingOpen ? 'block' : 'none') + ';"></div>' +
       '<div id="mas-table-wrap" style="display:' + (_masTableOpen ? 'block' : 'none') + ';">' +
         (_masTableOpen ? _masTable(c) : '') +
+      '</div>' +
+      '<div id="mas-late-wrap" style="display:' + (_masLateOpen ? 'block' : 'none') + ';">' +
+        (_masLateOpen ? _lateRenderHTML() : '') +
       '</div>' +
     '</div>';
   if (_masPendingOpen) { try{ _masPendingRender(); }catch(e){} }
