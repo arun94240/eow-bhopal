@@ -22693,6 +22693,35 @@ body.role-staff #mydaily-box{ display:none !important; }
 /* pr list — ensure clickable (v213) */
 #notice-search-wrap .pr-summary,#notice-search-wrap .pr-row{ cursor:pointer !important; -webkit-tap-highlight-color:rgba(37,99,235,.15); }
 #notice-search-wrap .pr-row:active{ background:#eef4fb !important; }
+
+/* ═══ Agenda compact Option-1 (v214) ═══ */
+#mydaily-box .n-pills{ display:flex !important; gap:6px !important; margin-top:8px !important; }
+#mydaily-box .n-pill{ flex:1; display:flex; align-items:center; justify-content:center; gap:5px; border-radius:10px !important; padding:6px 8px !important; font-size:10px !important; font-weight:700 !important; cursor:pointer; border:1.5px solid transparent !important; color:#fff !important; }
+#mydaily-box .n-pill b{ font-size:16px; font-weight:900; }
+#mydaily-box .n-pill i{ font-style:normal; font-size:8px; opacity:.75; }
+#mydaily-box .n-pill.a{ background:#2563eb !important; } #mydaily-box .n-pill.o{ background:#dc2626 !important; } #mydaily-box .n-pill.w{ background:#0d9488 !important; }
+#mydaily-box .n-pill.on{ border-color:rgba(255,255,255,.7) !important; }
+/* list under pills — monochrome navy, light text (no white weird box) */
+#mydaily-box .mbr-body-c{ padding:2px 2px 4px; }
+#mydaily-box .mbr-body-c:empty{ display:none; }
+#mydaily-box .mbr-body-c .n-daylbl{ color:#7f97b6 !important; font-size:9px !important; font-weight:900; letter-spacing:.4px; text-transform:uppercase; padding:6px 2px 2px !important; margin:0 !important; }
+#mydaily-box .mbr-body-c .mbr-item{ margin:0 !important; border-bottom:1px solid rgba(255,255,255,.06) !important; padding:0 !important; background:transparent !important; }
+#mydaily-box .mbr-body-c .mbr-item .n-it{ padding:8px 2px !important; }
+#mydaily-box .mbr-body-c .mbr-item .n-it .t{ color:#eaf1fb !important; font-size:12px !important; }
+#mydaily-box .mbr-body-c .mbr-caret{ color:#7f97b6 !important; }
+#mydaily-box .mbr-body-c .mbr-bb{ background:rgba(255,255,255,.06) !important; border-radius:9px !important; margin:0 0 8px !important; padding:9px 11px !important; }
+#mydaily-box .mbr-body-c .mbr-bmeta,#mydaily-box .mbr-body-c .mbr-bmeta2{ color:#b9cbe4 !important; }
+#mydaily-box .mbr-body-c .mbr-empty{ color:#5eead4 !important; font-size:11.5px !important; font-weight:700; text-align:center; padding:14px !important; margin:0 !important; }
+#mydaily-box .mbr-body-c .n-db.over{ background:rgba(220,38,38,.2) !important; color:#fca5a5 !important; }
+#mydaily-box .mbr-body-c .n-db.week{ color:#93c5fd !important; }
+#mydaily-box .mbr-foot{ padding:8px 2px 2px !important; font-size:9px !important; color:#7f97b6 !important; text-align:center; background:transparent !important; }
+/* toolbar → slim tools row (label removed) */
+#mydaily-box .mydd-dg-toprow{ padding-top:10px !important; gap:7px !important; }
+#mydaily-box .mtx-search-inline{ margin-left:0 !important; flex:1; }
+/* group chips compact */
+#mydaily-box .mtx-chip{ padding:8px 10px !important; }
+#mydaily-box .mtx-chip-ic{ width:27px !important; height:27px !important; font-size:13px !important; }
+#mydaily-box .mtx-chip-lbl{ font-size:11px !important; } #mydaily-box .mtx-chip-n{ font-size:14px !important; }
 </style>
 </head>
 <body>
@@ -23387,7 +23416,6 @@ body.role-staff #mydaily-box{ display:none !important; }
         <div class="mydd-tiles">
           <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleBox();">
-              <span class="mydd-tlabel mydd-tlabel-agenda">🗓️ Agenda</span>
               <span class="mydd-tcal" style="display:none;"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
               <span class="mydd-tnum" id="mydd-cnt-mytask" style="display:none;">0</span>
               <div class="mtx-search mtx-blk-keyword mtx-search-inline" onclick="event.stopPropagation();">
@@ -33422,6 +33450,8 @@ function _briefEnqToggleRow(k){
   if(open && !b.getAttribute('data-filled')){ b.innerHTML=_briefEnqCard(b.getAttribute('data-type'),b.getAttribute('data-id')); b.setAttribute('data-filled','1'); }
   b.style.display=open?'block':'none';
 }
+var _briefPill=null;
+function _briefPillTap(k){ _briefPill=(_briefPill===k)?null:k; try{ mddRenderBrief(); }catch(e){} }
 function mddRenderBrief(){
   var host=document.getElementById('mydd-brief'); if(!host) return;
   var today=_mddYMD(new Date());
@@ -33465,34 +33495,25 @@ function mddRenderBrief(){
     arr.forEach(function(a){ if(a.date!==last){ out+=dateBlock(a.date); last=a.date; } out+=item(a); });
     return out;
   }
-  // ── header ──
+  // ── header + compact tappable-collapsible pills ──
+  function pill(k,cls,lbl,cnt){
+    var on=(_briefPill===k);
+    return '<span class="n-pill '+cls+(on?' on':'')+'" onclick="event.stopPropagation();_briefPillTap(\''+k+'\')"><b>'+cnt+'</b> '+lbl+' <i>'+(on?'▴':'▾')+'</i></span>';
+  }
   var html='<div class="mbr-brief"><div class="n-top">'+cal+'<div class="n-hd"><div class="n-t">🗓️ Agenda</div>'+
-    '<div class="n-pills"><span class="n-pill a">आज '+todayItems.length+'</span>'+(overdue.length?'<span class="n-pill o">Overdue '+overdue.length+'</span>':'')+'<span class="n-pill w">सप्ताह '+weekArr.length+'</span></div>'+
+    '<div class="n-pills">'+pill('today','a','आज',todayItems.length)+pill('over','o','Overdue',overdue.length)+pill('week','w','सप्ताह',weekArr.length)+'</div>'+
   '</div></div>';
-  html+='<div class="mbr-body">';
-  // ── overdue: one collapsible red bar ──
-  if(overdue.length){
-    html+='<div class="mbr-overbar" onclick="_mbrBoxToggleNext(this)">⚠ '+overdue.length+' Overdue — देखने हेतु tap<span class="car">▾</span></div>'+
-      '<div style="display:none;">'+listOf(overdue)+'</div>';
+  // ── single list under whichever pill is active (default: all collapsed) ──
+  html+='<div class="mbr-body-c">';
+  if(_briefPill==='today'){
+    html+= todayItems.length ? '<div class="n-daylbl">📅 आज · '+_briefDShort(today)+'</div>'+listOf(todayItems) : '<div class="mbr-empty">आज कोई agenda नहीं — दिन नियंत्रण में ✅</div>';
+  } else if(_briefPill==='over'){
+    html+= overdue.length ? '<div class="n-daylbl">⚠ Overdue · '+overdue.length+'</div>'+listOf(overdue) : '<div class="mbr-empty">कोई overdue नहीं ✅</div>';
+  } else if(_briefPill==='week'){
+    html+= weekArr.length ? '<div class="n-daylbl">🗓️ इस सप्ताह · '+weekArr.length+'</div>'+listOf(weekArr) : '<div class="mbr-empty">इस सप्ताह कुछ नहीं</div>';
   }
-  // ── today (cap 4 + more) ──
-  if(todayItems.length){
-    html+='<div class="n-daylbl">📅 आज · '+_briefDShort(today)+'</div>';
-    var CAP=4;
-    html+=todayItems.slice(0,CAP).map(item).join('');
-    if(todayItems.length>CAP){
-      html+='<div class="mbr-more" onclick="_mbrMoreNext(this)">+ '+(todayItems.length-CAP)+' और आज का काम…</div>'+
-        '<div style="display:none;">'+todayItems.slice(CAP).map(item).join('')+'</div>';
-    }
-  } else {
-    html+='<div class="mbr-empty">आज कोई agenda नहीं — दिन नियंत्रण में ✅</div>';
-  }
-  // ── week: collapsible ──
-  if(weekArr.length){
-    html+='<div class="mbr-weekbar" onclick="_mbrBoxToggleNext(this)">🗓️ इस सप्ताह · '+weekArr.length+' काम<span class="car">▾</span></div>'+
-      '<div style="display:none;">'+listOf(weekArr)+'</div>';
-  }
-  html+='<div class="mbr-foot">↻ Home खोलने पर अपने-आप अद्यतन · Craft (📆 Subscribe) में भी live</div></div></div>';
+  html+='</div>';
+  html+='<div class="mbr-foot">↻ Craft (📆 Subscribe) में live · pill पर tap कर सूची देखें</div></div>';
   host.innerHTML=html;
 }
 function hctOpenReports(){
