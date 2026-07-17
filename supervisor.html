@@ -22923,6 +22923,25 @@ body.role-staff #mydaily-box{ display:none !important; }
   .usb-hero-io{ flex:1 1 auto; }
   .usb-hero-score{ gap:6px; } .usb-stat{ min-width:54px; padding:6px 10px; } .usb-stat-n{ font-size:16px; }
 }
+
+/* 🔕 जिन प्रकरणों में प्रगति नहीं (v232) */
+#nopragati-summary-wrap .nopr-tile{ cursor:pointer; }
+.nopr-t7 .hcc-num{ color:#a16207; } .nopr-t15 .hcc-num{ color:#c2410c; } .nopr-t30 .hcc-num{ color:#b91c1c; } .nopr-tnever .hcc-num{ color:#6d28d9; }
+.nopr-tile.is-active{ box-shadow:0 0 0 2px #dc2626 inset; }
+.nopr-iowrap{ padding:4px 2px 10px; }
+.nopr-iolbl{ font-size:10px; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:.04em; margin-bottom:7px; }
+.nopr-iochips{ display:flex; flex-wrap:wrap; gap:7px; }
+.nopr-iochip{ background:#f1f5f9; border:1px solid #e2e8f0; border-radius:999px; padding:4px 11px; font-size:11px; font-weight:700; color:#334155; cursor:pointer; }
+.nopr-iochip b{ color:#b91c1c; } .nopr-iochip.on{ background:#fee2e2; border-color:#fca5a5; color:#991b1b; }
+.nopr-rows{ display:flex; flex-direction:column; gap:7px; }
+.nopr-row{ display:flex; align-items:center; gap:10px; padding:10px 12px; background:#fff; border:1px solid #eef2f7; border-left:3px solid #dc2626; border-radius:9px; cursor:pointer; flex-wrap:wrap; }
+.nopr-row.d7{ border-left-color:#eab308; } .nopr-row.d15{ border-left-color:#ea580c; } .nopr-row.d30{ border-left-color:#dc2626; } .nopr-row.never{ border-left-color:#7c3aed; }
+.nopr-rmain{ min-width:0; flex:1; } .nopr-rc{ font-size:12.5px; font-weight:800; color:#12325c; } .nopr-rio{ font-size:10.5px; color:#64748b; margin-top:1px; }
+.nopr-rg{ margin-left:auto; background:#fee2e2; color:#b91c1c; border-radius:8px; padding:2px 9px; font-size:10.5px; font-weight:900; white-space:nowrap; }
+.nopr-row.never .nopr-rg{ background:#ede9fe; color:#6d28d9; }
+.nopr-rbrief{ flex-basis:100%; margin-top:8px; background:#f7fafd; border:1px solid #dbe7f5; border-radius:9px; padding:9px 11px; }
+.nopr-rbrief .mbr-cb-row{ font-size:12px; color:#1e293b; margin:2px 0; }
+.nopr-rbrief .mbr-oe{ margin-top:8px; display:inline-block; background:#2563eb; color:#fff; border:none; border-radius:8px; padding:6px 13px; font-size:12px; font-weight:800; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -23704,6 +23723,25 @@ body.role-staff #mydaily-box{ display:none !important; }
       <div id="home-compact-host"></div>
 
       <!-- DG EOW SECTION -->
+      <div class="ov-section collapsed" id="nopragati-summary-wrap">
+        <div class="ov-section-header" onclick="toggleNoPragatiSection(event)">
+          <div class="ov-section-titles">
+            <span class="sup-mini-cal" id="nopr-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
+            <div class="ov-section-title">🔕 जिन प्रकरणों में प्रगति नहीं</div>
+            <span class="dgeow-total-pill">Total: <strong id="nopr-cnt-total">0</strong></span>
+          </div>
+          <div class="hdr-counter-stack" id="nopr-counter-stack">
+            <div class="hdr-counter nopr-tile nopr-t7" onclick="event.stopPropagation();noprFilter('7',event)"><span class="hcc-icon">🟡</span><span class="hcc-label">7+ दिन</span><span class="hcc-num" id="nopr-cnt-7">0</span></div>
+            <div class="hdr-counter nopr-tile nopr-t15" onclick="event.stopPropagation();noprFilter('15',event)"><span class="hcc-icon">🟠</span><span class="hcc-label">15+ दिन</span><span class="hcc-num" id="nopr-cnt-15">0</span></div>
+            <div class="hdr-counter nopr-tile nopr-t30" onclick="event.stopPropagation();noprFilter('30',event)"><span class="hcc-icon">🔴</span><span class="hcc-label">30+ दिन</span><span class="hcc-num" id="nopr-cnt-30">0</span></div>
+            <div class="hdr-counter nopr-tile nopr-tnever" onclick="event.stopPropagation();noprFilter('never',event)"><span class="hcc-icon">⚫</span><span class="hcc-label">कभी नहीं</span><span class="hcc-num" id="nopr-cnt-never">0</span></div>
+          </div>
+          <div class="ov-section-toggle">▼</div>
+        </div>
+        <div class="ov-section-body">
+          <div id="nopragati-content"><div class="empty-state"><h3>✅ सभी सक्रिय प्रकरणों में हाल ही प्रगति दर्ज है</h3></div></div>
+        </div>
+      </div>
       <div class="ov-section collapsed" id="dgeow-summary-wrap">
         <div class="ov-section-header" onclick="toggleDgEowSection(event)">
           <div class="ov-section-titles">
@@ -51446,6 +51484,89 @@ function openYearHeadList(year, head) {
   document.getElementById('iof-modal-results').innerHTML = backBtnHTML + listHTML;
 }
 
+
+/* ══════════ 🔕 जिन प्रकरणों में प्रगति नहीं (progress-gap monitor) — v232 ══════════ */
+var _noprFilter=null;
+function _noprDaysBetween(d1,d2){ try{ var a=new Date(d1+'T00:00:00'), b=new Date(d2+'T00:00:00'); return Math.round((b-a)/86400000); }catch(e){ return null; } }
+function _noprLastMap(){
+  var m={};
+  (state.ioUpdates||[]).forEach(function(u){
+    if(!u.case_type||!u.case_id) return;
+    var k=u.case_type+'|'+u.case_id;
+    var d=String(u.update_date||u.created_at||'').slice(0,10);
+    if(d && (!m[k] || d>m[k])) m[k]=d;
+  });
+  return m;
+}
+function _noprCases(){
+  var m=_noprLastMap(); var today=todayISO(); var out=[];
+  Object.keys(ENQ_LABELS).forEach(function(t){
+    (state.enquiries[t]||[]).forEach(function(e){
+      if(isEntryDimmed(e)) return;                 // सिर्फ़ सक्रिय (लंबित)
+      var k=t+'|'+e.id; var last=m[k]||null;
+      var bucket, gap=null;
+      if(!last){ bucket='never'; }
+      else { gap=_noprDaysBetween(last,today); if(gap>=30)bucket='30'; else if(gap>=15)bucket='15'; else if(gap>=7)bucket='7'; else return; }
+      out.push({ type:t, id:e.id, label:buildCaseLabel(t,e), io:(e.io_name||'—'), last:last, gap:gap, bucket:bucket });
+    });
+  });
+  // sort: never first, then largest gap
+  out.sort(function(a,b){ if(a.bucket==='never'&&b.bucket!=='never')return -1; if(b.bucket==='never'&&a.bucket!=='never')return 1; return (b.gap||0)-(a.gap||0); });
+  return out;
+}
+function renderNoPragati(){
+  var all=_noprCases();
+  var c7=all.filter(function(x){return x.bucket==='7';}).length;
+  var c15=all.filter(function(x){return x.bucket==='15';}).length;
+  var c30=all.filter(function(x){return x.bucket==='30';}).length;
+  var cn=all.filter(function(x){return x.bucket==='never';}).length;
+  var set=function(id,v){ var el=document.getElementById(id); if(el)el.textContent=v; };
+  set('nopr-cnt-total',all.length); set('nopr-cnt-7',c7); set('nopr-cnt-15',c15); set('nopr-cnt-30',c30); set('nopr-cnt-never',cn);
+  try{ var mc=document.getElementById('nopr-mini-cal'); if(mc){ var d=new Date(); mc.querySelector('.smc-mo').textContent=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()]; mc.querySelector('.smc-dy').textContent=d.getDate(); } }catch(e){}
+  var host=document.getElementById('nopragati-content'); if(!host) return;
+  var list = _noprFilter ? all.filter(function(x){return x.bucket===_noprFilter;}) : all;
+  if(!all.length){ host.innerHTML='<div class="empty-state"><h3>✅ सभी सक्रिय प्रकरणों में हाल ही प्रगति दर्ज है</h3></div>'; return; }
+  // IO-wise summary
+  var ioMap={}; all.forEach(function(x){ ioMap[x.io]=(ioMap[x.io]||0)+1; });
+  var ioArr=Object.keys(ioMap).map(function(k){return {io:k,n:ioMap[k]};}).sort(function(a,b){return b.n-a.n;}).slice(0,8);
+  var ioHtml='<div class="nopr-iowrap"><div class="nopr-iolbl">IO-वार सर्वाधिक</div><div class="nopr-iochips">'+
+    ioArr.map(function(o){ return '<span class="nopr-iochip'+(_noprIoSel===o.io?' on':'')+'" onclick="event.stopPropagation();noprIoTap(\''+String(o.io).replace(/'/g,"\\'")+'\')">'+_mddEsc(o.io)+' <b>'+o.n+'</b></span>'; }).join('')+'</div></div>';
+  if(_noprIoSel) list=list.filter(function(x){return x.io===_noprIoSel;});
+  var rowsHtml = list.slice(0,200).map(function(x,idx){
+    var bcls = x.bucket==='never'?'never':(x.bucket==='30'?'d30':(x.bucket==='15'?'d15':'d7'));
+    var gtxt = x.bucket==='never' ? 'कभी नहीं' : (x.gap+' दिन');
+    return '<div class="nopr-row nopr-'+bcls+'" onclick="event.stopPropagation();_noprRowToggle('+idx+',\''+x.type+'\',\''+x.id+'\')">'+
+      '<div class="nopr-rmain"><div class="nopr-rc">📋 '+_mddEsc(x.label)+'</div><div class="nopr-rio">IO: '+_mddEsc(x.io)+(x.last?(' · अंतिम प्रगति: '+_mddEsc(x.last)):'')+'</div></div>'+
+      '<span class="nopr-rg">'+gtxt+'</span>'+
+      '<div class="nopr-rbrief" id="nopr-cb-'+idx+'" style="display:none;"></div>'+
+    '</div>';
+  }).join('');
+  host.innerHTML = ioHtml + '<div class="nopr-rows">'+rowsHtml+'</div>';
+}
+var _noprIoSel=null;
+function noprIoTap(io){ _noprIoSel=(_noprIoSel===io)?null:io; renderNoPragati(); }
+function _noprRowToggle(idx,type,id){
+  var b=document.getElementById('nopr-cb-'+idx); if(!b) return;
+  var open=(b.style.display==='none'||!b.style.display);
+  if(open && !b.getAttribute('data-filled')){ b.innerHTML=_briefEnqCard(type,id); b.setAttribute('data-filled','1'); }
+  b.style.display=open?'block':'none';
+}
+function noprFilter(bucket,evt){
+  if(evt){ try{ evt.stopPropagation(); }catch(e){} }
+  window._matrixClickActive=true; setTimeout(function(){window._matrixClickActive=false;},50);
+  _noprFilter=(_noprFilter===bucket)?null:bucket;
+  var wrap=document.getElementById('nopragati-summary-wrap'); if(wrap) wrap.classList.remove('collapsed');
+  document.querySelectorAll('.nopr-tile').forEach(function(t){t.classList.remove('is-active');});
+  if(_noprFilter){ var map={'7':'nopr-t7','15':'nopr-t15','30':'nopr-t30','never':'nopr-tnever'}; var el=document.querySelector('.'+map[_noprFilter]); if(el)el.classList.add('is-active'); }
+  renderNoPragati();
+}
+function toggleNoPragatiSection(evt){
+  if(window._matrixClickActive) return;
+  var wrap=document.getElementById('nopragati-summary-wrap'); if(!wrap) return;
+  wrap.classList.toggle('collapsed');
+  if(!wrap.classList.contains('collapsed')) renderNoPragati();
+}
+
 function renderOverview() {
   Object.keys(ENQ_LABELS).forEach(function(t){
     var arr = state.enquiries[t] || [];
@@ -51479,6 +51600,7 @@ function renderOverview() {
   if (cntIoNav) cntIoNav.textContent = ioCount;
   try{ _nsRefreshCounts(); }catch(e){}
   try{ if(typeof mddRenderAttStrip==='function') mddRenderAttStrip(); if(typeof mddAttStartLive==='function') mddAttStartLive(); }catch(e){}
+  try{ if(typeof renderNoPragati==='function') renderNoPragati(); }catch(e){}
   var ovIOTotal = document.getElementById('ov-iomaster-total');
   if (ovIOTotal) ovIOTotal.textContent = state.ioMaster.length + ' total establishment';
   var today = todayISO();
