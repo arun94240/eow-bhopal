@@ -22885,6 +22885,9 @@ body.role-staff #mydaily-box{ display:none !important; }
 .mpf-casebrief{ margin-top:7px; background:#f7fafd; border:1px solid #dbe7f5; border-radius:9px; padding:9px 11px; }
 .mpf-casebrief .mbr-cb-row{ font-size:12px; color:#1e293b; margin:2px 0; }
 .mpf-casebrief .mbr-oe{ margin-top:8px; display:inline-block; background:#2563eb; color:#fff; border:none; border-radius:8px; padding:6px 13px; font-size:12px; font-weight:800; cursor:pointer; }
+
+/* ═══ uniform 📊 database classifier on every top section-tab (v228) ═══ */
+.section-tab:not(.mobile-more-tab)::before{ content:"📊"; margin-right:5px; opacity:.9; font-size:0.95em; vertical-align:baseline; }
 </style>
 </head>
 <body>
@@ -23121,7 +23124,7 @@ body.role-staff #mydaily-box{ display:none !important; }
 
   <div class="section-tabs">
     <button class="section-tab active" data-section="overview">Home</button>
-    <button class="section-tab" data-section="totalcases">📊 Total Cases <span class="count" id="cnt-totalcases">0</span></button>
+    <button class="section-tab" data-section="totalcases">Total Cases <span class="count" id="cnt-totalcases">0</span></button>
     <button class="section-tab" data-section="complaints">Complaints <span class="count" id="cnt-complaints">0</span></button>
     <button class="section-tab" data-section="rcomplaints">R-Complaints <span class="count" id="cnt-rcomplaints">0</span></button>
     <button class="section-tab" data-section="rcs">RCs <span class="count" id="cnt-rcs">0</span></button>
