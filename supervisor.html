@@ -22741,6 +22741,25 @@ body.role-staff #mydaily-box{ display:none !important; }
 #mydaily-box .mtx-name-row .mydd-dg-subcaret,#mydaily-box #mtx-io-rows .mydd-dg-subrow .mydd-dg-subcaret{ color:#7f97b6 !important; margin-left:6px; }
 #mydaily-box #mtx-name-rows{ display:flex; flex-direction:column; }
 #mydaily-box #mtx-io-rows{ display:flex; flex-direction:column; }
+
+/* ═══ Agenda toolbar moved into title line (B) — v216 ═══ */
+#mydaily-box .n-hd-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+#mydaily-box .n-hd-row .n-t{ flex:0 0 auto; }
+#mydaily-box .agenda-tools-slot{ margin-left:auto; display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+/* the relocated toolbar row — strip its box look, make it inline compact */
+#mydaily-box .agenda-tools-slot .mydd-dg-toprow{ display:flex !important; align-items:center; gap:6px !important; padding:0 !important; margin:0 !important; background:transparent !important; border:none !important; box-shadow:none !important; flex-wrap:wrap; justify-content:flex-end; }
+#mydaily-box .agenda-tools-slot .mtx-search-inline{ flex:0 1 150px !important; min-width:110px !important; margin:0 !important; }
+#mydaily-box .agenda-tools-slot .mtx-add-btn{ margin-left:0 !important; padding:6px 11px !important; }
+#mydaily-box .agenda-tools-slot .mtx-tool-btn{ width:34px; height:34px; }
+/* craft sync becomes a compact chip in the header */
+#mydaily-box .agenda-tools-slot #mydd-craft-sync{ margin:0 !important; }
+#mydaily-box .agenda-tools-slot #mydd-craft-sync .mydd-craftsync,
+#mydaily-box .agenda-tools-slot #mydd-craft-sync > div{ transform:scale(.9); transform-origin:right center; }
+/* hide the now-empty toprow label area if any */
+#mydaily-box .agenda-tools-slot .mydd-tcal,#mydaily-box .agenda-tools-slot .mydd-tnum{ display:none !important; }
+@media (max-width:640px){
+  #mydaily-box .agenda-tools-slot{ width:100%; margin-left:0; justify-content:flex-start; margin-top:8px; }
+}
 </style>
 </head>
 <body>
@@ -33519,7 +33538,8 @@ function mddRenderBrief(){
     var on=(_briefPill===k);
     return '<span class="n-pill '+cls+(on?' on':'')+'" onclick="event.stopPropagation();_briefPillTap(\''+k+'\')"><b>'+cnt+'</b> '+lbl+' <i>'+(on?'▴':'▾')+'</i></span>';
   }
-  var html='<div class="mbr-brief"><div class="n-top">'+cal+'<div class="n-hd"><div class="n-t">🗓️ Agenda</div>'+
+  var html='<div class="mbr-brief"><div class="n-top">'+cal+'<div class="n-hd">'+
+    '<div class="n-hd-row"><div class="n-t">🗓️ Agenda</div><div class="agenda-tools-slot" id="agenda-tools-slot"></div></div>'+
     '<div class="n-pills">'+pill('today','a','आज',todayItems.length)+pill('over','o','Overdue',overdue.length)+pill('week','w','सप्ताह',weekArr.length)+'</div>'+
   '</div></div>';
   // ── single list under whichever pill is active (default: all collapsed) ──
@@ -33534,6 +33554,15 @@ function mddRenderBrief(){
   html+='</div>';
   html+='<div class="mbr-foot">↻ Craft (📆 Subscribe) में live · pill पर tap कर सूची देखें</div></div>';
   host.innerHTML=html;
+  try{
+    var _slot=document.getElementById('agenda-tools-slot');
+    if(_slot){
+      var _cs=document.getElementById('mydd-craft-sync');
+      var _tb=document.querySelector('#mydaily-box .mydd-dg-toprow');
+      if(_tb) _slot.appendChild(_tb);
+      if(_cs) _slot.appendChild(_cs);
+    }
+  }catch(e){}
 }
 function hctOpenReports(){
   try {
