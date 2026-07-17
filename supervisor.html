@@ -22963,7 +22963,13 @@ body.role-staff #mydaily-box{ display:none !important; }
 .late-logchip{ background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:7px; padding:2px 8px; font-size:10.5px; font-weight:700; }
 
 /* 🔕 प्रगति नहीं — कार्यालय Overview panel (v234) */
-.ovstats-tile-nopr .cmd-metric-num{ color:#b91c1c; }
+.ovstats-tile-nopr {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);  /* AMBER — प्रगति नहीं */
+  color: white;
+  border: 1.5px solid rgba(255,255,255,0.25);
+}
+.ovstats-tile-nopr .cmd-metric-num{ color:#fff8ec; }
+.ovstats-tile-nopr .cmd-metric-label{ color:#fff; }
 .nopr-filters{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:4px 2px 12px; }
 .nopr-io-sel{ flex:1; min-width:150px; padding:8px 11px; border:1.5px solid #cfdcec; border-radius:9px; font-family:inherit; font-size:12.5px; font-weight:700; color:#12325c; background:#fff; cursor:pointer; }
 .nopr-daterange{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
@@ -22981,6 +22987,24 @@ body.role-staff #mydaily-box{ display:none !important; }
 .nopr-seccar{ font-size:11px; color:#94a3b8; font-weight:900; }
 .nopr-sec .nopr-rows{ border:1px solid #eef2f7; border-top:none; border-radius:0 0 10px 10px; padding:9px; display:flex; flex-direction:column; gap:7px; background:#fafbfc; }
 .nopr-secempty{ text-align:center; color:#94a3b8; font-size:12px; padding:8px; }
+
+/* 🔕 प्रगति नहीं — side-by-side colourful bucket tiles (v235) */
+.nopr-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin:2px 0 4px; }
+.nopr-gtile{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:12px 8px; border-radius:12px; cursor:pointer; color:#fff; border:1.5px solid rgba(255,255,255,.25); box-shadow:0 3px 9px rgba(6,42,82,.13); transition:transform .12s, filter .12s; position:relative; }
+.nopr-gtile:hover{ transform:translateY(-2px); filter:brightness(1.05); }
+.nopr-gtile.sel{ box-shadow:0 0 0 3px #0a2342 inset, 0 4px 12px rgba(6,42,82,.2); }
+.nopr-g-d7{ background:linear-gradient(135deg,#facc15,#eab308); color:#713f12; }
+.nopr-g-d15{ background:linear-gradient(135deg,#fb923c,#ea580c); }
+.nopr-g-d30{ background:linear-gradient(135deg,#f87171,#dc2626); }
+.nopr-g-never{ background:linear-gradient(135deg,#a78bfa,#7c3aed); }
+.nopr-gic{ font-size:16px; line-height:1; }
+.nopr-gcnt{ font-size:22px; font-weight:900; line-height:1; }
+.nopr-glbl{ font-size:10.5px; font-weight:800; opacity:.95; }
+.nopr-gcar{ position:absolute; top:5px; right:7px; font-size:9px; opacity:.8; }
+.nopr-rows-d7{ border-top:2px solid #eab308; } .nopr-rows-d15{ border-top:2px solid #ea580c; }
+.nopr-rows-d30{ border-top:2px solid #dc2626; } .nopr-rows-never{ border-top:2px solid #7c3aed; }
+.nopr-rows{ margin-top:10px; padding-top:10px; display:flex; flex-direction:column; gap:7px; }
+@media (max-width:560px){ .nopr-grid{ grid-template-columns:repeat(2,1fr); } }
 </style>
 </head>
 <body>
@@ -51675,32 +51699,38 @@ function ovstatsRenderNoPragati(){
     '</div>'+
   '</div>';
   if(!list.length){ host.innerHTML=filt+'<div class="empty-state" style="padding:16px;"><h3>✅ इस filter में कोई प्रकरण नहीं</h3></div>'; return; }
-  // 4 collapsible bucket sections (inline, default collapsed)
-  var secs=['7','15','30','never'].map(function(bk){
-    var arr=buckets[bk]||[]; var m=meta[bk]; var open=!!_noprBucketOpen[bk];
-    var rows = open ? arr.map(function(x){
-      var rk=bk+'|'+x.id; var ro=!!_noprRowOpen[rk];
-      var gtxt = bk==='never'?'कभी नहीं':(x.gap+' दिन');
+  // 4 colourful bucket tiles — side-by-side grid (default none selected)
+  var grid='<div class="nopr-grid">'+['7','15','30','never'].map(function(bk){
+    var arr=buckets[bk]||[]; var m=meta[bk]; var sel=(_noprBucketSel===bk);
+    return '<div class="nopr-gtile nopr-g-'+m.cls+(sel?' sel':'')+'" onclick="event.stopPropagation();noprBucketSelect(\''+bk+'\')">'+
+      '<span class="nopr-gic">'+m.ic+'</span>'+
+      '<span class="nopr-gcnt">'+arr.length+'</span>'+
+      '<span class="nopr-glbl">'+m.lbl+'</span>'+
+      '<span class="nopr-gcar">'+(sel?'▴':'▾')+'</span>'+
+    '</div>';
+  }).join('')+'</div>';
+  // rows for the selected bucket — appear BELOW the grid (no jump), default collapsed
+  var rowsHtml='';
+  if(_noprBucketSel){
+    var sm=meta[_noprBucketSel]; var sarr=buckets[_noprBucketSel]||[];
+    var rws = sarr.map(function(x){
+      var rk=_noprBucketSel+'|'+x.id; var ro=!!_noprRowOpen[rk];
+      var gtxt = _noprBucketSel==='never'?'कभी नहीं':(x.gap+' दिन');
       var brief = ro ? ('<div class="nopr-rbrief">'+_briefEnqCard(x.type,x.id)+'</div>') : '';
-      return '<div class="nopr-row nopr-'+m.cls+(ro?' open':'')+'" onclick="event.stopPropagation();noprRowToggle(\''+rk+'\',\''+x.type+'\',\''+x.id+'\')">'+
+      return '<div class="nopr-row nopr-'+sm.cls+(ro?' open':'')+'" onclick="event.stopPropagation();noprRowToggle(\''+rk+'\',\''+x.type+'\',\''+x.id+'\')">'+
         '<div class="nopr-rmain"><div class="nopr-rc">📋 '+_mddEsc(x.label)+'</div><div class="nopr-rio">IO: '+_mddEsc(x.io)+(x.last?(' · अंतिम प्रगति: '+_mddEsc(x.last)):'')+'</div></div>'+
         '<span class="nopr-rg">'+gtxt+'</span>'+brief+
       '</div>';
-    }).join('') : '';
-    return '<div class="nopr-sec">'+
-      '<div class="nopr-sechd nopr-'+m.cls+(open?' open':'')+'" onclick="event.stopPropagation();noprBucketToggle(\''+bk+'\')">'+
-        '<span class="nopr-secic">'+m.ic+'</span><span class="nopr-seclbl">'+m.lbl+'</span>'+
-        '<span class="nopr-seccnt">'+arr.length+'</span><span class="nopr-seccar">'+(open?'▴':'▾')+'</span>'+
-      '</div>'+
-      (open?('<div class="nopr-rows">'+(arr.length?rows:'<div class="nopr-secempty">— कोई नहीं —</div>')+'</div>'):'')+
-    '</div>';
-  }).join('');
-  host.innerHTML=filt+secs;
+    }).join('');
+    rowsHtml='<div class="nopr-rows nopr-rows-'+sm.cls+'">'+(sarr.length?rws:'<div class="nopr-secempty">— इस श्रेणी में कोई प्रकरण नहीं —</div>')+'</div>';
+  }
+  host.innerHTML=filt+grid+rowsHtml;
 }
 function noprSetIo(v){ _noprIoSel=v||null; _noprRowOpen={}; ovstatsRenderNoPragati(); }
 function noprSetDate(which,v){ if(which==='from')_noprFrom=v||''; else _noprTo=v||''; _noprRowOpen={}; ovstatsRenderNoPragati(); }
 function noprClearFilters(){ _noprIoSel=null; _noprFrom=''; _noprTo=''; _noprRowOpen={}; ovstatsRenderNoPragati(); }
-function noprBucketToggle(bk){ _noprBucketOpen[bk]=!_noprBucketOpen[bk]; ovstatsRenderNoPragati(); }
+var _noprBucketSel=null;
+function noprBucketSelect(bk){ _noprBucketSel=(_noprBucketSel===bk)?null:bk; _noprRowOpen={}; ovstatsRenderNoPragati(); }
 function noprRowToggle(rk,type,id){ _noprRowOpen[rk]=!_noprRowOpen[rk]; ovstatsRenderNoPragati(); }
 
 function renderOverview() {
