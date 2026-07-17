@@ -33323,6 +33323,7 @@ function _mddNoticeFiltered(which){
 }
 function mddRenderNoticeStrip(){
   var host = document.getElementById('mydd-notice-strip'); if (!host) return;
+  host.innerHTML=''; host.style.display='none'; return; // legacy green Summons/Warrants strip removed — Notices search replaces it
   var issued=_mddNoticeFiltered('issued'), served=_mddNoticeFiltered('served'), pending=_mddNoticeFiltered('taameeli'), adam=_mddNoticeFiltered('adam');
   var i=issued.length, s=served.length, pn=pending.length, ad=adam.length, t=i||1;
   function pct(n){ return t?(n/t*100):0; }
@@ -63328,6 +63329,13 @@ window.openAgendaSubscribeModal = function(){
         '<div style="background:#fff8ec;border:1px solid #f5d08a;border-radius:10px;padding:14px;margin-bottom:14px;">'+
           '<div style="font-size:12px;font-weight:800;color:#7a5b12;margin-bottom:8px;letter-spacing:0.4px;">\ud83d\udcf1 iOS / macOS (1-tap subscribe):</div>'+
           '<a href="'+webcalUrl+'" style="display:inline-block;background:linear-gradient(135deg,#f5b942 0%,#e8a82e 100%);color:#062a52;padding:10px 16px;border-radius:8px;font-weight:800;text-decoration:none;font-size:14px;">\ud83d\udcc5 Apple Calendar \u092e\u0947\u0902 \u091c\u094b\u0921\u093c\u0947\u0902</a>'+
+        '</div>'+
+        '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:14px;margin-bottom:14px;">'+
+          '<div style="font-size:12px;font-weight:800;color:#3730a3;margin-bottom:8px;letter-spacing:0.4px;">\ud83c\udf4e Apple Reminders (\u0905\u0924\u093f\u0930\u093f\u0915\u094d\u0924 \u0935\u093f\u0915\u0932\u094d\u092a):</div>'+
+          '<p style="font-size:12px;color:#4338ca;margin:0 0 8px 0;line-height:1.5;">agenda \u0915\u0947 items \u0938\u0940\u0927\u0947 <b>Apple Reminders</b> \u092e\u0947\u0902 \u0932\u093e\u0928\u0947 \u0939\u0947\u0924\u0941 \u090f\u0915 <b>Apple Shortcut</b> \u092c\u0928\u093e\u090f\u0902 \u2014 "Get Contents of URL" (\u0928\u0940\u091a\u0947 \u0935\u093e\u0932\u093e feed) \u2192 "Add New Reminder" \u092a\u0930 loop\u0964 Automation \u092e\u0947\u0902 \u0930\u094b\u091c\u093c \u0938\u0941\u092c\u0939 8 \u092c\u091c\u0947 \u091a\u0932\u093e\u090f\u0902\u0964</p>'+
+          '<input type="text" readonly value="'+feedUrl+'?fmt=json" onclick="this.select();" style="width:100%;padding:8px 10px;border:1px solid #c7d2fe;border-radius:6px;font-family:monospace;font-size:11px;background:white;">'+
+          '<button onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+feedUrl+'?fmt=json\').then(function(){toast(\'Reminders feed link copied \u2713\');});" style="margin-top:8px;background:#4f46e5;border:none;color:white;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:12px;">\ud83c\udf4e Copy Reminders Feed</button>'+
+          '<p style="font-size:10.5px;color:#818cf8;margin:8px 0 0;font-style:italic;">\u0928\u094b\u091f: Apple Reminders webcal \u0938\u0940\u0927\u0947 subscribe \u0928\u0939\u0940\u0902 \u0915\u0930\u0924\u093e \u2014 \u0907\u0938\u0932\u093f\u090f Shortcut \u0938\u092c\u0938\u0947 \u092d\u0930\u094b\u0938\u0947\u092e\u0902\u0926 \u0930\u093e\u0938\u094d\u0924\u093e \u0939\u0948\u0964</p>'+
         '</div>'+
         '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;">'+
           '<div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:6px;letter-spacing:0.4px;">\ud83e\udd16 Google Calendar / Other:</div>'+
