@@ -35685,7 +35685,7 @@ function _ovccNoticeBar(){
     ((_ovccNoticeFilt.io||_ovccNoticeFilt.from||_ovccNoticeFilt.to)?'<button class="ovcc-nclr" onclick="_ovccNoticeFilt={io:\'\',from:\'\',to:\'\'};ovccRenderList(\'notice\')">✕</button>':'')+
   '</div>';
 }
-var _ovccNotActiveSection = 'taameeli';
+var _ovccNotActiveSection = null;  // collapsed by default — कोई section auto-open नहीं
 function _ovccNotInit(){
   var el = document.getElementById('ovcc-list'); if (!el) return;
   var tot = document.getElementById('ovcc-total');
@@ -35699,12 +35699,14 @@ function _ovccNotInit(){
       '<button class="pn-nt-add" onclick="event.stopPropagation();(typeof openNoticeModal===\'function\')&&openNoticeModal();">＋ नया Notice</button>' +
     '</div>' +
     '<div id="ovcc-not-content"></div>';
-  _ovccNotRender(_ovccNotActiveSection);
+  if(_ovccNotActiveSection) _ovccNotRender(_ovccNotActiveSection);
+  else { var hh=document.getElementById('ovcc-not-content'); if(hh) hh.innerHTML='<div class="mydd-empty" style="color:#64748b;padding:14px;">ऊपर किसी section (जारी / तामीली हेतु / तामील / अदम-तामील) पर tap करें</div>'; }
 }
 function _ovccNotSetSection(section){
-  _ovccNotActiveSection = section;
-  document.querySelectorAll('#ovcc-list .pn-nt').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-s')===section); });
-  _ovccNotRender(section);
+  _ovccNotActiveSection = (_ovccNotActiveSection===section) ? null : section;  // दुबारा tap → collapse
+  document.querySelectorAll('#ovcc-list .pn-nt').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-s')===_ovccNotActiveSection); });
+  if(_ovccNotActiveSection) _ovccNotRender(_ovccNotActiveSection);
+  else { var hh=document.getElementById('ovcc-not-content'); if(hh) hh.innerHTML='<div class="mydd-empty" style="color:#64748b;padding:14px;">ऊपर किसी section पर tap करें</div>'; }
 }
 function _ovccNotRender(section){
   var host=document.getElementById('ovcc-not-content'); if(!host) return;
