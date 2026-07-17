@@ -22783,6 +22783,32 @@ body.role-staff #mydaily-box{ display:none !important; }
   #mydaily-box .agenda-tools-wrap{ width:100%; margin-left:0; justify-content:flex-start; margin-top:6px; }
   #mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 auto !important; }
 }
+
+/* ═══ Agenda header — clean symmetric single line (v218) ═══ */
+#mydaily-box .agenda-hdr{ display:flex; align-items:center; gap:12px; flex-wrap:nowrap; padding:2px 0 12px; }
+#mydaily-box .agenda-title{ font-size:16px; font-weight:900; color:#fff; white-space:nowrap; }
+#mydaily-box .agenda-tools-wrap{ margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:nowrap; justify-content:flex-end; }
+#mydaily-box .agenda-tools-wrap .mydd-dg-toprow{ display:flex !important; align-items:center; gap:8px !important; padding:0 !important; margin:0 !important; background:transparent !important; border:none !important; box-shadow:none !important; flex-wrap:nowrap !important; }
+/* uniform control height = 38px */
+#mydaily-box .agenda-tools-wrap .mtx-search-inline{ height:38px; flex:0 1 210px !important; min-width:150px !important; margin:0 !important; padding:0 12px !important; border-radius:10px !important; display:flex; align-items:center; }
+#mydaily-box .agenda-tools-wrap .mtx-search-inline .mtx-search-inp{ font-size:12.5px !important; }
+#mydaily-box .agenda-tools-wrap .mtx-add-btn{ height:38px; margin:0 !important; padding:0 15px !important; border-radius:10px !important; font-size:13px !important; display:flex; align-items:center; }
+#mydaily-box .agenda-tools-wrap .mtx-tool-btn{ width:38px !important; height:38px !important; border-radius:10px !important; font-size:15px; display:flex; align-items:center; justify-content:center; }
+/* compact craft-sync chip — same height, subtle green */
+#mydaily-box .agenda-tools-wrap #mydd-craft-sync{ margin:0 !important; }
+#mydaily-box .agenda-csync-chip{ height:38px; display:inline-flex !important; align-items:center; gap:5px; background:rgba(34,197,94,.14) !important; border:1px solid rgba(34,197,94,.4) !important; border-radius:10px !important; padding:0 11px !important; box-shadow:none !important; transform:none !important; cursor:pointer; }
+#mydaily-box .agenda-csync-chip .csb-ico{ font-size:14px; }
+#mydaily-box .agenda-csync-chip .csb-ok{ color:#4ade80 !important; font-weight:900; font-size:13px; }
+#mydaily-box .agenda-csync-chip .csb-badge{ background:#f59e0b !important; color:#3d2705 !important; border-radius:999px; padding:1px 7px; font-size:10px; font-weight:900; }
+#mydaily-box .agenda-csync-chip.has-new{ background:rgba(245,158,11,.16) !important; border-color:rgba(245,158,11,.5) !important; }
+/* remove the old scale transform + white-pill look */
+#mydaily-box .agenda-tools-wrap #mydd-craft-sync .mydd-craftsync,#mydaily-box .agenda-tools-wrap #mydd-craft-sync > div{ transform:none !important; }
+/* mobile: allow graceful wrap */
+@media (max-width:720px){
+  #mydaily-box .agenda-hdr{ flex-wrap:wrap; }
+  #mydaily-box .agenda-tools-wrap{ width:100%; margin-left:0; margin-top:8px; flex-wrap:wrap; justify-content:flex-start; }
+  #mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 auto !important; }
+}
 </style>
 </head>
 <body>
@@ -63420,9 +63446,9 @@ function _craftBody(e){
 function renderCraftSyncBtn(){
   var host=document.getElementById('mydd-craft-sync'); if(!host) return;
   var n=0; try{ n=_craftPending().length; }catch(e){}
-  host.innerHTML='<button class="mydd-craftsync-btn'+(n?' has-new':'')+'" onclick="event.stopPropagation();craftSyncTap()" title="अब तक के नए प्रकरण Craft में भेजें">'+
-    '<span class="csb-ico">🔄</span><span class="csb-lbl">Craft Sync</span>'+
-    (n?('<span class="csb-badge">'+n+' नया</span>'):'<span class="csb-ok">✓ synced</span>')+
+  host.innerHTML='<button class="mydd-craftsync-btn agenda-csync-chip'+(n?' has-new':'')+'" onclick="event.stopPropagation();craftSyncTap()" title="'+(n?(n+' नए प्रकरण Craft में भेजें'):'Craft में synced')+'">'+
+    '<span class="csb-ico">🔄</span>'+
+    (n?('<span class="csb-badge">'+n+'</span>'):'<span class="csb-ok">✓</span>')+
   '</button>';
 }
 function craftSyncTap(){
