@@ -22722,6 +22722,25 @@ body.role-staff #mydaily-box{ display:none !important; }
 #mydaily-box .mtx-chip{ padding:8px 10px !important; }
 #mydaily-box .mtx-chip-ic{ width:27px !important; height:27px !important; font-size:13px !important; }
 #mydaily-box .mtx-chip-lbl{ font-size:11px !important; } #mydaily-box .mtx-chip-n{ font-size:14px !important; }
+
+/* ═══ References (@name / IO) as long teal tiles below groups (v215) ═══ */
+#mydaily-box .mtx-subttl{ font-size:9px !important; font-weight:900 !important; color:#7f97b6 !important; letter-spacing:.4px; text-transform:uppercase; padding:8px 2px 4px !important; margin:0 !important; background:transparent !important; border:none !important; }
+#mydaily-box #mtx-name-title::before{ content:"📎 "; }
+#mydaily-box #mtx-io-title{ }
+#mydaily-box .mtx-name-row,#mydaily-box #mtx-io-rows .mydd-dg-subrow{
+  display:flex !important; align-items:center !important; gap:9px !important;
+  background:rgba(94,234,212,.08) !important; border:1px solid rgba(94,234,212,.22) !important;
+  border-left:3px solid #5eead4 !important; border-radius:10px !important;
+  padding:10px 12px !important; margin:0 0 7px !important; cursor:pointer !important;
+}
+#mydaily-box #mtx-io-rows .mydd-dg-subrow{ background:rgba(147,197,253,.08) !important; border-color:rgba(147,197,253,.22) !important; border-left-color:#93c5fd !important; }
+#mydaily-box .mtx-name-row .mtx-ico-name,#mydaily-box #mtx-io-rows .mydd-dg-subrow .mtx-ico{ font-size:14px !important; }
+#mydaily-box .mtx-name-row .mydd-dg-sublabel,#mydaily-box #mtx-io-rows .mydd-dg-subrow .mydd-dg-sublabel{ font-size:12px !important; font-weight:700 !important; color:#eaf1fb !important; flex:1; }
+#mydaily-box .mtx-name-row .mydd-dg-subnum,#mydaily-box #mtx-io-rows .mydd-dg-subrow .mydd-dg-subnum{ margin-left:auto !important; background:rgba(94,234,212,.2) !important; color:#5eead4 !important; border-radius:999px !important; padding:1px 9px !important; font-size:10px !important; font-weight:900 !important; }
+#mydaily-box #mtx-io-rows .mydd-dg-subrow .mydd-dg-subnum{ background:rgba(147,197,253,.2) !important; color:#93c5fd !important; }
+#mydaily-box .mtx-name-row .mydd-dg-subcaret,#mydaily-box #mtx-io-rows .mydd-dg-subrow .mydd-dg-subcaret{ color:#7f97b6 !important; margin-left:6px; }
+#mydaily-box #mtx-name-rows{ display:flex; flex-direction:column; }
+#mydaily-box #mtx-io-rows{ display:flex; flex-direction:column; }
 </style>
 </head>
 <body>
