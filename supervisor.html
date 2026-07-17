@@ -23005,6 +23005,12 @@ body.role-staff #mydaily-box{ display:none !important; }
 .nopr-rows-d30{ border-top:2px solid #dc2626; } .nopr-rows-never{ border-top:2px solid #7c3aed; }
 .nopr-rows{ margin-top:10px; padding-top:10px; display:flex; flex-direction:column; gap:7px; }
 @media (max-width:560px){ .nopr-grid{ grid-template-columns:repeat(2,1fr); } }
+
+/* प्रगति नहीं — reuse pragati tile look; selected ring (v239) */
+#nopr-panel-content .mpf-per.nopr-sel{ box-shadow:0 0 0 3px #0a2342 inset; }
+#nopr-panel-content .mpf-periods{ margin-top:10px; }
+#nopr-panel-content .nopr-rows{ margin-top:10px; padding-top:0; display:flex; flex-direction:column; gap:7px; }
+#nopr-panel-content .nopr-row{ display:flex; align-items:center; gap:10px; padding:10px 12px; background:#fff; border:1px solid #eef2f7; border-left:3px solid #94a3b8; border-radius:9px; cursor:pointer; flex-wrap:wrap; }
 </style>
 </head>
 <body>
@@ -51768,43 +51774,39 @@ function ovstatsRenderNoPragati(){
   try{ var el=document.getElementById('ovstats-cnt-nopr'); if(el) el.textContent=_noprTileCount(); }catch(e){}
   var buckets={ '7':[], '15':[], '30':[], 'never':[] };
   list.forEach(function(x){ (buckets[x.bucket]=buckets[x.bucket]||[]).push(x); });
-  var meta={ '7':{ic:'🟡',lbl:'7+ दिन',cls:'d7'}, '15':{ic:'🟠',lbl:'15+ दिन',cls:'d15'}, '30':{ic:'🔴',lbl:'30+ दिन',cls:'d30'}, 'never':{ic:'⚫',lbl:'कभी नहीं',cls:'never'} };
-  // filters row
-  var filt='<div class="nopr-filters">'+
-    '<select class="nopr-io-sel" onchange="event.stopPropagation();noprSetIo(this.value)">'+_noprIoOptions()+'</select>'+
-    '<div class="nopr-daterange"><label>अंतिम प्रगति:</label>'+
-      '<input type="date" class="nopr-date" value="'+_mddEsc(_noprFrom)+'" onchange="event.stopPropagation();noprSetDate(\'from\',this.value)">'+
-      '<span>→</span>'+
-      '<input type="date" class="nopr-date" value="'+_mddEsc(_noprTo)+'" onchange="event.stopPropagation();noprSetDate(\'to\',this.value)">'+
-      ((_noprIoSel||_noprFrom||_noprTo)?'<button class="nopr-clear" onclick="event.stopPropagation();noprClearFilters()">✕ clear</button>':'')+
-    '</div>'+
+  // same colour theory as प्रगति प्रतिवेदन: green / blue / orange / purple
+  var meta={ '7':{lbl:'7+ दिन',cls:'today',col:'#16a34a'}, '15':{lbl:'15+ दिन',cls:'y',col:'#2563eb'}, '30':{lbl:'30+ दिन',cls:'7',col:'#d97706'}, 'never':{lbl:'कभी नहीं',cls:'30',col:'#7c3aed'} };
+  var hasFilt=(_noprIoSel||_noprFrom||_noprTo);
+  // search row — identical to pragati (.mln-filt)
+  var filt='<div class="mln-filt" onclick="event.stopPropagation();">'+
+    '<span class="mln-fl">🔎</span>'+
+    '<select class="mln-inp" onchange="event.stopPropagation();noprSetIo(this.value)">'+_noprIoOptions()+'</select>'+
+    '<input type="date" class="mln-inp" value="'+_mddEsc(_noprFrom)+'" onchange="event.stopPropagation();noprSetDate(\'from\',this.value)">'+
+    '<span class="mln-dash">—</span>'+
+    '<input type="date" class="mln-inp" value="'+_mddEsc(_noprTo)+'" onchange="event.stopPropagation();noprSetDate(\'to\',this.value)">'+
+    (hasFilt?'<button class="mln-clr" onclick="event.stopPropagation();noprClearFilters();">✕</button>':'')+
   '</div>';
-  if(!list.length){ host.innerHTML=filt+'<div class="empty-state" style="padding:16px;"><h3>✅ इस filter में कोई प्रकरण नहीं</h3></div>'; return; }
-  // 4 colourful bucket tiles — side-by-side grid (default none selected)
-  var grid='<div class="nopr-grid">'+['7','15','30','never'].map(function(bk){
+  // 4 tiles — identical to pragati (.mpf-periods / .mpf-per), clean & compact, no circles
+  var grid='<div class="mpf-periods">'+['7','15','30','never'].map(function(bk){
     var arr=buckets[bk]||[]; var m=meta[bk]; var sel=(_noprBucketSel===bk);
-    return '<div class="nopr-gtile nopr-g-'+m.cls+(sel?' sel':'')+'" onclick="event.stopPropagation();noprBucketSelect(\''+bk+'\')">'+
-      '<span class="nopr-gic">'+m.ic+'</span>'+
-      '<span class="nopr-gcnt">'+arr.length+'</span>'+
-      '<span class="nopr-glbl">'+m.lbl+'</span>'+
-      '<span class="nopr-gcar">'+(sel?'▴':'▾')+'</span>'+
-    '</div>';
+    return '<div class="mpf-per mpf-per-'+m.cls+(sel?' nopr-sel':'')+'" onclick="event.stopPropagation();noprBucketSelect(\''+bk+'\')"><div class="n">'+arr.length+'</div><div class="l">'+m.lbl+' '+(sel?'▴':'▾')+'</div></div>';
   }).join('')+'</div>';
-  // rows for the selected bucket — appear BELOW the grid (no jump), default collapsed
+  // rows for selected bucket — below, clean cards
   var rowsHtml='';
   if(_noprBucketSel){
     var sm=meta[_noprBucketSel]; var sarr=buckets[_noprBucketSel]||[];
-    var rws = sarr.map(function(x){
+    var rws=sarr.map(function(x){
       var rk=_noprBucketSel+'|'+x.id; var ro=!!_noprRowOpen[rk];
-      var gtxt = _noprBucketSel==='never'?'कभी नहीं':(x.gap+' दिन');
-      var brief = ro ? ('<div class="nopr-rbrief">'+_briefEnqCard(x.type,x.id)+'</div>') : '';
-      return '<div class="nopr-row nopr-'+sm.cls+(ro?' open':'')+'" onclick="event.stopPropagation();noprRowToggle(\''+rk+'\',\''+x.type+'\',\''+x.id+'\')">'+
+      var gtxt=_noprBucketSel==='never'?'कभी नहीं':(x.gap+' दिन');
+      var brief=ro?('<div class="nopr-rbrief">'+_briefEnqCard(x.type,x.id)+'</div>'):'';
+      return '<div class="nopr-row'+(ro?' open':'')+'" style="border-left-color:'+sm.col+'" onclick="event.stopPropagation();noprRowToggle(\''+rk+'\',\''+x.type+'\',\''+x.id+'\')">'+
         '<div class="nopr-rmain"><div class="nopr-rc">📋 '+_mddEsc(x.label)+'</div><div class="nopr-rio">IO: '+_mddEsc(x.io)+(x.last?(' · अंतिम प्रगति: '+_mddEsc(x.last)):'')+'</div></div>'+
-        '<span class="nopr-rg">'+gtxt+'</span>'+brief+
+        '<span class="nopr-rg" style="background:'+sm.col+'22;color:'+sm.col+'">'+gtxt+'</span>'+brief+
       '</div>';
     }).join('');
-    rowsHtml='<div class="nopr-rows nopr-rows-'+sm.cls+'">'+(sarr.length?rws:'<div class="nopr-secempty">— इस श्रेणी में कोई प्रकरण नहीं —</div>')+'</div>';
+    rowsHtml='<div class="nopr-rows">'+(sarr.length?rws:'<div class="nopr-secempty">— इस श्रेणी में कोई प्रकरण नहीं —</div>')+'</div>';
   }
+  if(!list.length){ host.innerHTML=filt+'<div class="mydd-empty" style="padding:16px;">✅ इस filter में कोई प्रकरण नहीं</div>'; return; }
   host.innerHTML=filt+grid+rowsHtml;
 }
 function noprSetIo(v){ _noprIoSel=v||null; _noprRowOpen={}; ovstatsRenderNoPragati(); }
