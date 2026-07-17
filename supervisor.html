@@ -22760,6 +22760,29 @@ body.role-staff #mydaily-box{ display:none !important; }
 @media (max-width:640px){
   #mydaily-box .agenda-tools-slot{ width:100%; margin-left:0; justify-content:flex-start; margin-top:8px; }
 }
+
+/* ═══ Agenda static header (v217 scratch) — toolbar lives here permanently ═══ */
+#mydaily-box .agenda-hdr{ display:flex; align-items:center; gap:11px; flex-wrap:wrap; padding:2px 0 10px; }
+#mydaily-box .agenda-cal{ background:#fff !important; color:#0a2342 !important; border-radius:11px !important; width:46px; min-width:46px; height:46px; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; box-shadow:0 3px 10px rgba(0,0,0,.25); padding:0 !important; }
+#mydaily-box .agenda-cal .m{ font-size:8.5px; font-weight:900; color:#dc2626; } #mydaily-box .agenda-cal .d{ font-size:19px; font-weight:900; margin:1px 0; color:#0a2342; } #mydaily-box .agenda-cal .w{ font-size:8px; color:#64748b; font-weight:700; }
+#mydaily-box .agenda-title{ font-size:16px; font-weight:900; color:#fff; }
+#mydaily-box .agenda-tools-wrap{ margin-left:auto; display:flex; align-items:center; gap:7px; flex-wrap:wrap; justify-content:flex-end; }
+/* strip the toolbar's old box look inside the header */
+#mydaily-box .agenda-tools-wrap .mydd-dg-toprow{ display:flex !important; align-items:center; gap:7px !important; padding:0 !important; margin:0 !important; background:transparent !important; border:none !important; box-shadow:none !important; flex-wrap:wrap; justify-content:flex-end; }
+#mydaily-box .agenda-tools-wrap .mydd-tcal,#mydaily-box .agenda-tools-wrap .mydd-tnum{ display:none !important; }
+/* search bar — preview size (a touch larger, not a huge pill) */
+#mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:0 1 200px !important; min-width:150px !important; margin:0 !important; padding:6px 11px !important; border-radius:10px !important; }
+#mydaily-box .agenda-tools-wrap .mtx-search-inline .mtx-search-inp{ font-size:12px !important; }
+#mydaily-box .agenda-tools-wrap .mtx-add-btn{ margin-left:0 !important; padding:7px 13px !important; }
+#mydaily-box .agenda-tools-wrap .mtx-tool-btn{ width:36px; height:36px; }
+#mydaily-box .agenda-tools-wrap #mydd-craft-sync{ margin:0 !important; }
+#mydaily-box .agenda-tools-wrap #mydd-craft-sync .mydd-craftsync,#mydaily-box .agenda-tools-wrap #mydd-craft-sync > div{ transform:scale(.92); transform-origin:right center; }
+/* brief now starts with pills (no header inside it) */
+#mydaily-box #mydd-brief .mbr-brief{ background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; margin:0 !important; }
+@media (max-width:640px){
+  #mydaily-box .agenda-tools-wrap{ width:100%; margin-left:0; justify-content:flex-start; margin-top:6px; }
+  #mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 auto !important; }
+}
 </style>
 </head>
 <body>
@@ -23447,12 +23470,10 @@ body.role-staff #mydaily-box{ display:none !important; }
       <!-- ════════════════════════════════════════════════════════════ -->
       <div id="staff-live-host" class="staff-live-host"><div class="slh-head">📋 आज की जानकारी — Live</div></div>
       <div class="mydd-box" id="mydaily-box">
-        <div id="mydd-brief"></div>
-        <div id="mydd-craft-sync" class="mydd-craftsync-host mydd-craftsync-top"></div>
-        <div id="mydd-reminder-panel" class="mydd-toppanel" style="display:none;"></div>
-        <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
-        <div class="mydd-tiles">
-          <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
+        <div class="agenda-hdr" id="agenda-hdr">
+          <div class="n-cal agenda-cal" id="agenda-cal"><div class="m">—</div><div class="d">—</div><div class="w">—</div></div>
+          <div class="agenda-title">🗓️ Agenda</div>
+          <div class="agenda-tools-wrap" id="agenda-tools-wrap">
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleBox();">
               <span class="mydd-tcal" style="display:none;"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
               <span class="mydd-tnum" id="mydd-cnt-mytask" style="display:none;">0</span>
@@ -23476,6 +23497,14 @@ body.role-staff #mydaily-box{ display:none !important; }
                 <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('keyword');">🏷 Keyword (प्रकरण में)</div>
               </div>
             </div>
+            <div id="mydd-craft-sync" class="mydd-craftsync-host"></div>
+          </div>
+        </div>
+        <div id="mydd-brief"></div>
+        <div id="mydd-reminder-panel" class="mydd-toppanel" style="display:none;"></div>
+        <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
+        <div class="mydd-tiles">
+          <div class="mydd-tile mydd-tile-mytask mydd-dg-tile mydd-master">
             <div id="mydd-dept-matrix" class="mydd-dept-host"></div>
             <div class="mtx-list mtx-list-top" id="mtx-search-results"></div>
             <div class="mddq-host" id="mtx-addhost-task"></div>
@@ -33538,10 +33567,10 @@ function mddRenderBrief(){
     var on=(_briefPill===k);
     return '<span class="n-pill '+cls+(on?' on':'')+'" onclick="event.stopPropagation();_briefPillTap(\''+k+'\')"><b>'+cnt+'</b> '+lbl+' <i>'+(on?'▴':'▾')+'</i></span>';
   }
-  var html='<div class="mbr-brief"><div class="n-top">'+cal+'<div class="n-hd">'+
-    '<div class="n-hd-row"><div class="n-t">🗓️ Agenda</div><div class="agenda-tools-slot" id="agenda-tools-slot"></div></div>'+
-    '<div class="n-pills">'+pill('today','a','आज',todayItems.length)+pill('over','o','Overdue',overdue.length)+pill('week','w','सप्ताह',weekArr.length)+'</div>'+
-  '</div></div>';
+  // update the STATIC calendar badge (header lives outside #mydd-brief, never wiped)
+  try{ var _c=document.getElementById('agenda-cal'); if(_c){ _c.innerHTML='<div class="m">'+MO[nd.getMonth()]+'</div><div class="d">'+nd.getDate()+'</div><div class="w">'+WD[nd.getDay()]+'</div>'; } }catch(e){}
+  var html='<div class="mbr-brief">'+
+    '<div class="n-pills">'+pill('today','a','आज',todayItems.length)+pill('over','o','Overdue',overdue.length)+pill('week','w','सप्ताह',weekArr.length)+'</div>';
   // ── single list under whichever pill is active (default: all collapsed) ──
   html+='<div class="mbr-body-c">';
   if(_briefPill==='today'){
@@ -33552,17 +33581,8 @@ function mddRenderBrief(){
     html+= weekArr.length ? '<div class="n-daylbl">🗓️ इस सप्ताह · '+weekArr.length+'</div>'+listOf(weekArr) : '<div class="mbr-empty">इस सप्ताह कुछ नहीं</div>';
   }
   html+='</div>';
-  html+='<div class="mbr-foot">↻ Craft (📆 Subscribe) में live · pill पर tap कर सूची देखें</div></div>';
+  html+='</div>';
   host.innerHTML=html;
-  try{
-    var _slot=document.getElementById('agenda-tools-slot');
-    if(_slot){
-      var _cs=document.getElementById('mydd-craft-sync');
-      var _tb=document.querySelector('#mydaily-box .mydd-dg-toprow');
-      if(_tb) _slot.appendChild(_tb);
-      if(_cs) _slot.appendChild(_cs);
-    }
-  }catch(e){}
 }
 function hctOpenReports(){
   try {
