@@ -23018,6 +23018,10 @@ body.role-staff #mydaily-box{ display:none !important; }
 #nopr-panel-content .nopr-feed .nopr-rows{ margin-top:11px; }
 #nopr-panel-content .nopr-feed .nopr-row{ background:#fff; }
 #nopr-panel-content .nopr-feed .mpf-periods{ margin-top:11px; }
+
+/* #3 — Agenda group chip inline ＋ add button (v241) */
+#mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+#mydaily-box .mtx-chip-add:hover{ background:#fff; transform:scale(1.12); }
 </style>
 </head>
 <body>
@@ -23157,7 +23161,6 @@ body.role-staff #mydaily-box{ display:none !important; }
         </div>
         <div class="usb-hero-score">
           <div class="usb-stat"><div class="usb-stat-n" id="search-cnt-total">0</div><div class="usb-stat-l">Total DB</div></div>
-          <div class="usb-stat"><div class="usb-stat-n" id="search-cnt-officers">0</div><div class="usb-stat-l">Officers</div></div>
         </div>
       </div>
       <div class="usb-hero-row">
@@ -23502,17 +23505,6 @@ body.role-staff #mydaily-box{ display:none !important; }
                 </div>
                 <div class="cmd-chips" id="ovstats-chips-pragati"></div>
               </div>
-              <!-- MOVED from My Dashboard: Notice लंबित -->
-              <div class="cmd-metric ovstats-tile ovstats-tile-notice ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovTileToggle('notice',event)">
-                <div class="cmd-metric-top">
-                  <div class="cmd-metric-icon" id="cc-cal-notice"></div>
-                  <div class="cmd-metric-body">
-                    <div class="cmd-metric-label">Notice</div>
-                    <div class="cmd-metric-num" id="ov-cnt-notice">0</div>
-                  </div>
-                </div>
-                <div class="cmd-chips"></div>
-              </div>
               <!-- NEW: जिन प्रकरणों में प्रगति नहीं (progress-gap) tile → inline panel -->
               <div class="cmd-metric ovstats-tile ovstats-tile-nopr ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovstatsNavTile('nopr',event)">
                 <div class="cmd-metric-top">
@@ -23520,6 +23512,17 @@ body.role-staff #mydaily-box{ display:none !important; }
                   <div class="cmd-metric-body">
                     <div class="cmd-metric-label">प्रगति नहीं</div>
                     <div class="cmd-metric-num" id="ovstats-cnt-nopr">0</div>
+                  </div>
+                </div>
+                <div class="cmd-chips"></div>
+              </div>
+              <!-- MOVED from My Dashboard: Notice लंबित -->
+              <div class="cmd-metric ovstats-tile ovstats-tile-notice ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovTileToggle('notice',event)">
+                <div class="cmd-metric-top">
+                  <div class="cmd-metric-icon" id="cc-cal-notice"></div>
+                  <div class="cmd-metric-body">
+                    <div class="cmd-metric-label">Notice</div>
+                    <div class="cmd-metric-num" id="ov-cnt-notice">0</div>
                   </div>
                 </div>
                 <div class="cmd-chips"></div>
@@ -23778,10 +23781,10 @@ body.role-staff #mydaily-box{ display:none !important; }
             <span id="mtx-ag-today" style="display:none;">0</span><span id="mtx-ag-week" style="display:none;">0</span><span id="mtx-ag-caret" style="display:none;"></span>
             <div class="mtx-list" id="mtx-agenda-panel" style="display:none;"></div>
             <div class="mtx-chip-grid">
-              <button type="button" class="mtx-chip mtx-chip-dg" data-w="dg" onclick="event.stopPropagation();mtxGroupTab('dg','disc');"><span class="mtx-chip-ic">🏛</span><span class="mtx-chip-lbl">DG EOW</span><span class="mtx-chip-n" id="mtx-cnt-dg">0</span></button>
-              <button type="button" class="mtx-chip mtx-chip-disc" data-w="disc" onclick="event.stopPropagation();mtxGroupTab('disc','dg');"><span class="mtx-chip-ic">💬</span><span class="mtx-chip-lbl">चर्चा</span><span class="mtx-chip-n" id="mtx-cnt-disc">0</span></button>
-              <button type="button" class="mtx-chip mtx-chip-rv" data-w="rv" onclick="event.stopPropagation();mtxGroupTab('rv','td');"><span class="mtx-chip-ic">⭐</span><span class="mtx-chip-lbl">समीक्षा</span><span class="mtx-chip-n" id="mtx-cnt-rv">0</span></button>
-              <button type="button" class="mtx-chip mtx-chip-td" data-w="td" onclick="event.stopPropagation();mtxGroupTab('td','rv');"><span class="mtx-chip-ic">📝</span><span class="mtx-chip-lbl">To-Do</span><span class="mtx-chip-n" id="mtx-cnt-td">0</span></button>
+              <button type="button" class="mtx-chip mtx-chip-dg" data-w="dg" onclick="event.stopPropagation();mtxGroupTab('dg','disc');"><span class="mtx-chip-ic">🏛</span><span class="mtx-chip-lbl">DG EOW</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();openDgDirectiveForm();">＋</span><span class="mtx-chip-n" id="mtx-cnt-dg">0</span></button>
+              <button type="button" class="mtx-chip mtx-chip-disc" data-w="disc" onclick="event.stopPropagation();mtxGroupTab('disc','dg');"><span class="mtx-chip-ic">💬</span><span class="mtx-chip-lbl">चर्चा</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();mddDiscInlineAdd();">＋</span><span class="mtx-chip-n" id="mtx-cnt-disc">0</span></button>
+              <button type="button" class="mtx-chip mtx-chip-rv" data-w="rv" onclick="event.stopPropagation();mtxGroupTab('rv','td');"><span class="mtx-chip-ic">⭐</span><span class="mtx-chip-lbl">समीक्षा</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();mddReviewAddPicker();">＋</span><span class="mtx-chip-n" id="mtx-cnt-rv">0</span></button>
+              <button type="button" class="mtx-chip mtx-chip-td" data-w="td" onclick="event.stopPropagation();mtxGroupTab('td','rv');"><span class="mtx-chip-ic">📝</span><span class="mtx-chip-lbl">To-Do</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();mddTaskFormOpen('mtx-addhost-task');">＋</span><span class="mtx-chip-n" id="mtx-cnt-td">0</span></button>
             </div>
             <span id="mtx-grp-tot-dir" style="display:none;">0</span><span id="mtx-grp-tot-work" style="display:none;">0</span>
             <span id="mtx-caret-dg" style="display:none;"></span><span id="mtx-caret-disc" style="display:none;"></span>
@@ -50747,7 +50750,6 @@ function openNoticeModal(noticeId) {
   });
   if (ioSel) ioSel.innerHTML = ioOpts;
   if (assignSel) assignSel.innerHTML = assignOpts;
-  try{ var _oc=document.getElementById('search-cnt-officers'); if(_oc){ _oc.textContent = (state.ioMaster||[]).filter(function(x){return x.is_io;}).length; } }catch(e){}
 
   var delBtn = document.getElementById('nf-delete');
 
