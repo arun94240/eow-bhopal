@@ -23011,6 +23011,13 @@ body.role-staff #mydaily-box{ display:none !important; }
 #nopr-panel-content .mpf-periods{ margin-top:10px; }
 #nopr-panel-content .nopr-rows{ margin-top:10px; padding-top:0; display:flex; flex-direction:column; gap:7px; }
 #nopr-panel-content .nopr-row{ display:flex; align-items:center; gap:10px; padding:10px 12px; background:#fff; border:1px solid #eef2f7; border-left:3px solid #94a3b8; border-radius:9px; cursor:pointer; flex-wrap:wrap; }
+
+/* प्रगति नहीं — navy feed to match pragati (v240) */
+#ovstats-panel-nopr .ovstats-panel-body{ padding:6px; }
+#nopr-panel-content .nopr-feed{ background:linear-gradient(160deg,#062a52,#0a3a6e); border-radius:12px; padding:11px 13px; box-shadow:0 6px 18px rgba(6,42,82,0.25); }
+#nopr-panel-content .nopr-feed .nopr-rows{ margin-top:11px; }
+#nopr-panel-content .nopr-feed .nopr-row{ background:#fff; }
+#nopr-panel-content .nopr-feed .mpf-periods{ margin-top:11px; }
 </style>
 </head>
 <body>
@@ -51806,8 +51813,8 @@ function ovstatsRenderNoPragati(){
     }).join('');
     rowsHtml='<div class="nopr-rows">'+(sarr.length?rws:'<div class="nopr-secempty">— इस श्रेणी में कोई प्रकरण नहीं —</div>')+'</div>';
   }
-  if(!list.length){ host.innerHTML=filt+'<div class="mydd-empty" style="padding:16px;">✅ इस filter में कोई प्रकरण नहीं</div>'; return; }
-  host.innerHTML=filt+grid+rowsHtml;
+  if(!list.length){ host.innerHTML='<div class="mpf-feed nopr-feed">'+filt+'<div class="mydd-empty" style="padding:16px;color:#cfe0f3;">✅ इस filter में कोई प्रकरण नहीं</div></div>'; return; }
+  host.innerHTML='<div class="mpf-feed nopr-feed">'+filt+grid+rowsHtml+'</div>';
 }
 function noprSetIo(v){ _noprIoSel=v||null; _noprRowOpen={}; ovstatsRenderNoPragati(); }
 function noprSetDate(which,v){ if(which==='from')_noprFrom=v||''; else _noprTo=v||''; _noprRowOpen={}; ovstatsRenderNoPragati(); }
