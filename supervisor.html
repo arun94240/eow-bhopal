@@ -24417,6 +24417,11 @@ body.role-staff #mydaily-box{ display:none !important; }
                 <!-- Rendered by renderDgfTagsWidget() -->
               </div>
             </div>
+            <div class="form-group">
+              <label class="form-label" style="color:#0d9488;">📎 Reference (@name) — व्यक्ति/tag (optional)</label>
+              <select class="form-input" id="dgf-refname"><option value="">— @name चुनें —</option></select>
+              <div style="display:flex;gap:6px;margin-top:6px;"><input type="text" class="form-input" id="dgf-newref" style="flex:1;" placeholder="＋ नया @name बनाएँ (e.g. @Gupta)"><button type="button" class="btn" onclick="event.stopPropagation();_mddRefCreateGeneric('dgf-newref','dgf-refname')">बनाएँ</button></div>
+            </div>
             
             <div class="form-group">
               <label class="form-label">Attachments</label>
@@ -34939,6 +34944,38 @@ function mddTaskInlineCancel(which) { mddTaskFormClose(_mddTaskHostFor(which)); 
 function mddTaskInlineSave(which) { return mddTaskFormSave(_mddTaskHostFor(which)); }
 
 // ── Inline Discussion Note add form (with hyperlink / Apple Notes / Craft link) ──
+function _mddRefPickerHTML(selId,newId,createCall,selTid,cls){
+  cls = cls || 'mddq-inp';
+  return '<label class="mddq-lbl" style="width:100%;font-size:11px;color:#0d9488;font-weight:800;display:block;margin-top:6px;">📎 Reference (@name) — व्यक्ति/tag (optional)'+
+    '<select id="'+selId+'" class="'+cls+'" style="margin-top:4px;width:100%;"><option value="">— @name चुनें —</option>'+
+    _mtxNameTags().map(function(t){ return '<option value="'+t.id+'"'+(selTid===t.id?' selected':'')+'>'+_mddEsc(_nameTagClean(t.name||''))+'</option>'; }).join('')+'</select></label>'+
+  '<div style="display:flex;gap:6px;margin-top:5px;"><input type="text" id="'+newId+'" class="'+cls+'" style="flex:1;" placeholder="＋ नया @name बनाएँ (e.g. @Gupta)"><button type="button" class="btn" style="flex:0 0 auto;" onclick="event.stopPropagation();'+createCall+'">बनाएँ</button></div>';
+}
+async function _mddRefCreateGeneric(newId,selId){
+  var inp=document.getElementById(newId); if(!inp) return;
+  var v=(inp.value||'').trim(); if(!v){ if(typeof toast==='function')toast('नया @name लिखें',true); return; }
+  if(v.charAt(0)!=='@') v='@'+v;
+  var clean=_nameTagClean(v).toLowerCase();
+  var dup=_mtxNameTags().find(function(t){return _nameTagClean(t.name||'').toLowerCase()===clean;});
+  var sel=document.getElementById(selId);
+  if(dup){ if(sel)sel.value=dup.id; inp.value=''; if(typeof toast==='function')toast('"'+_nameTagClean(dup.name)+'" पहले से है — select कर दिया'); return; }
+  try{
+    var r=await supa.from('tags').insert({name:v,color:'gray',is_system:false}).select().single();
+    if(r.error) throw r.error;
+    if(!state.tags) state.tags=[]; state.tags.push(r.data);
+    if(sel){ var o=document.createElement('option'); o.value=r.data.id; o.textContent=_nameTagClean(r.data.name||v); sel.appendChild(o); sel.value=r.data.id; }
+    inp.value=''; if(typeof toast==='function')toast('✓ "'+_nameTagClean(v)+'" @name बना — selected');
+  }catch(e){ if(typeof toast==='function')toast('Tag बनाना विफल: '+(e.message||e),true); }
+}
+function _mddRefTagIds(selId, existing){
+  var tid=(document.getElementById(selId)||{}).value||'';
+  var out = (existing && existing.slice) ? existing.slice() : [];
+  if(tid){
+    if(out.indexOf(tid)<0) out.push(tid);
+    try{ var rt=(typeof getTagByName==='function')?getTagByName('Reference'):null; if(rt&&rt.id&&out.indexOf(rt.id)<0) out.push(rt.id); }catch(e){}
+  }
+  return out;
+}
 function mddDiscInlineAdd() {
   var host = document.getElementById('mydd-addhost-disc'); if (!host) return;
   if (host.getAttribute('data-open') === '1') { host.innerHTML = ''; host.setAttribute('data-open', ''); return; }
@@ -34953,6 +34990,7 @@ function mddDiscInlineAdd() {
       '</div>' +
       '<select id="mddd-io" class="mddq-inp">' + _mddIoOptionsHTML('') + '</select>' +
       '<input type="url" id="mddd-link" class="mddq-inp" placeholder="🔗 Apple Notes / Craft / कोई hyperlink paste करें (optional)">' +
+      _mddRefPickerHTML('mddd-refname','mddd-newref','_mddRefCreateGeneric(\'mddd-newref\',\'mddd-refname\')','','mddq-inp') +
       '<div class="mddq-btns">' +
         '<button class="mddq-save" onclick="event.stopPropagation();mddDiscInlineSave();">✓ Save</button>' +
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddDiscInlineCancel();">Cancel</button>' +
@@ -34977,7 +35015,7 @@ async function mddDiscInlineSave() {
     scope: 'dg_eow', title: title, note_text: note || null, participants: ioName,
     reminder_date: rem, reminder_time: null, reminder_lead: null,
     priority: priority, status: 'Open',
-    attachments: [], links: link ? [{ url: link, label: link }] : [], tag_ids: []
+    attachments: [], links: link ? [{ url: link, label: link }] : [], tag_ids: _mddRefTagIds('mddd-refname', [])
   };
   try {
     var r = await supa.from('discussion_notes').insert(payload).select().single();
@@ -37361,6 +37399,7 @@ function navDgEow(which, evt) {
 
 // ============ DG DIRECTIVE FORM ============
 function openDgDirectiveForm() {
+  try{ var _rs=document.getElementById('dgf-refname'); if(_rs){ _rs.innerHTML='<option value="">— @name चुनें —</option>'+_mtxNameTags().map(function(t){return '<option value="'+t.id+'">'+_mddEsc(_nameTagClean(t.name||''))+'</option>';}).join(''); _rs.value=''; } var _rn=document.getElementById('dgf-newref'); if(_rn)_rn.value=''; }catch(e){}
   if (typeof isAdmin === 'function' && !isAdmin()) { toast('🔒 Only SP can add', true); return; }
   var panel = document.getElementById('dg-directive-panel');
   if (!panel) return;
@@ -37606,6 +37645,7 @@ async function saveDgDirective() {
   
   // Custom tags
   payload.tag_ids = (typeof getDgfCurrentTagIds === 'function') ? getDgfCurrentTagIds() : [];
+  payload.tag_ids = _mddRefTagIds('dgf-refname', payload.tag_ids);
   
   try {
     if (_dgEditingId) {
