@@ -22810,18 +22810,41 @@ body.role-staff #mydaily-box{ display:none !important; }
   #mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 auto !important; }
 }
 
-/* ═══ Agenda header — labeled colourful tool buttons (v219) ═══ */
+/* v219 labeled buttons */
 #mydaily-box .agenda-tools-wrap .mtx-tool-btn{ width:auto !important; height:38px !important; padding:0 12px !important; border-radius:10px !important; display:inline-flex !important; align-items:center; gap:6px; font-size:12px !important; font-weight:800 !important; color:#fff !important; border:none !important; white-space:nowrap; }
 #mydaily-box .agenda-tools-wrap .ttl-ic{ font-size:14px; }
 #mydaily-box .agenda-tools-wrap .ttl-lbl{ font-size:12px; font-weight:800; }
 #mydaily-box .agenda-tools-wrap .mtx-tool-sub{ background:linear-gradient(135deg,#2563eb,#1d4fc4) !important; }
 #mydaily-box .agenda-tools-wrap .mtx-tool-craft{ background:linear-gradient(135deg,#0d9488,#0f766e) !important; }
-/* Craft Sync chip — keep label, colourful */
 #mydaily-box .agenda-csync-chip{ padding:0 12px !important; }
 #mydaily-box .agenda-csync-chip .ttl-lbl{ font-size:12px; font-weight:800; color:#4ade80 !important; }
 #mydaily-box .agenda-csync-chip.has-new .ttl-lbl{ color:#fbbf24 !important; }
-/* search a touch smaller to make room for labels */
-#mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:0 1 170px !important; min-width:120px !important; }
+
+/* ═══ Agenda header compact + symmetric (v220) ═══ */
+#mydaily-box{ padding:16px 16px 18px !important; }
+#mydaily-box .agenda-hdr{ gap:9px !important; padding:2px 0 11px !important; }
+#mydaily-box .agenda-cal{ width:42px !important; min-width:42px !important; height:42px !important; }
+#mydaily-box .agenda-cal .d{ font-size:17px !important; }
+#mydaily-box .agenda-title{ font-size:15px !important; }
+#mydaily-box .agenda-tools-wrap{ gap:6px !important; min-width:0; }
+/* uniform 34px height, tighter paddings so everything fits on one line */
+#mydaily-box .agenda-tools-wrap .mtx-search-inline{ height:34px !important; flex:0 1 150px !important; min-width:96px !important; padding:0 10px !important; }
+#mydaily-box .agenda-tools-wrap .mtx-search-inline .mtx-search-inp{ font-size:11.5px !important; }
+#mydaily-box .agenda-tools-wrap .mtx-add-btn{ height:34px !important; padding:0 12px !important; font-size:12px !important; }
+#mydaily-box .agenda-tools-wrap .mtx-tool-btn{ height:34px !important; padding:0 10px !important; font-size:11.5px !important; gap:5px; }
+#mydaily-box .agenda-tools-wrap .ttl-ic{ font-size:13px !important; }
+#mydaily-box .agenda-tools-wrap .ttl-lbl{ font-size:11px !important; }
+#mydaily-box .agenda-csync-chip{ height:34px !important; padding:0 10px !important; }
+#mydaily-box .agenda-csync-chip .csb-ico{ font-size:13px !important; }
+#mydaily-box .agenda-csync-chip .ttl-lbl{ font-size:11px !important; }
+/* keep everything inside the box (no overflow past right edge) */
+#mydaily-box .agenda-hdr{ max-width:100%; overflow:visible; }
+#mydaily-box .agenda-tools-wrap{ flex-shrink:1; }
+#mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex-shrink:1; }
+@media (max-width:820px){
+  #mydaily-box .agenda-tools-wrap{ width:100%; margin-left:0; margin-top:8px; justify-content:flex-start; flex-wrap:wrap; }
+  #mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 130px !important; }
+}
 </style>
 </head>
 <body>
