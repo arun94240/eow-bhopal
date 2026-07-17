@@ -22877,6 +22877,14 @@ body.role-staff #mydaily-box{ display:none !important; }
 .pr-casecard .mbr-cb-row{ font-size:12px; color:#1e293b; margin:2px 0; }
 .pr-casecard .mbr-oe{ margin-top:8px; display:inline-block; background:#2563eb; color:#fff; border:none; border-radius:8px; padding:6px 13px; font-size:12px; font-weight:800; cursor:pointer; }
 .pr-detail-txt{ font-size:11.5px; color:#334155; margin-bottom:5px; }
+
+/* कार्यालय overview प्रगति feed — clickable case chip → brief → open/edit (v227) */
+.mpf-case{ display:inline-flex; align-items:center; gap:4px; background:rgba(37,99,235,.12); border:1px solid rgba(37,99,235,.3); color:#1e5aa8; border-radius:7px; padding:1px 8px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap; margin-left:2px; }
+.mpf-case:hover{ background:rgba(37,99,235,.2); }
+.mpf-case .mpf-car{ font-size:9px; opacity:.8; }
+.mpf-casebrief{ margin-top:7px; background:#f7fafd; border:1px solid #dbe7f5; border-radius:9px; padding:9px 11px; }
+.mpf-casebrief .mbr-cb-row{ font-size:12px; color:#1e293b; margin:2px 0; }
+.mpf-casebrief .mbr-oe{ margin-top:8px; display:inline-block; background:#2563eb; color:#fff; border:none; border-radius:8px; padding:6px 13px; font-size:12px; font-weight:800; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -33419,11 +33427,22 @@ function _mddPragatiItemHTML(u){
   var main = (prak ? prak + ' — ' : '') + act;
   var rel = _mddRelTime(u.created_at || u.update_date);
   var fresh = (rel === 'अभी-अभी');
-  return '<div class="mpf-item">' +
+  var rc=null; try{ rc=_briefResolveCase(u.case_type,u.case_id,(prak||'')+' '+(u.case_display||'')); }catch(e){}
+  var caseChip = rc ? '<span class="mpf-case" onclick="event.stopPropagation();_mddPragatiCaseToggle(this,\''+rc.type+'\',\''+rc.id+'\')">📋 '+_mddEsc(_briefEnqLabel(rc.type,rc.id))+' <span class="mpf-car">▾</span></span>' : '';
+  return '<div class="mpf-item' + (rc?' mpf-item-case':'') + '">' +
     '<span class="mpf-av">' + _mddEsc(_mddInitials(u.io_name)) + '</span>' +
-    '<div class="mpf-body"><div class="mpf-main">' + _mddEsc(main.slice(0,90)) + '</div>' +
-      '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div></div>' +
+    '<div class="mpf-body"><div class="mpf-main">' + _mddEsc(main.slice(0,90)) + ' ' + caseChip + '</div>' +
+      '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div>' +
+      '<div class="mpf-casebrief" style="display:none;"></div></div>' +
   '</div>';
+}
+function _mddPragatiCaseToggle(el, type, id){
+  var body = el.closest ? el.closest('.mpf-body') : null; if(!body) return;
+  var host = body.querySelector('.mpf-casebrief'); if(!host) return;
+  var open = (host.style.display==='none' || !host.style.display);
+  if(open && !host.getAttribute('data-filled')){ host.innerHTML=_briefEnqCard(type,id); host.setAttribute('data-filled','1'); }
+  host.style.display = open ? 'block' : 'none';
+  var c = el.querySelector('.mpf-car'); if(c) c.textContent = open ? '\u25b4' : '\u25be';
 }
 var _pragatiFeedHost='ovstats-host-pragati';
 function mddRenderPragatiFeed(hostId){
@@ -33656,7 +33675,7 @@ function mddRenderBrief(){
     var openJs=a.open||'';
     var k=++_bk;
     var _rc=(a.caseType && a.caseId && a.caseType!=='court') ? {type:a.caseType,id:a.caseId} : null;
-    if(!_rc){ try{ _rc=_briefResolveCase(a.caseType,a.caseId,a.lbl); }catch(e){ _rc=null; } if(_rc && _rc.type==='court') _rc=null; }
+    if(!_rc){ try{ _rc=_briefResolveCase(a.caseType,a.caseId,(a.lbl||'')+' '+(a.meta||'')); }catch(e){ _rc=null; } if(_rc && _rc.type==='court') _rc=null; }
     if(_rc){
       // WHOLE row clickable → case brief inline (brief → ✎ Open/Edit → modal)
       return '<div class="mbr-item mbr-item-case">'+
