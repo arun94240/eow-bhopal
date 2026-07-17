@@ -22845,6 +22845,22 @@ body.role-staff #mydaily-box{ display:none !important; }
   #mydaily-box .agenda-tools-wrap{ width:100%; margin-left:0; margin-top:8px; justify-content:flex-start; flex-wrap:wrap; }
   #mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 130px !important; }
 }
+
+/* ═══ #2 compact enquiry inline-brief (reduce gap before Open/Edit) ═══ */
+.ioc-parties{ margin-bottom:6px !important; gap:0 !important; }
+.ioc-party{ padding:5px 11px !important; }
+.ioc-party-vs{ margin:1px 0 !important; }
+.ioc-exp-checks{ margin-bottom:6px !important; gap:6px !important; }
+.ioc-exp-actions{ margin-top:6px !important; gap:6px !important; }
+.ioc-kw-box{ margin:6px 0 !important; }
+.ioc-exp-directives{ margin-bottom:6px !important; }
+/* tighten the whole inline brief body vertical rhythm */
+.ioc-expanded > *{ margin-top:0 !important; }
+.ioc-expanded{ padding:10px 12px !important; }
+/* ═══ #8 smooth reports inline open ═══ */
+#reports-home-content{ overflow:hidden; transition:max-height .32s ease, opacity .28s ease, padding .28s ease; }
+#reports-home-content.rh-anim-in{ animation:rhSlideIn .34s ease; }
+@keyframes rhSlideIn{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:translateY(0); } }
 </style>
 </head>
 <body>
@@ -25079,7 +25095,7 @@ body.role-staff #mydaily-box{ display:none !important; }
             <!-- Quick preset matrices (always visible) -->
             <div class="hdr-counter-stack reports-counter-stack reports-uni-stack" id="reports-counter-stack">
               <div class="hdr-counter rep-pchip rep-pchip-search" onclick="event.stopPropagation();openMatricesFromSettings()">
-                <span class="rep-ic">🔍</span><span class="rep-lbl">Global Search &amp; Matrices</span>
+                <span class="rep-ic">🔍</span><span class="rep-lbl">Search All</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-estab" onclick="event.stopPropagation();reportsShowEstabReports(event)">
                 <span class="rep-ic">🏖️</span><span class="rep-lbl">Search by Leaves</span>
@@ -46131,7 +46147,7 @@ function reportsShowEstabReports(evt) {
   if (wrap && wrap.classList.contains('collapsed')) wrap.classList.remove('collapsed');
   var tile = document.querySelector('.rep-pchip-estab');
   var panel = document.getElementById('estab-panel-reports');
-  var home = document.getElementById('reports-home-content');
+  var home = document.getElementById('reports-home-content'); if(home){ home.classList.remove('rh-anim-in'); void home.offsetWidth; home.classList.add('rh-anim-in'); }
   var wasActive = tile && tile.classList.contains('is-active');
   // clear all preset active states (and this tile)
   document.querySelectorAll('#reports-counter-stack .rep-pchip').forEach(function(t){ t.classList.remove('is-active'); });
