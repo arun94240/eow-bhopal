@@ -22809,6 +22809,19 @@ body.role-staff #mydaily-box{ display:none !important; }
   #mydaily-box .agenda-tools-wrap{ width:100%; margin-left:0; margin-top:8px; flex-wrap:wrap; justify-content:flex-start; }
   #mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 auto !important; }
 }
+
+/* ═══ Agenda header — labeled colourful tool buttons (v219) ═══ */
+#mydaily-box .agenda-tools-wrap .mtx-tool-btn{ width:auto !important; height:38px !important; padding:0 12px !important; border-radius:10px !important; display:inline-flex !important; align-items:center; gap:6px; font-size:12px !important; font-weight:800 !important; color:#fff !important; border:none !important; white-space:nowrap; }
+#mydaily-box .agenda-tools-wrap .ttl-ic{ font-size:14px; }
+#mydaily-box .agenda-tools-wrap .ttl-lbl{ font-size:12px; font-weight:800; }
+#mydaily-box .agenda-tools-wrap .mtx-tool-sub{ background:linear-gradient(135deg,#2563eb,#1d4fc4) !important; }
+#mydaily-box .agenda-tools-wrap .mtx-tool-craft{ background:linear-gradient(135deg,#0d9488,#0f766e) !important; }
+/* Craft Sync chip — keep label, colourful */
+#mydaily-box .agenda-csync-chip{ padding:0 12px !important; }
+#mydaily-box .agenda-csync-chip .ttl-lbl{ font-size:12px; font-weight:800; color:#4ade80 !important; }
+#mydaily-box .agenda-csync-chip.has-new .ttl-lbl{ color:#fbbf24 !important; }
+/* search a touch smaller to make room for labels */
+#mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:0 1 170px !important; min-width:120px !important; }
 </style>
 </head>
 <body>
@@ -23509,8 +23522,8 @@ body.role-staff #mydaily-box{ display:none !important; }
                 <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
               </div>
               <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddMenu();">＋ Add</button>
-              <button class="mtx-tool-btn mtx-tool-sub" onclick="event.stopPropagation();openAgendaSubscribeModal();" title="Subscribe (Apple/Google Calendar)">📆</button>
-              <button class="mtx-tool-btn mtx-tool-craft" onclick="event.stopPropagation();craftOpenTaskList();" title="Craft Agenda (live)">🔄</button>
+              <button class="mtx-tool-btn mtx-tool-sub" onclick="event.stopPropagation();openAgendaSubscribeModal();" title="Subscribe (Apple/Google Calendar)"><span class="ttl-ic">📆</span><span class="ttl-lbl">Subscribe</span></button>
+              <button class="mtx-tool-btn mtx-tool-craft" onclick="event.stopPropagation();craftOpenTaskList();" title="Open in Craft (live)"><span class="ttl-ic">🔄</span><span class="ttl-lbl">Open in Craft</span></button>
               <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;">
                 <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';vcOpen();" style="color:#062a52;font-weight:800;">🎤 Voice command</div>
                 <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';mddAddMenuPick('reminder');">⏰ Reminder</div>
@@ -63447,7 +63460,7 @@ function renderCraftSyncBtn(){
   var host=document.getElementById('mydd-craft-sync'); if(!host) return;
   var n=0; try{ n=_craftPending().length; }catch(e){}
   host.innerHTML='<button class="mydd-craftsync-btn agenda-csync-chip'+(n?' has-new':'')+'" onclick="event.stopPropagation();craftSyncTap()" title="'+(n?(n+' नए प्रकरण Craft में भेजें'):'Craft में synced')+'">'+
-    '<span class="csb-ico">🔄</span>'+
+    '<span class="csb-ico">🔄</span><span class="ttl-lbl">Craft Sync</span>'+
     (n?('<span class="csb-badge">'+n+'</span>'):'<span class="csb-ok">✓</span>')+
   '</button>';
 }
