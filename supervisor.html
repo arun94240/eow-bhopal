@@ -23041,8 +23041,6 @@ body.view-mobile .mydd-dg-toprow, body.view-mobile .agenda-tools-wrap, body.view
 body.view-mobile .hdr-counter-stack, body.view-mobile .reports-uni-stack, body.view-mobile .ovstats-tile-row { flex-wrap: wrap !important; }
 /* Media / tables never force horizontal scroll */
 body.view-mobile img, body.view-mobile video, body.view-mobile table, body.view-mobile pre { max-width: 100% !important; }
-/* long section-tab bar scrolls horizontally instead of pushing the page wide */
-body.view-mobile .section-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* Tag picker — श्रेणी-वार grouping (v247) */
 .itw-cat{ margin:8px 0 4px; }
@@ -23105,9 +23103,6 @@ img, video, pre { max-width:100% !important; height:auto; }
 #mobile-bottom-nav, body.view-mobile #mobile-bottom-nav { display:none !important; }
 .mobile-more-tab, body.view-mobile .mobile-more-tab { display:none !important; }
 body.view-mobile { padding-bottom:0 !important; }
-/* mobile: top tabs = one swipeable row (fits any count, nothing cut) */
-body.view-mobile .section-tabs { flex-wrap:nowrap !important; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-body.view-mobile .section-tabs::-webkit-scrollbar { display:none; }
 
 /* ═══════════ v255 — fluid tiles fill available width on ANY screen (uniform) ═══════════ */
 /* Agenda header/tools always wrap — Add / Subscribe / Craft never cut off */
