@@ -23261,6 +23261,11 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .court-card-wrap.docket-card{ border:1.5px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fff; }
 .court-card-wrap.docket-card:hover{ border-color:#f5b942; box-shadow:0 5px 16px rgba(245,185,66,.18); }
 .court-card-wrap .court-card.enq-card-head{ padding:0 !important; cursor:pointer; }
+.stamp-no .rel-sub{ margin-top:3px; font-size:9px; }
+.stamp-no .rel-sub .linked-enquiry-badge, .stamp-no .rel-sub .manual-apraadh-badge{ font-size:9px !important; padding:1px 6px !important; }
+.c-catno .cnr-sub{ font-size:8px; font-weight:700; opacity:.9; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.c-catno .cnr-sub.cnr-sub-empty{ opacity:.55; }
+
 </style>
 </head>
 <body>
@@ -56498,13 +56503,12 @@ function renderCourtTable() {
     var card = '<div class="docket-row-inner">'+
       '<div class="stamp-wrap">'+
         '<div class="stamp">'+
-          '<div class="stamp-no"><div class="no">'+escapeHtml(typeDisplay)+renderEnquiryIcon(c)+renderSupTagBadges(c)+renderCourtLinkBadge(c)+'</div></div>'+
+          '<div class="stamp-no"><div class="no">'+escapeHtml(typeDisplay)+renderEnquiryIcon(c)+renderSupTagBadges(c)+renderCourtLinkBadge(c)+'</div>'+(relCell?('<div class="rel-sub">'+relCell+'</div>'):'')+'</div>'+
           '<div class="stamp-date">'+escapeHtml(courtDisplay)+'</div>'+
           '<div class="stamp-cat '+tinfo.cls+'">'+tinfo.label+'</div>'+
         '</div>'+
       '</div>'+
       '<div class="body">'+
-        (relCell ? ('<div class="docket-sup">'+relCell+'</div>') : '')+
         '<div class="parties-wrap">'+petChip+vsSep+respChip+'</div>'+
         '<div class="docket-meta-grid">'+
           '<div class="dmg-cell">'+hearCell+'</div>'+
@@ -56555,17 +56559,19 @@ function renderCourtCards(rows) {
     var petChip = _docketCompChip(c.petitioner);
     var respChip = _docketNcompChip(c.respondent);
     var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 ' + escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing) + '</span>') : '<span class="m-chip m-empty">📅 —</span>';
-    var cnrCell = c.cnr_no ? '<span class="m-chip m-cnr">🔗 CNR</span>' : '<span class="m-chip m-empty">🔗 —</span>';
+    var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
+    var relGridCell = relCell || '<span class="m-empty" style="background:transparent;border:none;">—</span>';
     var statusCell = _courtStatusChip(isDisp);
     var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 ' + escapeHtml(officerDisplay) + '</span>') : '<span class="m-chip m-empty">👮 —</span>';
+    var cnrSub = c.cnr_no ? ('<div class="cnr-sub">CNR: ' + escapeHtml(c.cnr_no) + '</div>') : '<div class="cnr-sub cnr-sub-empty">CNR: —</div>';
     return '<div class="court-card-wrap docket-card" id="court-card-wrap-' + c.id + '">' +
       '<div class="court-card enq-card-head" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
-        '<div class="c-top"><div class="c-catno ' + tinfo.cls + '"><div class="cat">' + tinfo.label + '</div><div class="no">' + escapeHtml(typeNo) + '</div></div><div class="c-date ' + tinfo.cls + '">' + escapeHtml(courtName) + '</div></div>' +
+        '<div class="c-top"><div class="c-catno ' + tinfo.cls + '"><div class="cat">' + tinfo.label + '</div><div class="no">' + escapeHtml(typeNo) + '</div>' + cnrSub + '</div><div class="c-date ' + tinfo.cls + '">' + escapeHtml(courtName) + '</div></div>' +
         '<div class="c-body">' +
           '<div class="c-parties">' + petChip + respChip + '</div>' +
           '<div class="docket-meta-grid">' +
             '<div class="dmg-cell">' + hearCell + '</div>' +
-            '<div class="dmg-cell dmg-right">' + cnrCell + '</div>' +
+            '<div class="dmg-cell dmg-right">' + relGridCell + '</div>' +
             '<div class="dmg-cell">' + statusCell + '</div>' +
             '<div class="dmg-cell dmg-right">' + ioCell + '</div>' +
           '</div>' +
