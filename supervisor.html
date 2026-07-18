@@ -27981,6 +27981,8 @@ body.view-mobile .section-tabs { overflow-x: auto; -webkit-overflow-scrolling: t
       <div class="form-group"><label class="form-label">जन्म तिथि / Date of Birth</label><input type="date" class="form-input" id="io-dob"></div>
       <div class="form-group"><label class="form-label">सेवा में नियुक्ति तिथि</label><input type="date" class="form-input" id="io-doj-service"></div>
       <div class="form-group"><label class="form-label">EOW में नियुक्ति तिथि</label><input type="date" class="form-input" id="io-doj-eow"></div>
+      <div class="form-group"><label class="form-label">वर्तमान पदस्थापना</label><input type="text" class="form-input" id="io-current-posting" placeholder="जैसे: EOW भोपाल / थाना / शाखा"></div>
+      <div class="form-group full"><label class="form-label">कार्य-आवंटन / Duty <span style="font-weight:400;color:#64748b;font-size:11px;">(establishment — notice-तामील क्षेत्र / कार्य)</span></label><input type="text" class="form-input" id="io-work-assignment" placeholder="जैसे: नोटिस तामील — भोपाल शहर / कार्यालयीन कार्य"></div>
       <div class="form-group full">
         <label class="form-label">🔐 तामील PIN <span style="font-weight:500;color:#7a8aa1;font-size:12px;">(4-6 अंक — notice तामील form login हेतु)</span></label>
         <input type="text" class="form-input" id="io-pin" maxlength="6" inputmode="numeric" placeholder="जैसे: 4521" autocomplete="off">
@@ -57414,6 +57416,8 @@ function openIOModal(id) {
   document.getElementById('io-dob').value = io.date_of_birth || '';
   document.getElementById('io-doj-service').value = io.doj_service || '';
   document.getElementById('io-doj-eow').value = io.doj_eow || '';
+  document.getElementById('io-current-posting').value = io.current_posting || '';
+  document.getElementById('io-work-assignment').value = io.work_assignment || '';
   document.getElementById('io-pin').value = io.pin || '';
   document.getElementById('io-is-io').checked = (io.is_io === true);
   renderIOReportingStaff(io.reporting_staff_ids || []);
@@ -57633,6 +57637,8 @@ async function saveIO() {
     date_of_birth: document.getElementById('io-dob').value || null,
     doj_service: document.getElementById('io-doj-service').value || null,
     doj_eow: document.getElementById('io-doj-eow').value || null,
+    current_posting: document.getElementById('io-current-posting').value || null,
+    work_assignment: document.getElementById('io-work-assignment').value || null,
     pin: (document.getElementById('io-pin').value || '').trim() || null,
     reporting_staff_ids: ioGetReportingStaff(),
     photo_url: (pendingIOPhoto && typeof pendingIOPhoto === 'string') ? pendingIOPhoto : null
