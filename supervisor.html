@@ -23205,6 +23205,9 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
    neutralise that legacy rule for it specifically and let it size naturally. */
 .enq-tr.docket-row > td.docket-td{ width:auto !important; white-space:normal !important; padding-left:0 !important; padding-right:0 !important; text-align:left !important; }
 .enq-list-wrap .table-wrap > table:has(.docket-row){ width:100% !important; min-width:0; }
+.enq-list-wrap .table-wrap > table:has(.docket-row){ table-layout:fixed; }
+#court-list-wrap table{ table-layout:fixed; width:100%; }
+.io-inline-panel-row > td{ width:100%; }
 
 /* Neutralise the old mobile card-stack transform — Docket rows are already
    card-like and universal, no separate mobile stacking needed anymore. */
@@ -25742,7 +25745,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
       <select id="court-sort-field" class="filter-select" style="display:none;" onchange="courtSetSortField(this.value)"><option value="year">year</option></select>
     </div>
     
-    <div class="table-wrap" id="court-list-wrap" style="display:none;"><table><thead><tr><th>SN</th><th>Court &amp; Case</th><th>Related To</th><th>Petitioner / Respondent</th><th>I/C Officer</th><th>Files</th><th></th></tr></thead><tbody id="court-body"></tbody></table></div>
+    <div class="table-wrap" id="court-list-wrap" style="display:none;"><table><tbody id="court-body"></tbody></table></div>
     <div id="court-cards-wrap" class="court-cards-grid"></div>
   </div></section>
 
@@ -33578,7 +33581,7 @@ function _masTable(c){
   else if (srt === 'rank') all.sort(function(a,b){ return (_masRankOrder(a.o.name) - _masRankOrder(b.o.name)) || _masNameKey(a.o.name).localeCompare(_masNameKey(b.o.name)); });
   else if (srt === 'name') all.sort(function(a,b){ return _masNameKey(a.o.name).localeCompare(_masNameKey(b.o.name)); });
   var rows = all.map(function(x){ return _masTableRow(x.o, x.key); }).join('');
-  if (!rows) rows = '<tr><td colspan="5" style="padding:12px;text-align:center;color:#9ca3af;">कोई डेटा नहीं</td></tr>';
+  if (!rows) rows = '<tr><td style="padding:12px;text-align:center;color:#9ca3af;">कोई डेटा नहीं</td></tr>';
   function sb(k, lbl){ return '<button class="mas-sort-btn' + (srt===k ? ' is-on' : '') + '" onclick="event.stopPropagation();mddAttTableSort(\'' + k + '\');">' + lbl + '</button>'; }
   var sortBar = '<div class="mas-sort-bar"><span class="mas-sort-lbl">Sort:</span>' +
     sb('status','स्थिति') + sb('time','समय') + sb('rank','पद') + sb('name','नाम') + '</div>';
@@ -51648,7 +51651,6 @@ function _ioInsertInlinePanel(triggerEl, html){
     var wrapperTr = document.createElement('tr');
     wrapperTr.className = 'io-inline-panel-row';
     var td = document.createElement('td');
-    td.colSpan = 20;
     td.style.padding = '0';
     td.innerHTML = html;
     wrapperTr.appendChild(td);
@@ -53007,7 +53009,7 @@ function renderTable(type) {
   if (!yearFilter) {
     var tbodyEmpty = document.getElementById(type+'-body');
     if (tbodyEmpty) {
-      tbodyEmpty.innerHTML = '<tr><td colspan="5"><div class="empty-state year-pick-prompt">' +
+      tbodyEmpty.innerHTML = '<tr><td><div class="empty-state year-pick-prompt">' +
         '<div class="ypp-icon">📅</div>' +
         '<h3>वर्ष चुनें</h3>' +
         '<p>सब cases देखने के लिए "All Time" tap करें</p>' +
@@ -53034,7 +53036,7 @@ function renderTable(type) {
 
   var tbody = document.getElementById(type+'-body');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><h3>No entries yet</h3></div></td></tr>';
+    tbody.innerHTML = '<tr><td><div class="empty-state"><h3>No entries yet</h3></div></td></tr>';
   } else {
     tbody.innerHTML = rows.map(function(r, i){
       return _buildEnquiryRow(type, r, i, false);
@@ -53174,7 +53176,7 @@ function _buildEnquiryRow(type, r, i, scoped) {
   var scopedCatChip = scoped ? ('<span class="tc-cat-badge tc-cat-'+type+'">'+(_tcShort[type]||'')+'</span> ') : '';
 
   return '<tr class="enq-tr docket-row' + dimCls + '" id="' + rowId + '" onclick="'+expandHandler+'">'+
-    '<td class="docket-td" colspan="5">'+
+    '<td class="docket-td">'+
       '<div class="docket-row-inner">'+
         '<div class="docket-sn">'+(i+1)+'</div>'+
         '<div class="stamp-wrap">'+urgentHtml+
@@ -53199,7 +53201,7 @@ function _buildEnquiryRow(type, r, i, scoped) {
       '</div>'+
     '</td>'+
   '</tr>'+
-  '<tr class="enq-expand-row" id="' + cardId + '" style="display:none;"><td colspan="5" style="padding:0;"></td></tr>';
+  '<tr class="enq-expand-row" id="' + cardId + '" style="display:none;"><td style="padding:0;"></td></tr>';
 }
 
 // Scoped expand for Total Cases — finds the expand row via DOM sibling (no getElementById collision)
@@ -56613,7 +56615,7 @@ function renderCourtTable() {
   if (!yearFilter) {
     var tbodyEmpty = document.getElementById('court-body');
     if (tbodyEmpty) {
-      tbodyEmpty.innerHTML = '<tr><td colspan="7"><div class="empty-state year-pick-prompt">' +
+      tbodyEmpty.innerHTML = '<tr><td><div class="empty-state year-pick-prompt">' +
         '<div class="ypp-icon">📅</div>' +
         '<h3>वर्ष चुनें</h3>' +
         '<p>सब cases देखने के लिए "All Time" tap करें</p>' +
@@ -56634,7 +56636,7 @@ function renderCourtTable() {
   }
   
   var tbody = document.getElementById('court-body');
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><h3>No court cases yet</h3></div></td></tr>'; return; }
+  if (!rows.length) { tbody.innerHTML = '<tr><td><div class="empty-state"><h3>No court cases yet</h3></div></td></tr>'; return; }
   tbody.innerHTML = rows.map(function(c, i){
     // Look up court name from courts_master
     var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
@@ -56682,9 +56684,9 @@ function renderCourtTable() {
       '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">✎</button></div>'+
     '</div>';
     return '<tr class="crt-tr'+(isDisp?' crt-tr-dim':'')+'" id="' + rowId + '" onclick="toggleCourtExpand(\''+c.id+'\')">'+
-      '<td class="docket-td" colspan="7">'+card+'</td>'+
+      '<td class="docket-td">'+card+'</td>'+
     '</tr>'+
-    '<tr class="crt-expand-row" id="' + cardId + '" style="display:none;"><td colspan="7" style="padding:0;"></td></tr>';
+    '<tr class="crt-expand-row" id="' + cardId + '" style="display:none;"><td style="padding:0;"></td></tr>';
   }).join('');
   // ─── Also render Cards view (toggled via setCourtView) ───
   renderCourtCards(rows);
