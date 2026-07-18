@@ -23192,6 +23192,11 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 .c-catno .cat{ font-size:8.5px; font-weight:900; letter-spacing:.04em; opacity:.9; }
 .c-catno .no{ font-family:ui-monospace,monospace; font-size:13px; font-weight:900; margin-top:1px; }
 .c-date{ font-size:9.5px; font-weight:800; color:#fff; padding:8px 9px; white-space:nowrap; filter:brightness(0.85); }
+.c-date-wrap{ padding:8px 10px; text-align:right; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px; }
+.c-date-wrap .c-courtname{ font-size:10px; font-weight:900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 1px 2px rgba(0,0,0,.25); }
+.c-date-wrap .c-relsub{ font-size:9px; font-weight:700; }
+.c-date-wrap .c-relsub .linked-enquiry-badge{ background:rgba(255,255,255,.92) !important; color:#062a52 !important; font-size:9px !important; padding:1px 7px !important; }
+.c-date-wrap .c-relsub .manual-apraadh-badge{ font-size:9px !important; padding:1px 7px !important; }
 .c-body{ padding:10px 11px; display:flex; flex-direction:column; gap:7px; position:relative; }
 .c-urgent{ position:absolute; top:6px; right:8px; font-size:7.5px; font-weight:900; color:#fff; background:#dc2626; border-radius:4px; padding:1px 6px; transform:rotate(-6deg); box-shadow:0 2px 5px rgba(220,38,38,.4); }
 .c-parties{ display:flex; flex-direction:column; gap:5px; align-items:flex-start; }
@@ -23240,7 +23245,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .docket-meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:5px 8px; }
 .dmg-cell{ display:flex; min-width:0; }
 .dmg-cell.dmg-right{ justify-content:flex-end; }
-.dmg-cell .m-chip{ max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dmg-cell .m-chip{ max-width:100%; white-space:normal; word-break:break-word; line-height:1.25; }
 .m-chip{ font-size:10px; font-weight:800; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; }
 .m-hear{ background:#fef3c7; color:#92400e; } .m-cnr{ background:#e0f2fe; color:#0369a1; }
 .m-status{ background:#dcfce7; color:#166534; } .m-status.disp{ background:#e2e8f0; color:#475569; }
@@ -23251,6 +23256,8 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .a-btn{ display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; padding:5px 11px; border-radius:8px; border:none; cursor:pointer; color:#fff; }
 .a-link{ background:#7c3aed; } .a-link:hover{ background:#6d28d9; }
 .a-review{ background:#b45309; } .a-review:hover{ background:#92400e; }
+.a-cnr{ background:#0369a1; font-weight:900; letter-spacing:.01em; } .a-cnr:hover{ background:#075985; }
+.a-cnr.a-cnr-empty{ background:#94a3b8; cursor:default; }
 .act-link{ background:#7c3aed; color:#fff; border:none; }
 
 .crt-tr.crt-tr-dim .docket-row-inner{ opacity:.6; }
@@ -23263,8 +23270,9 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .court-card-wrap .court-card.enq-card-head{ padding:0 !important; cursor:pointer; }
 .stamp-no .rel-sub{ margin-top:3px; font-size:9px; }
 .stamp-no .rel-sub .linked-enquiry-badge, .stamp-no .rel-sub .manual-apraadh-badge{ font-size:9px !important; padding:1px 6px !important; }
-.c-catno .cnr-sub{ font-size:8px; font-weight:700; opacity:.9; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.c-catno .cnr-sub.cnr-sub-empty{ opacity:.55; }
+.c-catno .cnr-sub{ font-size:10.5px; font-weight:900; opacity:1; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.c-catno .cnr-sub.cnr-sub-empty{ opacity:.6; font-weight:700; }
+.c-catno .cnr-sub .cnr-ecourts{ color:inherit; text-decoration:none; margin-left:3px; }
 
 </style>
 </head>
@@ -56512,12 +56520,13 @@ function renderCourtTable() {
         '<div class="parties-wrap">'+petChip+vsSep+respChip+'</div>'+
         '<div class="docket-meta-grid">'+
           '<div class="dmg-cell">'+hearCell+'</div>'+
-          '<div class="dmg-cell dmg-right">'+cnrCell+'</div>'+
+          '<div class="dmg-cell dmg-right"></div>'+
           '<div class="dmg-cell">'+statusCell+'</div>'+
           '<div class="dmg-cell dmg-right">'+ioCell+'</div>'+
         '</div>'+
         '<div class="actions">'+
           '<button class="a-btn a-link" onclick="event.stopPropagation();openCourtLinkPicker(\''+c.id+'\')">🔗 Link Enquiry</button>'+
+          (c.cnr_no ? ('<button class="a-btn a-cnr" onclick="event.stopPropagation();'+(c.cnr_no.indexOf('SN-')===-1?('openEcourtsForCase(\''+c.id+'\', event)'):'void(0)')+'">🔍 CNR: '+escapeHtml(c.cnr_no)+'</button>') : '<span class="a-btn a-cnr a-cnr-empty">CNR: —</span>')+
           reviewActionBtn+
         '</div>'+
       '</div>'+
@@ -56547,7 +56556,7 @@ function renderCourtCards(rows) {
     wrap.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><h3>No court cases</h3></div>';
     return;
   }
-  wrap.innerHTML = '<div class="enq-cards-grid">' + rows.map(function(c){
+  wrap.innerHTML = rows.map(function(c){
     var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
     var courtName = cm ? cm.name : '— Unassigned —';
     var tier = cm ? (cm.tier || '') : '';
@@ -56560,18 +56569,19 @@ function renderCourtCards(rows) {
     var respChip = _docketNcompChip(c.respondent);
     var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 ' + escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing) + '</span>') : '<span class="m-chip m-empty">📅 —</span>';
     var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
-    var relGridCell = relCell || '<span class="m-empty" style="background:transparent;border:none;">—</span>';
     var statusCell = _courtStatusChip(isDisp);
     var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 ' + escapeHtml(officerDisplay) + '</span>') : '<span class="m-chip m-empty">👮 —</span>';
-    var cnrSub = c.cnr_no ? ('<div class="cnr-sub">CNR: ' + escapeHtml(c.cnr_no) + '</div>') : '<div class="cnr-sub cnr-sub-empty">CNR: —</div>';
+    var cnrSub = c.cnr_no
+      ? ('<div class="cnr-sub">CNR: ' + escapeHtml(c.cnr_no) + (c.cnr_no.indexOf('SN-')===-1 ? (' <a href="javascript:void(0)" class="cnr-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\'' + c.id + '\', event)" title="court site पर खोलें">🔍</a>') : '') + '</div>')
+      : '<div class="cnr-sub cnr-sub-empty">CNR: —</div>';
     return '<div class="court-card-wrap docket-card" id="court-card-wrap-' + c.id + '">' +
       '<div class="court-card enq-card-head" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
-        '<div class="c-top"><div class="c-catno ' + tinfo.cls + '"><div class="cat">' + tinfo.label + '</div><div class="no">' + escapeHtml(typeNo) + '</div>' + cnrSub + '</div><div class="c-date ' + tinfo.cls + '">' + escapeHtml(courtName) + '</div></div>' +
+        '<div class="c-top"><div class="c-catno ' + tinfo.cls + '"><div class="cat">' + tinfo.label + '</div><div class="no">' + escapeHtml(typeNo) + '</div>' + cnrSub + '</div><div class="c-date-wrap ' + tinfo.cls + '"><div class="c-courtname">' + escapeHtml(courtName) + '</div><div class="c-relsub">' + relCell + '</div></div></div>' +
         '<div class="c-body">' +
           '<div class="c-parties">' + petChip + respChip + '</div>' +
           '<div class="docket-meta-grid">' +
             '<div class="dmg-cell">' + hearCell + '</div>' +
-            '<div class="dmg-cell dmg-right">' + relGridCell + '</div>' +
+            '<div class="dmg-cell dmg-right"></div>' +
             '<div class="dmg-cell">' + statusCell + '</div>' +
             '<div class="dmg-cell dmg-right">' + ioCell + '</div>' +
           '</div>' +
@@ -56583,7 +56593,7 @@ function renderCourtCards(rows) {
       '</div>' +
       '<div class="court-card-brief" id="court-card-brief-' + c.id + '" style="display:none;"></div>' +
     '</div>';
-  }).join('') + '</div>';
+  }).join('');
 }
 
 // ─── Toggle inline brief expansion inside court card view ───
