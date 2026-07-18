@@ -23044,6 +23044,14 @@ body.view-mobile .hdr-counter-stack, body.view-mobile .reports-uni-stack, body.v
 body.view-mobile img, body.view-mobile video, body.view-mobile table, body.view-mobile pre { max-width: 100% !important; }
 /* long section-tab bar scrolls horizontally instead of pushing the page wide */
 body.view-mobile .section-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Tag picker — श्रेणी-वार grouping (v247) */
+.itw-cat{ margin:8px 0 4px; }
+.itw-cat-h{ display:flex; align-items:center; gap:7px; font-size:10.5px; font-weight:900; color:#0a3a6e; text-transform:none; margin-bottom:5px; }
+.itw-cat-n{ background:#e6edf5; color:#12325c; border-radius:999px; padding:0 7px; font-size:9px; font-weight:800; }
+.itw-cat-add{ margin-left:auto; background:#0d9488; color:#fff; border:none; border-radius:999px; padding:3px 10px; font-size:10px; font-weight:800; cursor:pointer; }
+.itw-cat-add:hover{ background:#0f766e; }
+.itw-newcat-lbl{ font-size:10px; color:#0d9488; font-weight:800; margin-left:4px; }
 </style>
 </head>
 <body>
@@ -58803,6 +58811,17 @@ function _renderTagUsageItem(srcKey, r) {
 // END TAGS MANAGEMENT
 // ════════════════════════════════════════════════════════════════════
 
+var TAG_CATS = [
+  { k:'designation', lbl:'🎖️ पदनाम', col:'blue' },
+  { k:'party',       lbl:'🏛️ राजनीतिक दल', col:'orange' },
+  { k:'district',    lbl:'📍 ज़िला', col:'teal' },
+  { k:'department',  lbl:'🏢 विभाग', col:'green' },
+  { k:'priority',    lbl:'⚡ महत्व / प्रकृति', col:'purple' },
+  { k:'system',      lbl:'⚙️ System', col:'blue' },
+  { k:'reference',   lbl:'👤 References (@name)', col:'gray' },
+  { k:'__other',     lbl:'🏷️ अन्य', col:'gray' }
+];
+function _tagCatOf(t){ var c=((t&&t.category)||'').trim(); if(c) return c; return (/^@/.test((t&&t.name)||''))?'reference':'__other'; }
 function renderTagsWidget(containerId, appliedIds, onChange) {
   var container = document.getElementById(containerId);
   if (!container) return;
@@ -58842,22 +58861,25 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
   }
   html += '</div></div>';
   
-  // ─── Section 2: Available chips ───
+  // ─── Section 2: Available chips — श्रेणी-वार (grouped) ───
   html += '<div class="itw-section">';
-  html += '<div class="itw-label">➕ उपलब्ध (tap to add) <span class="badge">' + available.length + '</span></div>';
-  html += '<div class="itw-chips-wrap">';
-  if (available.length === 0) {
-    html += '<span class="itw-empty">सब tags applied हैं</span>';
-  } else {
-    html += available.map(function(t){
-      return renderTagChip(t, { isAvailable: true, dataAction: 'add' });
-    }).join('');
-  }
-  html += '</div></div>';
+  html += '<div class="itw-label">➕ उपलब्ध — श्रेणी-वार <span class="badge">' + available.length + '</span></div>';
+  TAG_CATS.forEach(function(cat){
+    var items = available.filter(function(t){ return _tagCatOf(t)===cat.k; });
+    if (cat.k==='__other' && items.length===0) return;   // hide empty "अन्य"
+    html += '<div class="itw-cat">';
+    html += '<div class="itw-cat-h">' + cat.lbl + ' <span class="itw-cat-n">' + items.length + '</span>' +
+            '<button type="button" class="itw-cat-add" data-cat="' + cat.k + '">＋ जोड़ें</button></div>';
+    html += '<div class="itw-chips-wrap">';
+    if (items.length === 0) { html += '<span class="itw-empty" style="font-size:10px;opacity:.7;">— इस श्रेणी में उपलब्ध नहीं —</span>'; }
+    else { html += items.map(function(t){ return renderTagChip(t, { isAvailable: true, dataAction: 'add' }); }).join(''); }
+    html += '</div></div>';
+  });
+  html += '</div>';
   
   // ─── Section 3: New tag row + inline color swatches ───
   html += '<div class="itw-section itw-new">';
-  html += '<div class="itw-label">✨ नया Tag बनाएं</div>';
+  html += '<div class="itw-label">✨ नया Tag बनाएं <span class="itw-newcat-lbl" id="' + containerId + '-newcat-lbl"></span></div>';
   html += '<div class="itw-new-row">';
   html += '<input type="text" class="itw-new-input" id="' + inputId + '" placeholder="Tag का नाम..." maxlength="30">';
   html += '<button type="button" class="itw-add-btn" id="' + addBtnId + '">+ Add</button>';
@@ -58905,6 +58927,22 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
     });
   }
   
+  // Per-category ＋ जोड़ें → focus new-tag input with that category + colour
+  container.querySelectorAll('.itw-cat-add').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var ck = b.getAttribute('data-cat');
+      var meta = TAG_CATS.filter(function(c){return c.k===ck;})[0] || {col:'gray',lbl:ck};
+      container.dataset.newCategory = ck;
+      container.dataset.newColor = meta.col || 'gray';
+      var lblEl = document.getElementById(containerId + '-newcat-lbl');
+      if (lblEl) lblEl.textContent = '→ ' + (meta.lbl || ck);
+      var sw = document.getElementById(swRowId);
+      if (sw) { sw.querySelectorAll('.itw-sw').forEach(function(s){ s.classList.toggle('is-active', s.getAttribute('data-color')===(meta.col||'gray')); }); }
+      var inp = document.getElementById(inputId);
+      if (inp) { inp.focus(); try{ inp.scrollIntoView({block:'nearest'}); }catch(_){} }
+    });
+  });
   // Add new tag
   var input = document.getElementById(inputId);
   var addBtn = document.getElementById(addBtnId);
@@ -58931,7 +58969,7 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
     try {
       var color = container.dataset.newColor || 'gray';
       var resp = await supa.from('tags').insert({
-        name: name, color: color, is_system: false
+        name: name, color: color, is_system: false, category: (container.dataset.newCategory || null)
       }).select().single();
       if (resp.error) throw resp.error;
       
