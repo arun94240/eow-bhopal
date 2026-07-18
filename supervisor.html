@@ -23166,6 +23166,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 .review-chip{ font-size:10px; font-weight:800; color:#fff; background:linear-gradient(135deg,#7c3aed,#6d28d9); border-radius:20px; padding:3px 10px; }
 .review-chip.rc-overdue{ background:linear-gradient(135deg,#dc2626,#b91c1c); }
 .review-chip.rc-today{ background:linear-gradient(135deg,#f5b942,#e8a82e); color:#062a52; }
+.review-chip.rc-none{ background:#f1f5f9; color:#94a3b8; font-weight:700; }
 
 .docket-row-inner .actions{ display:flex; gap:6px; flex-wrap:wrap; }
 .act-btn{ display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; padding:5px 10px; border-radius:8px; border:none; cursor:pointer; color:#fff; }
@@ -52960,13 +52961,13 @@ function _docketIsUrgent(r){
   return r.tag_ids.some(function(tid){ var t=(typeof getTagById==='function')?getTagById(tid):null; return t && t.name==='URGENT'; });
 }
 function _docketReviewChip(type, r){
-  if (isEntryDimmed(r)) return '';
+  if (isEntryDimmed(r)) return '<span class="review-chip rc-none">—</span>';
   var rs = getReviewStatus(type, r.id);
   var lr = getLatestReview(type, r.id);
   if (rs === 'overdue') return '<span class="review-chip rc-overdue" title="समीक्षा overdue">⚠ ' + fmtReviewDate(lr.next_review_date) + '</span>';
   if (rs === 'today') return '<span class="review-chip rc-today" title="आज समीक्षा है">🎯 आज समीक्षा</span>';
   if (rs === 'fresh') return '<span class="review-chip" title="अगली समीक्षा">⭐ अगली समीक्षा ' + fmtReviewDate(lr.next_review_date) + '</span>';
-  return '';
+  return '<span class="review-chip rc-none" title="कभी समीक्षा नहीं">○ कभी समीक्षा नहीं</span>';
 }
 function _docketStatusChip(r){
   var st = r.case_status || 'Active';
@@ -53024,7 +53025,12 @@ function _buildEnquiryRow(type, r, i, scoped) {
         '<div class="body">'+
           (supBadges ? ('<div class="docket-sup">'+supBadges+'</div>') : '')+
           '<div class="parties-wrap">'+compChip+vsSep+ncompChip+'</div>'+
-          '<div class="meta-row">'+ioSeal+_docketStatusChip(r)+_docketReviewChip(type,r)+'</div>'+
+          '<div class="docket-meta-grid">'+
+            '<div class="dmg-cell">'+ioSeal+'</div>'+
+            '<div class="dmg-cell dmg-right">'+_docketStatusChip(r)+'</div>'+
+            '<div class="dmg-cell">'+_docketReviewChip(type,r)+'</div>'+
+            '<div class="dmg-cell dmg-right"></div>'+
+          '</div>'+
           '<div class="actions">'+_docketActions(type,r)+'</div>'+
         '</div>'+
         '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\''+type+'\',\''+r.id+'\')">✎</button></div>'+
@@ -53109,7 +53115,12 @@ function _buildEnquiryCard(type, r, scoped) {
       '<div class="c-body">' +
         urgentHtml +
         '<div class="c-parties">' + compChip + ncompChip + '</div>' +
-        '<div class="c-meta">' + ioSeal + _docketStatusChip(r) + _docketReviewChip(type, r) + '</div>' +
+        '<div class="docket-meta-grid">' +
+          '<div class="dmg-cell">' + ioSeal + '</div>' +
+          '<div class="dmg-cell dmg-right">' + _docketStatusChip(r) + '</div>' +
+          '<div class="dmg-cell">' + _docketReviewChip(type, r) + '</div>' +
+          '<div class="dmg-cell dmg-right"></div>' +
+        '</div>' +
         '<div class="c-actions">' +
           '<button class="act-btn act-timeline" title="Case Timeline" onclick="event.stopPropagation();showCasePragatiTimeline(\''+type+'\',\''+r.id+'\')">📊 Case Timeline</button>' +
           (isEntryDimmed(r) ? '' : ('<button class="act-btn act-review" title="प्रकरण समीक्षा" onclick="event.stopPropagation();openReviewModal(\''+type+'\',\''+r.id+'\')">⭐ प्रकरण समीक्षा</button>')) +
