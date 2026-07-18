@@ -23022,6 +23022,28 @@ body.role-staff #mydaily-box{ display:none !important; }
 /* #3 — Agenda group chip inline ＋ add button (v241) */
 #mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
 #mydaily-box .mtx-chip-add:hover{ background:#fff; transform:scale(1.12); }
+
+/* ══════════ Responsive overflow hardening — fit every screen (v246) ══════════ */
+html, body { overflow-x: hidden !important; max-width: 100vw; }
+main, .header-inner { max-width: 100%; }
+/* MOBILE: nothing may exceed the viewport width */
+body.view-mobile main { max-width: 100% !important; width: 100% !important; padding-left: 10px !important; padding-right: 10px !important; }
+body.view-mobile .header-inner { max-width: 100% !important; width: 100% !important; }
+body.view-mobile #unified-search-box, body.view-mobile .global-search-wrap, body.view-mobile .usb-hero,
+body.view-mobile .ov-section, body.view-mobile .section, body.view-mobile .cs-box { max-width: 100% !important; width: 100% !important; box-sizing: border-box !important; }
+/* Top Search hero → stack on phones so the IO pill & stats don't overflow */
+body.view-mobile .usb-hero-row { flex-wrap: wrap !important; }
+body.view-mobile .usb-hero-search { flex: 1 1 100% !important; min-width: 0 !important; }
+body.view-mobile .usb-hero-io { flex: 1 1 100% !important; min-width: 0 !important; }
+body.view-mobile .usb-hero-top { flex-wrap: wrap !important; }
+body.view-mobile .usb-hero-score { margin-left: 0 !important; }
+/* Agenda toolbar, chips, counter stacks, report tiles → always wrap */
+body.view-mobile .mydd-dg-toprow, body.view-mobile .agenda-tools-wrap, body.view-mobile .mtx-chip-grid,
+body.view-mobile .hdr-counter-stack, body.view-mobile .reports-uni-stack, body.view-mobile .ovstats-tile-row { flex-wrap: wrap !important; }
+/* Media / tables never force horizontal scroll */
+body.view-mobile img, body.view-mobile video, body.view-mobile table, body.view-mobile pre { max-width: 100% !important; }
+/* long section-tab bar scrolls horizontally instead of pushing the page wide */
+body.view-mobile .section-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 </style>
 </head>
 <body>
