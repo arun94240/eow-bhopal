@@ -28248,6 +28248,7 @@ async function doLogin() {
 
 function showMainApp() {
   // Apply view mode FIRST (before content load) — checks localStorage or shows modal
+  try{ localStorage.removeItem('eow_view_mode'); }catch(e){}  // migrate to auto-responsive
   applyViewMode();
   
   document.getElementById('mainApp').style.display = 'block';
@@ -28259,16 +28260,31 @@ function showMainApp() {
 }
 
 // ============ VIEW MODE: Desktop vs Mobile ============
+var _viewManual = false;      // true once the user manually toggles (session-only override)
+var _viewResizeDeb = null;
+function _autoViewMode() {
+  var w = window.innerWidth || document.documentElement.clientWidth || 1024;
+  return (w < 1024) ? 'mobile' : 'desktop';   // phones + iPad-portrait → mobile; iPad-landscape + desktop → desktop
+}
 function applyViewMode() {
-  var savedView = localStorage.getItem('eow_view_mode');
-  
-  if (savedView === 'desktop' || savedView === 'mobile') {
-    // User has a saved preference — apply silently
-    setViewMode(savedView, false);
-  } else {
-    // First time — show choice modal
-    showViewChoiceModal();
+  // Fully responsive: pick the view automatically from the actual screen, and
+  // re-evaluate on resize / orientation change — like any normal web app.
+  setViewMode(_autoViewMode(), false);
+  _bindAutoView();
+}
+function _bindAutoView() {
+  if (window._viewAutoBound) return; window._viewAutoBound = true;
+  function onResize() {
+    if (_viewManual) return;                    // respect a manual choice for this session
+    if (_viewResizeDeb) clearTimeout(_viewResizeDeb);
+    _viewResizeDeb = setTimeout(function() {
+      var want = _autoViewMode();
+      var cur = document.body.classList.contains('view-mobile') ? 'mobile' : 'desktop';
+      if (want !== cur) setViewMode(want, false);
+    }, 180);
   }
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', onResize);
 }
 
 function showViewChoiceModal() {
@@ -28352,8 +28368,9 @@ function updateViewToggleButton(currentMode) {
 function toggleViewMode() {
   var currentMode = document.body.classList.contains('view-mobile') ? 'mobile' : 'desktop';
   var newMode = (currentMode === 'mobile') ? 'desktop' : 'mobile';
-  setViewMode(newMode, true);  // always persist on manual toggle
-  toast('✓ Switched to ' + (newMode === 'mobile' ? 'Mobile' : 'Desktop') + ' view');
+  _viewManual = true;          // user override — stop auto-switching until reload
+  setViewMode(newMode, false); // don't persist across devices; auto again on next load
+  toast('✓ ' + (newMode === 'mobile' ? 'Mobile' : 'Desktop') + ' view (इस session हेतु)');
 }
 
 // Mobile-only: Toggle "More" panel to show hidden secondary tabs
