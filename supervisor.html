@@ -23277,6 +23277,26 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .c-catno .cnr-sub.cnr-sub-empty{ opacity:.6; font-weight:700; }
 .c-catno .cnr-sub .cnr-ecourts{ color:inherit; text-decoration:none; margin-left:3px; }
 
+
+/* ═══ IO/Court True Inline Breakdown Accordion (v272) ═══ */
+.io-inline-panel-row{ cursor:default; }
+.io-inline-panel{ background:linear-gradient(160deg,#062a52,#0a3a6e); border-radius:12px; margin:8px 0; padding:13px 15px; animation:ioInlineOpen .26s cubic-bezier(.22,.61,.36,1); }
+@keyframes ioInlineOpen{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:translateY(0); } }
+.io-inline-hd{ display:flex; align-items:center; gap:9px; margin-bottom:11px; }
+.io-inline-name{ font-size:13.5px; font-weight:900; color:#fff; }
+.io-inline-total{ font-size:10.5px; color:#f5b942; font-weight:800; margin-left:auto; }
+.io-inline-close{ background:rgba(255,255,255,.12); border:none; color:#fff; width:26px; height:26px; border-radius:7px; font-size:14px; cursor:pointer; }
+.io-inline-close:hover{ background:rgba(255,255,255,.22); }
+.io-inline-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:7px; }
+.io-inline-chip{ background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.2); border-radius:9px; padding:9px 7px; text-align:center; cursor:pointer; transition:all .15s; }
+.io-inline-chip:hover{ background:rgba(245,185,66,.2); border-color:#f5b942; }
+.io-inline-chip.io-inline-chip-active{ background:#f5b942; border-color:#f5b942; }
+.io-inline-chip.io-inline-chip-active .lbl, .io-inline-chip.io-inline-chip-active .ct{ color:#062a52 !important; }
+.io-inline-chip .lbl{ font-size:9.5px; color:#cfe0f3; font-weight:700; }
+.io-inline-chip .ct{ font-size:16px; font-weight:900; color:#fff; margin-top:2px; }
+.io-inline-chip.io-inline-chip-disabled{ opacity:.35; cursor:default; }
+.io-inline-caselist{ margin-top:11px; background:#eef2f7; border-radius:10px; padding:10px; animation:ioInlineOpen .22s ease; }
+.io-inline-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
 </style>
 </head>
 <body>
@@ -33090,7 +33110,7 @@ function renderIOInlineCell(ioName, assignedDate) {
     var dStr = (typeof fmtDateShort === 'function') ? fmtDateShort(assignedDate) : fmtDate(assignedDate);
     dateHTML = '<span class="io-badge-date">📅 ' + escapeHtml(dStr) + '</span>';
   }
-  return '<span class="io-inline-trigger io-badge' + (dateHTML ? ' io-badge-stacked' : '') + '" onclick="event.stopPropagation();openIOBreakdownModal(\'' + safeName + '\')" title="Click to view IO breakdown">' +
+  return '<span class="io-inline-trigger io-badge' + (dateHTML ? ' io-badge-stacked' : '') + '" onclick="toggleIOInlineBreakdown(\'' + safeName + '\', event)" title="Click to view IO breakdown — inline">' +
     '<span class="io-badge-top">' +
       '<span class="io-badge-icon">👮</span>' +
       '<span class="io-badge-name">' + escapeHtml(displayName) + '</span>' +
@@ -51568,6 +51588,132 @@ function navIOHead(ioName, head) {
 }
 
 // Open IO breakdown modal — like year breakdown but for an officer
+/* ═══════════════════════════════════════════════════════════════════
+   👮 IO / Court Officer — TRUE INLINE breakdown accordion (v272)
+   Opens directly below the tapped IO badge — no modal, no page jump.
+   Category tiles → tap → case-list (Docket cards) opens inline below
+   that, in the SAME panel. Tap a case → same toggleEnquiryCardBrief /
+   toggleCourtCardBrief inline-brief pattern used everywhere else.
+   ═══════════════════════════════════════════════════════════════════ */
+var _ioInlinePanelEl = null;
+var _ioBreakdownLabels = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs:'RCs', pes:'PEs', strs:'STRs', sutra:'Sutra Suchna', court:'Court Cases' };
+var _ioBreakdownOrder = ['complaints','rcomplaints','rcs','pes','strs','sutra','court'];
+
+function _ioComputeBreakdown(ioName){
+  var d = { complaints:0, rcomplaints:0, rcs:0, pes:0, strs:0, sutra:0, court:0, total:0 };
+  Object.keys(ENQ_LABELS).forEach(function(t){
+    (state.enquiries[t] || []).forEach(function(r){ if (r.io_name === ioName) { d[t] = (d[t]||0)+1; d.total++; } });
+  });
+  (state.courts || []).forEach(function(c){
+    var officer = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : '';
+    if (officer === ioName) { d.court++; d.total++; }
+  });
+  return d;
+}
+
+function _ioBuildCaseListHTML(ioName, cat){
+  if (cat === 'court') {
+    var crows = (state.courts || []).filter(function(c){
+      var officer = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : '';
+      return officer === ioName;
+    });
+    if (typeof chronoCompareCourt === 'function') crows.sort(chronoCompareCourt);
+    if (!crows.length) return '<div class="empty-state"><h3>कोई case नहीं</h3></div>';
+    return '<div class="io-inline-cards-grid">' + crows.map(function(c){ return _buildCourtCard(c); }).join('') + '</div>';
+  }
+  var erows = (state.enquiries[cat] || []).filter(function(r){ return r.io_name === ioName; });
+  if (typeof numCompareEntry === 'function') erows.sort(numCompareEntry);
+  if (!erows.length) return '<div class="empty-state"><h3>कोई case नहीं</h3></div>';
+  return '<div class="io-inline-cards-grid">' + erows.map(function(r){ return _buildEnquiryCard(cat, r, false); }).join('') + '</div>';
+}
+
+function _ioBuildPanelHTML(ioName, d, activeCat){
+  var safeIO = String(ioName).replace(/'/g, "\\'");
+  var chips = _ioBreakdownOrder.map(function(k){
+    var count = d[k] || 0;
+    var activeCls = (activeCat === k) ? ' io-inline-chip-active' : '';
+    if (!count) {
+      return '<div class="io-inline-chip io-inline-chip-disabled"><div class="lbl">' + _ioBreakdownLabels[k] + '</div><div class="ct">0</div></div>';
+    }
+    return '<div class="io-inline-chip' + activeCls + '" onclick="event.stopPropagation();ioInlineSelectCategory(\'' + safeIO + '\',\'' + k + '\')">' +
+      '<div class="lbl">' + _ioBreakdownLabels[k] + '</div><div class="ct">' + count + '</div></div>';
+  }).join('');
+  var caselistHTML = activeCat ? ('<div class="io-inline-caselist">' + _ioBuildCaseListHTML(ioName, activeCat) + '</div>') : '';
+  return '<div class="io-inline-panel">' +
+    '<div class="io-inline-hd">' +
+      '<span class="io-inline-name">👮 ' + escapeHtml(ioName) + '</span>' +
+      '<span class="io-inline-total">कुल ' + d.total + '</span>' +
+      '<button class="io-inline-close" onclick="event.stopPropagation();ioInlineClosePanel()">✕</button>' +
+    '</div>' +
+    '<div class="io-inline-grid">' + chips + '</div>' +
+    caselistHTML +
+  '</div>';
+}
+
+function _ioInsertInlinePanel(triggerEl, html){
+  var tr = triggerEl.closest('tr');
+  if (tr) {
+    var wrapperTr = document.createElement('tr');
+    wrapperTr.className = 'io-inline-panel-row';
+    var td = document.createElement('td');
+    td.colSpan = 20;
+    td.style.padding = '0';
+    td.innerHTML = html;
+    wrapperTr.appendChild(td);
+    tr.parentNode.insertBefore(wrapperTr, tr.nextSibling);
+    return wrapperTr;
+  }
+  var card = triggerEl.closest('.docket-card') || triggerEl.closest('.court-card-wrap') || triggerEl.closest('.enq-card') || triggerEl.parentElement;
+  var div = document.createElement('div');
+  div.className = 'io-inline-panel-row';
+  div.innerHTML = html;
+  if (card && card.parentNode) card.parentNode.insertBefore(div, card.nextSibling);
+  else triggerEl.insertAdjacentElement('afterend', div);
+  return div;
+}
+
+function _ioInlinePanelBody(panelEl){
+  return panelEl.tagName === 'TR' ? panelEl.querySelector('td') : panelEl;
+}
+
+function ioInlineClosePanel(){
+  if (_ioInlinePanelEl) { _ioInlinePanelEl.remove(); _ioInlinePanelEl = null; }
+}
+
+function toggleIOInlineBreakdown(ioName, ev){
+  if (ev) ev.stopPropagation();
+  var trigger = (ev && ev.target && ev.target.closest) ? ev.target.closest('.io-badge, .io-inline-trigger') : null;
+  if (!trigger) return;
+  // tapping the SAME badge again → close (toggle off)
+  if (_ioInlinePanelEl && _ioInlinePanelEl._forTrigger === trigger) {
+    ioInlineClosePanel();
+    return;
+  }
+  ioInlineClosePanel(); // only one panel open at a time, anywhere
+  var d = _ioComputeBreakdown(ioName);
+  var html = _ioBuildPanelHTML(ioName, d, null);
+  var panelEl = _ioInsertInlinePanel(trigger, html);
+  panelEl._forTrigger = trigger;
+  panelEl._ioName = ioName;
+  panelEl._activeCat = null;
+  _ioInlinePanelEl = panelEl;
+  setTimeout(function(){
+    var rect = panelEl.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight - 20) {
+      try { panelEl.scrollIntoView({ behavior:'smooth', block:'nearest' }); } catch(e){}
+    }
+  }, 60);
+}
+
+function ioInlineSelectCategory(ioName, cat){
+  if (!_ioInlinePanelEl) return;
+  var d = _ioComputeBreakdown(ioName);
+  var newActive = (_ioInlinePanelEl._activeCat === cat) ? null : cat; // tap same tile again → collapse case-list
+  _ioInlinePanelEl._activeCat = newActive;
+  var body = _ioInlinePanelBody(_ioInlinePanelEl);
+  body.innerHTML = _ioBuildPanelHTML(ioName, d, newActive);
+}
+
 function openIOBreakdownModal(ioName) {
   // Compute breakdown
   var d = { complaints: 0, rcomplaints: 0, rcs: 0, pes: 0, strs: 0, sutra: 0, court: 0, total: 0 };
@@ -56560,6 +56706,44 @@ function renderCourtTable() {
 //   • --Related to: RC-43-91
 // Responsive: 1col mobile, 2col tablet, 3col desktop (CSS handles via grid)
 // ═══════════════════════════════════════════════════════════════════
+function _buildCourtCard(c){
+  var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
+  var courtName = cm ? cm.name : '— Unassigned —';
+  var tier = cm ? (cm.tier || '') : '';
+  var tinfo = _courtTierInfo(tier);
+  var typeStr = (c.case_type === 'Other' ? c.case_type_other : c.case_type) || '';
+  var typeNo = (typeStr + ' ' + (c.case_no || '')).trim();
+  var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : '';
+  var isDisp = (c.case_status && /dispos|निरस्त|खारिज|withdraw/i.test(c.case_status)) || c.disposed === true;
+  var petChip = _docketCompChip(c.petitioner);
+  var respChip = _docketNcompChip(c.respondent);
+  var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 ' + escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing) + '</span>') : '<span class="m-chip m-empty">📅 —</span>';
+  var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
+  var statusCell = _courtStatusChip(isDisp);
+  var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 ' + escapeHtml(officerDisplay) + '</span>') : '<span class="m-chip m-empty">👮 —</span>';
+  var cnrSub = c.cnr_no
+    ? ('<div class="cnr-sub">CNR: ' + escapeHtml(c.cnr_no) + (c.cnr_no.indexOf('SN-')===-1 ? (' <a href="javascript:void(0)" class="cnr-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\'' + c.id + '\', event)" title="court site पर खोलें">🔍</a>') : '') + '</div>')
+    : '<div class="cnr-sub cnr-sub-empty">CNR: —</div>';
+  return '<div class="court-card-wrap docket-card" id="court-card-wrap-' + c.id + '">' +
+    '<div class="court-card enq-card-head" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
+      '<div class="c-top"><div class="c-catno ' + tinfo.cls + '"><div class="cat">' + tinfo.label + '</div><div class="no">' + escapeHtml(typeNo) + '</div>' + cnrSub + '</div><div class="c-date-wrap ' + tinfo.cls + '"><div class="c-courtname">' + escapeHtml(courtName) + '</div><div class="c-relsub">' + relCell + '</div></div></div>' +
+      '<div class="c-body">' +
+        '<div class="c-parties">' + petChip + respChip + '</div>' +
+        '<div class="docket-meta-grid">' +
+          '<div class="dmg-cell">' + hearCell + '</div>' +
+          '<div class="dmg-cell dmg-right"></div>' +
+          '<div class="dmg-cell">' + statusCell + '</div>' +
+          '<div class="dmg-cell dmg-right">' + ioCell + '</div>' +
+        '</div>' +
+        '<div class="c-actions">' +
+          '<button class="act-btn act-link" onclick="event.stopPropagation();openCourtLinkPicker(\'' + c.id + '\')">🔗 Link Enquiry</button>' +
+        '</div>' +
+        '<button class="c-edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\'' + c.id + '\')">✎</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="court-card-brief" id="court-card-brief-' + c.id + '" style="display:none;"></div>' +
+  '</div>';
+}
 function renderCourtCards(rows) {
   var wrap = document.getElementById('court-cards-wrap');
   if (!wrap) return;
@@ -56567,44 +56751,7 @@ function renderCourtCards(rows) {
     wrap.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><h3>No court cases</h3></div>';
     return;
   }
-  wrap.innerHTML = rows.map(function(c){
-    var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
-    var courtName = cm ? cm.name : '— Unassigned —';
-    var tier = cm ? (cm.tier || '') : '';
-    var tinfo = _courtTierInfo(tier);
-    var typeStr = (c.case_type === 'Other' ? c.case_type_other : c.case_type) || '';
-    var typeNo = (typeStr + ' ' + (c.case_no || '')).trim();
-    var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : '';
-    var isDisp = (c.case_status && /dispos|निरस्त|खारिज|withdraw/i.test(c.case_status)) || c.disposed === true;
-    var petChip = _docketCompChip(c.petitioner);
-    var respChip = _docketNcompChip(c.respondent);
-    var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 ' + escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing) + '</span>') : '<span class="m-chip m-empty">📅 —</span>';
-    var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
-    var statusCell = _courtStatusChip(isDisp);
-    var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 ' + escapeHtml(officerDisplay) + '</span>') : '<span class="m-chip m-empty">👮 —</span>';
-    var cnrSub = c.cnr_no
-      ? ('<div class="cnr-sub">CNR: ' + escapeHtml(c.cnr_no) + (c.cnr_no.indexOf('SN-')===-1 ? (' <a href="javascript:void(0)" class="cnr-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\'' + c.id + '\', event)" title="court site पर खोलें">🔍</a>') : '') + '</div>')
-      : '<div class="cnr-sub cnr-sub-empty">CNR: —</div>';
-    return '<div class="court-card-wrap docket-card" id="court-card-wrap-' + c.id + '">' +
-      '<div class="court-card enq-card-head" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
-        '<div class="c-top"><div class="c-catno ' + tinfo.cls + '"><div class="cat">' + tinfo.label + '</div><div class="no">' + escapeHtml(typeNo) + '</div>' + cnrSub + '</div><div class="c-date-wrap ' + tinfo.cls + '"><div class="c-courtname">' + escapeHtml(courtName) + '</div><div class="c-relsub">' + relCell + '</div></div></div>' +
-        '<div class="c-body">' +
-          '<div class="c-parties">' + petChip + respChip + '</div>' +
-          '<div class="docket-meta-grid">' +
-            '<div class="dmg-cell">' + hearCell + '</div>' +
-            '<div class="dmg-cell dmg-right"></div>' +
-            '<div class="dmg-cell">' + statusCell + '</div>' +
-            '<div class="dmg-cell dmg-right">' + ioCell + '</div>' +
-          '</div>' +
-          '<div class="c-actions">' +
-            '<button class="act-btn act-link" onclick="event.stopPropagation();openCourtLinkPicker(\'' + c.id + '\')">🔗 Link Enquiry</button>' +
-          '</div>' +
-          '<button class="c-edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\'' + c.id + '\')">✎</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="court-card-brief" id="court-card-brief-' + c.id + '" style="display:none;"></div>' +
-    '</div>';
-  }).join('');
+  wrap.innerHTML = rows.map(function(c){ return _buildCourtCard(c); }).join('');
 }
 
 // ─── Toggle inline brief expansion inside court card view ───
