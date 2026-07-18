@@ -23081,9 +23081,6 @@ body.view-mobile .section-tabs { overflow-x: auto; -webkit-overflow-scrolling: t
 .cs-scopes{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; align-items:center; }
 .cs-sc{ border-radius:999px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; color:#dbeafe; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); }
 .cs-sc.on{ background:#f5b942; color:#062a52; border-color:#f5b942; }
-.cs-tools{ margin-left:auto; display:flex; gap:6px; }
-.cs-advbtn,.cs-repbtn{ background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.22); border-radius:8px; padding:5px 11px; font-size:11px; font-weight:800; cursor:pointer; }
-.cs-advbtn.on{ background:#0d9488; border-color:#0d9488; } .cs-repbtn.on{ background:#7c3aed; border-color:#7c3aed; }
 .cs-adv{ margin-top:10px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:11px; }
 .cs-adv-h{ font-size:10px; font-weight:900; color:#f5b942; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; }
 .cs-adv-row{ display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
@@ -46752,19 +46749,8 @@ function _searchAll(q){
   var hits=_searchIdx.filter(function(it){
     return it.blob.indexOf(raw)>-1 || (rom && it.blob.indexOf(rom)>-1);
   });
-  // scope + filters (Step 3)
-  var enqF=(_csF.type||_csF.status||_csF.from||_csF.to);
-  hits=hits.filter(function(it){
-    if(_csScope!=='all' && it.scope!==_csScope) return false;
-    if(enqF && it.scope!=='enq') return false;               // enq-filters → केवल प्रकरण
-    if(it.scope==='enq' && enqF){
-      var r=_csFindEnq(it.type,it.id); if(!r) return false;
-      if(_csF.type && it.type!==_csF.type) return false;
-      if(_csF.status && (r.case_status||'Active')!==_csF.status) return false;
-      if(_csF.from||_csF.to){ var d=String(r.io_assigned_date||r.date||'').slice(0,10); if(!d) return false; if(_csF.from&&d<_csF.from) return false; if(_csF.to&&d>_csF.to) return false; }
-    }
-    return true;
-  });
+  // scope narrowing
+  if(_csScope!=='all'){ hits=hits.filter(function(it){ return it.scope===_csScope; }); }
   var order=[['enq','📁 प्रकरण'],['court','⚖️ Court'],['io','👮 IO / Staff'],['leave','🏖️ Leaves'],['notice','📨 Notices'],['tag','🏷️ Tags']];
   var groups=order.map(function(o){
     var items=hits.filter(function(h){return h.scope===o[0];});
@@ -46777,8 +46763,7 @@ function invalidateSearchIndex(){ _searchIdx=null; }
 
 /* ── UI: bar + grouped dropdown (renders into #reports-home-content) ── */
 var _csQ='', _csDeb2=null;
-var _csScope='all', _csFiltersOpen=false, _csRowOpenMap={}, _csReportsOpen=false;
-var _csF={ type:'', status:'', from:'', to:'' };
+var _csScope='all', _csRowOpenMap={};
 function _csFindEnq(t,id){ return ((state.enquiries&&state.enquiries[t])||[]).find(function(r){return r.id===id;}); }
 var _CS_SCOPE_CAT={ enq:'c-cmp', court:'c-court', io:'c-io', leave:'c-lv', notice:'c-not', tag:'c-tag' };
 function openComprehensiveSearch(){
@@ -46794,33 +46779,11 @@ function _csRenderSearch(){
   var host=document.getElementById('reports-home-content'); if(!host) return;
   var scopes=[['all','सभी'],['enq','📁 प्रकरण'],['court','⚖️ Court'],['io','👮 IO'],['leave','🏖️ Leaves'],['notice','📨 Notices']];
   var chips=scopes.map(function(s){ return '<span class="cs-sc'+(_csScope===s[0]?' on':'')+'" onclick="event.stopPropagation();csSetScope(\''+s[0]+'\')">'+s[1]+'</span>'; }).join('');
-  var advBtn='<button class="cs-advbtn'+(_csFiltersOpen?' on':'')+'" onclick="event.stopPropagation();csToggleFilters()">⚙️ Filters</button>';
-  var repBtn='<button class="cs-repbtn'+(_csReportsOpen?' on':'')+'" onclick="event.stopPropagation();csToggleReports()">📊 Reports</button>';
-  var adv='';
-  if(_csFiltersOpen){
-    adv='<div class="cs-adv"><div class="cs-adv-h">⚙️ Filters (प्रकरण)</div><div class="cs-adv-row">'+
-      '<select onchange="csSetF(\'type\',this.value)"><option value="">प्रकार: सभी</option>'+Object.keys(ENQ_LABELS).map(function(t){return '<option value="'+t+'"'+(_csF.type===t?' selected':'')+'>'+ENQ_LABELS[t]+'</option>';}).join('')+'</select>'+
-      '<select onchange="csSetF(\'status\',this.value)"><option value="">स्थिति: सभी</option><option value="Active"'+(_csF.status==='Active'?' selected':'')+'>जाँच में</option><option value="Closed"'+(_csF.status==='Closed'?' selected':'')+'>नस्तीबद्ध</option><option value="Converted to RC"'+(_csF.status==='Converted to RC'?' selected':'')+'>RC में</option></select>'+
-      '<input type="date" value="'+_mddEsc(_csF.from)+'" onchange="csSetF(\'from\',this.value)"><span class="cs-dash">→</span><input type="date" value="'+_mddEsc(_csF.to)+'" onchange="csSetF(\'to\',this.value)">'+
-      ((_csF.type||_csF.status||_csF.from||_csF.to)?'<button class="cs-clrf" onclick="event.stopPropagation();csClearF()">✕ साफ़</button>':'')+
-    '</div></div>';
-  }
-  var reports='';
-  if(_csReportsOpen){
-    reports='<div class="cs-adv"><div class="cs-adv-h">📊 Reports</div><div class="cs-rep-grid">'+
-      '<button class="cs-repb" onclick="event.stopPropagation();reportsShowByTypes&&reportsShowByTypes(event)">📁 प्रकरण (type-wise)</button>'+
-      '<button class="cs-repb" onclick="event.stopPropagation();reportsShowEstabReports&&reportsShowEstabReports(event)">🏖️ Leaves</button>'+
-      '<button class="cs-repb" onclick="event.stopPropagation();reportsToggleCao&&reportsToggleCao(event)">👮 Cases vs Officers</button>'+
-      '<button class="cs-repb" onclick="event.stopPropagation();reportsToggleDept&&reportsToggleDept(event)">🏛️ विभाग-wise</button>'+
-      '<button class="cs-repb" onclick="event.stopPropagation();openReportBuilderInline&&openReportBuilderInline()">📊 Custom builder</button>'+
-    '</div></div>';
-  }
   host.innerHTML='<div class="cs-box">'+
-    '<div class="cs-top"><div class="cs-ic">🔍</div><div><div class="cs-ttl">Search & Reports</div><div class="cs-sub">पूरे database में — English या हिंदी · scope: सभी</div></div></div>'+
+    '<div class="cs-top"><div class="cs-ic">🔍</div><div><div class="cs-ttl">Search & Reports</div><div class="cs-sub">पूरे database में — English या हिंदी</div></div></div>'+
     '<div class="cs-bar"><span class="cs-mag">🔎</span><input id="cs-input" type="text" autocomplete="off" value="'+_mddEsc(_csQ)+'" placeholder="कुछ भी टाइप करें — नाम, number, keyword, विवेचक, ज़िला...">'+
       (_csQ?'<button class="cs-clr" onclick="event.stopPropagation();csClearSearch()">✕</button>':'')+'</div>'+
-    '<div class="cs-scopes">'+chips+'<span class="cs-tools">'+advBtn+repBtn+'</span></div>'+
-    adv+reports+
+    '<div class="cs-scopes">'+chips+'</div>'+
     '<div id="cs-dd">'+_csDropdownHTML(_csQ)+'</div>'+
   '</div>';
   var inp=document.getElementById('cs-input');
@@ -46876,10 +46839,6 @@ function _csInlineBrief(scope,type,id){
   return '<div class="cs-brief cs-brief-mini"><div class="cs-bt">'+_mddEsc(it.title)+'</div><div class="cs-bs">'+_mddEsc(it.sub||'')+'</div>'+oe+'</div>';
 }
 function csSetScope(s){ _csScope=s; _csRowOpenMap={}; _csRenderSearch(); var i=document.getElementById('cs-input'); if(i)i.focus(); }
-function csToggleFilters(){ _csFiltersOpen=!_csFiltersOpen; if(_csFiltersOpen)_csReportsOpen=false; _csRenderSearch(); }
-function csToggleReports(){ _csReportsOpen=!_csReportsOpen; if(_csReportsOpen)_csFiltersOpen=false; _csRenderSearch(); }
-function csSetF(k,v){ _csF[k]=v||''; _csRowOpenMap={}; if((k==='type'||k==='status')&&v&&_csScope==='all')_csScope='enq'; _csRenderSearch(); }
-function csClearF(){ _csF={type:'',status:'',from:'',to:''}; _csRenderSearch(); }
 
 function reportsShowByTypes(evt) {
   if (evt && evt.stopPropagation) evt.stopPropagation();
