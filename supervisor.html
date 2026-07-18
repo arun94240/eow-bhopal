@@ -18266,10 +18266,9 @@ body.view-mobile .mbn-btn.active .mbn-label {
   color: #062a52;
 }
 
-/* HIDE top section-tabs in mobile (replaced by bottom nav) */
-body.view-mobile .section-tabs {
-  display: none !important;
-}
+/* Top section-tabs strip is the database navigation (Complaints/RCs/PEs/...).
+   It used to be hidden here in favour of a bottom nav bar; that bottom nav has
+   been removed, so the strip must stay visible — no override, natural wrap. */
 
 /* Floating Add Entry button — bottom-right floating */
 body.view-mobile .quick-add-tab {
@@ -23125,20 +23124,7 @@ body.view-mobile .cmd-metrics{ grid-template-columns:repeat(auto-fit, minmax(200
 body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 /* Agenda tiles (DG EOW / चर्चा / समीक्षा / To-Do) fill width too */
 #mydaily-box .mtx-chip-grid{ grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)) !important; }
-/* counter-tile rows wrap to fit */
-.hdr-counter-stack{ flex-wrap:wrap !important; }
 
-/* ═══════════ v259 — mobile navigation FIX (was disappearing) ═══════════ */
-/* The section-tabs were display:none in view-mobile (old design showed a bottom nav,
-   which has since been removed). That made the whole database-navigation strip flash
-   on first paint then vanish once view-mobile applied. Force it visible as ONE
-   swipeable row, including the secondary tabs, so navigation is always present. */
-body.view-mobile .section-tabs{ display:flex !important; flex-wrap:nowrap !important; overflow-x:auto !important; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-body.view-mobile .section-tabs::-webkit-scrollbar{ display:none; }
-body.view-mobile .section-tab{ display:inline-flex !important; flex:0 0 auto !important; white-space:nowrap; }
-body.view-mobile .section-tab[data-mobile-priority="secondary"]{ display:inline-flex !important; flex:0 0 auto !important; }
-/* keep the now-unused "More" tab hidden (navigation is the swipe row itself) */
-body.view-mobile .section-tab.mobile-more-tab{ display:none !important; }
 </style>
 </head>
 <body>
