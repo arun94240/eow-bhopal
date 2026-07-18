@@ -23102,6 +23102,7 @@ body.view-mobile .section-tabs { overflow-x: auto; -webkit-overflow-scrolling: t
 </style>
 </head>
 <body>
+<script>(function(){try{var m=window.matchMedia('(max-width: 1023px)').matches;document.body.classList.add(m?'view-mobile':'view-desktop');}catch(e){document.body.classList.add('view-desktop');}})();</script>
 
 <!-- CONFIG SCREEN -->
 <div id="configScreen" class="config-screen" style="display:none;">
@@ -28341,29 +28342,29 @@ function showMainApp() {
 // ============ VIEW MODE: Desktop vs Mobile ============
 var _viewManual = false;      // true once the user manually toggles (session-only override)
 var _viewResizeDeb = null;
+var _VIEW_MQ = '(max-width: 1023px)';   // single breakpoint — browser decides
 function _autoViewMode() {
-  var w = window.innerWidth || document.documentElement.clientWidth || 1024;
-  return (w < 1024) ? 'mobile' : 'desktop';   // phones + iPad-portrait → mobile; iPad-landscape + desktop → desktop
+  try { return window.matchMedia(_VIEW_MQ).matches ? 'mobile' : 'desktop'; }
+  catch(e){ var w = window.innerWidth || document.documentElement.clientWidth || 1024; return (w < 1024) ? 'mobile' : 'desktop'; }
 }
 function applyViewMode() {
-  // Fully responsive: pick the view automatically from the actual screen, and
-  // re-evaluate on resize / orientation change — like any normal web app.
+  // One normal, browser-driven layout — no manual Desktop/Mobile mode.
   setViewMode(_autoViewMode(), false);
   _bindAutoView();
 }
 function _bindAutoView() {
   if (window._viewAutoBound) return; window._viewAutoBound = true;
-  function onResize() {
-    if (_viewManual) return;                    // respect a manual choice for this session
-    if (_viewResizeDeb) clearTimeout(_viewResizeDeb);
-    _viewResizeDeb = setTimeout(function() {
-      var want = _autoViewMode();
-      var cur = document.body.classList.contains('view-mobile') ? 'mobile' : 'desktop';
-      if (want !== cur) setViewMode(want, false);
-    }, 180);
-  }
-  window.addEventListener('resize', onResize);
-  window.addEventListener('orientationchange', onResize);
+  var apply = function() {
+    var want = _autoViewMode();
+    if (!document.body.classList.contains('view-' + want)) setViewMode(want, false);
+  };
+  try {
+    var mq = window.matchMedia(_VIEW_MQ);
+    if (mq.addEventListener) mq.addEventListener('change', apply);
+    else if (mq.addListener) mq.addListener(apply);
+  } catch(e){}
+  window.addEventListener('resize', function(){ if(_viewResizeDeb) clearTimeout(_viewResizeDeb); _viewResizeDeb=setTimeout(apply,140); });
+  window.addEventListener('orientationchange', apply);
 }
 
 function showViewChoiceModal() {
@@ -28419,9 +28420,6 @@ function setViewMode(mode, persist) {
     localStorage.setItem('eow_view_mode', mode);
   }
   
-  // Update header toggle button (if visible)
-  updateViewToggleButton(mode);
-  
   // Sync bottom nav active state with current active section
   if (mode === 'mobile' && typeof mbnSyncActiveFromSection === 'function') {
     var activeTab = document.querySelector('.section-tab.active');
@@ -28444,13 +28442,7 @@ function updateViewToggleButton(currentMode) {
   }
 }
 
-function toggleViewMode() {
-  var currentMode = document.body.classList.contains('view-mobile') ? 'mobile' : 'desktop';
-  var newMode = (currentMode === 'mobile') ? 'desktop' : 'mobile';
-  _viewManual = true;          // user override — stop auto-switching until reload
-  setViewMode(newMode, false); // don't persist across devices; auto again on next load
-  toast('✓ ' + (newMode === 'mobile' ? 'Mobile' : 'Desktop') + ' view (इस session हेतु)');
-}
+function toggleViewMode() { /* removed — layout is now purely browser-driven */ }
 
 // Mobile-only: Toggle "More" panel to show hidden secondary tabs
 function toggleMobileMore() {
@@ -28795,7 +28787,7 @@ function applyRoleBasedUI() {
   var roleEmoji = currentUser.role === 'admin' ? '👑' : '👤';
   badge.innerHTML = roleEmoji + ' ' + escapeHtml(currentUser.display_name) +
     ' <button id="notif-bell-btn" onclick="toggleNotifPanel(event)" class="notif-bell" title="Notifications">🔔<span class="notif-badge" id="notif-badge" style="display:none;">0</span></button>' +
-    ' <button id="view-toggle-btn" onclick="toggleViewMode()" class="view-mode-toggle" title="Switch view">💻 Desktop</button>' +
+    '' +
     ' <button onclick="openHelpModal()" style="background:rgba(245,185,66,0.9);border:none;color:#062a52;padding:3px 10px;border-radius:10px;cursor:pointer;font-size:11px;font-weight:800;margin-left:4px;" title="Quick help & tips">❓ Help</button>' +
     ' <button onclick="doLogout()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:3px 10px;border-radius:10px;cursor:pointer;font-size:11px;font-weight:700;margin-left:4px;">Logout</button>';
   
