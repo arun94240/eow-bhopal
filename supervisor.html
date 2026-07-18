@@ -23112,6 +23112,24 @@ body.view-mobile { padding-bottom:0 !important; }
 /* mobile: top tabs = one swipeable row (fits any count, nothing cut) */
 body.view-mobile .section-tabs { flex-wrap:nowrap !important; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
 body.view-mobile .section-tabs::-webkit-scrollbar { display:none; }
+
+/* ═══════════ v255 — fluid tiles fill available width on ANY screen (uniform) ═══════════ */
+/* Agenda header/tools always wrap — Add / Subscribe / Craft never cut off */
+#mydaily-box .agenda-hdr,
+#mydaily-box .agenda-tools-wrap,
+#mydaily-box .agenda-tools-wrap .mydd-dg-toprow{ flex-wrap:wrap !important; }
+#mydaily-box .agenda-tools-wrap .mtx-search-inline{ flex:1 1 130px !important; min-width:110px !important; }
+@media (max-width: 860px){
+  #mydaily-box .agenda-tools-wrap{ width:100% !important; margin-left:0 !important; justify-content:flex-start !important; margin-top:8px; }
+}
+/* Command-Center / कार्यालय-overview tiles: as many columns as the width allows
+   (phone→1-2, iPad→3, desktop→more) instead of a hardcoded 2 that wastes iPad space */
+body.view-mobile .cmd-metrics{ grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)) !important; }
+body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
+/* Agenda tiles (DG EOW / चर्चा / समीक्षा / To-Do) fill width too */
+#mydaily-box .mtx-chip-grid{ grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)) !important; }
+/* counter-tile rows wrap to fit */
+.hdr-counter-stack{ flex-wrap:wrap !important; }
 </style>
 </head>
 <body>
