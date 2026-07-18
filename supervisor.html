@@ -63670,12 +63670,30 @@ function rbExportPDF() {
 
 <!-- PWA: Register service worker for offline support + app install -->
 <script>
+/* The service worker was caching a stale copy of the app, which flashed on
+   refresh (old box showing then disappearing). Disable it: unregister any
+   existing worker and clear all caches so every load is fresh from the network.
+   Also re-register /service-worker.js which is now a self-destroying worker
+   that wipes its own caches on the browsers that still hold the old one. */
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(function(reg) { console.log('[PWA] Service worker registered'); })
-      .catch(function(err) { console.warn('[PWA] SW registration failed:', err); });
-  });
+  try {
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      var had = regs && regs.length;
+      regs.forEach(function(r){ r.unregister(); });
+      // register the self-destroying worker so cache-first browsers also get cleaned
+      navigator.serviceWorker.register('/service-worker.js').catch(function(){});
+      if (window.caches && caches.keys) {
+        caches.keys().then(function(names){
+          var hadC = names && names.length;
+          names.forEach(function(n){ caches.delete(n); });
+          if ((had || hadC) && !sessionStorage.getItem('_swCleaned')) {
+            try { sessionStorage.setItem('_swCleaned','1'); } catch(e){}
+            setTimeout(function(){ location.reload(); }, 250);
+          }
+        }).catch(function(){});
+      }
+    }).catch(function(){});
+  } catch(e){}
 }
 </script>
 
