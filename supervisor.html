@@ -823,7 +823,8 @@ body.view-mobile .ql-preview-note {
 .enq-tr:hover, .crt-tr:hover, .lv-tr:hover { background: #f5f8fc; }
 .enq-tr.active, .crt-tr.active, .lv-tr.active { background: #eef4fa; }
 .enq-expand-row, .crt-expand-row, .lv-expand-row { background: #f5f8fc; }
-.enq-expand-row > td, .crt-expand-row > td, .lv-expand-row > td { padding: 0 !important; }
+.enq-expand-row, .crt-expand-row { padding: 0; }
+.lv-expand-row > td { padding: 0 !important; }
 
 /* 🌫 DIMMED rows — Closed or Converted to RC entries fade out to de-prioritize */
 .enq-tr.enq-tr-dim {
@@ -1512,7 +1513,7 @@ body.view-desktop .enq-tr > td:last-child { width: 1%; white-space: nowrap; padd
 .ioc-dir-head-sm { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; color: #155e75; padding: 2px 0; margin-bottom: 2px; }
 
 /* Smoother inline expand open */
-.enq-expand-row > td > .ioc-exp-card { animation: iocExpOpen 0.22s cubic-bezier(0.22,0.61,0.36,1); transform-origin: top; }
+.enq-expand-row > .ioc-exp-card, .crt-expand-row > .ioc-exp-card { animation: iocExpOpen 0.22s cubic-bezier(0.22,0.61,0.36,1); transform-origin: top; }
 @keyframes iocExpOpen { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 .name-chip-more {
   display: inline-flex; align-items: center; padding: 1px 7px; margin-left: 3px;
@@ -23119,9 +23120,8 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
    Universal: same structure on every screen width (flex-wrap does
    the responsive work — no separate mobile/desktop markup needed).
    ═══════════════════════════════════════════════════════════════ */
-.docket-row{ display:block !important; background:transparent; border:none !important; margin:0 !important; padding:0 !important; box-shadow:none !important; }
+.docket-row{ background:transparent; margin:0; }
 .docket-row:hover{ background:transparent !important; }
-.docket-td{ padding:0 !important; border:none !important; display:block !important; }
 .docket-row-inner{ display:flex; align-items:stretch; border:1.5px solid #e2e8f0; border-radius:12px; background:#fff; overflow:hidden; margin-bottom:10px; transition:all .15s; cursor:pointer; }
 .docket-row-inner:hover{ border-color:#f5b942; box-shadow:0 6px 18px rgba(245,185,66,.22); }
 .enq-tr-dim .docket-row-inner{ opacity:.6; }
@@ -23203,10 +23203,6 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 /* The old desktop 'last-child width:1%' rule was written for the previous
    multi-td row layout; the Docket row is now a single colspan td, so
    neutralise that legacy rule for it specifically and let it size naturally. */
-.enq-tr.docket-row > td.docket-td{ width:auto !important; white-space:normal !important; padding-left:0 !important; padding-right:0 !important; text-align:left !important; }
-.enq-list-wrap .table-wrap > table:has(.docket-row){ width:100% !important; min-width:0; }
-.enq-list-wrap .table-wrap > table:has(.docket-row){ table-layout:fixed; }
-#court-list-wrap table{ table-layout:fixed; width:100%; }
 .io-inline-panel-row > td{ width:100%; }
 
 /* Neutralise the old mobile card-stack transform — Docket rows are already
@@ -23259,8 +23255,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .act-link{ background:#7c3aed; color:#fff; border:none; }
 
 .crt-tr.crt-tr-dim .docket-row-inner{ opacity:.6; }
-.crt-tr{ display:block !important; background:transparent !important; border:none !important; }
-.crt-tr .docket-td{ padding:0 !important; border:none !important; }
+.crt-tr{ background:transparent; margin:0; }
 
 /* Court card wrap uses the same .docket-card/.c-top/.c-body language as enquiry cards */
 .court-card-wrap.docket-card{ border:1.5px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fff; }
@@ -25620,7 +25615,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-complaints-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-complaints" onclick="openMobileYearModal('complaints')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-complaints">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-complaints"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-complaints" onclick="setEnquiryView('complaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-complaints" onclick="setEnquiryView('complaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-complaints" onclick="enqToggleSort('complaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-complaints" onclick="craftOpenCategory('complaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="complaints-list-wrap"><div class="table-wrap"><table><tbody id="complaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="complaints-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-complaints" onclick="setEnquiryView('complaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-complaints" onclick="setEnquiryView('complaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-complaints" onclick="enqToggleSort('complaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-complaints" onclick="craftOpenCategory('complaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="complaints-list-wrap"><div class="table-wrap"><div class="docket-list-host" id="complaints-body"></div></div></div><div class="enq-cards-wrap" id="complaints-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="rcomplaints" class="section">
@@ -25636,7 +25631,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-rcomplaints-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-rcomplaints" onclick="openMobileYearModal('rcomplaints')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-rcomplaints">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-rcomplaints"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcomplaints" onclick="enqToggleSort('rcomplaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcomplaints" onclick="craftOpenCategory('rcomplaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcomplaints-list-wrap"><div class="table-wrap"><table><tbody id="rcomplaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcomplaints-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcomplaints" onclick="enqToggleSort('rcomplaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcomplaints" onclick="craftOpenCategory('rcomplaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcomplaints-list-wrap"><div class="table-wrap"><div class="docket-list-host" id="rcomplaints-body"></div></div></div><div class="enq-cards-wrap" id="rcomplaints-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="rcs" class="section">
@@ -25652,7 +25647,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-rcs-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-rcs" onclick="openMobileYearModal('rcs')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-rcs">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-rcs"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcs" onclick="setEnquiryView('rcs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcs" onclick="setEnquiryView('rcs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcs" onclick="enqToggleSort('rcs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcs" onclick="craftOpenCategory('rcs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcs-list-wrap"><div class="table-wrap"><table><tbody id="rcs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcs-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcs" onclick="setEnquiryView('rcs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcs" onclick="setEnquiryView('rcs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcs" onclick="enqToggleSort('rcs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcs" onclick="craftOpenCategory('rcs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcs-list-wrap"><div class="table-wrap"><div class="docket-list-host" id="rcs-body"></div></div></div><div class="enq-cards-wrap" id="rcs-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="pes" class="section">
@@ -25668,7 +25663,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-pes-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-pes" onclick="openMobileYearModal('pes')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-pes">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-pes"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-pes" onclick="setEnquiryView('pes','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-pes" onclick="setEnquiryView('pes','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-pes" onclick="enqToggleSort('pes')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-pes" onclick="craftOpenCategory('pes')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="pes-list-wrap"><div class="table-wrap"><table><tbody id="pes-body"></tbody></table></div></div><div class="enq-cards-wrap" id="pes-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-pes" onclick="setEnquiryView('pes','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-pes" onclick="setEnquiryView('pes','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-pes" onclick="enqToggleSort('pes')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-pes" onclick="craftOpenCategory('pes')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="pes-list-wrap"><div class="table-wrap"><div class="docket-list-host" id="pes-body"></div></div></div><div class="enq-cards-wrap" id="pes-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="strs" class="section">
@@ -25684,7 +25679,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-strs-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-strs" onclick="openMobileYearModal('strs')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-strs">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-strs"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-strs" onclick="setEnquiryView('strs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-strs" onclick="setEnquiryView('strs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-strs" onclick="enqToggleSort('strs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-strs" onclick="craftOpenCategory('strs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="strs-list-wrap"><div class="table-wrap"><table><tbody id="strs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="strs-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-strs" onclick="setEnquiryView('strs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-strs" onclick="setEnquiryView('strs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-strs" onclick="enqToggleSort('strs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-strs" onclick="craftOpenCategory('strs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="strs-list-wrap"><div class="table-wrap"><div class="docket-list-host" id="strs-body"></div></div></div><div class="enq-cards-wrap" id="strs-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="sutra" class="section">
@@ -25700,7 +25695,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-sutra-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-sutra" onclick="openMobileYearModal('sutra')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-sutra">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-sutra"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-sutra" onclick="setEnquiryView('sutra','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-sutra" onclick="setEnquiryView('sutra','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-sutra" onclick="enqToggleSort('sutra')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-sutra" onclick="craftOpenCategory('sutra')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="sutra-list-wrap"><div class="table-wrap"><table><tbody id="sutra-body"></tbody></table></div></div><div class="enq-cards-wrap" id="sutra-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-sutra" onclick="setEnquiryView('sutra','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-sutra" onclick="setEnquiryView('sutra','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-sutra" onclick="enqToggleSort('sutra')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-sutra" onclick="craftOpenCategory('sutra')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="sutra-list-wrap"><div class="table-wrap"><div class="docket-list-host" id="sutra-body"></div></div></div><div class="enq-cards-wrap" id="sutra-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <!-- COURT -->
@@ -25745,7 +25740,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
       <select id="court-sort-field" class="filter-select" style="display:none;" onchange="courtSetSortField(this.value)"><option value="year">year</option></select>
     </div>
     
-    <div class="table-wrap" id="court-list-wrap" style="display:none;"><table><tbody id="court-body"></tbody></table></div>
+    <div class="table-wrap" id="court-list-wrap" style="display:none;"><div class="docket-list-host" id="court-body"></div></div>
     <div id="court-cards-wrap" class="court-cards-grid"></div>
   </div></section>
 
@@ -31925,14 +31920,14 @@ function toggleEnquiryExpand(type, id) {
   var row = document.getElementById('enq-row-' + id);
   if (!card) return;
   var isOpen = card.style.display !== 'none';
-  // Close all other expanded rows in this table
-  var table = card.closest('table');
-  if (table) {
-    table.querySelectorAll('.enq-expand-row').forEach(function(c){ c.style.display = 'none'; });
-    table.querySelectorAll('.enq-tr.active').forEach(function(r){ r.classList.remove('active'); });
+  // Close all other expanded rows in this list
+  var host = card.closest('.docket-list-host') || card.parentElement;
+  if (host) {
+    host.querySelectorAll('.enq-expand-row').forEach(function(c){ c.style.display = 'none'; });
+    host.querySelectorAll('.enq-tr.active').forEach(function(r){ r.classList.remove('active'); });
   }
   if (!isOpen) {
-    card.querySelector('td').innerHTML = buildEnquiryExpandCard(type, rec);
+    card.innerHTML = buildEnquiryExpandCard(type, rec);
     card.style.display = '';
     if (row) row.classList.add('active');
     // Initialize auto-expand for inline directive textarea
@@ -32031,13 +32026,13 @@ function toggleCourtExpand(id) {
   var row = document.getElementById('crt-row-' + id);
   if (!card) return;
   var isOpen = card.style.display !== 'none';
-  var table = card.closest('table');
-  if (table) {
-    table.querySelectorAll('.crt-expand-row').forEach(function(c){ c.style.display = 'none'; });
-    table.querySelectorAll('.crt-tr.active').forEach(function(r){ r.classList.remove('active'); });
+  var host = card.closest('.docket-list-host') || card.parentElement;
+  if (host) {
+    host.querySelectorAll('.crt-expand-row').forEach(function(c){ c.style.display = 'none'; });
+    host.querySelectorAll('.crt-tr.active').forEach(function(r){ r.classList.remove('active'); });
   }
   if (!isOpen) {
-    card.querySelector('td').innerHTML = buildCourtExpandCard(c);
+    card.innerHTML = buildCourtExpandCard(c);
     card.style.display = '';
     if (row) row.classList.add('active');
     // Smart scroll: only if expansion is partly below viewport
@@ -52929,11 +52924,9 @@ function renderTotalCases() {
       allRows.map(function(e){ return _buildEnquiryCard(e.type, e.row, true); }).join('') +
       '</div></div>';
   } else {
-    listHTML = '<div class="enq-list-wrap"><div class="table-wrap"><table>' +
-      '' +
-      '<tbody>' +
+    listHTML = '<div class="enq-list-wrap"><div class="table-wrap"><div class="docket-list-host">' +
       allRows.map(function(e, i){ return _buildEnquiryRow(e.type, e.row, i, true); }).join('') +
-      '</tbody></table></div></div>';
+      '</div></div></div>';
   }
   
   var _dn = new Date();
@@ -53009,11 +53002,11 @@ function renderTable(type) {
   if (!yearFilter) {
     var tbodyEmpty = document.getElementById(type+'-body');
     if (tbodyEmpty) {
-      tbodyEmpty.innerHTML = '<tr><td><div class="empty-state year-pick-prompt">' +
+      tbodyEmpty.innerHTML = '<div class="empty-state year-pick-prompt">' +
         '<div class="ypp-icon">📅</div>' +
         '<h3>वर्ष चुनें</h3>' +
         '<p>सब cases देखने के लिए "All Time" tap करें</p>' +
-        '</div></td></tr>';
+        '</div>';
     }
     var ioSelEmpty = sec.querySelector('.io-filter');
     if (ioSelEmpty) {
@@ -53036,7 +53029,7 @@ function renderTable(type) {
 
   var tbody = document.getElementById(type+'-body');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td><div class="empty-state"><h3>No entries yet</h3></div></td></tr>';
+    tbody.innerHTML = '<div class="empty-state"><h3>No entries yet</h3></div>';
   } else {
     tbody.innerHTML = rows.map(function(r, i){
       return _buildEnquiryRow(type, r, i, false);
@@ -53175,8 +53168,7 @@ function _buildEnquiryRow(type, r, i, scoped) {
   var ioSeal = r.io_name ? renderIOInlineCell(r.io_name, r.io_assigned_date) : '<span class="io-badge io-badge-none">👮 कोई IO नहीं</span>';
   var scopedCatChip = scoped ? ('<span class="tc-cat-badge tc-cat-'+type+'">'+(_tcShort[type]||'')+'</span> ') : '';
 
-  return '<tr class="enq-tr docket-row' + dimCls + '" id="' + rowId + '" onclick="'+expandHandler+'">'+
-    '<td class="docket-td">'+
+  return '<div class="enq-tr docket-row' + dimCls + '" id="' + rowId + '" onclick="'+expandHandler+'">'+
       '<div class="docket-row-inner">'+
         '<div class="docket-sn">'+(i+1)+'</div>'+
         '<div class="stamp-wrap">'+urgentHtml+
@@ -53199,9 +53191,8 @@ function _buildEnquiryRow(type, r, i, scoped) {
         '</div>'+
         '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\''+type+'\',\''+r.id+'\')">✎</button></div>'+
       '</div>'+
-    '</td>'+
-  '</tr>'+
-  '<tr class="enq-expand-row" id="' + cardId + '" style="display:none;"><td style="padding:0;"></td></tr>';
+  '</div>'+
+  '<div class="enq-expand-row" id="' + cardId + '" style="display:none;"></div>';
 }
 
 // Scoped expand for Total Cases — finds the expand row via DOM sibling (no getElementById collision)
@@ -53213,13 +53204,13 @@ function tcToggleExpand(type, id, ev) {
   var card = rowEl.nextElementSibling;
   if (!card || !card.classList.contains('enq-expand-row')) return;
   var isOpen = card.style.display !== 'none';
-  var table = card.closest('table');
-  if (table) {
-    table.querySelectorAll('.enq-expand-row').forEach(function(c){ c.style.display = 'none'; });
-    table.querySelectorAll('.enq-tr.active').forEach(function(rr){ rr.classList.remove('active'); });
+  var host = card.closest('.docket-list-host') || card.parentElement;
+  if (host) {
+    host.querySelectorAll('.enq-expand-row').forEach(function(c){ c.style.display = 'none'; });
+    host.querySelectorAll('.enq-tr.active').forEach(function(rr){ rr.classList.remove('active'); });
   }
   if (!isOpen) {
-    card.querySelector('td').innerHTML = buildEnquiryExpandCard(type, rec);
+    card.innerHTML = buildEnquiryExpandCard(type, rec);
     card.style.display = '';
     rowEl.classList.add('active');
     setTimeout(function(){
@@ -56615,11 +56606,11 @@ function renderCourtTable() {
   if (!yearFilter) {
     var tbodyEmpty = document.getElementById('court-body');
     if (tbodyEmpty) {
-      tbodyEmpty.innerHTML = '<tr><td><div class="empty-state year-pick-prompt">' +
+      tbodyEmpty.innerHTML = '<div class="empty-state year-pick-prompt">' +
         '<div class="ypp-icon">📅</div>' +
         '<h3>वर्ष चुनें</h3>' +
         '<p>सब cases देखने के लिए "All Time" tap करें</p>' +
-        '</div></td></tr>';
+        '</div>';
     }
     return;
   }
@@ -56636,7 +56627,7 @@ function renderCourtTable() {
   }
   
   var tbody = document.getElementById('court-body');
-  if (!rows.length) { tbody.innerHTML = '<tr><td><div class="empty-state"><h3>No court cases yet</h3></div></td></tr>'; return; }
+  if (!rows.length) { tbody.innerHTML = '<div class="empty-state"><h3>No court cases yet</h3></div>'; return; }
   tbody.innerHTML = rows.map(function(c, i){
     // Look up court name from courts_master
     var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
@@ -56683,10 +56674,10 @@ function renderCourtTable() {
       '</div>'+
       '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">✎</button></div>'+
     '</div>';
-    return '<tr class="crt-tr'+(isDisp?' crt-tr-dim':'')+'" id="' + rowId + '" onclick="toggleCourtExpand(\''+c.id+'\')">'+
-      '<td class="docket-td">'+card+'</td>'+
-    '</tr>'+
-    '<tr class="crt-expand-row" id="' + cardId + '" style="display:none;"><td style="padding:0;"></td></tr>';
+    return '<div class="crt-tr'+(isDisp?' crt-tr-dim':'')+'" id="' + rowId + '" onclick="toggleCourtExpand(\''+c.id+'\')">'+
+      card+
+    '</div>'+
+    '<div class="crt-expand-row" id="' + cardId + '" style="display:none;"></div>';
   }).join('');
   // ─── Also render Cards view (toggled via setCourtView) ───
   renderCourtCards(rows);
