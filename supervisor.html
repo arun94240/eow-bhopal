@@ -22278,6 +22278,9 @@ body.role-staff #mydaily-box{ display:none !important; }
 .dbbox-gt{ text-align:center; } .dbbox-gn{ font-size:22px; font-weight:900; color:#f5b942; line-height:1; } .dbbox-gl{ font-size:8.5px; color:#9db5d4; }
 .dbgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:0 13px 11px; }
 .dbcard{ border-radius:12px; padding:10px 6px; text-align:center; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.28); cursor:pointer; transition:transform .12s; }
+.dbcard-active{ box-shadow:0 0 0 3px #f5b942, 0 4px 14px rgba(0,0,0,.35) !important; transform:translateY(-2px); }
+.tc-catfilter-chip{ background:#f5b942; color:#062a52; border:none; border-radius:20px; padding:6px 14px; font-size:12px; font-weight:900; cursor:pointer; margin-right:8px; }
+
 .dbcard:hover{ transform:translateY(-2px); }
 .dbcard-ic{ font-size:14px; } .dbcard-nm{ font-size:9.5px; font-weight:800; margin-top:2px; opacity:.95; } .dbcard-ct{ font-size:16px; font-weight:900; }
 .db-an-row{ margin:0 13px 13px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:9px 10px; }
@@ -25602,7 +25605,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-complaints-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-complaints" onclick="openMobileYearModal('complaints')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-complaints">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-complaints"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-complaints" onclick="setEnquiryView('complaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-complaints" onclick="setEnquiryView('complaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-complaints" onclick="enqToggleSort('complaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-complaints" onclick="craftOpenCategory('complaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="complaints-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="complaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="complaints-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-complaints" onclick="setEnquiryView('complaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-complaints" onclick="setEnquiryView('complaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-complaints" onclick="enqToggleSort('complaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-complaints" onclick="craftOpenCategory('complaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="complaints-list-wrap"><div class="table-wrap"><table><tbody id="complaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="complaints-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="rcomplaints" class="section">
@@ -25618,7 +25621,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-rcomplaints-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-rcomplaints" onclick="openMobileYearModal('rcomplaints')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-rcomplaints">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-rcomplaints"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcomplaints" onclick="enqToggleSort('rcomplaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcomplaints" onclick="craftOpenCategory('rcomplaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcomplaints-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="rcomplaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcomplaints-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcomplaints" onclick="setEnquiryView('rcomplaints','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcomplaints" onclick="enqToggleSort('rcomplaints')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcomplaints" onclick="craftOpenCategory('rcomplaints')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcomplaints-list-wrap"><div class="table-wrap"><table><tbody id="rcomplaints-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcomplaints-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="rcs" class="section">
@@ -25634,7 +25637,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-rcs-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-rcs" onclick="openMobileYearModal('rcs')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-rcs">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-rcs"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcs" onclick="setEnquiryView('rcs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcs" onclick="setEnquiryView('rcs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcs" onclick="enqToggleSort('rcs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcs" onclick="craftOpenCategory('rcs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcs-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="rcs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcs-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-rcs" onclick="setEnquiryView('rcs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-rcs" onclick="setEnquiryView('rcs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-rcs" onclick="enqToggleSort('rcs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-rcs" onclick="craftOpenCategory('rcs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="rcs-list-wrap"><div class="table-wrap"><table><tbody id="rcs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="rcs-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="pes" class="section">
@@ -25650,7 +25653,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-pes-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-pes" onclick="openMobileYearModal('pes')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-pes">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-pes"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-pes" onclick="setEnquiryView('pes','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-pes" onclick="setEnquiryView('pes','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-pes" onclick="enqToggleSort('pes')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-pes" onclick="craftOpenCategory('pes')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="pes-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="pes-body"></tbody></table></div></div><div class="enq-cards-wrap" id="pes-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-pes" onclick="setEnquiryView('pes','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-pes" onclick="setEnquiryView('pes','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-pes" onclick="enqToggleSort('pes')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-pes" onclick="craftOpenCategory('pes')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="pes-list-wrap"><div class="table-wrap"><table><tbody id="pes-body"></tbody></table></div></div><div class="enq-cards-wrap" id="pes-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="strs" class="section">
@@ -25666,7 +25669,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-strs-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-strs" onclick="openMobileYearModal('strs')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-strs">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-strs"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-strs" onclick="setEnquiryView('strs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-strs" onclick="setEnquiryView('strs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-strs" onclick="enqToggleSort('strs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-strs" onclick="craftOpenCategory('strs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="strs-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="strs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="strs-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-strs" onclick="setEnquiryView('strs','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-strs" onclick="setEnquiryView('strs','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-strs" onclick="enqToggleSort('strs')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-strs" onclick="craftOpenCategory('strs')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="strs-list-wrap"><div class="table-wrap"><table><tbody id="strs-body"></tbody></table></div></div><div class="enq-cards-wrap" id="strs-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <section id="sutra" class="section">
@@ -25682,7 +25685,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <div class="smart-chips" id="ss-sutra-chips"></div>
     <button class="mobile-year-filter-btn" id="myfb-sutra" onclick="openMobileYearModal('sutra')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-sutra">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-sutra"></div>
-    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-sutra" onclick="setEnquiryView('sutra','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-sutra" onclick="setEnquiryView('sutra','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-sutra" onclick="enqToggleSort('sutra')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-sutra" onclick="craftOpenCategory('sutra')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="sutra-list-wrap"><div class="table-wrap"><table><thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead><tbody id="sutra-body"></tbody></table></div></div><div class="enq-cards-wrap" id="sutra-cards-wrap" style="display:none;"></div>
+    <div class="enq-view-toggle"><button type="button" class="enq-view-btn active" id="enq-view-list-btn-sutra" onclick="setEnquiryView('sutra','list')">📋 List</button><button type="button" class="enq-view-btn" id="enq-view-cards-btn-sutra" onclick="setEnquiryView('sutra','cards')">🃏 Cards</button><button type="button" class="enq-sort-btn" id="enq-sort-btn-sutra" onclick="enqToggleSort('sutra')">↑ Ascending</button><button type="button" class="enq-craft-btn" id="enq-craft-btn-sutra" onclick="craftOpenCategory('sutra')" title="Craft में इस श्रेणी के दस्तावेज़ देखें">🔄 Craft</button></div><div class="enq-list-wrap" id="sutra-list-wrap"><div class="table-wrap"><table><tbody id="sutra-body"></tbody></table></div></div><div class="enq-cards-wrap" id="sutra-cards-wrap" style="display:none;"></div>
   </div></section>
 
   <!-- COURT -->
@@ -52676,6 +52679,11 @@ function dbAnalysisOpen(kind){
   }catch(e){}
   try{ panel.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
 }
+var _tcCatFilter = null;
+function tcSetCatFilter(h){
+  _tcCatFilter = (_tcCatFilter === h) ? null : h;
+  renderTotalCases();
+}
 function renderTotalCases() {
   var content = document.getElementById('totalcases-content');
   if (!content) return;
@@ -52724,6 +52732,7 @@ function renderTotalCases() {
     }
     counts[h] = rows.length;
     grandTotal += rows.length;
+    if (_tcCatFilter && _tcCatFilter !== h) return;
     rows.forEach(function(r){ allRows.push({ type: h, row: r }); });
   });
   
@@ -52743,9 +52752,10 @@ function renderTotalCases() {
   var DBMETA = { complaints:{ic:'📩',g:'linear-gradient(135deg,#2563eb,#1d4fc4)'}, rcomplaints:{ic:'📨',g:'linear-gradient(135deg,#7c3aed,#6527cc)'}, rcs:{ic:'📕',g:'linear-gradient(135deg,#dc2626,#b91c1c)'}, pes:{ic:'🔎',g:'linear-gradient(135deg,#ea580c,#c2410c)'}, strs:{ic:'🏦',g:'linear-gradient(135deg,#0891b2,#0e7490)'}, sutra:{ic:'🧭',g:'linear-gradient(135deg,#16a34a,#15803d)'} };
   var cards = enquiryHeads.map(function(h){
     var m = DBMETA[h] || {ic:'📁',g:'#0f2a4a'};
-    return '<div class="dbcard" style="background:'+m.g+'" onclick="switchSection(\'' + h + '\')">' +
+    var isActive = (_tcCatFilter === h);
+    return '<div class="dbcard'+(isActive?' dbcard-active':'')+'" style="background:'+m.g+'" onclick="tcSetCatFilter(\'' + h + '\')" title="टैप करें — नीचे इसी श्रेणी के प्रकरण inline दिखेंगे">' +
       '<div class="dbcard-ic">'+m.ic+'</div>' +
-      '<div class="dbcard-nm">' + escapeHtml(labels[h]) + '</div>' +
+      '<div class="dbcard-nm">' + escapeHtml(labels[h]) + (isActive?' ✓':'') + '</div>' +
       '<div class="dbcard-ct">' + counts[h] + '</div>' +
     '</div>';
   }).join('');
@@ -52761,6 +52771,7 @@ function renderTotalCases() {
   // View toggle + sort toolbar
   var sortLabel = _tcSortDir === 'desc' ? '↓ नए पहले' : '↑ पुराने पहले';
   var toolbar = '<div class="tc-list-toolbar">' +
+    (_tcCatFilter ? ('<button type="button" class="tc-catfilter-chip" onclick="tcSetCatFilter(\''+_tcCatFilter+'\')">🔎 '+escapeHtml(labels[_tcCatFilter])+' ✕</button>') : '') +
     '<div class="enq-view-toggle">' +
       '<button type="button" class="enq-view-btn' + (_tcView==='list'?' active':'') + '" onclick="tcSetView(\'list\')">📋 List</button>' +
       '<button type="button" class="enq-view-btn' + (_tcView==='cards'?' active':'') + '" onclick="tcSetView(\'cards\')">🃏 Cards</button>' +
@@ -52779,7 +52790,7 @@ function renderTotalCases() {
       '</div></div>';
   } else {
     listHTML = '<div class="enq-list-wrap"><div class="table-wrap"><table>' +
-      '<thead><tr><th>SN</th><th>No / Date</th><th>IO</th><th>Complainant / Non-Complainant</th><th></th></tr></thead>' +
+      '' +
       '<tbody>' +
       allRows.map(function(e, i){ return _buildEnquiryRow(e.type, e.row, i, true); }).join('') +
       '</tbody></table></div></div>';
