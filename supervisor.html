@@ -23127,6 +23127,18 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 #mydaily-box .mtx-chip-grid{ grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)) !important; }
 /* counter-tile rows wrap to fit */
 .hdr-counter-stack{ flex-wrap:wrap !important; }
+
+/* ═══════════ v259 — mobile navigation FIX (was disappearing) ═══════════ */
+/* The section-tabs were display:none in view-mobile (old design showed a bottom nav,
+   which has since been removed). That made the whole database-navigation strip flash
+   on first paint then vanish once view-mobile applied. Force it visible as ONE
+   swipeable row, including the secondary tabs, so navigation is always present. */
+body.view-mobile .section-tabs{ display:flex !important; flex-wrap:nowrap !important; overflow-x:auto !important; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+body.view-mobile .section-tabs::-webkit-scrollbar{ display:none; }
+body.view-mobile .section-tab{ display:inline-flex !important; flex:0 0 auto !important; white-space:nowrap; }
+body.view-mobile .section-tab[data-mobile-priority="secondary"]{ display:inline-flex !important; flex:0 0 auto !important; }
+/* keep the now-unused "More" tab hidden (navigation is the swipe row itself) */
+body.view-mobile .section-tab.mobile-more-tab{ display:none !important; }
 </style>
 </head>
 <body>
@@ -63686,10 +63698,6 @@ if ('serviceWorker' in navigator) {
         caches.keys().then(function(names){
           var hadC = names && names.length;
           names.forEach(function(n){ caches.delete(n); });
-          if ((had || hadC) && !sessionStorage.getItem('_swCleaned')) {
-            try { sessionStorage.setItem('_swCleaned','1'); } catch(e){}
-            setTimeout(function(){ location.reload(); }, 250);
-          }
         }).catch(function(){});
       }
     }).catch(function(){});
