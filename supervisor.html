@@ -23247,117 +23247,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 
   <!-- GLOBAL SEARCH -->
   <!-- 🔍 UNIFIED SEARCH BOX (merged: quick search + matrices) -->
-  <div class="global-search-wrap" id="unified-search-box">
-    <div class="usb-hero">
-      <div class="usb-hero-top">
-        <span class="sup-mini-cal usb-hero-cal" id="search-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
-        <div class="usb-hero-tt">
-          <div class="usb-hero-ttl">🔍 Search</div>
-          <div class="usb-hero-sub">पूरे database में खोजें — number, नाम, tag, IO</div>
-        </div>
-        <div class="usb-hero-score">
-          <div class="usb-stat"><div class="usb-stat-n" id="search-cnt-total">0</div><div class="usb-stat-l">Total DB</div></div>
-        </div>
-      </div>
-      <div class="usb-hero-row">
-        <div class="usb-hero-search">
-          <span class="usb-hero-sic">🔎</span>
-          <input type="text" id="global-search" placeholder="कोई number, नाम, serial, keyword, tag खोजें..." oninput="performGlobalSearch()" autocomplete="off">
-          <button class="global-search-clear usb-hero-clear" onclick="clearGlobalSearch()" id="global-search-clear" style="display:none;">✕</button>
-        </div>
-        <div class="usb-hero-io">
-          <span class="usb-hero-ioic">👮</span>
-          <select class="io-search-select usb-hero-select" id="io-search-select" onchange="performIOSearch()">
-            <option value="">Search by IO</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div id="global-search-results" class="global-search-results"></div>
-    <div id="deep-search-panel" class="deep-search-panel" style="display:none;"></div>
-    <!-- matrices (collapsible, moved from old Search box) -->
-    <div id="search-matrices-collapse" style="display:none;">
-          <div id="search-content" class="search-content">
-    
-            <!-- Matrix 1: Free-text search -->
-            <div class="search-matrix">
-              <div class="search-matrix-head">
-                <span class="search-matrix-icon">🔎</span>
-                <span class="search-matrix-title">Free-text Search</span>
-                <span class="search-matrix-sub">case no, complainant, brief, court, IO — kuch bhi</span>
-              </div>
-              <div class="search-matrix-body">
-                <div class="search-freetext-wrap">
-                  <input type="search" id="search-freetext-input" class="search-freetext-input" 
-                         placeholder="🔎 Type to search across all data..." 
-                         oninput="searchFreetextDebounced(this.value)" autocomplete="off">
-                  <button class="search-freetext-clear" id="search-freetext-clear" onclick="clearFreetextSearch()" style="display:none;">✕</button>
-                </div>
-                <div class="search-freetext-meta" id="search-freetext-meta" style="display:none;"></div>
-              </div>
-            </div>
-    
-            <!-- Matrix 2: Search by Type -->
-            <div class="search-matrix">
-              <div class="search-matrix-head">
-                <span class="search-matrix-icon">📁</span>
-                <span class="search-matrix-title">Search by Type</span>
-              </div>
-              <div class="search-matrix-body">
-                <div class="search-chips-grid" id="search-by-type-chips"></div>
-              </div>
-            </div>
-    
-            <!-- Matrix 3: Search by IO -->
-            <div class="search-matrix">
-              <div class="search-matrix-head">
-                <span class="search-matrix-icon">👮</span>
-                <span class="search-matrix-title">Search by IO</span>
-              </div>
-              <div class="search-matrix-body">
-                <div class="search-chips-grid" id="search-by-io-chips"></div>
-              </div>
-            </div>
-    
-            <!-- Matrix 4: Search by Year -->
-            <div class="search-matrix">
-              <div class="search-matrix-head">
-                <span class="search-matrix-icon">📅</span>
-                <span class="search-matrix-title">Search by Year</span>
-              </div>
-              <div class="search-matrix-body">
-                <div class="search-chips-grid" id="search-by-year-chips"></div>
-              </div>
-            </div>
-    
-            <!-- Matrix 5: Cases against Officers -->
-            <div class="search-matrix">
-              <div class="search-matrix-head">
-                <span class="search-matrix-icon">🛡️</span>
-                <span class="search-matrix-title">Cases against Officers (Supervision Tags)</span>
-              </div>
-              <div class="search-matrix-body">
-                <div class="search-chips-grid" id="search-by-cao-chips"></div>
-              </div>
-            </div>
-    
-            <!-- Matrix 6: Search by Tag -->
-            <div class="search-matrix">
-              <div class="search-matrix-head">
-                <span class="search-matrix-icon">🏷️</span>
-                <span class="search-matrix-title">Search by Tag</span>
-              </div>
-              <div class="search-matrix-body">
-                <div class="search-chips-grid" id="search-by-tag-chips"></div>
-              </div>
-            </div>
-    
-            <!-- Results panel area (inline filtered list pattern) -->
-            <div id="search-results-area"></div>
-    
-          </div>
-    </div>
-  </div>
+  
 
   <div class="section-tabs">
     <button class="section-tab active" data-section="overview">Home</button>
@@ -25535,7 +25425,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
   <!-- TOTAL CASES — combined view across 6 enquiry heads -->
   <section id="totalcases" class="section">
     <div class="section-header">
-      <div><h2>📊 Total Cases</h2><div class="desc">All categories combined — Complaints, R-Complaints, RCs, PEs, STRs, Sutra Suchna</div></div>
+      <div><h2>📊 Total Cases</h2></div>
     </div>
     <button class="mobile-year-filter-btn" id="myfb-totalcases" onclick="openMobileYearModal('totalcases')"><span class="myfb-label">📅 Year</span><span class="myfb-value" id="myfb-value-totalcases">All Time</span><span class="myfb-chevron">▾</span></button>
     <div class="year-tabs-row" id="yt-totalcases"></div>
@@ -25543,7 +25433,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
   </section>
 
   <section id="complaints" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('complaints')"><span class="collapse-arrow" id="complaints-arrow">▼</span> 📩 Complaints</h2><div class="desc">प्राप्त शिकायतें — श्रेणी-वार</div></div><div><button class="btn btn-primary" data-action="add" data-type="complaints">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('complaints')"><span class="collapse-arrow" id="complaints-arrow">▼</span> 📩 Complaints</h2></div><div><button class="btn btn-primary" data-action="add" data-type="complaints">+ Add Entry</button></div></div>
     <div class="section-collapse" id="complaints-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -25559,7 +25449,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
   </div></section>
 
   <section id="rcomplaints" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcomplaints')"><span class="collapse-arrow" id="rcomplaints-arrow">▼</span> 📨 R-Complaints</h2><div class="desc">पुनः / स्थानांतरित शिकायतें</div></div><div><button class="btn btn-primary" data-action="add" data-type="rcomplaints">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcomplaints')"><span class="collapse-arrow" id="rcomplaints-arrow">▼</span> 📨 R-Complaints</h2></div><div><button class="btn btn-primary" data-action="add" data-type="rcomplaints">+ Add Entry</button></div></div>
     <div class="section-collapse" id="rcomplaints-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -25575,7 +25465,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
   </div></section>
 
   <section id="rcs" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcs')"><span class="collapse-arrow" id="rcs-arrow">▼</span> 📕 RCs</h2><div class="desc">पंजीबद्ध अपराध (RC)</div></div><div><button class="btn btn-primary" data-action="add" data-type="rcs">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('rcs')"><span class="collapse-arrow" id="rcs-arrow">▼</span> 📕 RCs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="rcs">+ Add Entry</button></div></div>
     <div class="section-collapse" id="rcs-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -25591,7 +25481,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
   </div></section>
 
   <section id="pes" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('pes')"><span class="collapse-arrow" id="pes-arrow">▼</span> 🔎 PEs</h2><div class="desc">प्रारंभिक जाँच (PE)</div></div><div><button class="btn btn-primary" data-action="add" data-type="pes">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('pes')"><span class="collapse-arrow" id="pes-arrow">▼</span> 🔎 PEs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="pes">+ Add Entry</button></div></div>
     <div class="section-collapse" id="pes-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -25607,7 +25497,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
   </div></section>
 
   <section id="strs" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('strs')"><span class="collapse-arrow" id="strs-arrow">▼</span> 🏦 STRs</h2><div class="desc">संदिग्ध लेन-देन प्रतिवेदन</div></div><div><button class="btn btn-primary" data-action="add" data-type="strs">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('strs')"><span class="collapse-arrow" id="strs-arrow">▼</span> 🏦 STRs</h2></div><div><button class="btn btn-primary" data-action="add" data-type="strs">+ Add Entry</button></div></div>
     <div class="section-collapse" id="strs-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -25623,7 +25513,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
   </div></section>
 
   <section id="sutra" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('sutra')"><span class="collapse-arrow" id="sutra-arrow">▼</span> 🧭 Sutra Suchna</h2><div class="desc">सूत्र सूचना</div></div><div><button class="btn btn-primary" data-action="add" data-type="sutra">+ Add Entry</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('sutra')"><span class="collapse-arrow" id="sutra-arrow">▼</span> 🧭 Sutra Suchna</h2></div><div><button class="btn btn-primary" data-action="add" data-type="sutra">+ Add Entry</button></div></div>
     <div class="section-collapse" id="sutra-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -25640,7 +25530,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 
   <!-- COURT -->
   <section id="court" class="section">
-    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('court')"><span class="collapse-arrow" id="court-arrow">▼</span> ⚖️ Court Cases / न्यायालय</h2><div class="desc">न्यायालयीन प्रकरण — 8 ज़िले</div></div><div><button class="btn" onclick="openCourtsMasterManager()" id="manage-courts-btn">⚙ Manage Courts</button> <button class="btn btn-primary" data-action="add-court">+ Add Court Case</button></div></div>
+    <div class="section-header"><div><h2 class="collapsible-h2" onclick="toggleSectionCollapse('court')"><span class="collapse-arrow" id="court-arrow">▼</span> ⚖️ Court Cases / न्यायालय</h2></div><div><button class="btn" onclick="openCourtsMasterManager()" id="manage-courts-btn">⚙ Manage Courts</button> <button class="btn btn-primary" data-action="add-court">+ Add Court Case</button></div></div>
     <div class="section-collapse" id="court-collapse">
     <div class="toolbar smart-search-toolbar">
       <div class="smart-search-wrap">
@@ -63969,8 +63859,17 @@ if ('serviceWorker' in navigator) {
     y=Math.max(6,Math.min(y,window.innerHeight-size-6));
     mic.style.left=Math.round(x)+'px';mic.style.top=Math.round(y)+'px';
   }
-  function show(el){curField=el;place(el);mic.style.display='flex';}
-  function hide(){if(micBusy)return;mic.style.display='none';curField=null;}
+  var _fmWatch=null;
+  function show(el){curField=el;place(el);mic.style.display='flex';
+    if(_fmWatch)clearInterval(_fmWatch);
+    _fmWatch=setInterval(function(){
+      if(!curField){clearInterval(_fmWatch);return;}
+      // field hidden by a tab switch / box collapse (no scroll/resize event fires) → mic must not stay stuck
+      if(!curField.isConnected || curField.offsetParent===null){ hide(); clearInterval(_fmWatch); return; }
+      place(curField);
+    },300);
+  }
+  function hide(){if(micBusy)return;mic.style.display='none';curField=null;if(_fmWatch){clearInterval(_fmWatch);_fmWatch=null;}}
 
   function stopRec(){if(mic)mic.classList.remove('listening');micBusy=false;rec=null;}
   function startRec(){
