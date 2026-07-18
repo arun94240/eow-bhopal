@@ -1,99 +1,19 @@
-// EOW Bhopal Dashboard - Service Worker (PWA)
-// Provides offline caching for instant loading
-
-const CACHE_VERSION = 'eow-v1';
-const CACHE_NAME = `eow-bhopal-${CACHE_VERSION}`;
-
-// Files to cache on install (app shell)
-const APP_SHELL = [
-  '/',
-  '/supervisor.html',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/icons/apple-touch-icon.png'
-];
-
-// Install event - cache app shell
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      // Best effort - don't fail if some files missing
-      return Promise.all(
-        APP_SHELL.map(function(url) {
-          return cache.add(url).catch(function(err) {
-            console.warn('[SW] Failed to cache:', url, err);
-          });
-        })
-      );
-    })
-  );
-  // Activate immediately
-  self.skipWaiting();
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(k) { return k !== CACHE_NAME; })
-            .map(function(k) { return caches.delete(k); })
-      );
-    })
-  );
-  // Take control immediately
-  self.clients.claim();
-});
-
-// Fetch event - network-first for HTML, cache-first for assets
-self.addEventListener('fetch', function(event) {
-  const url = new URL(event.request.url);
-  
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') return;
-  
-  // Skip Supabase API requests (always go to network)
-  if (url.hostname.indexOf('supabase') > -1) return;
-  
-  // Skip cross-origin requests
-  if (url.origin !== location.origin) return;
-  
-  // For HTML files: network first, fall back to cache
-  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
-    event.respondWith(
-      fetch(event.request).then(function(response) {
-        // Update cache with fresh response
-        const respClone = response.clone();
-        caches.open(CACHE_NAME).then(function(cache) {
-          cache.put(event.request, respClone);
-        });
-        return response;
-      }).catch(function() {
-        // Network failed - serve from cache
-        return caches.match(event.request).then(function(cached) {
-          return cached || caches.match('/supervisor.html');
-        });
-      })
-    );
-    return;
-  }
-  
-  // For assets (images, scripts): cache first, fall back to network
-  event.respondWith(
-    caches.match(event.request).then(function(cached) {
-      if (cached) return cached;
-      return fetch(event.request).then(function(response) {
-        // Cache successful responses
-        if (response && response.status === 200) {
-          const respClone = response.clone();
-          caches.open(CACHE_NAME).then(function(cache) {
-            cache.put(event.request, respClone);
-          });
-        }
-        return response;
-      });
-    })
+/* Self-destroying service worker.
+   The previous worker cached a stale copy of the app, which flashed on refresh
+   (an old box appearing then disappearing). This worker takes over, deletes all
+   caches, unregisters itself, and reloads open pages so every future load is
+   served fresh from the network. */
+self.addEventListener('install', function(e){ self.skipWaiting(); });
+self.addEventListener('activate', function(e){
+  e.waitUntil(
+    caches.keys()
+      .then(function(keys){ return Promise.all(keys.map(function(k){ return caches.delete(k); })); })
+      .then(function(){ return self.registration.unregister(); })
+      .then(function(){ return self.clients.matchAll({ type: 'window' }); })
+      .then(function(clients){ clients.forEach(function(c){ try { c.navigate(c.url); } catch(e){} }); })
+      .catch(function(){})
   );
 });
+/* Network-only fetch (no caching) in case any request still reaches this worker
+   before it finishes unregistering. */
+self.addEventListener('fetch', function(e){ /* pass through to network */ });
