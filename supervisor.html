@@ -23225,6 +23225,41 @@ body.view-mobile section[id="rcs"] tbody tr.enq-tr td[data-label]::before,
 body.view-mobile section[id="pes"] tbody tr.enq-tr td[data-label]::before,
 body.view-mobile section[id="strs"] tbody tr.enq-tr td[data-label]::before,
 body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ content:none !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ⚖️ COURT DOCKET — same visual language as Enquiry Docket v4,
+   with FIXED 2×2 meta-grid (Hearing/CNR always top row, Status/IO
+   always bottom row — empty slots show a dashed placeholder, never
+   shift position).
+   ═══════════════════════════════════════════════════════════════ */
+.tier-supreme{ background:linear-gradient(135deg,#7c3aed,#6d28d9); border-color:#6d28d9 !important; }
+.tier-high{ background:linear-gradient(135deg,#2563eb,#1d4ed8); border-color:#1d4ed8 !important; }
+.tier-district{ background:linear-gradient(135deg,#0d9488,#0f766e); border-color:#0f766e !important; }
+
+.docket-meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:5px 8px; }
+.dmg-cell{ display:flex; min-width:0; }
+.dmg-cell.dmg-right{ justify-content:flex-end; }
+.dmg-cell .m-chip{ max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.m-chip{ font-size:10px; font-weight:800; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; }
+.m-hear{ background:#fef3c7; color:#92400e; } .m-cnr{ background:#e0f2fe; color:#0369a1; }
+.m-status{ background:#dcfce7; color:#166534; } .m-status.disp{ background:#e2e8f0; color:#475569; }
+.m-io{ background:linear-gradient(135deg,#0f766e,#0d9488); color:#fff; }
+.m-empty{ background:#f1f5f9; color:#b8c2cf; border:1px dashed #d8dee6; }
+.m-cnr .cc-ecourts{ color:inherit; text-decoration:none; margin-left:2px; }
+
+.a-btn{ display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; padding:5px 11px; border-radius:8px; border:none; cursor:pointer; color:#fff; }
+.a-link{ background:#7c3aed; } .a-link:hover{ background:#6d28d9; }
+.a-review{ background:#b45309; } .a-review:hover{ background:#92400e; }
+.act-link{ background:#7c3aed; color:#fff; border:none; }
+
+.crt-tr.crt-tr-dim .docket-row-inner{ opacity:.6; }
+.crt-tr{ display:block !important; background:transparent !important; border:none !important; }
+.crt-tr .docket-td{ padding:0 !important; border:none !important; }
+
+/* Court card wrap uses the same .docket-card/.c-top/.c-body language as enquiry cards */
+.court-card-wrap.docket-card{ border:1.5px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fff; }
+.court-card-wrap.docket-card:hover{ border-color:#f5b942; box-shadow:0 5px 16px rgba(245,185,66,.18); }
+.court-card-wrap .court-card.enq-card-head{ padding:0 !important; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -56340,6 +56375,13 @@ function _courtSortComparator(a, b) {
   return _courtSortDir === 'asc' ? cmp : -cmp;
 }
 
+function _courtTierInfo(tier){
+  var map = { supreme:{cls:'tier-supreme', label:'SUPREME'}, high:{cls:'tier-high', label:'HIGH COURT'}, district:{cls:'tier-district', label:'DISTRICT'} };
+  return map[tier] || { cls:'tier-district', label:'—' };
+}
+function _courtStatusChip(isDisp){
+  return isDisp ? '<span class="m-chip m-status disp">निराकृत</span>' : '<span class="m-chip m-status">सक्रिय</span>';
+}
 function renderCourtTable() {
   // Render tier sub-tabs first (always)
   renderCourtTierTabs();
@@ -56425,92 +56467,53 @@ function renderCourtTable() {
     var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
     var courtDisplay = cm ? cm.name : '— Unassigned —';
     var tier = cm ? (cm.tier || '') : '';
-    var tierMap = { supreme:{c:'#7c3aed',l:'SUPREME',ic:'🏛'}, high:{c:'#2563eb',l:'HIGH',ic:'⚖️'}, district:{c:'#0d9488',l:'DISTRICT',ic:'🏢'} };
-    var tinfo = tierMap[tier] || {c:'#64748b',l:'—',ic:'⚖️'};
+    var tinfo = _courtTierInfo(tier);
     // Look up officer from io_master
     var ioObj = (state.ioMaster || []).find(function(x){ return x.id === c.incharge_io_id; });
     var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : (ioObj ? ((ioObj.rank ? ioObj.rank + ' ' : '') + ioObj.name) : '');
     var typeDisplay = (c.case_type || '') + '-' + (c.case_no || '');
     var rowId = 'crt-row-' + c.id;
     var cardId = 'crt-exp-' + c.id;
-    // ═══ Card layout (v195) ═══
     var isDisp = (c.case_status && /dispos|निरस्त|खारिज|withdraw/i.test(c.case_status)) || c.disposed === true;
-    var hearChip='';
-    if(c.next_hearing){ var nh=String(c.next_hearing).slice(0,10); var d=new Date(nh); var lbl=isNaN(d)?nh:(d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]); hearChip='<span class="cc-chip hear">📅 अगली: '+escapeHtml(lbl)+'</span>'; }
-    var cnrChip='';
-    if(c.cnr_no){ cnrChip='<span class="cc-chip cnr">🔗 '+escapeHtml(c.cnr_no)+ (c.cnr_no.indexOf('SN-')===-1 ? ' <a href="javascript:void(0)" class="cc-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\''+c.id+'\', event)" title="court site पर खोलें">🔍</a>' : '') +'</span>'; }
-    else { cnrChip='<span class="cc-chip cnr" style="opacity:.6">🔗 CNR: —</span>'; }
-    var ioChip = officerDisplay ? '<span class="cc-chip io" title="'+escapeHtml(officerDisplay)+'">👮 '+escapeHtml(officerDisplay)+'</span>' : '';
+    var petChip = _docketCompChip(c.petitioner);
+    var respChip = _docketNcompChip(c.respondent);
+    var vsSep = (petChip && respChip) ? '<span class="p-vs">Vs</span>' : '';
+    var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 अगली: '+escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing)+'</span>') : '<span class="m-chip m-empty">📅 अगली: —</span>';
+    var cnrCell = c.cnr_no ? ('<span class="m-chip m-cnr">🔗 '+escapeHtml(c.cnr_no)+(c.cnr_no.indexOf('SN-')===-1?' <a href="javascript:void(0)" class="cc-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\''+c.id+'\', event)" title="court site पर खोलें">🔍</a>':'')+'</span>') : '<span class="m-chip m-empty">🔗 CNR: —</span>';
+    var statusCell = _courtStatusChip(isDisp);
+    var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 '+escapeHtml(officerDisplay)+'</span>') : '<span class="m-chip m-empty">👮 IO: —</span>';
     var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
-    var partiesHTML = escapeHtml(c.petitioner || '—') + ((c.petitioner && c.respondent) ? ' <span class="cc-vs">Vs</span> ' : (c.respondent?' ':'')) + (c.respondent ? escapeHtml(c.respondent) : '');
-    var card = '<div class="cc'+(isDisp?' cc-disp':'')+'" style="--tier:'+tinfo.c+'" id="'+rowId+'" onclick="toggleCourtExpand(\''+c.id+'\')">'+
-      '<div class="cc-hd">'+
-        '<div class="cc-top"><span class="cc-tier" style="background:'+tinfo.c+'">'+tinfo.l+'</span>'+
-          '<span class="cc-no" onclick="event.stopPropagation();openCourtStatusSite(\''+c.id+'\', event)" title="court site + details copy">'+escapeHtml(typeDisplay)+'</span>'+
-          renderEnquiryIcon(c)+renderSupTagBadges(c)+renderCourtLinkBadge(c)+
-          '<span class="cc-court">'+tinfo.ic+' '+escapeHtml(courtDisplay)+'</span></div>'+
-        '<div class="cc-parties">'+partiesHTML+'</div>'+
-        (relCell ? '<div class="cc-rel">'+relCell+'</div>' : '')+
-        '<div class="cc-meta">'+hearChip+cnrChip+ioChip+
-          '<span class="cc-actions">'+
-            '<button class="cc-lnk" onclick="event.stopPropagation();openCourtLinkPicker(\''+c.id+'\')" title="अन्य court case से link करें">🔗</button>'+
-            '<button class="cc-oe" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">Open / Edit ›</button>'+
-          '</span>'+
+    var reviewActionBtn = isDisp ? '' : ('<button class="a-btn a-review" onclick="event.stopPropagation();openReviewModal(\'court\',\''+c.id+'\')">⭐ समीक्षा</button>');
+    var card = '<div class="docket-row-inner">'+
+      '<div class="stamp-wrap">'+
+        '<div class="stamp">'+
+          '<div class="stamp-no"><div class="no">'+escapeHtml(typeDisplay)+renderEnquiryIcon(c)+renderSupTagBadges(c)+renderCourtLinkBadge(c)+'</div></div>'+
+          '<div class="stamp-date">'+escapeHtml(courtDisplay)+'</div>'+
+          '<div class="stamp-cat '+tinfo.cls+'">'+tinfo.label+'</div>'+
         '</div>'+
       '</div>'+
+      '<div class="body">'+
+        (relCell ? ('<div class="docket-sup">'+relCell+'</div>') : '')+
+        '<div class="parties-wrap">'+petChip+vsSep+respChip+'</div>'+
+        '<div class="docket-meta-grid">'+
+          '<div class="dmg-cell">'+hearCell+'</div>'+
+          '<div class="dmg-cell dmg-right">'+cnrCell+'</div>'+
+          '<div class="dmg-cell">'+statusCell+'</div>'+
+          '<div class="dmg-cell dmg-right">'+ioCell+'</div>'+
+        '</div>'+
+        '<div class="actions">'+
+          '<button class="a-btn a-link" onclick="event.stopPropagation();openCourtLinkPicker(\''+c.id+'\')">🔗 Link Enquiry</button>'+
+          reviewActionBtn+
+        '</div>'+
+      '</div>'+
+      '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">✎</button></div>'+
     '</div>';
-    return '<tr class="crt-card-tr"><td colspan="7" style="padding:0 0 9px;border:none;">'+card+'</td></tr>'+
-      '<tr class="crt-expand-row" id="' + cardId + '" style="display:none;"><td colspan="7" style="padding:0;border:none;"></td></tr>';
+    return '<tr class="crt-tr'+(isDisp?' crt-tr-dim':'')+'" id="' + rowId + '" onclick="toggleCourtExpand(\''+c.id+'\')">'+
+      '<td class="docket-td" colspan="7">'+card+'</td>'+
+    '</tr>'+
+    '<tr class="crt-expand-row" id="' + cardId + '" style="display:none;"><td colspan="7" style="padding:0;"></td></tr>';
   }).join('');
-  var _oldMapDone=true; if(_oldMapDone) return;
-  tbody.innerHTML = rows.map(function(c, i){
-    var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
-    var courtDisplay = cm ? cm.name : '— Unassigned —';
-    var ioObj = (state.ioMaster || []).find(function(x){ return x.id === c.incharge_io_id; });
-    var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : (ioObj ? ((ioObj.rank ? ioObj.rank + ' ' : '') + ioObj.name) : '');
-    var typeDisplay = (c.case_type || '') + '-' + (c.case_no || '');
-    var rowId = 'crt-row-' + c.id;
-    var cardId = 'crt-exp-' + c.id;
-    
-    // Build combined Court/Type/CNR stacked cell
-    var cnrBlock = '';
-    if (c.cnr_no) {
-      cnrBlock = '<div class="crt-cnr-line"><span class="cnr-cell">'+escapeHtml(c.cnr_no)+'</span>' +
-        (c.cnr_no.indexOf('SN-') === -1 ? ' <a href="javascript:void(0)" class="ecourts-link" onclick="openEcourtsForCase(\''+c.id+'\', event)" title="इस court की site पर खोलें (CNR copy)">🔍</a>' : '') +
-      '</div>';
-    } else {
-      cnrBlock = '<div class="crt-cnr-line crt-cnr-none">CNR: —</div>';
-    }
-    
-    // Diary No line (shown when present — typically Supreme Court)
-    var diaryBlock = '';
-    if (c.diary_no) {
-      diaryBlock = '<div class="crt-diary-line"><span class="diary-cell">Diary: '+escapeHtml(courtDiaryDisplay(c))+'</span></div>';
-    }
-    
-    var courtStack = '<div class="crt-court-stack">' +
-      '<div class="crt-court-name"><span class="court-badge">'+escapeHtml(courtDisplay)+'</span></div>' +
-      '<div class="crt-type-line"><span class="type-no-cell type-no-clickable" onclick="event.stopPropagation();openCourtStatusSite(\''+c.id+'\', event)" title="Court website पर खोलें + details copy">'+escapeHtml(typeDisplay)+'</span>'+renderEnquiryIcon(c)+'</div>' +
-      diaryBlock +
-      cnrBlock +
-    '</div>';
-    
-    return '<tr class="crt-tr" id="' + rowId + '" onclick="toggleCourtExpand(\''+c.id+'\')">'+
-      '<td data-label="SN"><span class="serial-cell">'+(i+1)+'</span></td>'+
-      '<td data-label="Court &amp; Case">'+courtStack+renderSupTagBadges(c)+renderCourtLinkBadge(c)+'</td>'+
-      '<td data-label="Related To">'+renderRelatedToCell(c)+'</td>'+
-      '<td data-label="पक्षकार" class="crt-parties-cell">'+
-        '<div class="cp-pet">'+(c.petitioner ? '<span class="court-name-chip court-pet-chip" title="'+escapeHtml(c.petitioner)+'">👤 '+cpartyDisplayChip(c.petitioner)+'</span>' : '—')+'</div>'+
-        ((c.petitioner && c.respondent) ? '<div class="cp-vs">Vs</div>' : '')+
-        '<div class="cp-resp">'+(c.respondent ? '<span class="court-name-chip court-resp-chip" title="'+escapeHtml(c.respondent)+'">⚖ '+cpartyDisplayChip(c.respondent)+'</span>' : '—')+'</div>'+
-      '</td>'+
-      '<td data-label="I/C Officer">'+(officerDisplay ? '<span class="court-io-chip" title="'+escapeHtml(officerDisplay)+'">👮 '+escapeHtml(officerDisplay)+'</span>' : '—')+'</td>'+
-      '<td data-label="Files">'+renderAttachIcons(c.attachments, c.links)+'</td>'+
-      '<td data-label=""><button class="btn btn-sm crt-link-btn" onclick="event.stopPropagation();openCourtLinkPicker(\''+c.id+'\')" title="इस case को किसी अन्य दर्ज court case से link करें">🔗</button> <button class="btn btn-sm" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">Open / Edit</button></td></tr>'+
-      '<tr class="crt-expand-row" id="' + cardId + '" style="display:none;"><td colspan="7" style="padding:0;"></td></tr>';
-  }).join('');
-  
-  // ─── Also render Cards view (separately — toggled via setCourtView) ───
+  // ─── Also render Cards view (toggled via setCourtView) ───
   renderCourtCards(rows);
 }
 
@@ -56525,87 +56528,45 @@ function renderCourtTable() {
 function renderCourtCards(rows) {
   var wrap = document.getElementById('court-cards-wrap');
   if (!wrap) return;
-  
   if (!rows || !rows.length) {
     wrap.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><h3>No court cases</h3></div>';
     return;
   }
-  
-  wrap.innerHTML = rows.map(function(c){
+  wrap.innerHTML = '<div class="enq-cards-grid">' + rows.map(function(c){
     var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
     var courtName = cm ? cm.name : '— Unassigned —';
-    
-    // Type/No format: e.g., "WP 10862-25"
-    var typeNo = '';
+    var tier = cm ? (cm.tier || '') : '';
+    var tinfo = _courtTierInfo(tier);
     var typeStr = (c.case_type === 'Other' ? c.case_type_other : c.case_type) || '';
-    var caseNoStr = c.case_no || '';
-    if (typeStr || caseNoStr) {
-      typeNo = (typeStr + ' ' + caseNoStr).trim();
-    }
-    
-    // Petitioner: first name only
-    var petitioner = c.petitioner ? cpartyDisplayChip(c.petitioner) : '—';
-    // Respondent: first name + "+N others" (Sir's spec)
-    var respondent = c.respondent ? cpartyDisplayChip(c.respondent) : '—';
-    
-    // Related to
-    var relatedTo = '';
-    if (c.related_to_id && c.related_to_type) {
-      var enq = (typeof getLinkedEnquiry === 'function') ? getLinkedEnquiry(c) : null;
-      if (enq) {
-        relatedTo = (typeof formatEntryNo === 'function') 
-          ? formatEntryNo(c.related_to_type, enq.no, enq.entry_year)
-          : (enq.no + '/' + (enq.entry_year || ''));
-      }
-    } else if (c.apraadh_kramank) {
-      relatedTo = c.apraadh_kramank + ' (manual)';
-    }
-    
-    // CNR
-    var cnr = (c.cnr_no && c.cnr_no.indexOf('SN-') === -1) ? c.cnr_no : '';
-    
-    // Officer
-    var officer = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : (c.incharge_officer || '');
-    
-    // Status
-    var status = c.case_status || c.status || 'Active';
-    var statusClass = 'active';
-    var statusLabel = status;
-    if (typeof getStatusLabel === 'function') {
-      statusLabel = getStatusLabel(status);
-    }
-    var sLower = String(status).toLowerCase();
-    if (sLower.indexOf('closed') > -1 || sLower.indexOf('nasti') > -1) statusClass = 'closed';
-    else if (sLower.indexOf('convert') > -1 || sLower.indexOf('rc') > -1) statusClass = 'converted';
-    
-    var _tier = cm ? String(cm.tier||'') : '';
-    var _tierCls = _tier==='supreme'?'cc-sup':_tier==='high'?'cc-high':_tier==='district'?'cc-dist':'cc-unassigned';
-    var _tierLbl = ({supreme:'🏛 Supreme Court',high:'⚖ High Court',district:'📜 District Court'})[_tier] || '⚖ Court';
-    var _nextHear = c.next_hearing ? ((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing) : '';
-    return '<div class="court-card-wrap" id="court-card-wrap-' + c.id + '">' +
-      '<div class="court-card ccx ' + _tierCls + ' status-' + statusClass + '" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
-        '<div class="ccx-top">' +
-          '<span class="ccx-tier">' + _tierLbl + '</span>' +
-          (typeNo ? '<span class="ccx-no" onclick="event.stopPropagation();openCourtStatusSite(\'' + c.id + '\', event)" title="Court site पर खोलें">' + escapeHtml(typeNo) + '</span>' : '') +
-          (cnr ? '<span class="ccx-cnr">' + escapeHtml(cnr) + '</span><button class="ccx-cnr-btn" onclick="event.stopPropagation();openEcourtsForCase(\'' + c.id + '\', event)" title="इस court की site पर खोलें (CNR copy)">🔍</button>' : '') +
+    var typeNo = (typeStr + ' ' + (c.case_no || '')).trim();
+    var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : '';
+    var isDisp = (c.case_status && /dispos|निरस्त|खारिज|withdraw/i.test(c.case_status)) || c.disposed === true;
+    var petChip = _docketCompChip(c.petitioner);
+    var respChip = _docketNcompChip(c.respondent);
+    var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 ' + escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing) + '</span>') : '<span class="m-chip m-empty">📅 —</span>';
+    var cnrCell = c.cnr_no ? '<span class="m-chip m-cnr">🔗 CNR</span>' : '<span class="m-chip m-empty">🔗 —</span>';
+    var statusCell = _courtStatusChip(isDisp);
+    var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 ' + escapeHtml(officerDisplay) + '</span>') : '<span class="m-chip m-empty">👮 —</span>';
+    return '<div class="court-card-wrap docket-card" id="court-card-wrap-' + c.id + '">' +
+      '<div class="court-card enq-card-head" id="court-card-' + c.id + '" onclick="event.stopPropagation();toggleCourtCardBrief(\'' + c.id + '\')">' +
+        '<div class="c-top"><div class="c-catno ' + tinfo.cls + '"><div class="cat">' + tinfo.label + '</div><div class="no">' + escapeHtml(typeNo) + '</div></div><div class="c-date ' + tinfo.cls + '">' + escapeHtml(courtName) + '</div></div>' +
+        '<div class="c-body">' +
+          '<div class="c-parties">' + petChip + respChip + '</div>' +
+          '<div class="docket-meta-grid">' +
+            '<div class="dmg-cell">' + hearCell + '</div>' +
+            '<div class="dmg-cell dmg-right">' + cnrCell + '</div>' +
+            '<div class="dmg-cell">' + statusCell + '</div>' +
+            '<div class="dmg-cell dmg-right">' + ioCell + '</div>' +
+          '</div>' +
+          '<div class="c-actions">' +
+            '<button class="act-btn act-link" onclick="event.stopPropagation();openCourtLinkPicker(\'' + c.id + '\')">🔗 Link Enquiry</button>' +
+          '</div>' +
+          '<button class="c-edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\'' + c.id + '\')">✎</button>' +
         '</div>' +
-        '<div class="ccx-court">' + escapeHtml(courtName) + (c.diary_no ? ' · Diary: ' + escapeHtml(courtDiaryDisplay(c)) : '') + '</div>' +
-        '<div class="ccx-parties">' +
-          '<span class="ccx-pet" title="'+escapeHtml(c.petitioner||'')+'">👤 ' + petitioner + '</span>' +
-          '<span class="ccx-vs">Vs</span>' +
-          '<span class="ccx-resp" title="'+escapeHtml(c.respondent||'')+'">⚖ ' + respondent + '</span>' +
-        '</div>' +
-        '<div class="ccx-meta">' +
-          (officer ? '<span class="ccx-io">👮 ' + escapeHtml(officer) + '</span>' : '') +
-          (_nextHear ? '<span class="ccx-hear">📅 अगली: ' + escapeHtml(_nextHear) + '</span>' : '') +
-          '<span class="ccx-status ' + statusClass + '">' + escapeHtml(statusLabel) + '</span>' +
-          (relatedTo ? '<span class="ccx-rel">' + (c.related_to_id?'🔗 ':'📎 ') + escapeHtml(relatedTo) + '</span>' : '') +
-        '</div>' +
-        '<span class="ccx-car">▾</span>' +
       '</div>' +
       '<div class="court-card-brief" id="court-card-brief-' + c.id + '" style="display:none;"></div>' +
     '</div>';
-  }).join('');
+  }).join('') + '</div>';
 }
 
 // ─── Toggle inline brief expansion inside court card view ───
