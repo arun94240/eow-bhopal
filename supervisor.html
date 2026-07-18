@@ -23117,6 +23117,114 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 /* Agenda tiles (DG EOW / चर्चा / समीक्षा / To-Do) fill width too */
 #mydaily-box .mtx-chip-grid{ grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)) !important; }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   🖋️ DOCKET v4 — unified compact list/card design for all
+   inquiry types (Complaints/R-Complaints/RCs/PEs/STRs/Sutra Suchna)
+   Universal: same structure on every screen width (flex-wrap does
+   the responsive work — no separate mobile/desktop markup needed).
+   ═══════════════════════════════════════════════════════════════ */
+.docket-row{ display:block !important; background:transparent; border:none !important; margin:0 !important; padding:0 !important; box-shadow:none !important; }
+.docket-row:hover{ background:transparent !important; }
+.docket-td{ padding:0 !important; border:none !important; display:block !important; }
+.docket-row-inner{ display:flex; align-items:stretch; border:1.5px solid #e2e8f0; border-radius:12px; background:#fff; overflow:hidden; margin-bottom:10px; transition:all .15s; cursor:pointer; }
+.docket-row-inner:hover{ border-color:#f5b942; box-shadow:0 6px 18px rgba(245,185,66,.22); }
+.enq-tr-dim .docket-row-inner{ opacity:.6; }
+
+.docket-sn{ flex:0 0 26px; display:flex; align-items:center; justify-content:center; background:#f5f8fc; border-right:1px solid #e2e8f0; font-size:11px; font-weight:900; color:#94a3b8; font-family:ui-monospace,monospace; }
+
+.stamp-wrap{ flex:0 0 122px; display:flex; align-items:center; justify-content:center; padding:10px 8px; position:relative; }
+.stamp{ width:100%; border-radius:10px; overflow:hidden; box-shadow:0 2px 6px rgba(6,42,82,.1); }
+.stamp-no{ padding:8px 6px 6px; text-align:center; background:#fff; border:2px solid #062a52; border-bottom:none; border-radius:10px 10px 0 0; }
+.stamp-no .no{ font-family:ui-monospace,monospace; font-size:13.5px; font-weight:900; color:#062a52; line-height:1.15; letter-spacing:.01em; display:flex; align-items:center; justify-content:center; gap:3px; flex-wrap:wrap; }
+.stamp-date{ font-size:10px; font-weight:800; color:#fff; background:#0a3a6e; padding:3px 6px; letter-spacing:.02em; border:2px solid #062a52; border-top:none; border-bottom:none; text-align:center; }
+.stamp-cat{ font-size:9px; font-weight:900; letter-spacing:.04em; text-align:center; padding:5px 4px; color:#fff; border:2px solid #062a52; border-top:none; border-radius:0 0 10px 10px; }
+.cat-complaints{ background:linear-gradient(135deg,#2563eb,#1d4ed8); border-color:#1d4ed8 !important; }
+.cat-rcomplaints{ background:linear-gradient(135deg,#7c3aed,#6d28d9); border-color:#6d28d9 !important; }
+.cat-rcs{ background:linear-gradient(135deg,#dc2626,#b91c1c); border-color:#b91c1c !important; }
+.cat-pes{ background:linear-gradient(135deg,#ea580c,#c2410c); border-color:#c2410c !important; }
+.cat-strs{ background:linear-gradient(135deg,#0891b2,#0e7490); border-color:#0e7490 !important; }
+.cat-sutra{ background:linear-gradient(135deg,#16a34a,#15803d); border-color:#15803d !important; }
+
+.urgent-stamp{ position:absolute; top:1px; left:1px; font-size:7.5px; font-weight:900; color:#fff; background:#dc2626; border-radius:4px; padding:1px 5px; transform:rotate(-8deg); letter-spacing:.02em; box-shadow:0 2px 5px rgba(220,38,38,.4); z-index:2; }
+
+.docket-row-inner .body{ flex:1; min-width:0; padding:11px 13px; display:flex; flex-direction:column; gap:7px; justify-content:center; }
+.docket-sup{ display:flex; flex-wrap:wrap; gap:4px; }
+.parties-wrap{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.p-chip{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:800; padding:4px 11px; border-radius:20px; white-space:normal; word-break:break-word; line-height:1.3; }
+.p-comp{ background:#1d4ed8; color:#fff; }
+.p-ncomp{ background:#fff; color:#b45309; border:1.8px solid #f59e0b; }
+.p-vs{ color:#dc2626; font-weight:900; font-size:10px; }
+
+.meta-row{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.io-badge{ display:inline-flex !important; align-items:center; gap:5px; font-size:10.5px; font-weight:800; color:#fff !important; background:linear-gradient(135deg,#0f766e,#0d9488) !important; border-radius:20px; padding:3px 11px !important; }
+.io-badge-none{ background:#94a3b8 !important; }
+.io-badge .io-badge-icon{ display:none; }
+.io-badge-date{ background:rgba(255,255,255,.22) !important; color:#fff !important; border-radius:20px; margin-left:4px; padding:1px 7px !important; font-size:9.5px !important; }
+.status-chip{ font-size:9.5px; font-weight:900; padding:3px 9px; border-radius:6px; letter-spacing:.02em; }
+.status-chip.active{ background:#1e40af; color:#fff; } .status-chip.rc{ background:#b45309; color:#fff; } .status-chip.closed{ background:#475569; color:#fff; }
+.review-chip{ font-size:10px; font-weight:800; color:#fff; background:linear-gradient(135deg,#7c3aed,#6d28d9); border-radius:20px; padding:3px 10px; }
+.review-chip.rc-overdue{ background:linear-gradient(135deg,#dc2626,#b91c1c); }
+.review-chip.rc-today{ background:linear-gradient(135deg,#f5b942,#e8a82e); color:#062a52; }
+
+.docket-row-inner .actions{ display:flex; gap:6px; flex-wrap:wrap; }
+.act-btn{ display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; padding:5px 10px; border-radius:8px; border:none; cursor:pointer; color:#fff; }
+.act-timeline{ background:#1d4ed8; } .act-timeline:hover{ background:#1e40af; }
+.act-review{ background:#b45309; } .act-review:hover{ background:#92400e; }
+.act-craft{ background:#15803d; } .act-craft:hover{ background:#166534; }
+
+.docket-row-inner .right{ flex:0 0 46px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#062a52,#0a3a6e); }
+.docket-row-inner .edit{ width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,.12); border:1.5px solid #f5b942; color:#f5b942; font-size:13px; cursor:pointer; }
+.docket-row-inner .edit:hover{ background:#f5b942; color:#062a52; }
+
+@media (max-width:640px){
+  .docket-row-inner{ flex-wrap:wrap; }
+  .stamp-wrap{ flex:0 0 100px; }
+}
+
+/* ── matching Card view ── */
+.docket-card{ border:1.5px solid #e2e8f0 !important; border-radius:12px !important; overflow:hidden; }
+.docket-card:hover{ border-color:#f5b942 !important; box-shadow:0 5px 16px rgba(245,185,66,.18); }
+.docket-card .enq-card-head{ padding:0 !important; display:flex; flex-direction:column; }
+.c-top{ display:flex; align-items:stretch; }
+.c-catno{ flex:1; padding:8px 11px; color:#fff; min-width:0; }
+.c-catno .cat{ font-size:8.5px; font-weight:900; letter-spacing:.04em; opacity:.9; }
+.c-catno .no{ font-family:ui-monospace,monospace; font-size:13px; font-weight:900; margin-top:1px; }
+.c-date{ font-size:9.5px; font-weight:800; color:#fff; padding:8px 9px; white-space:nowrap; filter:brightness(0.85); }
+.c-body{ padding:10px 11px; display:flex; flex-direction:column; gap:7px; position:relative; }
+.c-urgent{ position:absolute; top:6px; right:8px; font-size:7.5px; font-weight:900; color:#fff; background:#dc2626; border-radius:4px; padding:1px 6px; transform:rotate(-6deg); box-shadow:0 2px 5px rgba(220,38,38,.4); }
+.c-parties{ display:flex; flex-direction:column; gap:5px; align-items:flex-start; }
+.c-meta{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.c-actions{ display:flex; gap:5px; margin-top:2px; padding-top:6px; border-top:1px dashed #eef2f7; }
+.c-actions .act-btn{ flex:1; justify-content:center; padding:5px 4px; }
+.c-edit{ position:absolute; bottom:9px; right:9px; width:26px; height:26px; border-radius:7px; background:#062a52; border:none; color:#f5b942; font-size:11px; cursor:pointer; }
+
+/* The old desktop 'last-child width:1%' rule was written for the previous
+   multi-td row layout; the Docket row is now a single colspan td, so
+   neutralise that legacy rule for it specifically and let it size naturally. */
+.enq-tr.docket-row > td.docket-td{ width:auto !important; white-space:normal !important; padding-left:0 !important; padding-right:0 !important; text-align:left !important; }
+.enq-list-wrap .table-wrap > table:has(.docket-row){ width:100% !important; min-width:0; }
+
+/* Neutralise the old mobile card-stack transform — Docket rows are already
+   card-like and universal, no separate mobile stacking needed anymore. */
+body.view-mobile section[id="complaints"] tbody tr.enq-tr,
+body.view-mobile section[id="rcomplaints"] tbody tr.enq-tr,
+body.view-mobile section[id="rcs"] tbody tr.enq-tr,
+body.view-mobile section[id="pes"] tbody tr.enq-tr,
+body.view-mobile section[id="strs"] tbody tr.enq-tr,
+body.view-mobile section[id="sutra"] tbody tr.enq-tr{ display:block !important; background:transparent !important; border:none !important; padding:0 !important; box-shadow:none !important; margin-bottom:0 !important; }
+body.view-mobile section[id="complaints"] tbody tr.enq-tr td,
+body.view-mobile section[id="rcomplaints"] tbody tr.enq-tr td,
+body.view-mobile section[id="rcs"] tbody tr.enq-tr td,
+body.view-mobile section[id="pes"] tbody tr.enq-tr td,
+body.view-mobile section[id="strs"] tbody tr.enq-tr td,
+body.view-mobile section[id="sutra"] tbody tr.enq-tr td{ display:block !important; padding:0 !important; border:none !important; }
+body.view-mobile section[id="complaints"] tbody tr.enq-tr td[data-label]::before,
+body.view-mobile section[id="rcomplaints"] tbody tr.enq-tr td[data-label]::before,
+body.view-mobile section[id="rcs"] tbody tr.enq-tr td[data-label]::before,
+body.view-mobile section[id="pes"] tbody tr.enq-tr td[data-label]::before,
+body.view-mobile section[id="strs"] tbody tr.enq-tr td[data-label]::before,
+body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ content:none !important; }
 </style>
 </head>
 <body>
@@ -52803,57 +52911,92 @@ function renderEnquiryCards(type) {
 
 // Reusable enquiry row builder (used by category tables AND Total Cases).
 // scoped=true → 'tc-' prefixed ids + sibling-based expand (no id collision with category sections)
+/* ═══ Docket v4 — shared helpers (list row + card share these) ═══ */
+var _docketCat = {
+  complaints:{ label:'COMPLAINT', cls:'cat-complaints' },
+  rcomplaints:{ label:'R-COMPLAINT', cls:'cat-rcomplaints' },
+  rcs:{ label:'RC', cls:'cat-rcs' },
+  pes:{ label:'PE', cls:'cat-pes' },
+  strs:{ label:'STR', cls:'cat-strs' },
+  sutra:{ label:'SUTRA SUCHNA', cls:'cat-sutra' }
+};
+function _docketIsUrgent(r){
+  if(!r || !r.tag_ids || !Array.isArray(r.tag_ids) || !r.tag_ids.length) return false;
+  return r.tag_ids.some(function(tid){ var t=(typeof getTagById==='function')?getTagById(tid):null; return t && t.name==='URGENT'; });
+}
+function _docketReviewChip(type, r){
+  if (isEntryDimmed(r)) return '';
+  var rs = getReviewStatus(type, r.id);
+  var lr = getLatestReview(type, r.id);
+  if (rs === 'overdue') return '<span class="review-chip rc-overdue" title="समीक्षा overdue">⚠ ' + fmtReviewDate(lr.next_review_date) + '</span>';
+  if (rs === 'today') return '<span class="review-chip rc-today" title="आज समीक्षा है">🎯 आज समीक्षा</span>';
+  if (rs === 'fresh') return '<span class="review-chip" title="अगली समीक्षा">⭐ अगली समीक्षा ' + fmtReviewDate(lr.next_review_date) + '</span>';
+  return '';
+}
+function _docketStatusChip(r){
+  var st = r.case_status || 'Active';
+  var cls = st === 'Closed' ? 'closed' : (st === 'Converted to RC' ? 'rc' : 'active');
+  return '<span class="status-chip ' + cls + '" title="' + escapeHtml(st) + '">' + escapeHtml(getStatusLabel(st)) + '</span>';
+}
+function _docketCompChip(text){
+  if (!text || !String(text).trim()) return '';
+  return '<span class="p-chip p-comp">👤 ' + escapeHtml(String(text).trim()) + '</span>';
+}
+function _docketNcompChip(text){
+  if (!text || !String(text).trim()) return '';
+  return '<span class="p-chip p-ncomp">👥 ' + escapeHtml(String(text).trim()) + '</span>';
+}
+function _docketActions(type, r){
+  var timelineBtn = '<button class="act-btn act-timeline" title="Case Timeline kholen" onclick="event.stopPropagation();showCasePragatiTimeline(\''+type+'\',\''+r.id+'\')">📊 Case Timeline</button>';
+  var reviewBtn = isEntryDimmed(r) ? '' : ('<button class="act-btn act-review" title="समीक्षा दर्ज करें" onclick="event.stopPropagation();openReviewModal(\''+type+'\',\''+r.id+'\')">⭐ प्रकरण समीक्षा</button>');
+  var craftBtn = '<button class="act-btn act-craft" title="Craft में यह प्रकरण खोलें" onclick="event.stopPropagation();craftOpenForCase(\''+type+'\',\''+r.id+'\')">📄 Craft</button>';
+  return timelineBtn + reviewBtn + craftBtn;
+}
+
+// Reusable enquiry row builder (used by category tables AND Total Cases).
+// scoped=true → 'tc-' prefixed ids + sibling-based expand (no id collision with category sections)
 function _buildEnquiryRow(type, r, i, scoped) {
   var pfx = scoped ? 'tc-' : '';
   var rowId = pfx + 'enq-row-' + r.id;
   var cardId = pfx + 'enq-exp-' + r.id;
-  var hasLinks = entryHasLinks(r);
-  var linkIcon = hasLinks ? '<span class="nd-link-icon" onclick="event.stopPropagation();openLinkedCluster(\''+r.id+'\')" title="Linked प्रकरण देखें">🔗</span>' : '';
   var dimCls = isEntryDimmed(r) ? ' enq-tr-dim' : '';
-  var statusBadge = '';
-  if (r.case_status && r.case_status !== 'Active') {
-    var stCls = r.case_status === 'Converted to RC' ? 'enq-status-conv' : 'enq-status-closed';
-    statusBadge = '<span class="enq-status-badge ' + stCls + '" title="' + escapeHtml(r.case_status) + '">' + escapeHtml(getStatusLabel(r.case_status)) + '</span>';
-  }
-  var reviewBadge = '';
-  var reviewBtn = '';
-  if (!isEntryDimmed(r)) {
-    var rs = getReviewStatus(type, r.id);
-    var latestRev = getLatestReview(type, r.id);
-    if (rs === 'overdue') {
-      reviewBadge = '<span class="rev-row-badge rev-rb-overdue" title="समीक्षा overdue">⚠ ' + fmtReviewDate(latestRev.next_review_date) + '</span>';
-    } else if (rs === 'today') {
-      reviewBadge = '<span class="rev-row-badge rev-rb-today" title="आज समीक्षा है">🎯 आज</span>';
-    } else if (rs === 'fresh') {
-      reviewBadge = '<span class="rev-row-badge rev-rb-fresh" title="अगली समीक्षा">⭐ ' + fmtReviewDate(latestRev.next_review_date) + '</span>';
-    }
-    reviewBtn = '<button class="ctc-btn-full nd-review-btn" title="समीक्षा दर्ज करें" onclick="event.stopPropagation();openReviewModal(\''+type+'\',\''+r.id+'\')">⭐ प्रकरण समीक्षा</button>';
-  }
-  var rowReviewRibbon = _buildReviewRibbon(type, r);
-  var craftBtn = '<button class="ctc-btn-full nd-craft-btn" title="Craft में यह प्रकरण खोलें" onclick="event.stopPropagation();craftOpenForCase(\''+type+'\',\''+r.id+'\')">📄 Craft</button>';
   var expandHandler = scoped
     ? ('tcToggleExpand(\''+type+'\',\''+r.id+'\',event)')
     : ('toggleEnquiryExpand(\''+type+'\',\''+r.id+'\')');
-  // Total Cases shows a small category badge before the No
-  var catBadge = scoped ? ('<span class="tc-cat-badge tc-cat-'+type+'">'+(_tcShort[type]||'')+'</span> ') : '';
-  return '<tr class="enq-tr' + dimCls + '" id="' + rowId + '" onclick="'+expandHandler+'">'+
-    '<td data-label="SN"><span class="serial-cell">'+(i+1)+'</span></td>'+
-    '<td data-label="No / Date" class="no-date-cell">'+
-      '<div class="nd-no">'+catBadge+escapeHtml(formatEntryNo(type, r.no, r.entry_year))+linkIcon+renderCourtIcon(r.id)+renderSupTagBadges(r)+statusBadge+'</div>'+
-      '<div class="nd-date">'+fmtDateShort(r.date)+'</div>'+
-      rowReviewRibbon +
-      '<button class="ctc-btn-full nd-timeline-btn" title="Case Timeline kholen" onclick="event.stopPropagation();showCasePragatiTimeline(\''+type+'\',\''+r.id+'\')">📊 Case Timeline</button>'+
-      reviewBtn +
-      craftBtn +
+  var cat = _docketCat[type] || { label:(type||'').toUpperCase(), cls:'cat-complaints' };
+  var no = formatEntryNo(type, r.no, r.entry_year);
+  var linkIcon = entryHasLinks(r) ? '<span class="nd-link-icon" onclick="event.stopPropagation();openLinkedCluster(\''+r.id+'\')" title="Linked प्रकरण देखें">🔗</span>' : '';
+  var courtIcon = renderCourtIcon(r.id);
+  var supBadges = renderSupTagBadges(r);
+  var urgentHtml = _docketIsUrgent(r) ? '<span class="urgent-stamp">अति. जरूरी</span>' : '';
+  var compChip = _docketCompChip(r.complainant);
+  var ncompChip = _docketNcompChip(r.non_complainant);
+  var vsSep = (compChip && ncompChip) ? '<span class="p-vs">Vs</span>' : '';
+  var ioSeal = r.io_name ? renderIOInlineCell(r.io_name, r.io_assigned_date) : '<span class="io-badge io-badge-none">👮 कोई IO नहीं</span>';
+  var scopedCatChip = scoped ? ('<span class="tc-cat-badge tc-cat-'+type+'">'+(_tcShort[type]||'')+'</span> ') : '';
+
+  return '<tr class="enq-tr docket-row' + dimCls + '" id="' + rowId + '" onclick="'+expandHandler+'">'+
+    '<td class="docket-td" colspan="5">'+
+      '<div class="docket-row-inner">'+
+        '<div class="docket-sn">'+(i+1)+'</div>'+
+        '<div class="stamp-wrap">'+urgentHtml+
+          '<div class="stamp">'+
+            '<div class="stamp-no"><div class="no">'+scopedCatChip+escapeHtml(no)+linkIcon+courtIcon+'</div></div>'+
+            '<div class="stamp-date">📅 '+fmtDateShort(r.date)+'</div>'+
+            '<div class="stamp-cat '+cat.cls+'">'+cat.label+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="body">'+
+          (supBadges ? ('<div class="docket-sup">'+supBadges+'</div>') : '')+
+          '<div class="parties-wrap">'+compChip+vsSep+ncompChip+'</div>'+
+          '<div class="meta-row">'+ioSeal+_docketStatusChip(r)+_docketReviewChip(type,r)+'</div>'+
+          '<div class="actions">'+_docketActions(type,r)+'</div>'+
+        '</div>'+
+        '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\''+type+'\',\''+r.id+'\')">✎</button></div>'+
+      '</div>'+
     '</td>'+
-    '<td data-label="IO">'+(r.io_name ? renderIOInlineCell(r.io_name, r.io_assigned_date) : '—')+'</td>'+
-    '<td data-label="पक्षकार" class="enq-parties-cell">'+
-      '<div class="ep-comp">'+renderComplainantChip(r.complainant)+'</div>'+
-      ((r.complainant && String(r.complainant).trim() && r.non_complainant && String(r.non_complainant).trim()) ? '<div class="ep-vs">Vs</div>' : '')+
-      '<div class="ep-ncomp">'+renderNcompChips(r.non_complainant)+'</div>'+
-    '</td>'+
-    '<td data-label=""><button class="btn btn-sm" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\''+type+'\',\''+r.id+'\')">Open / Edit</button></td></tr>'+
-    '<tr class="enq-expand-row" id="' + cardId + '" style="display:none;"><td colspan="5" style="padding:0;"></td></tr>';
+  '</tr>'+
+  '<tr class="enq-expand-row" id="' + cardId + '" style="display:none;"><td colspan="5" style="padding:0;"></td></tr>';
 }
 
 // Scoped expand for Total Cases — finds the expand row via DOM sibling (no getElementById collision)
@@ -52909,47 +53052,36 @@ function tcToggleCard(type, id, ev) {
 // Collapsed card (Notice-box style) — tap to expand the full brief inline
 function _buildEnquiryCard(type, r, scoped) {
   var no = formatEntryNo(type, r.no, r.entry_year);
-  var dimCls = (typeof isEntryDimmed === 'function' && isEntryDimmed(r)) ? ' enq-card-dim' : '';
-
-  // Status chip
-  var statusChip = '';
-  if (r.case_status && r.case_status !== 'Active') {
-    var stCls = r.case_status === 'Converted to RC' ? 'enqc-chip-conv' : 'enqc-chip-closed';
-    statusChip = '<span class="enqc-chip ' + stCls + '">' + escapeHtml(getStatusLabel(r.case_status)) + '</span>';
-  }
-
-  // Review status mini-badge (color-coded)
-  var revChip = '';
-  if (!(typeof isEntryDimmed === 'function' && isEntryDimmed(r))) {
-    var rs = getReviewStatus(type, r.id);
-    var lr = getLatestReview(type, r.id);
-    if (rs === 'overdue') revChip = '<span class="enqc-rev enqc-rev-overdue">⚠ ' + fmtReviewDate(lr.next_review_date) + '</span>';
-    else if (rs === 'today') revChip = '<span class="enqc-rev enqc-rev-today">🎯 आज</span>';
-    else if (rs === 'fresh') revChip = '<span class="enqc-rev enqc-rev-fresh">⭐ ' + fmtReviewDate(lr.next_review_date) + '</span>';
-    else revChip = '<span class="enqc-rev enqc-rev-never">○ कोई समीक्षा नहीं</span>';
-  }
-
-  var compChip = renderComplainantChip(r.complainant);
-  var ncompChip = r.non_complainant ? renderNcompChips(r.non_complainant) : '';
-  var reviewRibbon = _buildReviewRibbon(type, r);
+  var dimCls = isEntryDimmed(r) ? ' enq-card-dim' : '';
+  var cat = _docketCat[type] || { label:(type||'').toUpperCase(), cls:'cat-complaints' };
+  var compChip = _docketCompChip(r.complainant);
+  var ncompChip = _docketNcompChip(r.non_complainant);
+  var ioSeal = r.io_name ? renderIOInlineCell(r.io_name, r.io_assigned_date) : '<span class="io-badge io-badge-none">👮 कोई IO नहीं</span>';
+  var urgentHtml = _docketIsUrgent(r) ? '<span class="c-urgent">अति. जरूरी</span>' : '';
 
   var pfx = scoped ? 'tc-' : '';
   var headHandler = scoped
     ? ('tcToggleCard(\''+type+'\',\''+r.id+'\',event)')
     : ('toggleEnquiryCardBrief(\'' + type + '\',\'' + r.id + '\')');
-  var catBadge = scoped ? ('<span class="tc-cat-badge tc-cat-'+type+'">'+(_tcShort[type]||'')+'</span> ') : '';
-  return '<div class="enq-card' + dimCls + '" id="' + pfx + 'enqcard-' + r.id + '">' +
+  var scopedCatChip = scoped ? ('<span class="tc-cat-badge tc-cat-'+type+'">'+(_tcShort[type]||'')+'</span> ') : '';
+
+  return '<div class="enq-card docket-card' + dimCls + '" id="' + pfx + 'enqcard-' + r.id + '">' +
     '<div class="enq-card-head" onclick="event.stopPropagation();' + headHandler + '">' +
-      '<div class="enq-card-top">' +
-        catBadge +
-        '<span class="enq-card-no">' + escapeHtml(no) + '</span>' +
-        '<button class="enqc-craft-btn" title="Craft में यह प्रकरण खोलें" onclick="event.stopPropagation();craftOpenForCase(\'' + type + '\',\'' + r.id + '\')">📄 Craft</button>' +
-        statusChip +
-        '<span class="enq-card-date">📅 पंजीबद्ध: ' + fmtDateShort(r.date) + '</span>' +
+      '<div class="c-top">' +
+        '<div class="c-catno ' + cat.cls + '"><div class="cat">' + cat.label + '</div><div class="no">' + scopedCatChip + escapeHtml(no) + '</div></div>' +
+        '<div class="c-date ' + cat.cls + '">' + fmtDateShort(r.date) + '</div>' +
       '</div>' +
-      '<div class="enq-card-names">' + compChip + (ncompChip ? ' <span class="vs-sep">Vs</span> ' + ncompChip : '') + '</div>' +
-      '<div class="enq-card-io-wrap">' + (r.io_name ? renderIOInlineCell(r.io_name, r.io_assigned_date) : '<span class="enq-card-io-none">👮 कोई IO नहीं</span>') + '</div>' +
-      (reviewRibbon || (revChip ? '<div class="enq-card-chips">' + revChip + '</div>' : '')) +
+      '<div class="c-body">' +
+        urgentHtml +
+        '<div class="c-parties">' + compChip + ncompChip + '</div>' +
+        '<div class="c-meta">' + ioSeal + _docketStatusChip(r) + _docketReviewChip(type, r) + '</div>' +
+        '<div class="c-actions">' +
+          '<button class="act-btn act-timeline" title="Case Timeline" onclick="event.stopPropagation();showCasePragatiTimeline(\''+type+'\',\''+r.id+'\')">📊</button>' +
+          (isEntryDimmed(r) ? '' : ('<button class="act-btn act-review" title="प्रकरण समीक्षा" onclick="event.stopPropagation();openReviewModal(\''+type+'\',\''+r.id+'\')">⭐</button>')) +
+          '<button class="act-btn act-craft" title="Craft" onclick="event.stopPropagation();craftOpenForCase(\''+type+'\',\''+r.id+'\')">📄</button>' +
+        '</div>' +
+        '<button class="c-edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\''+type+'\',\''+r.id+'\')">✎</button>' +
+      '</div>' +
     '</div>' +
     '<div class="enq-card-brief" id="' + pfx + 'enqcardbrief-' + r.id + '" style="display:none;"></div>' +
   '</div>';
