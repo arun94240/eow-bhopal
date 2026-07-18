@@ -23099,10 +23099,37 @@ body.view-mobile .section-tabs { overflow-x: auto; -webkit-overflow-scrolling: t
 .cs-oe{ margin-top:9px; background:#2563eb; color:#fff; border:none; border-radius:8px; padding:6px 13px; font-size:12px; font-weight:800; cursor:pointer; }
 .cs-brief .mbr-cb-row,.cs-brief .mbr-oe{ }
 @media (max-width:600px){ .cs-rep-grid{ grid-template-columns:1fr; } .cs-tools{ margin-left:0; width:100%; } }
+
+/* ═══════════ ONE universal responsive layout (v253) — no modes ═══════════ */
+html, body { overflow-x:hidden; max-width:100vw; }
+/* Tablet / phone width */
+@media (max-width: 1023px){
+  main{ padding:16px 14px 48px !important; }
+  .header-inner{ gap:12px; }
+  /* tabs become a single swipeable row instead of many wrapped rows */
+  .section-tabs{ flex-wrap:nowrap !important; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .section-tabs::-webkit-scrollbar{ display:none; }
+  .section-tab{ flex:0 0 auto; }
+  /* boxes/sections always full width, never overflow */
+  .ov-section, .section, .cs-box, #reports-home-content, .global-search-wrap, .usb-hero, .cmd-center, .mydd-box{ width:100% !important; max-width:100% !important; box-sizing:border-box; }
+  /* any button/tile row auto-arranges by space */
+  .hdr-counter-stack, .reports-uni-stack, .ovstats-tile-row, .cmd-metrics, .cmd-chips, .mtx-chip-grid, .mydd-dg-toprow, .agenda-tools-wrap, .usb-hero-row, .usb-hero-top, .enq-view-toggle, .cs-scopes, .cs-adv-row, .cs-rep-grid{ flex-wrap:wrap !important; }
+  .cmd-metric-wide{ width:100%; }
+  /* media & tables never force horizontal scroll */
+  img, video, pre{ max-width:100% !important; height:auto; }
+  .table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+}
+/* Phone width */
+@media (max-width: 600px){
+  main{ padding:14px 10px 48px !important; }
+  .header-inner{ flex-wrap:wrap; }
+  .cs-rep-grid{ grid-template-columns:1fr !important; }
+  .cmd-metrics{ grid-template-columns:1fr !important; }
+}
 </style>
 </head>
 <body>
-<script>(function(){try{var m=window.matchMedia('(max-width: 1023px)').matches;document.body.classList.add(m?'view-mobile':'view-desktop');}catch(e){document.body.classList.add('view-desktop');}})();</script>
+<script>(function(){try{document.body.classList.add('view-desktop');}catch(e){}})();</script>
 
 <!-- CONFIG SCREEN -->
 <div id="configScreen" class="config-screen" style="display:none;">
@@ -28342,30 +28369,14 @@ function showMainApp() {
 // ============ VIEW MODE: Desktop vs Mobile ============
 var _viewManual = false;      // true once the user manually toggles (session-only override)
 var _viewResizeDeb = null;
-var _VIEW_MQ = '(max-width: 1023px)';   // single breakpoint — browser decides
-function _autoViewMode() {
-  try { return window.matchMedia(_VIEW_MQ).matches ? 'mobile' : 'desktop'; }
-  catch(e){ var w = window.innerWidth || document.documentElement.clientWidth || 1024; return (w < 1024) ? 'mobile' : 'desktop'; }
-}
+function _autoViewMode() { return 'desktop'; }   // single universal responsive layout — no modes
 function applyViewMode() {
-  // One normal, browser-driven layout — no manual Desktop/Mobile mode.
-  setViewMode(_autoViewMode(), false);
-  _bindAutoView();
+  // One responsive layout for every browser/device — CSS media queries do the adapting.
+  document.body.classList.remove('view-mobile');
+  document.body.classList.add('view-desktop');
+  try{ localStorage.removeItem('eow_view_mode'); }catch(e){}
 }
-function _bindAutoView() {
-  if (window._viewAutoBound) return; window._viewAutoBound = true;
-  var apply = function() {
-    var want = _autoViewMode();
-    if (!document.body.classList.contains('view-' + want)) setViewMode(want, false);
-  };
-  try {
-    var mq = window.matchMedia(_VIEW_MQ);
-    if (mq.addEventListener) mq.addEventListener('change', apply);
-    else if (mq.addListener) mq.addListener(apply);
-  } catch(e){}
-  window.addEventListener('resize', function(){ if(_viewResizeDeb) clearTimeout(_viewResizeDeb); _viewResizeDeb=setTimeout(apply,140); });
-  window.addEventListener('orientationchange', apply);
-}
+function _bindAutoView() { /* no mode switching — layout is pure CSS responsive */ }
 
 function showViewChoiceModal() {
   // Update welcome message with user name
@@ -28411,9 +28422,9 @@ function selectViewMode(mode) {
 }
 
 function setViewMode(mode, persist) {
-  // Apply class to body
+  // Single universal layout — always desktop/full; responsiveness handled by CSS.
   document.body.classList.remove('view-mobile', 'view-desktop');
-  document.body.classList.add('view-' + mode);
+  document.body.classList.add('view-desktop');
   
   // Save to localStorage if requested
   if (persist) {
