@@ -23196,7 +23196,7 @@ body.view-mobile .cmd-metric-wide{ grid-column:auto !important; }
 .c-parties{ display:flex; flex-direction:column; gap:5px; align-items:flex-start; }
 .c-meta{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
 .c-actions{ display:flex; gap:5px; margin-top:2px; padding-top:6px; border-top:1px dashed #eef2f7; }
-.c-actions .act-btn{ flex:1; justify-content:center; padding:5px 4px; }
+.c-actions .act-btn{ flex:1; justify-content:center; padding:5px 3px; font-size:8.5px !important; gap:2px !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .c-edit{ position:absolute; bottom:9px; right:9px; width:26px; height:26px; border-radius:7px; background:#062a52; border:none; color:#f5b942; font-size:11px; cursor:pointer; }
 
 /* The old desktop 'last-child width:1%' rule was written for the previous
@@ -53076,9 +53076,9 @@ function _buildEnquiryCard(type, r, scoped) {
         '<div class="c-parties">' + compChip + ncompChip + '</div>' +
         '<div class="c-meta">' + ioSeal + _docketStatusChip(r) + _docketReviewChip(type, r) + '</div>' +
         '<div class="c-actions">' +
-          '<button class="act-btn act-timeline" title="Case Timeline" onclick="event.stopPropagation();showCasePragatiTimeline(\''+type+'\',\''+r.id+'\')">📊</button>' +
-          (isEntryDimmed(r) ? '' : ('<button class="act-btn act-review" title="प्रकरण समीक्षा" onclick="event.stopPropagation();openReviewModal(\''+type+'\',\''+r.id+'\')">⭐</button>')) +
-          '<button class="act-btn act-craft" title="Craft" onclick="event.stopPropagation();craftOpenForCase(\''+type+'\',\''+r.id+'\')">📄</button>' +
+          '<button class="act-btn act-timeline" title="Case Timeline" onclick="event.stopPropagation();showCasePragatiTimeline(\''+type+'\',\''+r.id+'\')">📊 Case Timeline</button>' +
+          (isEntryDimmed(r) ? '' : ('<button class="act-btn act-review" title="प्रकरण समीक्षा" onclick="event.stopPropagation();openReviewModal(\''+type+'\',\''+r.id+'\')">⭐ प्रकरण समीक्षा</button>')) +
+          '<button class="act-btn act-craft" title="Craft" onclick="event.stopPropagation();craftOpenForCase(\''+type+'\',\''+r.id+'\')">📄 Craft</button>' +
         '</div>' +
         '<button class="c-edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\''+type+'\',\''+r.id+'\')">✎</button>' +
       '</div>' +
