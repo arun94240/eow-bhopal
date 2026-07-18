@@ -46653,7 +46653,8 @@ var _DEV_C={ 'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'n','च':'ch','छ
   'ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n',
   'प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v',
   'श':'sh','ष':'sh','स':'s','ह':'h','क़':'q','ख़':'kh','ग़':'g','ज़':'z','फ़':'f','ड़':'d','ढ़':'dh','ळ':'l','ऱ':'r' };
-var _DEV_M={ 'ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ं':'n','ः':'h','ँ':'n','़':'','ॉ':'o','ॅ':'e' };
+var _DEV_M={ 'ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ॉ':'o','ॅ':'e' };
+var _DEV_MOD={ 'ं':'n','ः':'h','ँ':'n','़':'' };  // modifiers — इनसे inherent 'a' नहीं गिरता (पं→pan, pn नहीं)
 var _DEV_V={ 'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au','ऍ':'e','ऑ':'o','ॐ':'om' };
 function _csDevToRoman(s){
   if(!s) return '';
@@ -46664,8 +46665,9 @@ function _csDevToRoman(s){
       var base=_DEV_C[c];
       if(nx==='्'){ out+=base; i++; }
       else if(_DEV_M[nx]!=null){ out+=base+_DEV_M[nx]; i++; }
-      else { out+=base+'a'; }
+      else { out+=base+'a'; }     // inherent 'a' — भले ही अगला अनुस्वार/व्यंजन हो
     } else if(_DEV_V[c]!=null){ out+=_DEV_V[c]; }
+    else if(_DEV_MOD[c]!=null){ out+=_DEV_MOD[c]; }   // ं ः ँ ़ — modifier, अलग से जुड़े
     else if(_DEV_M[c]!=null){ out+=_DEV_M[c]; }
     else if(c==='्'){ }
     else if(c==='।'||c==='॥'){ out+=' '; }
@@ -46695,7 +46697,7 @@ function buildSearchIndex(){
       var lbl=(typeof buildCaseLabel==='function')?buildCaseLabel(t,r):(t+'-'+r.no);
       idx.push({ scope:'enq', type:t, id:r.id, label:lbl,
         title:(r.complainant||r.non_complainant||lbl),
-        sub:'विवेचक: '+(r.io_name||'—')+' · '+((typeof getStatusLabel==='function')?getStatusLabel(r.case_status||'Active'):''),
+        sub:'विवेचक: '+(r.io_name||'—')+' · '+((typeof getStatusLabel==='function')?getStatusLabel(r.case_status||'Active'):'')+((r.non_complainant&&String(r.non_complainant).trim())?(' · अनावेदक: '+String(r.non_complainant).slice(0,45)):''),
         blob:_searchBlob([lbl, r.no, String(r.entry_year||''), r.complainant, r.non_complainant, r.brief, r.sections, r.keywords, r.io_name]) });
     });
   });
