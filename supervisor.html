@@ -23484,6 +23484,60 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .todo-ref-chip{ font-size:10px; font-weight:800; padding:3px 10px; border-radius:20px; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; cursor:pointer; }
 .todo-ref-chip.todo-ref-io{ background:linear-gradient(135deg,#0f766e,#0d9488); }
 .todo-ref-brief-wrap{ margin-top:8px; border-top:1px dashed #e2e8f0; padding-top:8px; }
+.todo-repeat-badge{ font-size:8.5px; font-weight:800; color:#7c3aed; background:#f3e8ff; padding:1px 7px; border-radius:20px; }
+.todo-tags-row{ display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+.todo-tag-chip{ font-size:8.5px; font-weight:800; padding:2px 8px; border-radius:20px; color:#fff; }
+.todo-mini-thumbs{ display:flex; gap:4px; margin-top:5px; }
+.todo-mini-thumb{ width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:12px; background:#f1f5f9; }
+.todo-full-attach .todo-attach-thumbs{ margin-top:6px; }
+.todo-full-attach a.todo-thumb{ text-decoration:none; color:inherit; cursor:pointer; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   📝 To-Do Entry Form v2 — Priority/Repeat/Pencil/Tags/Attachments
+   ═══════════════════════════════════════════════════════════════ */
+.todo-flbl{ font-size:11px; font-weight:800; color:#062a52; margin:10px 0 5px; }
+.todo-pencil-btn{ background:#eef2f7; }
+
+/* Priority */
+.todo-pr-row{ display:flex; gap:6px; margin-bottom:4px; }
+.todo-pr-opt{ flex:1; text-align:center; padding:8px; border-radius:8px; border:1.5px solid #e2e8f0; font-size:11px; font-weight:800; cursor:pointer; color:#64748b; }
+.todo-pr-opt.high.sel{ background:linear-gradient(135deg,#f87171,#dc2626); color:#fff; border-color:#dc2626; }
+.todo-pr-opt.medium.sel{ background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; border-color:#2563eb; }
+.todo-pr-opt.low.sel{ background:linear-gradient(135deg,#94a3b8,#64748b); color:#fff; border-color:#64748b; }
+
+/* Repeat */
+.todo-repeat-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px; }
+.todo-repeat-chip{ font-size:10.5px; font-weight:700; padding:6px 12px; border-radius:20px; background:#eef2f7; color:#334155; cursor:pointer; }
+.todo-repeat-chip.sel{ background:#062a52; color:#fff; }
+.todo-custom-box{ background:#f7fafd; border:1.5px dashed #cbd5e1; border-radius:9px; padding:10px; margin-top:8px; }
+.todo-custom-row{ display:flex; align-items:center; gap:7px; margin-bottom:9px; font-size:11px; font-weight:700; color:#062a52; }
+.todo-custom-row input[type=number]{ border:1.5px solid #e2e8f0; border-radius:7px; padding:5px; }
+.todo-custom-row select{ border:1.5px solid #e2e8f0; border-radius:7px; padding:5px 7px; font-size:11px; }
+.todo-custom-days{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:9px; }
+.todo-day-chip{ width:32px; height:30px; border-radius:8px; background:#fff; border:1.5px solid #e2e8f0; font-size:9.5px; font-weight:800; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#64748b; }
+.todo-day-chip.sel{ background:#062a52; color:#fff; border-color:#062a52; }
+.todo-custom-end{ display:flex; align-items:center; gap:7px; font-size:10.5px; font-weight:700; color:#062a52; }
+.todo-custom-end select{ border:1.5px solid #e2e8f0; border-radius:7px; padding:5px 7px; font-size:10.5px; }
+
+/* Pencil canvas */
+.todo-pencil-wrap{ margin:6px 0 10px; }
+.todo-pencil-canvas{ width:100%; height:140px; border:2px solid #062a52; border-radius:10px; touch-action:none; background:repeating-linear-gradient(#fff,#fff 27px,#f1f5f9 28px); cursor:crosshair; }
+.todo-pencil-tools{ display:flex; align-items:center; gap:9px; margin-top:6px; }
+.todo-pencil-clear{ background:#eef2f7; border:none; border-radius:7px; padding:5px 12px; font-size:10.5px; font-weight:800; cursor:pointer; color:#334155; }
+.todo-pencil-hint{ font-size:9.5px; color:#94a3b8; }
+
+/* Attachments */
+.todo-attach-btn{ display:flex; align-items:center; gap:8px; border:1.5px dashed #cbd5e1; border-radius:9px; padding:10px; cursor:pointer; color:#64748b; font-size:11px; font-weight:700; }
+.todo-attach-thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:7px; margin-top:9px; }
+.todo-thumb{ position:relative; border-radius:9px; overflow:hidden; border:1.5px solid #e2e8f0; aspect-ratio:1; background:#f1f5f9; display:flex; align-items:center; justify-content:center; }
+.todo-thumb img{ width:100%; height:100%; object-fit:cover; }
+.todo-thumb-photo{ background:linear-gradient(135deg,#dbeafe,#bfdbfe); }
+.todo-thumb-pdf{ background:linear-gradient(135deg,#fee2e2,#fecaca); }
+.todo-thumb-sketch{ background:#f1f5f9; }
+.todo-thumb-ic{ font-size:24px; }
+.todo-thumb-lbl{ position:absolute; bottom:0; left:0; right:0; background:rgba(6,42,82,.85); color:#fff; font-size:7.5px; font-weight:700; padding:2px 4px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.todo-thumb-x{ position:absolute; top:2px; right:2px; background:rgba(0,0,0,.5); color:#fff; width:15px; height:15px; border-radius:50%; font-size:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -34324,10 +34378,10 @@ function hctOpenReports(){
    ═══════════════════════════════════════════════════════════════════ */
 var _todoView = 'list';
 function _todoPriorityInfo(p){
-  p = String(p || 'सामान्य');
-  if (p === 'High' || p === 'उच्च') return { cls:'pr-high', label:'उच्च' };
-  if (p === 'Low' || p === 'कम') return { cls:'pr-low', label:'कम' };
-  return { cls:'pr-normal', label:'सामान्य' };
+  p = String(p || 'Medium');
+  if (p === 'High' || p === 'उच्च') return { cls:'pr-high', label:'High' };
+  if (p === 'Low' || p === 'कम') return { cls:'pr-low', label:'Low' };
+  return { cls:'pr-normal', label:'Medium' }; // 'Normal'/'सामान्य' (legacy) also lands here
 }
 function _todoRefChipHTML(t, pfx){
   if (t.case_type && t.case_id) {
@@ -34337,6 +34391,34 @@ function _todoRefChipHTML(t, pfx){
   }
   if (t.io_name) return '<span class="todo-ref-chip todo-ref-io">👮 ' + _mddEsc(t.io_name) + '</span>';
   return '<span class="m-chip m-empty">—</span>';
+}
+function _todoRepeatLabel(rr){
+  if (!rr || !rr.freq || rr.freq === 'Once') return '';
+  if (rr.freq !== 'Custom') return '🔁 ' + rr.freq;
+  var WD_HI = { Mon:'सो', Tue:'मं', Wed:'बु', Thu:'गु', Fri:'शु', Sat:'श', Sun:'र' };
+  var every = rr.every || 1, unit = rr.unit || 'Days';
+  var txt = '🔁 हर ' + every + ' ' + unit;
+  if (rr.weekdays && rr.weekdays.length) txt += ' · ' + rr.weekdays.map(function(d){ return WD_HI[d] || d; }).join('/');
+  return txt;
+}
+function _todoTagsHTML(t){
+  if (!t.tag_ids || !t.tag_ids.length) return '';
+  var tags = t.tag_ids.map(function(id){ return (typeof getTagById === 'function') ? getTagById(id) : null; }).filter(Boolean);
+  if (!tags.length) return '';
+  return '<div class="todo-tags-row">' + tags.map(function(tg){
+    return '<span class="todo-tag-chip" style="background:' + (_todoTagColor(tg.category)) + ';">' + _mddEsc(tg.name) + '</span>';
+  }).join('') + '</div>';
+}
+function _todoTagColor(cat){
+  var m = { designation:'#2563eb', department:'#16a34a', district:'#0891b2', priority:'#7c3aed', reference:'#0f766e', system:'#64748b' };
+  return m[cat] || '#475569';
+}
+function _todoAttachMiniHTML(t){
+  if (!t.attachments || !t.attachments.length) return '';
+  return '<div class="todo-mini-thumbs">' + t.attachments.map(function(a){
+    var ic = a.type === 'photo' ? '🖼️' : (a.type === 'pdf' ? '📄' : (a.type === 'sketch' ? '✍️' : '📎'));
+    return '<span class="todo-mini-thumb todo-mini-' + a.type + '" title="' + _mddEsc(a.name||'') + '">' + ic + '</span>';
+  }).join('') + '</div>';
 }
 function _buildTodoRow(t, i, prefix){
   var pfx = prefix || '';
@@ -34349,11 +34431,12 @@ function _buildTodoRow(t, i, prefix){
     '<div class="todo-row-inner">' +
       '<div class="todo-stamp"><div class="todo-no">#' + (i + 1) + '</div><div class="todo-pr ' + pr.cls + '">' + pr.label + '</div></div>' +
       '<div class="todo-body">' +
-        '<div class="todo-title">' + (done ? '✅ ' : '📝 ') + _mddEsc(t.task_title || '(बिना शीर्षक)') + '</div>' +
+        '<div class="todo-title">' + (done ? '✅ ' : '📝 ') + _mddEsc(t.task_title || '(बिना शीर्षक)') + (_todoRepeatLabel(t.recurrence_rule) ? (' <span class="todo-repeat-badge">' + _todoRepeatLabel(t.recurrence_rule) + '</span>') : '') + '</div>' +
         '<div class="docket-meta-grid todo-meta-grid">' +
           '<div class="dmg-cell">' + dateChip + '</div>' +
           '<div class="dmg-cell dmg-right">' + _todoRefChipHTML(t, pfx) + '</div>' +
         '</div>' +
+        _todoTagsHTML(t) + _todoAttachMiniHTML(t) +
       '</div>' +
       '<div class="todo-right"><button class="todo-done-btn" title="पूर्ण करें" onclick="event.stopPropagation();mddTaskToggleDone && mddTaskToggleDone(\'' + t.id + '\')">✓</button></div>' +
     '</div>' +
@@ -34369,11 +34452,12 @@ function _buildTodoCard(t, prefix){
     '<div class="todo-card-head" onclick="event.stopPropagation();todoToggleCardBrief(\'' + pfx + '\',\'' + t.id + '\')">' +
       '<div class="todo-card-top ' + pr.cls + '"><span class="lbl">' + pr.label + '</span></div>' +
       '<div class="todo-card-body">' +
-        '<div class="todo-title">' + (done ? '✅ ' : '📝 ') + _mddEsc(t.task_title || '(बिना शीर्षक)') + '</div>' +
+        '<div class="todo-title">' + (done ? '✅ ' : '📝 ') + _mddEsc(t.task_title || '(बिना शीर्षक)') + (_todoRepeatLabel(t.recurrence_rule) ? (' <span class="todo-repeat-badge">' + _todoRepeatLabel(t.recurrence_rule) + '</span>') : '') + '</div>' +
         '<div class="docket-meta-grid todo-meta-grid">' +
           '<div class="dmg-cell">' + dateChip + '</div>' +
           '<div class="dmg-cell dmg-right">' + _todoRefChipHTML(t, pfx) + '</div>' +
         '</div>' +
+        _todoTagsHTML(t) + _todoAttachMiniHTML(t) +
       '</div>' +
     '</div>' +
     '<div class="todo-card-brief" id="' + pfx + 'todocardbrief-' + t.id + '" style="display:none;"></div>' +
@@ -34383,10 +34467,17 @@ function buildTodoExpandCard(t){
   var refLine = (t.case_type && t.case_id)
     ? ('<div class="mydd-brief-row"><b>प्रकरण:</b> ' + _todoRefChipHTML(t, '') + '</div>')
     : '';
+  var fullAttach = (t.attachments && t.attachments.length) ? ('<div class="mydd-brief-row todo-full-attach"><b>📎 Attachments:</b><div class="todo-attach-thumbs">' +
+    t.attachments.map(function(a){
+      var body = (a.type === 'photo') ? ('<img src="' + _mddEsc(a.url) + '" alt="">') : ('<span class="todo-thumb-ic">' + (a.type==='pdf'?'📄':(a.type==='sketch'?'✍️':'📎')) + '</span>');
+      return '<a href="' + _mddEsc(a.url) + '" target="_blank" rel="noopener" class="todo-thumb todo-thumb-' + a.type + '">' + body + '<span class="todo-thumb-lbl">' + _mddEsc((a.name||'').slice(0,16)) + '</span></a>';
+    }).join('') + '</div></div>') : '';
   return '<div class="ioc-exp-card">' +
     (t.task_detail ? ('<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>') : '') +
     (t.io_name ? ('<div class="mydd-brief-row"><b>IO:</b> ' + _mddEsc(t.io_name) + '</div>') : '') +
     (t.remarks ? ('<div class="mydd-brief-row"><b>संदर्भ:</b> ' + _mddEsc(t.remarks) + '</div>') : '') +
+    _todoTagsHTML(t) +
+    fullAttach +
     refLine +
     '<div id="todo-refbrief-inline-' + t.id + '"></div>' +
     '<div class="ioc-exp-actions"><button class="mydd-oe-btn" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\')">✎ Open / Edit</button></div>' +
@@ -35319,88 +35410,256 @@ function mddTaskFormOpen(hostId, task) {
   _mddCloseAllTaskForms();
   host.setAttribute('data-open', '1');
   _mddTaskEditId = (task && task.id) ? task.id : null;
+  _mddTaskAttachments = (task && task.attachments) ? (Array.isArray(task.attachments) ? task.attachments.slice() : []) : [];
   var today = new Date().toISOString().slice(0, 10);
+  var rawPriority = task ? (task.priority || 'Medium') : 'Medium';
+  if (rawPriority === 'Normal') rawPriority = 'Medium'; // back-compat with older tasks
+  var rr = (task && task.recurrence_rule) ? task.recurrence_rule : null;
   var v = {
     title: task ? (task.task_title || '') : '',
-    ref: task ? (task.remarks || '') : '',
     detail: task ? (task.task_detail || '') : '',
     date: task ? (String(task.task_date || today).slice(0,10)) : today,
-    priority: task ? (task.priority || 'Normal') : 'Normal',
+    priority: rawPriority,
     io: task ? (task.io_name || '') : '',
     remDate: '', remTime: '',
-    refTid: (function(){ try{ if(task && task.tag_ids){ var ids=(typeof task.tag_ids==='string')?JSON.parse(task.tag_ids):task.tag_ids; var nt=(state.tags||[]).filter(function(t){return typeof _isNameTag==='function'&&_isNameTag(t);}); var hit=(ids||[]).find(function(id){ return nt.some(function(t){return t.id===id;}); }); return hit||''; } }catch(e){} return ''; })()
+    tagIds: (function(){ try{ if(task && task.tag_ids){ return (typeof task.tag_ids==='string')?JSON.parse(task.tag_ids):(task.tag_ids||[]); } }catch(e){} return []; })()
   };
   if (task && task.reminder_at) { var rd = new Date(task.reminder_at); if (!isNaN(rd.getTime())) {
     v.remDate = rd.getFullYear()+'-'+String(rd.getMonth()+1).padStart(2,'0')+'-'+String(rd.getDate()).padStart(2,'0');
     v.remTime = String(rd.getHours()).padStart(2,'0')+':'+String(rd.getMinutes()).padStart(2,'0');
   }}
-  function pr(p){ return v.priority===p ? ' selected' : ''; }
+  function pr(p){ return v.priority===p ? ' sel' : ''; }
+  var freq = rr ? rr.freq : 'Once';
+  function rp(f){ return freq===f ? ' sel' : ''; }
+  var every = rr && rr.every ? rr.every : 1;
+  var unit = rr && rr.unit ? rr.unit : 'Days';
+  var wd = (rr && rr.weekdays) ? rr.weekdays : [];
+  var endsType = (rr && rr.ends && rr.ends.type) ? rr.ends.type : 'never';
+  var WD = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
   host.innerHTML =
-    '<div class="mddq-form">' +
-      '<div class="mddq-formttl">' + (_mddTaskEditId ? '✎ To-Do संपादित करें' : '📝 नया To-Do / Office task') + '</div>' +
-      '<div class="mddq-voice-row"><input type="text" id="mddq-title" class="mddq-inp" placeholder="📋 विषय / Subject (क्या करना है)..." value="' + _mddEsc(v.title) + '"><button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-title\',this);" title="बोलकर लिखें">🎤</button></div>' +
-      '<input type="text" id="mddq-ref" class="mddq-inp" placeholder="👤 किसके संदर्भ में / किसके लिए (नाम/अनुभाग/पत्र क्र.)..." value="' + _mddEsc(v.ref) + '">' +
-      '<label class="mddq-lbl" style="width:100%;font-size:11px;color:#0d9488;font-weight:800;">📎 Reference (@name) — व्यक्ति/tag (optional)' +
-        '<select id="mddq-refname" class="mddq-inp" style="margin-top:4px;"><option value="">— @name चुनें —</option>' + _mtxNameTags().map(function(t){ return '<option value="' + t.id + '"' + (v.refTid===t.id?' selected':'') + '>' + _mddEsc(_nameTagClean(t.name||'')) + '</option>'; }).join('') + '</select></label>' +
-      '<div class="mddq-row2"><input type="text" id="mddq-newref" class="mddq-inp" placeholder="＋ नया @name बनाएँ (e.g. @Gupta)"><button type="button" class="mddq-cancel" style="flex:0 0 auto;" onclick="event.stopPropagation();mddTaskRefCreate();">बनाएँ</button></div>' +
-      '<select id="mddq-io" class="mddq-inp">' + _mddIoOptionsHTML(v.io) + '</select>' +
-      '<div class="mddq-voice-row"><textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="📝 विवरण / Detail (optional)...">' + _mddEsc(v.detail) + '</textarea><button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-detail\',this);" title="बोलकर लिखें">🎤</button></div>' +
+    '<div class="mddq-form todo-form-v2">' +
+      '<div class="mddq-formttl">' + (_mddTaskEditId ? '✎ To-Do संपादित करें' : '📝 नया To-Do') + '</div>' +
+
+      '<div class="mddq-voice-row"><input type="text" id="mddq-title" class="mddq-inp" placeholder="📋 विषय / Subject (क्या करना है)..." value="' + _mddEsc(v.title) + '">' +
+        '<button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-title\',this);" title="बोलकर लिखें">🎤</button>' +
+        '<button type="button" class="mddq-mic todo-pencil-btn" onclick="event.stopPropagation();todoTogglePencil(\'title\');" title="Apple Pencil से लिखें">✍️</button></div>' +
+      '<div id="todo-pencil-title" class="todo-pencil-wrap" style="display:none;"></div>' +
+
+      '<div class="mddq-voice-row"><textarea id="mddq-detail" class="mddq-inp mddq-ta" rows="2" placeholder="📝 विवरण / Detail (optional)...">' + _mddEsc(v.detail) + '</textarea>' +
+        '<button type="button" class="mddq-mic" onclick="event.stopPropagation();mddVoiceInput(\'mddq-detail\',this);" title="बोलकर लिखें">🎤</button>' +
+        '<button type="button" class="mddq-mic todo-pencil-btn" onclick="event.stopPropagation();todoTogglePencil(\'detail\');" title="Apple Pencil से लिखें">✍️</button></div>' +
+      '<div id="todo-pencil-detail" class="todo-pencil-wrap" style="display:none;"></div>' +
+
       '<div class="mddq-row2">' +
         '<label class="mddq-lbl">📅 <input type="date" id="mddq-date" class="mddq-inp mddq-sm" value="' + v.date + '"></label>' +
-        '<label class="mddq-lbl">⚑ <select id="mddq-priority" class="mddq-inp mddq-sm"><option' + pr('Normal') + '>Normal</option><option' + pr('High') + '>High</option><option' + pr('Low') + '>Low</option></select></label>' +
+        '<select id="mddq-io" class="mddq-inp mddq-sm">' + _mddIoOptionsHTML(v.io) + '</select>' +
       '</div>' +
+
+      '<div class="flbl todo-flbl">Priority</div>' +
+      '<div class="todo-pr-row">' +
+        '<div class="todo-pr-opt high' + pr('High') + '" onclick="event.stopPropagation();todoSetPriority(\'High\')">High</div>' +
+        '<div class="todo-pr-opt medium' + pr('Medium') + '" onclick="event.stopPropagation();todoSetPriority(\'Medium\')">Medium</div>' +
+        '<div class="todo-pr-opt low' + pr('Low') + '" onclick="event.stopPropagation();todoSetPriority(\'Low\')">Low</div>' +
+      '</div>' +
+      '<input type="hidden" id="mddq-priority" value="' + v.priority + '">' +
+
+      '<div class="flbl todo-flbl">🔗 प्रकरण से जोड़ें (optional)</div>' +
       '<div class="mddq-row2">' +
         '<select id="mddq-task-ctype" class="mddq-inp mddq-sm" onchange="_mddFillCaseSelect(\'mddq-task-cnum\', this.value);">' +
-          '<option value="">🔗 प्रकरण (optional)</option>' + _mddTypeOptionsHTML() +
+          '<option value="">प्रकार चुनें</option>' + _mddTypeOptionsHTML() +
         '</select>' +
         '<select id="mddq-task-cnum" class="mddq-inp mddq-sm"><option value="">— number —</option></select>' +
       '</div>' +
+
       '<div class="mddq-reminder-box">' +
-        '<span class="mddq-rem-lbl">⏰ Reminder सेट करें (optional):</span>' +
+        '<span class="mddq-rem-lbl">⏰ Reminder (optional):</span>' +
         '<div class="mddq-row2">' +
           '<input type="date" id="mddq-rem-date" class="mddq-inp mddq-sm" value="' + v.remDate + '">' +
           '<input type="time" id="mddq-rem-time" class="mddq-inp mddq-sm" value="' + v.remTime + '">' +
         '</div>' +
       '</div>' +
+
+      '<div class="flbl todo-flbl">Repeat</div>' +
+      '<div class="todo-repeat-chips">' +
+        '<div class="todo-repeat-chip' + rp('Once') + '" onclick="event.stopPropagation();todoSetRepeat(\'Once\')">Once</div>' +
+        '<div class="todo-repeat-chip' + rp('Daily') + '" onclick="event.stopPropagation();todoSetRepeat(\'Daily\')">Daily</div>' +
+        '<div class="todo-repeat-chip' + rp('Weekly') + '" onclick="event.stopPropagation();todoSetRepeat(\'Weekly\')">Weekly</div>' +
+        '<div class="todo-repeat-chip' + rp('Monthly') + '" onclick="event.stopPropagation();todoSetRepeat(\'Monthly\')">Monthly</div>' +
+        '<div class="todo-repeat-chip' + rp('Custom') + '" onclick="event.stopPropagation();todoSetRepeat(\'Custom\')">Custom</div>' +
+      '</div>' +
+      '<input type="hidden" id="mddq-repeat-freq" value="' + freq + '">' +
+      '<div id="todo-custom-box" class="todo-custom-box" style="display:' + (freq==='Custom'?'block':'none') + ';">' +
+        '<div class="todo-custom-row">Every <input type="number" id="mddq-repeat-every" min="1" value="' + every + '" style="width:52px;text-align:center;"> ' +
+          '<select id="mddq-repeat-unit"><option' + (unit==='Days'?' selected':'') + '>Days</option><option' + (unit==='Weeks'?' selected':'') + '>Weeks</option><option' + (unit==='Months'?' selected':'') + '>Months</option></select></div>' +
+        '<div class="todo-custom-days">' + WD.map(function(d){ return '<div class="todo-day-chip' + (wd.indexOf(d)>-1?' sel':'') + '" data-day="' + d + '" onclick="event.stopPropagation();todoToggleWeekday(this)">' + d + '</div>'; }).join('') + '</div>' +
+        '<div class="todo-custom-end">Ends: <select id="mddq-repeat-ends"><option value="never"' + (endsType==='never'?' selected':'') + '>Never</option><option value="date"' + (endsType==='date'?' selected':'') + '>On date</option><option value="count"' + (endsType==='count'?' selected':'') + '>After N times</option></select></div>' +
+      '</div>' +
+
+      '<div class="flbl todo-flbl">🏷️ Tags</div>' +
+      '<div id="todo-tags-widget"></div>' +
+
+      '<div class="flbl todo-flbl">📎 Attach (फ़ोटो / फ़ाइल)</div>' +
+      '<div class="todo-attach-btn" onclick="event.stopPropagation();document.getElementById(\'todo-file-inp\').click();">📎 फ़ोटो, PDF, या कोई भी फ़ाइल जोड़ें...</div>' +
+      '<input type="file" id="todo-file-inp" style="display:none;" onchange="event.stopPropagation();todoFilePicked(this)">' +
+      '<div id="todo-attach-thumbs" class="todo-attach-thumbs"></div>' +
+
       '<div class="mddq-btns">' +
         '<button class="mddq-save" onclick="event.stopPropagation();mddTaskFormSave(\'' + hostId + '\');">✓ Save</button>' +
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'' + hostId + '\');">Cancel</button>' +
       '</div>' +
     '</div>';
-  // pre-fill प्रकरण in edit mode
+
   if (task && task.case_type && task.case_id) {
     var ct = document.getElementById('mddq-task-ctype');
     if (ct) { ct.value = task.case_type; _mddFillCaseSelect('mddq-task-cnum', task.case_type); var cn = document.getElementById('mddq-task-cnum'); if (cn) cn.value = task.case_id; }
   }
+  if (typeof renderTagsWidget === 'function') renderTagsWidget('todo-tags-widget', v.tagIds, function(){});
+  todoRenderAttachThumbs();
   var ti = document.getElementById('mddq-title'); if (ti) { try { ti.focus(); } catch(e){} }
   try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
-async function mddTaskRefCreate() {
-  var inp = document.getElementById('mddq-newref'); if (!inp) return;
-  var v = (inp.value || '').trim();
-  if (!v) { if (typeof toast === 'function') toast('नया @name लिखें', true); return; }
-  if (v.charAt(0) !== '@') v = '@' + v;
-  var clean = _nameTagClean(v).toLowerCase();
-  var dup = _mtxNameTags().find(function(t){ return _nameTagClean(t.name || '').toLowerCase() === clean; });
-  var sel = document.getElementById('mddq-refname');
-  if (dup) { if (sel) sel.value = dup.id; inp.value = ''; if (typeof toast === 'function') toast('"' + _nameTagClean(dup.name) + '" पहले से है — select कर दिया'); return; }
+
+/* ═══ To-Do form v2 — supporting functions (priority/repeat/pencil/attachments) ═══ */
+var _mddTaskAttachments = [];
+function todoSetPriority(p){
+  var h = document.getElementById('mddq-priority'); if (h) h.value = p;
+  document.querySelectorAll('.todo-pr-opt').forEach(function(el){ el.classList.remove('sel'); });
+  var target = document.querySelector('.todo-pr-opt.' + p.toLowerCase());
+  if (target) target.classList.add('sel');
+}
+function todoSetRepeat(f){
+  var h = document.getElementById('mddq-repeat-freq'); if (h) h.value = f;
+  document.querySelectorAll('.todo-repeat-chip').forEach(function(el){ el.classList.remove('sel'); });
+  var idx = ['Once','Daily','Weekly','Monthly','Custom'].indexOf(f);
+  var chips = document.querySelectorAll('.todo-repeat-chip');
+  if (chips[idx]) chips[idx].classList.add('sel');
+  var box = document.getElementById('todo-custom-box');
+  if (box) box.style.display = (f === 'Custom') ? 'block' : 'none';
+}
+function todoToggleWeekday(el){ el.classList.toggle('sel'); }
+function _todoCollectRepeat(){
+  var freq = (document.getElementById('mddq-repeat-freq') || {}).value || 'Once';
+  if (freq === 'Once') return null;
+  if (freq !== 'Custom') return { freq: freq };
+  var every = parseInt((document.getElementById('mddq-repeat-every') || {}).value, 10) || 1;
+  var unit = (document.getElementById('mddq-repeat-unit') || {}).value || 'Days';
+  var weekdays = Array.prototype.map.call(document.querySelectorAll('.todo-day-chip.sel'), function(el){ return el.getAttribute('data-day'); });
+  var endsType = (document.getElementById('mddq-repeat-ends') || {}).value || 'never';
+  return { freq: 'Custom', every: every, unit: unit, weekdays: weekdays, ends: { type: endsType } };
+}
+
+/* ── ✍️ Pencil canvas — stays handwritten (saved as PNG image), no OCR/text-conversion ── */
+var _todoPencilState = {};
+function todoTogglePencil(which){
+  var wrap = document.getElementById('todo-pencil-' + which); if (!wrap) return;
+  var isOpen = wrap.style.display !== 'none';
+  if (isOpen) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+  wrap.style.display = 'block';
+  var canvasId = 'todo-pencil-canvas-' + which;
+  wrap.innerHTML = '<canvas id="' + canvasId + '" class="todo-pencil-canvas" width="500" height="140"></canvas>' +
+    '<div class="todo-pencil-tools"><button type="button" class="todo-pencil-clear" onclick="event.stopPropagation();todoPencilClear(\'' + which + '\')">साफ़ करें</button>' +
+    '<span class="todo-pencil-hint">✍️ हस्तलिखित — जैसा लिखा वैसा ही सुरक्षित रहेगा</span></div>';
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext && canvas.getContext('2d');
+  if (!ctx) { _todoPencilState[which] = { canvas: canvas }; return; } // e.g. headless/test env without canvas support
+  ctx.strokeStyle = '#062a52'; ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  var drawing = false, lastX = 0, lastY = 0;
+  function pos(e){
+    var r = canvas.getBoundingClientRect();
+    var cx = (e.touches ? e.touches[0].clientX : e.clientX);
+    var cy = (e.touches ? e.touches[0].clientY : e.clientY);
+    return { x: (cx - r.left) * (canvas.width / r.width), y: (cy - r.top) * (canvas.height / r.height) };
+  }
+  function start(e){ e.preventDefault(); drawing = true; var p = pos(e); lastX = p.x; lastY = p.y; }
+  function move(e){
+    if (!drawing) return; e.preventDefault();
+    var p = pos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }
+  function end(){ drawing = false; }
+  canvas.addEventListener('pointerdown', start);
+  canvas.addEventListener('pointermove', move);
+  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointerleave', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+  _todoPencilState[which] = { canvas: canvas };
+}
+function todoPencilClear(which){
+  var st = _todoPencilState[which]; if (!st) return;
+  var ctx = st.canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, st.canvas.width, st.canvas.height);
+}
+function _todoPencilIsBlank(canvas){
+  var ctx = canvas.getContext('2d');
+  var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  for (var i = 0; i < data.length; i += 4) {
+    if (data[i] !== 255 || data[i+1] !== 255 || data[i+2] !== 255) return false;
+  }
+  return true;
+}
+async function _todoUploadPencilSketches(){
+  var out = [];
+  for (var which in _todoPencilState) {
+    var st = _todoPencilState[which];
+    if (!st || !st.canvas) continue;
+    if (_todoPencilIsBlank(st.canvas)) continue;
+    try {
+      var blob = await new Promise(function(res){ st.canvas.toBlob(res, 'image/png'); });
+      var file = new File([blob], 'sketch-' + which + '-' + Date.now() + '.png', { type: 'image/png' });
+      var up = await uploadFileToStorage(file);
+      out.push({ name: 'हस्तलिखित नोट (' + which + ')', type: 'sketch', size: up.size, url: up.url, path: up.path });
+    } catch(e) { console.error('pencil upload failed', e); }
+  }
+  return out;
+}
+
+/* ── 📎 File/photo attachments — reuses the existing uploadFileToStorage() ── */
+async function todoFilePicked(inp){
+  var file = inp.files && inp.files[0]; if (!file) return;
   try {
-    var r = await supa.from('tags').insert({ name: v, color: 'gray', is_system: false }).select().single();
-    if (r.error) throw r.error;
-    if (!state.tags) state.tags = [];
-    state.tags.push(r.data);
-    if (sel) { var opt = document.createElement('option'); opt.value = r.data.id; opt.textContent = _nameTagClean(r.data.name || v); sel.appendChild(opt); sel.value = r.data.id; }
-    inp.value = '';
-    if (typeof toast === 'function') toast('✓ "' + _nameTagClean(v) + '" @name बना — selected');
-  } catch(e) { if (typeof toast === 'function') toast('Tag बनाना विफल: ' + (e.message || e), true); }
+    if (typeof toast === 'function') toast('अपलोड हो रहा है...');
+    var up = await uploadFileToStorage(file);
+    var kind = /^image\//.test(file.type) ? 'photo' : (/pdf$/i.test(file.type) ? 'pdf' : 'file');
+    _mddTaskAttachments.push({ name: up.name, type: kind, size: up.size, url: up.url, path: up.path });
+    todoRenderAttachThumbs();
+    if (typeof toast === 'function') toast('✓ जुड़ गया');
+  } catch(e) {
+    if (typeof toast === 'function') toast('अपलोड विफल: ' + (e.message || e), true);
+  }
+  inp.value = '';
+}
+function todoRemoveAttachment(idx){
+  _mddTaskAttachments.splice(idx, 1);
+  todoRenderAttachThumbs();
+}
+function _todoThumbIcon(kind){
+  if (kind === 'photo') return '🖼️';
+  if (kind === 'pdf') return '📄';
+  if (kind === 'sketch') return '✍️';
+  return '📎';
+}
+function todoRenderAttachThumbs(){
+  var host = document.getElementById('todo-attach-thumbs'); if (!host) return;
+  if (!_mddTaskAttachments.length) { host.innerHTML = ''; return; }
+  host.innerHTML = _mddTaskAttachments.map(function(a, i){
+    var body = (a.type === 'photo') ? ('<img src="' + _mddEsc(a.url) + '" alt="">') : ('<span class="todo-thumb-ic">' + _todoThumbIcon(a.type) + '</span>');
+    return '<div class="todo-thumb todo-thumb-' + a.type + '">' + body +
+      '<span class="todo-thumb-lbl">' + _mddEsc((a.name||'').slice(0,16)) + '</span>' +
+      '<span class="todo-thumb-x" onclick="event.stopPropagation();todoRemoveAttachment(' + i + ')">✕</span>' +
+    '</div>';
+  }).join('');
 }
 async function mddTaskFormSave(hostId) {
   var title = ((document.getElementById('mddq-title') || {}).value || '').trim();
   if (!title) { if (typeof toast === 'function') toast('विषय (Subject) लिखें', true); return; }
-  var ref = ((document.getElementById('mddq-ref') || {}).value || '').trim();
   var detail = ((document.getElementById('mddq-detail') || {}).value || '').trim();
   var date = (document.getElementById('mddq-date') || {}).value || new Date().toISOString().slice(0,10);
-  var priority = (document.getElementById('mddq-priority') || {}).value || 'Normal';
+  var priority = (document.getElementById('mddq-priority') || {}).value || 'Medium';
   var remAt = _mddCombineReminder((document.getElementById('mddq-rem-date') || {}).value || '', (document.getElementById('mddq-rem-time') || {}).value || '');
   var ioName = (document.getElementById('mddq-io') || {}).value || null;
   var _ctype = (document.getElementById('mddq-task-ctype') || {}).value || '';
@@ -35410,26 +35669,32 @@ async function mddTaskFormSave(hostId) {
     var _cobj = ((state.enquiries && state.enquiries[_ctype]) || []).find(function(x){ return x.id === _cid; });
     if (_cobj) { caseType = _ctype; caseId = _cid; caseDisplay = (typeof _reviewCaseDisplay === 'function') ? _reviewCaseDisplay(_cobj, _ctype) : (_cobj.no || ''); }
   }
-  var _refTid = (document.getElementById('mddq-refname') || {}).value || '';
-  var _tagIds = null;
-  if (_refTid) { _tagIds = [_refTid]; try { var _rt = (typeof getTagByName === 'function') ? getTagByName('Reference') : null; if (_rt && _rt.id) _tagIds.push(_rt.id); } catch(e){} }
+  var tagsWidgetEl = document.getElementById('todo-tags-widget');
+  var tagIds = [];
+  try { tagIds = tagsWidgetEl ? JSON.parse(tagsWidgetEl.dataset.appliedIds || '[]') : []; } catch(e){}
+  var recurrenceRule = _todoCollectRepeat();
+
+  var saveBtn = document.querySelector('#' + hostId + ' .mddq-save');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Saving...'; }
+  var sketchAttachments = await _todoUploadPencilSketches();
+  var allAttachments = _mddTaskAttachments.concat(sketchAttachments);
+
   var payload = {
-    task_title: title, task_detail: detail || null, remarks: ref || null, io_name: ioName,
+    task_title: title, task_detail: detail || null, io_name: ioName,
     priority: priority, reminder_at: remAt, updated_at: new Date().toISOString(),
     case_type: caseType, case_id: caseId, case_display: caseDisplay,
-    task_date: date
+    task_date: date, tag_ids: tagIds, recurrence_rule: recurrenceRule,
+    attachments: allAttachments.length ? allAttachments : null
   };
-  if (_tagIds) payload.tag_ids = _tagIds;
   try {
     if (_mddTaskEditId) {
       var ru = await supa.from('my_office_tasks').update(payload).eq('id', _mddTaskEditId).select().single();
-      if (ru.error && /io_name|column|schema cache|does not exist/i.test((ru.error.message||'')+(ru.error.details||''))) { var _p=Object.assign({},payload); delete _p.io_name; ru = await supa.from('my_office_tasks').update(_p).eq('id', _mddTaskEditId).select().single(); }
       if (ru.error) throw ru.error;
       var idx = (state.myOfficeTasks || []).findIndex(function(x){ return x.id === _mddTaskEditId; });
       if (idx >= 0) state.myOfficeTasks[idx] = ru.data;
       if (typeof toast === 'function') toast('To-Do अद्यतन ✓');
     } else {
-      payload.status = 'Pending'; payload.deadline = null;
+      payload.status = 'Pending';
       var r = await _mddInsertResilient('my_office_tasks', payload);
       if (r.error) throw r.error;
       if (!state.myOfficeTasks) state.myOfficeTasks = [];
@@ -35437,12 +35702,16 @@ async function mddTaskFormSave(hostId) {
       if (typeof toast === 'function') toast('To-Do जुड़ा ✓');
     }
     _mddTaskEditId = null;
+    _mddTaskAttachments = [];
+    _todoPencilState = {};
     mddTaskFormClose(hostId);
     if (typeof renderMyDailyBox === 'function') renderMyDailyBox();
+    if (typeof renderTodoList === 'function') renderTodoList();
     try { mtRender('office'); } catch(e){}
     try { mddRenderTodos(); } catch(e){}
   } catch(e) {
     if (typeof toast === 'function') toast('Save विफल: ' + (e.message || e), true);
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '✓ Save'; }
   }
 }
 // back-compat wrappers (To-Dos / Office buttons)
