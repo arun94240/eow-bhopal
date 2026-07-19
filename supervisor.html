@@ -23444,10 +23444,15 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .todo-view-btn{ background:#eef2f7; border:none; border-radius:8px; padding:6px 13px; font-size:11px; font-weight:800; color:#334155; cursor:pointer; }
 .todo-view-btn.active{ background:#062a52; color:#f5b942; }
 
-/* priority colors — matching Docket's category-gradient language */
-.pr-high{ background:linear-gradient(135deg,#dc2626,#b91c1c); }
-.pr-normal{ background:linear-gradient(135deg,#2563eb,#1d4ed8); }
-.pr-low{ background:linear-gradient(135deg,#64748b,#475569); }
+/* priority colors — brighter, more vivid gradients; text ALWAYS explicit white */
+.pr-high{ background:linear-gradient(135deg,#f87171,#dc2626); }
+.pr-normal{ background:linear-gradient(135deg,#3b82f6,#2563eb); }
+.pr-low{ background:linear-gradient(135deg,#94a3b8,#64748b); }
+.todo-pr, .todo-card-top{ color:#fff !important; }
+.todo-pr *, .todo-card-top *{ color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.25); }
+/* date-chip had NO colour of its own before (bug — showed default black text
+   with no background); now explicit, bright, and matches the meta-grid family */
+.m-chip.todo-date{ background:#fef3c7; color:#92400e !important; font-weight:900; }
 
 /* ── List (Docket Stamp) ── */
 .todo-tr{ background:transparent; margin:0; cursor:pointer; }
@@ -24094,20 +24099,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                 <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="खोजें..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
                 <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
               </div>
-              <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddMenu();">＋ Add</button>
+              <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddPick('task');">＋ Add To-Do</button>
               <button class="mtx-tool-btn mtx-tool-sub" onclick="event.stopPropagation();openAgendaSubscribeModal();" title="Subscribe (Apple/Google Calendar)"><span class="ttl-ic">📆</span><span class="ttl-lbl">Subscribe</span></button>
               <button class="mtx-tool-btn mtx-tool-craft" onclick="event.stopPropagation();craftOpenTaskList();" title="Open in Craft (live)"><span class="ttl-ic">🔄</span><span class="ttl-lbl">Open in Craft</span></button>
-              <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;">
-                <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';vcOpen();" style="color:#062a52;font-weight:800;">🎤 Voice command</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';mddAddMenuPick('reminder');">⏰ Reminder</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();var mm=document.getElementById('mtx-add-menu');if(mm)mm.style.display='none';mddAddMenuPick('calendar');">📅 Calendar</div>
-                <div class="mtx-add-mi mtx-add-sep" onclick="event.stopPropagation();mtxAddPick('disc');">💬 Discussion Note</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('dg');">🏛 DG EOW</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('review');">⭐ प्रकरण समीक्षा</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('task');">📝 To-Dos / Office</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('ref');">📎 References — @name</div>
-                <div class="mtx-add-mi" onclick="event.stopPropagation();mtxAddPick('keyword');">🏷 Keyword (प्रकरण में)</div>
-              </div>
+              <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;"></div>
             </div>
             <div id="mydd-craft-sync" class="mydd-craftsync-host"></div>
           </div>
