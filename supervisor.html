@@ -23287,6 +23287,81 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .io-inline-chip.io-inline-chip-disabled{ opacity:.35; cursor:default; }
 .io-inline-caselist{ margin-top:11px; background:#eef2f7; border-radius:10px; padding:10px; animation:ioInlineOpen .22s ease; }
 .io-inline-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   📊👮🏛️ Reports + Dept/Officer Hub CSS (v278)
+   ═══════════════════════════════════════════════════════════════ */
+.rep-hub{ background:#fff; border-radius:12px; padding:13px 14px; margin-top:8px; }
+.rep-hub-hd{ font-size:13px; font-weight:900; color:#062a52; margin-bottom:11px; }
+.rep-hub-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
+.rep-hub-tile{ border-radius:12px; overflow:hidden; cursor:pointer; border:1.5px solid #e2e8f0; transition:all .15s; }
+.rep-hub-tile:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.12); border-color:#f5b942; }
+.rep-glimpse{ height:52px; display:flex; align-items:center; justify-content:center; }
+.rep-glimpse-ic{ font-size:22px; }
+.rep-hub-info{ padding:8px 9px 9px; }
+.rep-hub-ttl{ font-size:11px; font-weight:900; color:#062a52; }
+.rep-hub-desc{ font-size:9px; color:#64748b; margin-top:2px; line-height:1.4; }
+.g1{ background:linear-gradient(150deg,#0d9488,#0f766e); } .g2{ background:linear-gradient(150deg,#2563eb,#1d4ed8); }
+.g3{ background:linear-gradient(150deg,#7c3aed,#6d28d9); } .g4{ background:linear-gradient(150deg,#ea580c,#c2410c); }
+.g5{ background:linear-gradient(150deg,#dc2626,#b91c1c); } .g6{ background:linear-gradient(150deg,#0891b2,#0e7490); }
+.dg1{ background:linear-gradient(150deg,#1d4ed8,#1e40af); } .dg2{ background:linear-gradient(150deg,#16a34a,#15803d); }
+.dg3{ background:linear-gradient(150deg,#7c3aed,#6d28d9); } .dg4{ background:linear-gradient(150deg,#0f766e,#0d9488); }
+
+.rep-style-view{ background:#fff; border-radius:12px; padding:13px 14px; margin-top:8px; }
+.rep-back{ font-size:11px; font-weight:800; color:#062a52; cursor:pointer; margin-bottom:11px; }
+.rep-back:hover{ text-decoration:underline; }
+.rep-cards-hd{ font-size:12.5px; font-weight:900; color:#062a52; margin-bottom:10px; }
+.rep-mini-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:9px; }
+.rep-mini-lbl{ font-size:10.5px; font-weight:800; color:#64748b; flex:0 0 auto; min-width:52px; }
+.rep-mini-row input[type="date"]{ border:1.5px solid #e2e8f0; border-radius:7px; padding:5px 8px; font-size:10.5px; font-family:inherit; }
+.rep-chips{ display:flex; flex-wrap:wrap; gap:5px; }
+.rep-chip{ font-size:10px; font-weight:700; padding:5px 10px; border-radius:20px; background:#eef2f7; color:#334155; cursor:pointer; border:none; font-family:inherit; }
+.rep-chip.on{ background:#062a52; color:#fff; }
+.rep-chip.dept{ background:#dcfce7; color:#166534; }
+.rep-chip.dept.on{ background:#16a34a; color:#fff; }
+.rep-results-hd{ font-size:11.5px; font-weight:900; color:#062a52; margin:12px 0 8px; padding-top:10px; border-top:1px dashed #e2e8f0; }
+
+.rep-tpl-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
+.rep-tpl-card{ border-radius:10px; padding:12px 10px; color:#fff; font-size:11px; font-weight:800; cursor:pointer; text-align:center; }
+.rep-tpl-card.t1{ background:linear-gradient(135deg,#2563eb,#1d4ed8); } .rep-tpl-card.t2{ background:linear-gradient(135deg,#dc2626,#b91c1c); }
+.rep-tpl-card.t3{ background:linear-gradient(135deg,#0d9488,#0f766e); } .rep-tpl-card.t4{ background:linear-gradient(135deg,#16a34a,#15803d); }
+
+.rep-mtx-sec{ border:1px solid #e2e8f0; border-radius:9px; padding:9px 11px; margin-bottom:7px; }
+.rep-mtx-hd{ font-size:10px; font-weight:900; color:#94a3b8; text-transform:uppercase; margin-bottom:6px; }
+
+.rep-timeline-box{ background:#f7fafd; border-radius:10px; padding:10px 12px; margin-bottom:9px; }
+.rep-tl-presets{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+
+.rep-compare-grid{ display:grid; grid-template-columns:1fr auto 1fr; gap:9px; align-items:center; margin-bottom:10px; }
+.rep-cmp-side{ background:#f7fafd; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:6px; }
+.rep-cmp-side.b{ background:#fef3e2; }
+.rep-cmp-hd{ font-size:11px; font-weight:900; color:#062a52; }
+.rep-cmp-side input{ border:1px solid #dbe3ee; border-radius:7px; padding:5px 8px; font-size:10.5px; font-family:inherit; }
+.rep-cmp-num{ font-size:20px; font-weight:900; color:#062a52; text-align:center; }
+.rep-cmp-vs{ font-size:11px; font-weight:900; color:#dc2626; }
+.rep-gen-btn{ width:100%; background:#062a52; color:#f5b942; border:none; border-radius:9px; padding:9px; font-size:11.5px; font-weight:900; cursor:pointer; }
+
+.rep-chat{ display:flex; flex-direction:column; gap:9px; }
+.rep-chat-b{ background:#eef2f7; padding:8px 12px; border-radius:12px; font-size:11px; align-self:flex-start; max-width:80%; }
+
+.do-catlbl{ font-size:9.5px; font-weight:900; color:#94a3b8; text-transform:uppercase; margin:9px 0 5px; }
+.do-cloud{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; padding:6px; }
+.do-cloud-chip{ border-radius:999px; background:#1d4ed8; color:#fff; font-weight:800; cursor:pointer; white-space:nowrap; }
+.do-shelf{ display:grid; grid-template-columns:repeat(auto-fit,minmax(95px,1fr)); gap:8px; }
+.do-card{ border-radius:6px 10px 10px 6px; padding:9px 10px; position:relative; cursor:pointer; }
+.do-card::before{ content:''; position:absolute; left:-1px; top:8px; bottom:8px; width:4px; border-radius:3px 0 0 3px; }
+.do-card.desig{ background:#eff6ff; border:1.5px solid #bfdbfe; } .do-card.desig::before{ background:#2563eb; }
+.do-card.dept{ background:#f0fdf4; border:1.5px solid #bbf7d0; } .do-card.dept::before{ background:#16a34a; }
+.do-card-lbl{ font-size:10.5px; font-weight:800; color:#0f2542; }
+.do-card-num{ font-size:16px; font-weight:900; color:#062a52; margin-top:2px; }
+.do-search-bar{ background:#f7fafd; border-radius:9px; padding:9px 12px; display:flex; align-items:center; gap:7px; }
+.do-search-bar input{ border:none; outline:none; flex:1; font-size:12px; font-family:inherit; background:transparent; }
+.do-hit{ display:flex; align-items:center; gap:7px; padding:7px 10px; border-radius:8px; cursor:pointer; margin-top:5px; }
+.do-hit:hover{ background:#f5f8fc; }
+.do-hit-tag{ font-size:8.5px; font-weight:900; padding:2px 7px; border-radius:5px; color:#fff; }
+.do-hit.desig .do-hit-tag{ background:#2563eb; } .do-hit.dept .do-hit-tag{ background:#16a34a; }
+.do-hit-nm{ font-size:11px; font-weight:700; flex:1; }
+.do-hit-ct{ font-size:10.5px; font-weight:900; color:#94a3b8; }
 </style>
 </head>
 <body>
@@ -25447,20 +25522,18 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
               <div class="hdr-counter rep-pchip rep-pchip-search rep-pchip-cs" onclick="event.stopPropagation();openComprehensiveSearch()">
                 <span class="rep-ic">🔍</span><span class="rep-lbl">Search All</span>
               </div>
-              <div class="hdr-counter rep-pchip rep-pchip-cao" onclick="event.stopPropagation();reportsToggleCao(event)">
-                <span class="rep-ic">👮</span><span class="rep-lbl">Cases Against Officers</span><span class="rep-sub-n" id="sb-cao-cnt-total">0</span>
+              <div class="hdr-counter rep-pchip rep-pchip-dept" onclick="event.stopPropagation();doOpenHub()">
+                <span class="rep-ic">👮🏛️</span><span class="rep-lbl">Search by Department and Officers</span>
               </div>
-              <div class="hdr-counter rep-pchip rep-pchip-dept" onclick="event.stopPropagation();reportsToggleDept(event)">
-                <span class="rep-ic">🏛️</span><span class="rep-lbl">Search by Deptt</span><span class="rep-sub-n" id="sb-dept-cnt-total">0</span>
-              </div>
-              <div class="hdr-counter rep-pchip rep-pchip-reports" onclick="event.stopPropagation();openReportBuilderInline()">
+              <div class="hdr-counter rep-pchip rep-pchip-reports" onclick="event.stopPropagation();repOpenHub()">
                 <span class="rep-ic">📊</span><span class="rep-lbl">Reports</span><span class="rep-sub-n">↗</span>
               </div>
             </div>
-            <!-- Department matrix — collapsible, tap the tile above -->
-            <div class="rep-dept-strip" id="rep-dept-wrap" style="display:none;" onclick="event.stopPropagation();"></div>
+            <!-- New Hub hosts (v278) -->
+            <div class="do-hub-host" id="do-hub-host" style="display:none;" onclick="event.stopPropagation();"></div>
+            <div class="report-hub-host" id="report-hub-host" style="display:none;" onclick="event.stopPropagation();"></div>
             <div class="notice-search-strip" id="notice-search-wrap" style="display:none;" onclick="event.stopPropagation();"></div>
-            <!-- CAO chips — collapsible, tap the tile above -->
+            <!-- legacy hidden (kept for any other callers, not shown) -->
             <div class="cao-strip cao-strip-collapsible" id="cao-chips-wrap" style="display:none;" onclick="event.stopPropagation();">
                       <div class="cao-strip-tiles">
                         <button type="button" class="cao-chip cao-chip-ias" data-tag-name="IAS" onclick="event.stopPropagation();navCaoByTag('IAS',event)" title="IAS">
@@ -52825,6 +52898,331 @@ function tcSetCatFilter(h){
   _tcCatFilter = (_tcCatFilter === h) ? null : h;
   renderTotalCases();
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   📊 REPORTS + 👮🏛️ DEPT/OFFICER — shared "Hub" system (v278)
+   One filter-engine, 6 report-styles + 4 dept/officer-styles — all
+   built on the SAME data-matching logic, only the picking UI differs.
+   Results always render as the same Docket List/Card rows used
+   everywhere else (universal pattern).
+   ═══════════════════════════════════════════════════════════════════ */
+var REP_HEADS = ['complaints','rcomplaints','rcs','pes','strs','sutra'];
+var REP_HEAD_LABELS = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs:'RCs', pes:'PEs', strs:'STRs', sutra:'Sutra Suchna', court:'Court Cases' };
+
+// filters: default = everything included until narrowed
+function _repDefaultFilters(){
+  return { types: REP_HEADS.slice(), includeCourt:true, dateFrom:'', dateTo:'', statuses:[], officers:[], tagIds:[] };
+}
+var _repF = _repDefaultFilters();
+
+function _repRowMatchesTags(r, tagIds){
+  if (!tagIds || !tagIds.length) return true;
+  var rt = Array.isArray(r.tag_ids) ? r.tag_ids : [];
+  return tagIds.some(function(id){ return rt.indexOf(id) > -1; });
+}
+function _repCompute(filters){
+  var f = filters || _repF;
+  var enqResults = [];
+  (f.types.length ? f.types : REP_HEADS).forEach(function(type){
+    (state.enquiries[type] || []).forEach(function(r){
+      if (f.dateFrom || f.dateTo) {
+        var d = r.date; if (!d) return;
+        var dm = new Date(d).getTime();
+        if (f.dateFrom && dm < new Date(f.dateFrom).getTime()) return;
+        if (f.dateTo && dm > new Date(f.dateTo + 'T23:59:59').getTime()) return;
+      }
+      if (f.statuses && f.statuses.length && f.statuses.indexOf(r.case_status || 'Active') === -1) return;
+      if (f.officers && f.officers.length && f.officers.indexOf(r.io_name) === -1) return;
+      if (!_repRowMatchesTags(r, f.tagIds)) return;
+      enqResults.push({ type: type, row: r });
+    });
+  });
+  var courtResults = [];
+  if (f.includeCourt !== false) {
+    (state.courts || []).forEach(function(c){
+      if (f.dateFrom || f.dateTo) {
+        var d = c.next_hearing || c.case_year; if (!d) { /* keep — court dates sparse */ }
+      }
+      if (f.officers && f.officers.length) {
+        var officer = (typeof getCourtICDisplay==='function') ? getCourtICDisplay(c) : '';
+        if (f.officers.indexOf(officer) === -1) return;
+      }
+      if (!_repRowMatchesTags(c, f.tagIds)) return;
+      courtResults.push(c);
+    });
+  }
+  return { enq: enqResults, court: courtResults, total: enqResults.length + courtResults.length };
+}
+function _repRenderResultsHTML(computed, prefix){
+  var pfx = prefix || 'rp-';
+  if (!computed.total) return '<div class="empty-state"><h3>कोई मिलान प्रकरण नहीं</h3></div>';
+  var html = '<div class="docket-list-host">';
+  computed.enq.forEach(function(e, i){ html += _buildEnquiryRow(e.type, e.row, i, pfx); });
+  computed.court.forEach(function(c){ html += _buildCourtRow(c, pfx); });
+  html += '</div>';
+  return html;
+}
+
+/* ══ REPORTS HUB ══ */
+var REP_STYLES = [
+  { id:'cards', ic:'📇', ttl:'सरल Cards', desc:'साफ़ पंक्ति-सूची, "सभी" डिफ़ॉल्ट', cls:'g1' },
+  { id:'templates', ic:'🖼️', ttl:'तैयार Templates', desc:'रंगीन एक-tap reports', cls:'g2' },
+  { id:'matrix', ic:'🧩', ttl:'पूर्ण Parameter Matrix', desc:'सभी parameters, live गिनती', cls:'g3' },
+  { id:'timeline', ic:'📅', ttl:'समय-केंद्रित', desc:'पहले समय-सीमा, फिर filter', cls:'g4' },
+  { id:'compare', ic:'⚖️', ttl:'तुलनात्मक (A vs B)', desc:'दो अवधि/अधिकारी की तुलना', cls:'g5' },
+  { id:'chat', ic:'💬', ttl:'सवाल-जवाब से बनाएँ', desc:'कोई form नहीं — बातचीत से', cls:'g6' }
+];
+function repOpenHub(){
+  var host = document.getElementById('report-hub-host');
+  var chip = document.querySelector('.rep-pchip-reports');
+  var isOpen = host.style.display === 'block';
+  var open = !isOpen;
+  host.style.display = open ? 'block' : 'none';
+  if (chip) chip.classList.toggle('is-active', open);
+  if (open) { _repRenderHub(); setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60); }
+}
+function _repRenderHub(){
+  var host = document.getElementById('report-hub-host'); if (!host) return;
+  host.innerHTML = '<div class="rep-hub">' +
+    '<div class="rep-hub-hd">📊 Reports — कौन-सी शैली में बनाएँ?</div>' +
+    '<div class="rep-hub-grid">' +
+    REP_STYLES.map(function(s){
+      return '<div class="rep-hub-tile" onclick="event.stopPropagation();repOpenStyle(\'' + s.id + '\')">' +
+        '<div class="rep-glimpse ' + s.cls + '"><span class="rep-glimpse-ic">' + s.ic + '</span></div>' +
+        '<div class="rep-hub-info"><div class="rep-hub-ttl">' + s.ic + ' ' + s.ttl + '</div><div class="rep-hub-desc">' + s.desc + '</div></div>' +
+      '</div>';
+    }).join('') +
+    '</div></div>';
+}
+function repOpenStyle(styleId){
+  _repF = _repDefaultFilters();
+  var host = document.getElementById('report-hub-host'); if (!host) return;
+  var back = '<div class="rep-back" onclick="event.stopPropagation();_repRenderHub()">← Reports शैलियाँ</div>';
+  host.innerHTML = '<div class="rep-style-view">' + back + '<div id="rep-style-body"></div><div id="rep-style-results"></div></div>';
+  _repRenderStyleBody(styleId);
+}
+function _repRunAndShow(){
+  var computed = _repCompute(_repF);
+  var el = document.getElementById('rep-style-results');
+  if (el) el.innerHTML = '<div class="rep-results-hd">📄 ' + computed.total + ' प्रकरण मिले</div>' + _repRenderResultsHTML(computed, 'rp-');
+}
+
+function _repChipsFor(kind){
+  // kind: 'types' | 'status' | 'officers'
+  if (kind === 'types') {
+    return REP_HEADS.concat(['court']).map(function(t){
+      var on = _repF.types.indexOf(t) > -1 || (t==='court' && _repF.includeCourt);
+      var lbl = REP_HEAD_LABELS[t];
+      return '<span class="rep-chip' + (on?' on':'') + '" onclick="event.stopPropagation();repToggleType(\'' + t + '\')">' + lbl + '</span>';
+    }).join('');
+  }
+  if (kind === 'status') {
+    var opts = [['Active','सक्रिय'],['Closed','नस्तीबद्ध'],['Converted to RC','RC में']];
+    return opts.map(function(o){
+      var on = _repF.statuses.indexOf(o[0]) > -1;
+      return '<span class="rep-chip' + (on?' on':'') + '" onclick="event.stopPropagation();repToggleStatus(\'' + o[0] + '\')">' + o[1] + '</span>';
+    }).join('');
+  }
+  if (kind === 'officers') {
+    var ios = (typeof getActiveIONames==='function') ? getActiveIONames() : [];
+    return ios.slice(0,20).map(function(n){
+      var on = _repF.officers.indexOf(n) > -1;
+      var safe = n.replace(/'/g,"\\'");
+      return '<span class="rep-chip' + (on?' on':'') + '" onclick="event.stopPropagation();repToggleOfficer(\'' + safe + '\')">' + escapeHtml(n) + '</span>';
+    }).join('');
+  }
+  return '';
+}
+function repToggleType(t){
+  if (t==='court') { _repF.includeCourt = !_repF.includeCourt; }
+  else {
+    var i = _repF.types.indexOf(t);
+    if (i>-1) _repF.types.splice(i,1); else _repF.types.push(t);
+  }
+  _repRenderStyleBody(_repCurrentStyle); _repRunAndShow();
+}
+function repToggleStatus(s){
+  var i = _repF.statuses.indexOf(s);
+  if (i>-1) _repF.statuses.splice(i,1); else _repF.statuses.push(s);
+  _repRenderStyleBody(_repCurrentStyle); _repRunAndShow();
+}
+function repToggleOfficer(n){
+  var i = _repF.officers.indexOf(n);
+  if (i>-1) _repF.officers.splice(i,1); else _repF.officers.push(n);
+  _repRenderStyleBody(_repCurrentStyle); _repRunAndShow();
+}
+function repSetDate(which, val){
+  if (which==='from') _repF.dateFrom = val; else _repF.dateTo = val;
+  _repRunAndShow();
+}
+
+var _repCurrentStyle = null;
+function _repRenderStyleBody(styleId){
+  _repCurrentStyle = styleId;
+  var body = document.getElementById('rep-style-body'); if (!body) return;
+  var html = '';
+  if (styleId === 'cards') {
+    html = '<div class="rep-cards-hd">📇 सरल Cards — डिफ़ॉल्ट सभी</div>' +
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">📅 समय</span><input type="date" onchange="repSetDate(\'from\',this.value)"><span>—</span><input type="date" onchange="repSetDate(\'to\',this.value)"></div>' +
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">📁 प्रकार</span><div class="rep-chips">' + _repChipsFor('types') + '</div></div>' +
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">🟢 स्थिति</span><div class="rep-chips">' + _repChipsFor('status') + '</div></div>' +
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">👮 IO</span><div class="rep-chips">' + _repChipsFor('officers') + '</div></div>';
+  } else if (styleId === 'templates') {
+    html = '<div class="rep-cards-hd">🖼️ तैयार Templates</div>' +
+      '<div class="rep-tpl-grid">' +
+        '<div class="rep-tpl-card t1" onclick="event.stopPropagation();repApplyTemplate(\'month\')">📋 मासिक सारांश</div>' +
+        '<div class="rep-tpl-card t2" onclick="event.stopPropagation();repApplyTemplate(\'pending90\')">⏰ लंबित 90+ दिन</div>' +
+        '<div class="rep-tpl-card t3" onclick="event.stopPropagation();repApplyTemplate(\'thisyear\')">📅 इस वर्ष सभी</div>' +
+        '<div class="rep-tpl-card t4" onclick="event.stopPropagation();repApplyTemplate(\'active\')">🟢 सभी सक्रिय</div>' +
+      '</div>';
+  } else if (styleId === 'matrix') {
+    html = '<div class="rep-cards-hd">🧩 पूर्ण Parameter Matrix</div>' +
+      '<div class="rep-mtx-sec"><div class="rep-mtx-hd">📁 प्रकार</div><div class="rep-chips">' + _repChipsFor('types') + '</div></div>' +
+      '<div class="rep-mtx-sec"><div class="rep-mtx-hd">📅 समय</div><div class="rep-mini-row"><input type="date" onchange="repSetDate(\'from\',this.value)"><span>—</span><input type="date" onchange="repSetDate(\'to\',this.value)"></div></div>' +
+      '<div class="rep-mtx-sec"><div class="rep-mtx-hd">🟢 स्थिति</div><div class="rep-chips">' + _repChipsFor('status') + '</div></div>' +
+      '<div class="rep-mtx-sec"><div class="rep-mtx-hd">👮 IO</div><div class="rep-chips">' + _repChipsFor('officers') + '</div></div>';
+  } else if (styleId === 'timeline') {
+    html = '<div class="rep-cards-hd">📅 समय-केंद्रित</div>' +
+      '<div class="rep-timeline-box"><div class="rep-mini-row"><span class="rep-mini-lbl">से</span><input type="date" onchange="repSetDate(\'from\',this.value)"><span class="rep-mini-lbl">तक</span><input type="date" onchange="repSetDate(\'to\',this.value)"></div>' +
+      '<div class="rep-tl-presets"><button class="rep-chip" onclick="event.stopPropagation();repApplyTemplate(\'d30\')">पिछले 30 दिन</button><button class="rep-chip" onclick="event.stopPropagation();repApplyTemplate(\'d90\')">पिछले 90 दिन</button><button class="rep-chip" onclick="event.stopPropagation();repApplyTemplate(\'thisyear\')">इस वर्ष</button><button class="rep-chip" onclick="event.stopPropagation();repApplyTemplate(\'all\')">सभी समय</button></div></div>' +
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">📁 प्रकार</span><div class="rep-chips">' + _repChipsFor('types') + '</div></div>';
+  } else if (styleId === 'compare') {
+    html = '<div class="rep-cards-hd">⚖️ तुलनात्मक — A बनाम B</div>' +
+      '<div class="rep-compare-grid">' +
+        '<div class="rep-cmp-side"><div class="rep-cmp-hd">A</div><input type="date" id="rep-cmp-a-from" placeholder="से"><input type="date" id="rep-cmp-a-to" placeholder="तक"><div id="rep-cmp-a-num" class="rep-cmp-num">—</div></div>' +
+        '<div class="rep-cmp-vs">VS</div>' +
+        '<div class="rep-cmp-side b"><div class="rep-cmp-hd">B</div><input type="date" id="rep-cmp-b-from" placeholder="से"><input type="date" id="rep-cmp-b-to" placeholder="तक"><div id="rep-cmp-b-num" class="rep-cmp-num">—</div></div>' +
+      '</div><button class="rep-gen-btn" onclick="event.stopPropagation();repRunCompare()">तुलना करें</button>';
+  } else if (styleId === 'chat') {
+    html = '<div class="rep-cards-hd">💬 सवाल-जवाब से बनाएँ</div>' +
+      '<div class="rep-chat" id="rep-chat-log"><div class="rep-chat-b bot">किस प्रकार का डेटा चाहिए?</div>' +
+      '<div class="rep-chips">' + _repChipsFor('types') + '</div></div>';
+  }
+  body.innerHTML = html;
+  if (styleId !== 'compare') _repRunAndShow();
+}
+function repApplyTemplate(t){
+  _repF = _repDefaultFilters();
+  var today = new Date();
+  function iso(d){ return d.toISOString().slice(0,10); }
+  if (t==='month') { var f=new Date(today.getFullYear(),today.getMonth(),1); _repF.dateFrom=iso(f); _repF.dateTo=iso(today); }
+  else if (t==='pending90') { var f2=new Date(today.getTime()-90*86400000); _repF.dateTo=iso(f2); _repF.statuses=['Active']; }
+  else if (t==='thisyear') { _repF.dateFrom=today.getFullYear()+'-01-01'; _repF.dateTo=iso(today); }
+  else if (t==='active') { _repF.statuses=['Active']; }
+  else if (t==='d30') { _repF.dateFrom=iso(new Date(today.getTime()-30*86400000)); _repF.dateTo=iso(today); }
+  else if (t==='d90') { _repF.dateFrom=iso(new Date(today.getTime()-90*86400000)); _repF.dateTo=iso(today); }
+  else if (t==='all') { /* defaults already all */ }
+  _repRenderStyleBody(_repCurrentStyle || 'templates');
+  _repRunAndShow();
+}
+function repRunCompare(){
+  var af=document.getElementById('rep-cmp-a-from').value, at=document.getElementById('rep-cmp-a-to').value;
+  var bf=document.getElementById('rep-cmp-b-from').value, bt=document.getElementById('rep-cmp-b-to').value;
+  var fa = _repDefaultFilters(); fa.dateFrom=af; fa.dateTo=at;
+  var fb = _repDefaultFilters(); fb.dateFrom=bf; fb.dateTo=bt;
+  var ca = _repCompute(fa), cb = _repCompute(fb);
+  document.getElementById('rep-cmp-a-num').textContent = ca.total;
+  document.getElementById('rep-cmp-b-num').textContent = cb.total;
+  var el = document.getElementById('rep-style-results');
+  if (el) el.innerHTML = '<div class="rep-results-hd">A: ' + ca.total + ' vs B: ' + cb.total + '</div>';
+}
+
+
+/* ══ DEPT / OFFICER HUB ══ */
+var DO_STYLES = [
+  { id:'grid', ic:'📋', ttl:'Combined Grid', desc:'दोनों एक साथ, श्रेणी-लेबल सहित', cls:'dg1' },
+  { id:'cloud', ic:'☁️', ttl:'Proportional Cloud', desc:'आकार = मात्रा', cls:'dg2' },
+  { id:'rolodex', ic:'🗂️', ttl:'Directory Rolodex', desc:'Docket-file जैसे छोटे index-card', cls:'dg3' },
+  { id:'search', ic:'🔎', ttl:'Smart Search Bar', desc:'टाइप करते ही मिलान', cls:'dg4' }
+];
+function _doTagCounts(category){
+  var tags = (state.tags || []).filter(function(t){ return t.category === category; });
+  return tags.map(function(t){
+    var ct = 0;
+    REP_HEADS.forEach(function(type){
+      (state.enquiries[type] || []).forEach(function(r){
+        if (Array.isArray(r.tag_ids) && r.tag_ids.indexOf(t.id) > -1) ct++;
+      });
+    });
+    return { tag: t, count: ct };
+  }).sort(function(a,b){ return b.count - a.count; });
+}
+function doOpenHub(){
+  var host = document.getElementById('do-hub-host');
+  var tile = document.querySelector('.rep-pchip-cao, .rep-pchip-dept');
+  var isOpen = host.style.display === 'block';
+  var open = !isOpen;
+  host.style.display = open ? 'block' : 'none';
+  if (open) { _doRenderHub(); setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60); }
+}
+function _doRenderHub(){
+  var host = document.getElementById('do-hub-host'); if (!host) return;
+  host.innerHTML = '<div class="rep-hub">' +
+    '<div class="rep-hub-hd">👮🏛️ विभाग एवं अधिकारी — कौन-सी शैली में खोजें?</div>' +
+    '<div class="rep-hub-grid">' +
+    DO_STYLES.map(function(s){
+      return '<div class="rep-hub-tile" onclick="event.stopPropagation();doOpenStyle(\'' + s.id + '\')">' +
+        '<div class="rep-glimpse ' + s.cls + '"><span class="rep-glimpse-ic">' + s.ic + '</span></div>' +
+        '<div class="rep-hub-info"><div class="rep-hub-ttl">' + s.ic + ' ' + s.ttl + '</div><div class="rep-hub-desc">' + s.desc + '</div></div>' +
+      '</div>';
+    }).join('') +
+    '</div></div>';
+}
+function doOpenStyle(styleId){
+  var host = document.getElementById('do-hub-host'); if (!host) return;
+  var back = '<div class="rep-back" onclick="event.stopPropagation();_doRenderHub()">← खोज शैलियाँ</div>';
+  host.innerHTML = '<div class="rep-style-view">' + back + '<div id="do-style-body"></div><div id="do-style-results"></div></div>';
+  _doRenderStyleBody(styleId);
+}
+function _doRenderStyleBody(styleId){
+  var body = document.getElementById('do-style-body'); if (!body) return;
+  var desig = _doTagCounts('designation');
+  var dept = _doTagCounts('department');
+  var html = '';
+  if (styleId === 'grid') {
+    html = '<div class="do-catlbl">🎖️ पदनाम</div><div class="rep-chips">' +
+      desig.map(function(x){ return '<span class="rep-chip" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>'; }).join('') +
+      '</div><div class="do-catlbl">🏛️ विभाग</div><div class="rep-chips">' +
+      dept.map(function(x){ return '<span class="rep-chip dept" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>'; }).join('') +
+      '</div>';
+  } else if (styleId === 'cloud') {
+    var all = desig.concat(dept);
+    var maxCt = Math.max.apply(null, all.map(function(x){return x.count;}).concat([1]));
+    html = '<div class="do-cloud">' + all.map(function(x){
+      var size = 10 + Math.round((x.count / maxCt) * 12);
+      return '<span class="do-cloud-chip" style="font-size:' + size + 'px;padding:' + (size*0.4) + 'px ' + (size*0.7) + 'px;" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>';
+    }).join('') + '</div>';
+  } else if (styleId === 'rolodex') {
+    var all2 = desig.concat(dept);
+    html = '<div class="do-shelf">' + all2.map(function(x){
+      var cls = x.tag.category === 'department' ? 'dept' : 'desig';
+      return '<div class="do-card ' + cls + '" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')"><div class="do-card-lbl">' + escapeHtml(x.tag.name) + '</div><div class="do-card-num">' + x.count + '</div></div>';
+    }).join('') + '</div>';
+  } else if (styleId === 'search') {
+    html = '<div class="do-search-bar">🔍 <input type="text" placeholder="अधिकारी या विभाग टाइप करें..." oninput="doSearchFilter(this.value)"></div><div id="do-search-dd"></div>';
+  }
+  body.innerHTML = html;
+}
+var _doAllTagsCache = null;
+function doSearchFilter(q){
+  var dd = document.getElementById('do-search-dd'); if (!dd) return;
+  q = (q||'').trim().toLowerCase();
+  if (!q) { dd.innerHTML=''; return; }
+  var all = _doTagCounts('designation').concat(_doTagCounts('department'));
+  var hits = all.filter(function(x){ return x.tag.name.toLowerCase().indexOf(q) > -1; });
+  dd.innerHTML = hits.map(function(x){
+    var cls = x.tag.category === 'department' ? 'dept' : 'desig';
+    return '<div class="do-hit ' + cls + '" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')"><span class="do-hit-tag">' + (cls==='dept'?'विभाग':'पदनाम') + '</span><span class="do-hit-nm">' + escapeHtml(x.tag.name) + '</span><span class="do-hit-ct">' + x.count + '</span></div>';
+  }).join('') || '<div class="empty-state" style="padding:10px;"><h3>कोई मिलान नहीं</h3></div>';
+}
+function doSelectTag(tagId){
+  var f = _repDefaultFilters(); f.tagIds = [tagId];
+  var computed = _repCompute(f);
+  var tag = getTagById(tagId);
+  var el = document.getElementById('do-style-results');
+  if (el) el.innerHTML = '<div class="rep-results-hd">📄 ' + escapeHtml(tag ? tag.name : '') + ' — ' + computed.total + ' प्रकरण</div>' + _repRenderResultsHTML(computed, 'do-');
+}
+
 function renderTotalCases() {
   var content = document.getElementById('totalcases-content');
   if (!content) return;
