@@ -64728,6 +64728,10 @@ if ('serviceWorker' in navigator) {
   function place(el){
     var r=el.getBoundingClientRect();
     if(r.width===0&&r.height===0){hide();return;}
+    // Field has scrolled fully off-screen — hide the mic instead of pinning
+    // it to a viewport edge (that pinning-while-scrolling is what looked
+    // "unstable"/disconnected during fast scroll).
+    if(r.bottom<0||r.top>window.innerHeight||r.right<0||r.left>window.innerWidth){ hide(); return; }
     var size=28;
     var x=r.right-size-6;
     var y=(el.tagName==='TEXTAREA')?(r.top+7):(r.top+(r.height-size)/2);
