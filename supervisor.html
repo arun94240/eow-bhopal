@@ -25752,7 +25752,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
             <!-- Quick preset matrices (always visible) -->
             <div class="hdr-counter-stack reports-counter-stack reports-uni-stack" id="reports-counter-stack">
               <div class="hdr-counter rep-pchip rep-pchip-search rep-pchip-cs" onclick="event.stopPropagation();openComprehensiveSearch()">
-                <span class="rep-ic">🔍</span><span class="rep-lbl">Search All</span>
+                <span class="rep-ic">🔍</span><span class="rep-lbl">Search All</span><span class="rep-sub-n" id="rep-search-tile-total">0</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-dept" onclick="event.stopPropagation();doOpenHub()">
                 <span class="rep-ic">👮🏛️</span><span class="rep-lbl">Search By Officers &amp; Deptt</span>
@@ -47632,6 +47632,7 @@ function refreshReportsBox() {
   });
   total += (state.courts || []).length;
   setEl('reports-cnt-total', total);
+  setEl('rep-search-tile-total', total);
   
   // Mini-cal — today
   var miniCal = document.getElementById('reports-mini-cal');
