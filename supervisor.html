@@ -22591,6 +22591,10 @@ body.role-staff #mydaily-box{ display:none !important; }
 .opm-row3{ box-shadow:0 2px 8px rgba(6,42,82,.08); border-radius:9px; }
 .mas-pill.is-active{ box-shadow:0 0 0 2px #fff inset, 0 3px 8px rgba(0,0,0,.25); }
 .mas-pill.ovstats-tile-open{ box-shadow:0 0 0 2px #fff inset, 0 3px 8px rgba(0,0,0,.25); }
+.opm-row3 .mas-pill{ padding:8px 5px; }
+.opm-row3 .mas-pill .n{ font-size:17px; }
+.opm-row3 .mas-pill .l{ font-size:8.3px; line-height:1.2; white-space:normal; word-break:break-word; overflow-wrap:break-word; padding:0 1px; }
+
 
 /* ═══ Independent top search bar (Home) — plain white, no header/label ═══ */
 .cs-top-bar{ background:#fff; border-radius:13px; padding:13px 17px; display:flex; align-items:center; gap:10px; box-shadow:0 3px 12px rgba(6,42,82,.13); margin-bottom:10px; border:1.5px solid #e2e8f0; }
@@ -23809,10 +23813,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                     <div class="n" id="ovstats-cnt-pragati">0</div>
                     <div class="l">प्रतिवेदन दिया</div>
                   </div>
-                  <div class="ovstats-tile ovstats-tile-nopr mas-pill mp-absent" onclick="event.stopPropagation();ovstatsNavTile('nopr',event)">
+                  <div class="ovstats-tile ovstats-tile-nopr mas-pill mp-absent" onclick="event.stopPropagation();ovstatsNavTile('nopr',event)" title="30+ दिन से प्रगति दर्ज नहीं">
                     <div class="cmd-metric-icon" id="ovstats-nopr-cal" style="display:none;"></div>
                     <div class="n" id="ovstats-cnt-nopr">0</div>
-                    <div class="l">प्रगति नहीं (30+)</div>
+                    <div class="l">प्रगति नहीं</div>
                   </div>
                   <div class="ovstats-tile ovstats-tile-notice mas-pill mp-out" onclick="event.stopPropagation();ovTileToggle('notice',event)">
                     <div class="cmd-metric-icon" id="cc-cal-notice" style="display:none;"></div>
