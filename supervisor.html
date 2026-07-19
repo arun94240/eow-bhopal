@@ -22583,6 +22583,14 @@ body.role-staff #mydaily-box{ display:none !important; }
 
 /* Attendance permanent box above कार्यालय + notice collapsed summary (v205) */
 .att-live-box{ margin:0 0 12px; }
+/* ═══ Independent top search bar (Home) — plain white, no header/label ═══ */
+.cs-top-bar{ background:#fff; border-radius:13px; padding:13px 17px; display:flex; align-items:center; gap:10px; box-shadow:0 3px 12px rgba(6,42,82,.13); margin-bottom:10px; border:1.5px solid #e2e8f0; }
+.cs-top-mag{ font-size:17px; opacity:.5; flex:0 0 auto; }
+.cs-top-bar input{ flex:1; border:none; outline:none; font-size:14.5px; font-family:inherit; background:transparent; color:#0f2238; min-width:0; }
+.cs-top-bar input::placeholder{ color:#94a3b8; font-weight:600; }
+.cs-top-clr{ background:#eef2f7; border:none; border-radius:7px; width:25px; height:25px; font-size:12px; color:#475569; cursor:pointer; flex:0 0 auto; }
+#cs-top-dd:not(:empty){ background:linear-gradient(160deg,#062a52,#0a3a6e); border-radius:13px; padding:11px 13px; margin:-2px 0 12px; box-shadow:0 8px 22px rgba(6,42,82,.22); animation:ssrOpen .22s ease; }
+
 .att-live-box .mydd-att-strip{ box-shadow:0 5px 18px rgba(0,0,0,.22); }
 .ovcc-nsum{ background:linear-gradient(135deg,#fff7ed,#fffbf5); border:1px solid #fdba74; border-radius:11px; padding:11px 13px; font-size:12px; font-weight:800; color:#9a3412; cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:9px; }
 .ovcc-nsum .car{ margin-left:auto; color:#ea580c; font-weight:900; }
@@ -23702,6 +23710,11 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
       <div class="att-live-box" id="att-live-box">
         <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
       </div>
+      <div class="cs-top-bar" id="cs-top-bar" onclick="event.stopPropagation();">
+        <span class="cs-top-mag">🔍</span>
+        <input type="text" id="cs-top-input" autocomplete="off" placeholder="Search All" oninput="event.stopPropagation();csTopSearchInput(this.value)">
+      </div>
+      <div id="cs-top-dd" onclick="event.stopPropagation();"></div>
       <div class="ov-section collapsed" id="ovstats-summary-wrap">
         <div class="ov-section-header">
           <div class="ov-section-titles">
@@ -46955,6 +46968,61 @@ function _ssrIsOpen(panelId){
   var el = document.getElementById(panelId);
   return !!el && el.style.display !== 'none' && el.style.display !== '';
 }
+/* ═══ Independent SECOND search bar (Home, between attendance-live and
+   कार्यालय-Overview) — its own state, own dropdown host, own inline results.
+   Reuses the same underlying matching engine (_searchAll) so both bars stay
+   in sync with the same live data, but never share query/scope/open-state,
+   so typing/opening one never affects or jumps to the other. ═══ */
+var _csTopQ = '', _csTopDeb = null, _csTopRowOpenMap = {};
+function _csTopDropdownHTML(q){
+  q = String(q||'').trim();
+  if (!q) return '';
+  var res = _searchAll(q);
+  if (!res.total) return '<div class="cs-hint">"' + _mddEsc(q) + '" — कोई मिलान नहीं</div>';
+  var rom = _csLooseRom(_csDevToRoman(q.toLowerCase()));
+  var html = '<div class="cs-ddhint">💡 <b>' + _mddEsc(q) + '</b>' + ((rom && rom !== q.toLowerCase()) ? (' → रोमन-मिलान <b>' + _mddEsc(rom) + '</b>') : '') + ' — कुल ' + res.total + ' परिणाम</div>';
+  res.groups.forEach(function(g){
+    html += '<div class="cs-grp">' + g.label + ' <span class="cs-gn">' + g.count + '</span></div>';
+    g.items.forEach(function(it){
+      var key = it.scope + '|' + it.id; var open = !!_csTopRowOpenMap[key];
+      html += '<div class="cs-row' + (open ? ' open' : '') + '" onclick="event.stopPropagation();csTopRowToggle(\'' + it.scope + '\',\'' + (it.type || '') + '\',\'' + it.id + '\')">' +
+        '<span class="cs-cat ' + (_CS_SCOPE_CAT[it.scope] || 'c-tag') + '">' + _mddEsc(it.label).slice(0, 22) + '</span>' +
+        '<div class="cs-rmain"><div class="cs-rttl">' + _csHi(it.title, q) + '</div><div class="cs-rsub">' + _csHi(it.sub || '', q) + '</div></div>' +
+        '<span class="cs-rcar">' + (open ? '▴' : '▾') + '</span>' +
+      '</div>';
+      if (open) html += _csInlineBrief(it.scope, it.type, it.id);
+    });
+    if (g.count > g.items.length) html += '<div class="cs-more">…और ' + (g.count - g.items.length) + ' ' + g.label.replace(/^[^ ]+ /, '') + '</div>';
+  });
+  return html;
+}
+function csTopRowToggle(scope, type, id){
+  var key = scope + '|' + id; _csTopRowOpenMap[key] = !_csTopRowOpenMap[key];
+  var dd = document.getElementById('cs-top-dd'); if (dd) dd.innerHTML = _csTopDropdownHTML(_csTopQ);
+}
+function csTopSearchInput(v){
+  _csTopQ = v;
+  if (_csTopDeb) clearTimeout(_csTopDeb);
+  _csTopDeb = setTimeout(function(){
+    var dd = document.getElementById('cs-top-dd'); if (dd) dd.innerHTML = _csTopDropdownHTML(_csTopQ);
+    var bar = document.getElementById('cs-top-bar');
+    if (bar) {
+      var has = bar.querySelector('.cs-top-clr');
+      if (_csTopQ && !has) {
+        var b = document.createElement('button'); b.className = 'cs-top-clr'; b.textContent = '✕';
+        b.onclick = function(e){ e.stopPropagation(); csTopClearSearch(); };
+        bar.appendChild(b);
+      } else if (!_csTopQ && has) { has.remove(); }
+    }
+  }, 170);
+}
+function csTopClearSearch(){
+  _csTopQ = '';
+  var i = document.getElementById('cs-top-input'); if (i) { i.value = ''; i.focus(); }
+  var dd = document.getElementById('cs-top-dd'); if (dd) dd.innerHTML = '';
+  var bar = document.getElementById('cs-top-bar'); if (bar) { var has = bar.querySelector('.cs-top-clr'); if (has) has.remove(); }
+}
+
 function openComprehensiveSearch(){
   // Re-tapping while already open closes it exactly here — no jump to any other view.
   if (_ssrIsOpen('reports-home-content')) { _ssrClose('reports-home-content'); return; }
