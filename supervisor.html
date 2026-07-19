@@ -23433,6 +23433,52 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .gp-bar{ background:rgba(255,255,255,.9); border-radius:7px; padding:5px 8px; font-size:8px; font-weight:700; color:#062a52; margin-bottom:5px; }
 .gp-hit{ display:flex; align-items:center; gap:5px; padding:2px 6px; background:rgba(255,255,255,.15); border-radius:5px; margin-bottom:3px; font-size:7px; color:#fff; font-weight:700; }
 .gp-tag{ background:#f5b942; color:#062a52; border-radius:3px; padding:0 4px; font-size:6px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   📝 To-Do — Docket Stamp (List) + Docket Card (v286)
+   ═══════════════════════════════════════════════════════════════ */
+.agenda-collapse-car{ font-size:10px; margin-left:4px; opacity:.8; }
+.agenda-title{ cursor:pointer; }
+
+.todo-view-toggle{ display:flex; gap:6px; margin:6px 0 10px; }
+.todo-view-btn{ background:#eef2f7; border:none; border-radius:8px; padding:6px 13px; font-size:11px; font-weight:800; color:#334155; cursor:pointer; }
+.todo-view-btn.active{ background:#062a52; color:#f5b942; }
+
+/* priority colors — matching Docket's category-gradient language */
+.pr-high{ background:linear-gradient(135deg,#dc2626,#b91c1c); }
+.pr-normal{ background:linear-gradient(135deg,#2563eb,#1d4ed8); }
+.pr-low{ background:linear-gradient(135deg,#64748b,#475569); }
+
+/* ── List (Docket Stamp) ── */
+.todo-tr{ background:transparent; margin:0; cursor:pointer; }
+.todo-row-inner{ display:flex; align-items:stretch; border:1.5px solid #e2e8f0; border-radius:12px; background:#fff; overflow:hidden; margin-bottom:9px; transition:all .15s; }
+.todo-row-inner:hover{ border-color:#f5b942; box-shadow:0 6px 16px rgba(245,185,66,.2); }
+.todo-tr-done .todo-row-inner{ opacity:.55; }
+.todo-tr.active .todo-row-inner{ border-color:#f5b942; }
+.todo-stamp{ flex:0 0 66px; display:flex; flex-direction:column; }
+.todo-no{ background:#fff; border-bottom:2px solid #062a52; text-align:center; font-family:ui-monospace,monospace; font-size:11px; font-weight:900; color:#062a52; padding:6px 4px; }
+.todo-pr{ flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:8px; font-weight:900; text-align:center; padding:4px; }
+.todo-body{ flex:1; min-width:0; padding:9px 11px; display:flex; flex-direction:column; gap:6px; justify-content:center; }
+.todo-title{ font-size:12.5px; font-weight:800; color:#0f2542; }
+.todo-meta-grid{ grid-template-columns:1fr 1fr; }
+.todo-right{ flex:0 0 42px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#062a52,#0a3a6e); }
+.todo-done-btn{ width:28px; height:28px; border-radius:8px; background:rgba(255,255,255,.12); border:1.5px solid #f5b942; color:#f5b942; font-size:13px; cursor:pointer; }
+.todo-done-btn:hover{ background:#f5b942; color:#062a52; }
+.todo-expand-row{ padding:0; }
+
+/* ── Cards (Docket Card) ── */
+.todo-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; }
+.todo-card{ border:1.5px solid #e2e8f0; border-radius:11px; overflow:hidden; }
+.todo-card:hover{ border-color:#f5b942; box-shadow:0 5px 14px rgba(245,185,66,.18); }
+.todo-card-done{ opacity:.55; }
+.todo-card-head{ cursor:pointer; }
+.todo-card-top{ color:#fff; padding:6px 10px; font-size:8.5px; font-weight:900; }
+.todo-card-body{ padding:9px 10px; display:flex; flex-direction:column; gap:6px; }
+
+/* ── reference chip (linked case, or IO fallback) ── */
+.todo-ref-chip{ font-size:10px; font-weight:800; padding:3px 10px; border-radius:20px; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; cursor:pointer; }
+.todo-ref-chip.todo-ref-io{ background:linear-gradient(135deg,#0f766e,#0d9488); }
+.todo-ref-brief-wrap{ margin-top:8px; border-top:1px dashed #e2e8f0; padding-top:8px; }
 </style>
 </head>
 <body>
@@ -24038,7 +24084,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
       <div class="mydd-box" id="mydaily-box">
         <div class="agenda-hdr" id="agenda-hdr">
           <div class="n-cal agenda-cal" id="agenda-cal"><div class="m">—</div><div class="d">—</div><div class="w">—</div></div>
-          <div class="agenda-title">🗓️ Agenda</div>
+          <div class="agenda-title" onclick="event.stopPropagation();agendaToggleCollapse(event);">🗓️ Agenda <span id="agenda-collapse-car" class="agenda-collapse-car">▾</span></div>
           <div class="agenda-tools-wrap" id="agenda-tools-wrap">
             <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleBox();">
               <span class="mydd-tcal" style="display:none;"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
@@ -24076,26 +24122,29 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
             <div class="mddq-host" id="mtx-addhost-task"></div>
             <div class="mddq-host" id="mydd-addhost-disc"></div>
             <div class="mddq-host" id="mydd-addhost-review"></div>
-            <div id="mtx-body">
+            <div id="mtx-body" style="display:none;">
+            <!-- legacy hidden markers kept (harmless, unused) so any stray references never error -->
             <span id="mtx-ag-today" style="display:none;">0</span><span id="mtx-ag-week" style="display:none;">0</span><span id="mtx-ag-caret" style="display:none;"></span>
             <div class="mtx-list" id="mtx-agenda-panel" style="display:none;"></div>
-            <div class="mtx-chip-grid">
-              <button type="button" class="mtx-chip mtx-chip-dg" data-w="dg" onclick="event.stopPropagation();mtxGroupTab('dg','disc');"><span class="mtx-chip-ic">🏛</span><span class="mtx-chip-lbl">DG EOW</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();openDgDirectiveForm();">＋</span><span class="mtx-chip-n" id="mtx-cnt-dg">0</span></button>
-              <button type="button" class="mtx-chip mtx-chip-disc" data-w="disc" onclick="event.stopPropagation();mtxGroupTab('disc','dg');"><span class="mtx-chip-ic">💬</span><span class="mtx-chip-lbl">चर्चा</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();mddDiscInlineAdd();">＋</span><span class="mtx-chip-n" id="mtx-cnt-disc">0</span></button>
-              <button type="button" class="mtx-chip mtx-chip-rv" data-w="rv" onclick="event.stopPropagation();mtxGroupTab('rv','td');"><span class="mtx-chip-ic">⭐</span><span class="mtx-chip-lbl">समीक्षा</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();mddReviewAddPicker();">＋</span><span class="mtx-chip-n" id="mtx-cnt-rv">0</span></button>
-              <button type="button" class="mtx-chip mtx-chip-td" data-w="td" onclick="event.stopPropagation();mtxGroupTab('td','rv');"><span class="mtx-chip-ic">📝</span><span class="mtx-chip-lbl">To-Do</span><span class="mtx-chip-add" title="जोड़ें" onclick="event.stopPropagation();mddTaskFormOpen('mtx-addhost-task');">＋</span><span class="mtx-chip-n" id="mtx-cnt-td">0</span></button>
-            </div>
+            <span id="mtx-cnt-dg" style="display:none;">0</span><span id="mtx-cnt-disc" style="display:none;">0</span><span id="mtx-cnt-rv" style="display:none;">0</span><span id="mtx-cnt-td" style="display:none;">0</span>
             <span id="mtx-grp-tot-dir" style="display:none;">0</span><span id="mtx-grp-tot-work" style="display:none;">0</span>
             <span id="mtx-caret-dg" style="display:none;"></span><span id="mtx-caret-disc" style="display:none;"></span>
             <span id="mtx-caret-rv" style="display:none;"></span><span id="mtx-caret-td" style="display:none;"></span>
-            <div class="mtx-list" id="mtx-list-dg"></div>
-            <div class="mtx-list" id="mtx-list-disc"></div>
-            <div class="mtx-list" id="mtx-list-rv"></div>
-            <div class="mtx-list" id="mtx-list-td"></div>
+            <div class="mtx-list" id="mtx-list-dg" style="display:none;"></div>
+            <div class="mtx-list" id="mtx-list-disc" style="display:none;"></div>
+            <div class="mtx-list" id="mtx-list-rv" style="display:none;"></div>
             <div class="mtx-subttl" id="mtx-name-title" style="display:none;">References — @name</div>
-            <div id="mtx-name-rows"></div>
+            <div id="mtx-name-rows" style="display:none;"></div>
             <div class="mtx-subttl" id="mtx-io-title" style="display:none;">👮 IO अनुसार</div>
-            <div id="mtx-io-rows"></div>
+            <div id="mtx-io-rows" style="display:none;"></div>
+            <!-- v286: clean To-Do only — Docket Stamp (List) + Docket Card, collapsible -->
+            <div class="todo-view-toggle">
+              <button type="button" class="todo-view-btn active" id="todo-view-list-btn" onclick="event.stopPropagation();setTodoView('list')">📋 List</button>
+              <button type="button" class="todo-view-btn" id="todo-view-cards-btn" onclick="event.stopPropagation();setTodoView('cards')">🃏 Cards</button>
+            </div>
+            <div class="docket-list-host" id="todo-list-host"></div>
+            <div class="todo-cards-grid" id="todo-cards-host" style="display:none;"></div>
+            <div class="mtx-addbar"><button type="button" class="mydd-sub-add mtx-dark" onclick="event.stopPropagation();mtxAddPick('task');">＋ Add To-Do</button></div>
             </div>
           </div>
         </div>
@@ -34268,6 +34317,172 @@ function hctOpenReports(){
     if (typeof renderReportsHomePreview === 'function') renderReportsHomePreview();
   } catch(e){}
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   📝 To-Do — Docket Stamp (List) + Docket Card (v286)
+   Replaces the old DG/चर्चा/समीक्षा/To-Do 4-tab mtx system with a
+   clean, collapsible To-Do list — same universal pattern as everywhere
+   else: row/card → tap → inline brief → Open/Edit for the real form.
+   A linked case (case_type+case_id) shows as its own tappable chip that
+   opens THAT case's own inline brief (buildEnquiryExpandCard/
+   buildCourtExpandCard — same functions used app-wide), never jumping.
+   ═══════════════════════════════════════════════════════════════════ */
+var _todoView = 'list';
+function _todoPriorityInfo(p){
+  p = String(p || 'सामान्य');
+  if (p === 'High' || p === 'उच्च') return { cls:'pr-high', label:'उच्च' };
+  if (p === 'Low' || p === 'कम') return { cls:'pr-low', label:'कम' };
+  return { cls:'pr-normal', label:'सामान्य' };
+}
+function _todoRefChipHTML(t, pfx){
+  if (t.case_type && t.case_id) {
+    var safeType = String(t.case_type).replace(/'/g,"\\'");
+    var safeId = String(t.case_id).replace(/'/g,"\\'");
+    return '<span class="todo-ref-chip" onclick="event.stopPropagation();todoToggleRef(\'' + pfx + '\',\'' + t.id + '\',\'' + safeType + '\',\'' + safeId + '\')">' + _mddEsc(t.case_display || t.case_type) + '</span>';
+  }
+  if (t.io_name) return '<span class="todo-ref-chip todo-ref-io">👮 ' + _mddEsc(t.io_name) + '</span>';
+  return '<span class="m-chip m-empty">—</span>';
+}
+function _buildTodoRow(t, i, prefix){
+  var pfx = prefix || '';
+  var rowId = pfx + 'todo-row-' + t.id;
+  var expId = pfx + 'todo-exp-' + t.id;
+  var pr = _todoPriorityInfo(t.priority);
+  var dateChip = t.task_date ? ('<span class="m-chip todo-date">📅 ' + _mddEsc(_mddDate(t.task_date)) + '</span>') : '<span class="m-chip m-empty">—</span>';
+  var done = (t.status === 'Done' || t.status === 'पूर्ण');
+  return '<div class="todo-tr' + (done ? ' todo-tr-done' : '') + '" id="' + rowId + '" onclick="todoToggleExpand(\'' + pfx + '\',\'' + t.id + '\',event)">' +
+    '<div class="todo-row-inner">' +
+      '<div class="todo-stamp"><div class="todo-no">#' + (i + 1) + '</div><div class="todo-pr ' + pr.cls + '">' + pr.label + '</div></div>' +
+      '<div class="todo-body">' +
+        '<div class="todo-title">' + (done ? '✅ ' : '📝 ') + _mddEsc(t.task_title || '(बिना शीर्षक)') + '</div>' +
+        '<div class="docket-meta-grid todo-meta-grid">' +
+          '<div class="dmg-cell">' + dateChip + '</div>' +
+          '<div class="dmg-cell dmg-right">' + _todoRefChipHTML(t, pfx) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="todo-right"><button class="todo-done-btn" title="पूर्ण करें" onclick="event.stopPropagation();mddTaskToggleDone && mddTaskToggleDone(\'' + t.id + '\')">✓</button></div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="todo-expand-row" id="' + expId + '" style="display:none;"></div>';
+}
+function _buildTodoCard(t, prefix){
+  var pfx = prefix || '';
+  var pr = _todoPriorityInfo(t.priority);
+  var dateChip = t.task_date ? ('<span class="m-chip todo-date">📅 ' + _mddEsc(_mddDate(t.task_date)) + '</span>') : '<span class="m-chip m-empty">—</span>';
+  var done = (t.status === 'Done' || t.status === 'पूर्ण');
+  return '<div class="todo-card' + (done ? ' todo-card-done' : '') + '" id="' + pfx + 'todocard-' + t.id + '">' +
+    '<div class="todo-card-head" onclick="event.stopPropagation();todoToggleCardBrief(\'' + pfx + '\',\'' + t.id + '\')">' +
+      '<div class="todo-card-top ' + pr.cls + '"><span class="lbl">' + pr.label + '</span></div>' +
+      '<div class="todo-card-body">' +
+        '<div class="todo-title">' + (done ? '✅ ' : '📝 ') + _mddEsc(t.task_title || '(बिना शीर्षक)') + '</div>' +
+        '<div class="docket-meta-grid todo-meta-grid">' +
+          '<div class="dmg-cell">' + dateChip + '</div>' +
+          '<div class="dmg-cell dmg-right">' + _todoRefChipHTML(t, pfx) + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="todo-card-brief" id="' + pfx + 'todocardbrief-' + t.id + '" style="display:none;"></div>' +
+  '</div>';
+}
+function buildTodoExpandCard(t){
+  var refLine = (t.case_type && t.case_id)
+    ? ('<div class="mydd-brief-row"><b>प्रकरण:</b> ' + _todoRefChipHTML(t, '') + '</div>')
+    : '';
+  return '<div class="ioc-exp-card">' +
+    (t.task_detail ? ('<div class="mydd-brief-row">' + _mddEsc(t.task_detail) + '</div>') : '') +
+    (t.io_name ? ('<div class="mydd-brief-row"><b>IO:</b> ' + _mddEsc(t.io_name) + '</div>') : '') +
+    (t.remarks ? ('<div class="mydd-brief-row"><b>संदर्भ:</b> ' + _mddEsc(t.remarks) + '</div>') : '') +
+    refLine +
+    '<div id="todo-refbrief-inline-' + t.id + '"></div>' +
+    '<div class="ioc-exp-actions"><button class="mydd-oe-btn" onclick="event.stopPropagation();mddTaskEditInline(\'' + t.id + '\')">✎ Open / Edit</button></div>' +
+  '</div>';
+}
+function _todoFindTask(id){ return (state.myOfficeTasks || []).find(function(x){ return x.id === id; }); }
+
+function todoToggleExpand(prefix, id, ev){
+  var t = _todoFindTask(id); if (!t) return;
+  var row = document.getElementById(prefix + 'todo-row-' + id);
+  var card = document.getElementById(prefix + 'todo-exp-' + id);
+  if (!card) return;
+  var isOpen = card.style.display !== 'none';
+  var host = card.closest('.docket-list-host') || card.parentElement;
+  if (host) {
+    host.querySelectorAll('.todo-expand-row').forEach(function(c){ c.style.display = 'none'; });
+    host.querySelectorAll('.todo-tr.active').forEach(function(r){ r.classList.remove('active'); });
+  }
+  if (!isOpen) {
+    card.innerHTML = buildTodoExpandCard(t);
+    card.style.display = '';
+    if (row) row.classList.add('active');
+  }
+}
+function todoToggleCardBrief(prefix, id){
+  var t = _todoFindTask(id); if (!t) return;
+  var brief = document.getElementById(prefix + 'todocardbrief-' + id); if (!brief) return;
+  var host = brief.closest('.todo-cards-grid');
+  var isOpen = brief.style.display !== 'none';
+  if (host) host.querySelectorAll('.todo-card-brief').forEach(function(b){ b.style.display = 'none'; });
+  if (!isOpen) { brief.innerHTML = buildTodoExpandCard(t); brief.style.display = 'block'; }
+}
+// Tapping a linked-case reference chip → that case's OWN inline brief, nested
+// right inside the To-Do's own brief — never jumps, its "Open/Edit" leads to
+// the real edit form exactly like everywhere else in the app.
+function todoToggleRef(prefix, taskId, caseType, caseId, ev){
+  if (ev) ev.stopPropagation();
+  var host = document.getElementById('todo-refbrief-inline-' + taskId);
+  if (!host) return;
+  var isOpen = host.innerHTML.length > 0;
+  if (isOpen) { host.innerHTML = ''; return; }
+  var html = '';
+  try {
+    if (caseType === 'court') {
+      var c = (state.courts || []).find(function(x){ return x.id === caseId; });
+      if (c && typeof buildCourtExpandCard === 'function') html = buildCourtExpandCard(c);
+    } else {
+      var r = (state.enquiries[caseType] || []).find(function(x){ return x.id === caseId; });
+      if (r && typeof buildEnquiryExpandCard === 'function') html = buildEnquiryExpandCard(caseType, r);
+    }
+  } catch(e){}
+  host.innerHTML = html ? ('<div class="todo-ref-brief-wrap">' + html + '</div>') : '<div class="mydd-brief-row">प्रकरण नहीं मिला</div>';
+}
+function setTodoView(mode){
+  _todoView = mode;
+  var lh = document.getElementById('todo-list-host'), ch = document.getElementById('todo-cards-host');
+  var lb = document.getElementById('todo-view-list-btn'), cb = document.getElementById('todo-view-cards-btn');
+  if (lh) lh.style.display = (mode === 'list') ? '' : 'none';
+  if (ch) ch.style.display = (mode === 'cards') ? '' : 'none';
+  if (lb) lb.classList.toggle('active', mode === 'list');
+  if (cb) cb.classList.toggle('active', mode === 'cards');
+  renderTodoList();
+}
+function renderTodoList(){
+  var tasks = (state.myOfficeTasks || []).slice();
+  tasks.sort(function(a,b){ return String(a.task_date||'9999').localeCompare(String(b.task_date||'9999')); });
+  var lh = document.getElementById('todo-list-host'), ch = document.getElementById('todo-cards-host');
+  if (lh) {
+    lh.innerHTML = tasks.length
+      ? tasks.map(function(t,i){ return _buildTodoRow(t, i, ''); }).join('')
+      : '<div class="empty-state"><h3>कोई To-Do नहीं</h3></div>';
+  }
+  if (ch) {
+    ch.innerHTML = tasks.length
+      ? tasks.map(function(t){ return _buildTodoCard(t, ''); }).join('')
+      : '<div class="empty-state"><h3>कोई To-Do नहीं</h3></div>';
+  }
+}
+// Outer Agenda box collapse — default collapsed, tap the title to expand.
+var _agendaCollapsed = true;
+function agendaToggleCollapse(ev){
+  if (ev) ev.stopPropagation();
+  _agendaCollapsed = !_agendaCollapsed;
+  var body = document.getElementById('mtx-body');
+  if (body) body.style.display = _agendaCollapsed ? 'none' : '';
+  var car = document.getElementById('agenda-collapse-car');
+  if (car) car.textContent = _agendaCollapsed ? '▾' : '▴';
+  if (!_agendaCollapsed) renderTodoList();
+}
+
+
 function renderMyDailyBox() {
   try { mddRenderBrief(); mddRenderAttStrip(); mddAttStartLive(); hctOpenReports(); } catch(e){}
   try { renderDeptMatrix(); } catch(e){}
@@ -34293,6 +34508,7 @@ function renderMyDailyBox() {
   if (typeof refRenderSubheads === 'function') refRenderSubheads(); // References dynamic @name sub-headings
   if (typeof noticeUpdateCounts === 'function') noticeUpdateCounts(); // Notice-Summons-Warrants counts
   if (typeof pragatiUpdateCounts === 'function') pragatiUpdateCounts(); // Pragati Prativedan counts
+  if (typeof renderTodoList === 'function') renderTodoList(); // v286 To-Do list/cards
   if (typeof mtxRefresh === 'function') mtxRefresh(); // unified My Tasks master
   if (typeof hctUpdateCounts === 'function') hctUpdateCounts(); // Home compact tiles
   if (typeof ovccRefreshCounts === 'function') ovccRefreshCounts(); // ovstats leave(current)+notice(taameeli)
