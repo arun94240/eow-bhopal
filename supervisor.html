@@ -23346,6 +23346,21 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .rep-expand-btn{ width:100%; background:#eef2f7; border:none; border-radius:8px; padding:9px; font-size:11px; font-weight:800; color:#334155; cursor:pointer; margin-top:6px; }
 .rep-expand-btn:hover{ background:#e2e8f0; }
 .rep-prag-sec{ margin-top:14px; padding-top:12px; border-top:1.5px dashed #cbd5e1; }
+/* ═══ Reports Export — Bottom Sheet (v295) ═══ */
+.rep-exp-btn{ width:100%; background:#062a52; color:#f5b942; border:none; border-radius:9px; padding:10px; font-size:11.5px; font-weight:900; margin-top:9px; cursor:pointer; }
+.rep-exp-sheet{ background:#f1f5f9; border-radius:13px; padding:13px; margin-top:9px; animation:ssrOpen .22s ease; }
+.rep-exp-thumbrow{ display:flex; gap:12px; align-items:center; margin-bottom:11px; }
+.rep-exp-thumb{ width:60px; height:82px; background:#fff; border:1.5px solid #dbe3ee; border-radius:5px; box-shadow:0 3px 8px rgba(0,0,0,.12); flex:0 0 auto; padding:6px 5px; }
+.rep-exp-thumb .ln{ height:3px; background:#e2e8f0; border-radius:2px; margin-bottom:4px; }
+.rep-exp-thumb .ln.w60{ width:60%; } .rep-exp-thumb .ln.w80{ width:80%; } .rep-exp-thumb .ln.hdr{ background:#062a52; height:5px; margin-bottom:7px; }
+.rep-exp-info{ flex:1; }
+.rep-exp-ttl{ font-size:11px; font-weight:800; color:#062a52; }
+.rep-exp-sub{ font-size:9.5px; color:#64748b; margin-top:2px; }
+.rep-exp-fieldlbl{ font-size:10px; font-weight:900; color:#94a3b8; text-transform:uppercase; margin:4px 0 6px; }
+.rep-exp-actrow{ display:flex; gap:6px; margin-top:11px; }
+.rep-exp-abtn{ flex:1; text-align:center; padding:8px 4px; border-radius:8px; font-size:9.5px; font-weight:800; background:#fff; border:1.5px solid #dbe3ee; color:#334155; cursor:pointer; }
+.rep-exp-abtn.gold{ background:#f5b942; color:#062a52; border-color:#f5b942; }
+
 
 
 .rep-tpl-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
@@ -53580,8 +53595,129 @@ function repOpenStyle(styleId){
   host.innerHTML = '<div class="rep-style-view">' + back + '<div id="rep-style-body"></div><div id="rep-style-results"></div></div>';
   _repRenderStyleBody(styleId);
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   🖨️ Reports Export — Bottom Sheet + configurable field-selector (v295)
+   One export mechanism (browser print dialog) naturally covers all
+   three requested actions — Preview shows the print dialog's live
+   preview, PDF uses its "Save as PDF" destination, Print uses print —
+   so all 3 buttons call the same window.print()-based flow.
+   ═══════════════════════════════════════════════════════════════════ */
+var _repLastComputed = null;
+var _repExportFields = { complainant:true, nonComplainant:true, io:true, sections:false, status:false, tags:false };
+var _repExportSheetOpen = false;
+
+function repToggleExportField(key){
+  _repExportFields[key] = !_repExportFields[key];
+  _repRenderExportSheet();
+}
+function repExportOpen(){
+  _repExportSheetOpen = !_repExportSheetOpen;
+  var el = document.getElementById('rep-export-sheet'); if (!el) return;
+  el.style.display = _repExportSheetOpen ? 'block' : 'none';
+  if (_repExportSheetOpen) _repRenderExportSheet();
+}
+function _repExportRows(){
+  if (!_repLastComputed) return [];
+  var rows = _repLastComputed.enq.map(function(e){ return { kind:'enq', type:e.type, r:e.row }; });
+  return rows; // court rows aren't tabular in the same way; PDF export covers enquiry types
+}
+function _repRenderExportSheet(){
+  var host = document.getElementById('rep-export-sheet'); if (!host) return;
+  var rows = _repExportRows();
+  var pageCount = Math.max(1, Math.ceil(rows.length / 25));
+  var fieldDefs = [
+    ['complainant', '👤 शिकायतकर्ता'], ['nonComplainant', '👥 अनावेदक'],
+    ['io', '👮 IO'], ['sections', '📜 धाराएं'], ['status', '🟢 स्थिति'], ['tags', '🏷️ Tags']
+  ];
+  host.innerHTML =
+    '<div class="rep-exp-thumbrow">' +
+      '<div class="rep-exp-thumb"><div class="ln hdr w80"></div><div class="ln w60"></div><div class="ln"></div><div class="ln w80"></div><div class="ln"></div><div class="ln w60"></div><div class="ln"></div></div>' +
+      '<div class="rep-exp-info"><div class="rep-exp-ttl">' + rows.length + ' प्रकरण · ' + pageCount + ' पृष्ठ</div><div class="rep-exp-sub">A4 · EOW Letterhead सहित</div></div>' +
+    '</div>' +
+    '<div class="rep-exp-fieldlbl">कौन-से कॉलम शामिल हों?</div>' +
+    '<div class="rep-chips">' + fieldDefs.map(function(f){
+      var on = _repExportFields[f[0]];
+      return '<span class="rep-chip' + (on?' on':'') + '" onclick="event.stopPropagation();repToggleExportField(\'' + f[0] + '\')">' + f[1] + '</span>';
+    }).join('') + '</div>' +
+    '<div class="rep-exp-actrow">' +
+      '<button class="rep-exp-abtn" onclick="event.stopPropagation();repExportGenerate(\'preview\')">👁️ Preview</button>' +
+      '<button class="rep-exp-abtn" onclick="event.stopPropagation();repExportGenerate(\'pdf\')">📄 PDF</button>' +
+      '<button class="rep-exp-abtn gold" onclick="event.stopPropagation();repExportGenerate(\'print\')">🖨️ Print</button>' +
+    '</div>';
+}
+function repExportGenerate(mode){
+  var rows = _repExportRows();
+  if (!rows.length) { if (typeof toast==='function') toast('कोई प्रकरण नहीं मिला', true); return; }
+  var f = _repExportFields;
+  var cols = [['#','30px'], ['Case No','90px'], ['Date','75px']];
+  if (f.io) cols.push(['I/O','120px']);
+  if (f.complainant) cols.push(['शिकायतकर्ता','']);
+  if (f.nonComplainant) cols.push(['अनावेदक','']);
+  if (f.sections) cols.push(['धाराएं','110px']);
+  if (f.status) cols.push(['स्थिति','80px']);
+  if (f.tags) cols.push(['Tags','120px']);
+
+  var rowsHTML = rows.map(function(x, i){
+    var r = x.r;
+    var caseLabel = formatEntryNo(x.type, r.no, r.entry_year);
+    var tds = ['<td class="num">' + (i+1) + '</td>', '<td class="caseno">' + escapeHtml(caseLabel) + '</td>', '<td class="date">' + (r.date ? fmtDateShort(r.date) : '—') + '</td>'];
+    if (f.io) tds.push('<td class="io-col">' + escapeHtml(r.io_name || '—') + '</td>');
+    if (f.complainant) tds.push('<td>' + escapeHtml(r.complainant || '—') + '</td>');
+    if (f.nonComplainant) tds.push('<td>' + escapeHtml((typeof ncompDisplay==='function' ? ncompDisplay(r.non_complainant) : r.non_complainant) || '—') + '</td>');
+    if (f.sections) tds.push('<td>' + escapeHtml(r.sections || '—') + '</td>');
+    if (f.status) tds.push('<td>' + escapeHtml(r.case_status || 'Active') + '</td>');
+    if (f.tags) {
+      var tnames = (Array.isArray(r.tag_ids) ? r.tag_ids : []).map(function(id){ var t=getTagById(id); return t?t.name:''; }).filter(Boolean).join(', ');
+      tds.push('<td>' + escapeHtml(tnames || '—') + '</td>');
+    }
+    return '<tr>' + tds.join('') + '</tr>';
+  }).join('');
+
+  var now = new Date();
+  var stampDate = now.toLocaleString('en-IN', { timeZone:'Asia/Kolkata', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+  var actionLabel = mode === 'print' ? '🖨️ Print' : (mode === 'pdf' ? '📄 Save as PDF' : '👁️ Preview');
+
+  var printWindow = window.open('', '_blank');
+  if (!printWindow) { if (typeof toast==='function') toast('Pop-up blocked — कृपया अनुमति दें', true); return; }
+  printWindow.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>EOW Bhopal — Report</title><style>' +
+    'body{font-family:Arial,sans-serif;color:#1a1a1a;margin:24px;}' +
+    '.header{border-bottom:3px solid #062a52;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;}' +
+    '.crest{background:#062a52;color:#f5b942;padding:8px 14px;border-radius:6px;font-weight:800;font-size:13px;letter-spacing:1px;display:inline-block;}' +
+    '.title{font-size:17px;font-weight:800;margin-top:8px;color:#062a52;}' +
+    '.sub{font-size:10px;color:#555;margin-top:4px;}' +
+    '.stamp{text-align:right;font-size:10px;color:#777;}' +
+    '.count-pill{display:inline-block;background:#f5b942;color:#062a52;padding:6px 14px;border-radius:4px;font-weight:800;font-size:14px;margin-top:4px;}' +
+    'table{width:100%;border-collapse:collapse;font-size:10.5px;}' +
+    'thead{background:#062a52;color:#fff;} thead th{padding:9px 6px;text-align:left;font-weight:700;font-size:10px;border:1px solid #051f3d;}' +
+    'tbody tr{border-bottom:1px solid #e0e6ed;page-break-inside:avoid;} tbody tr:nth-child(even){background:#fafbfc;}' +
+    'tbody td{padding:7px 6px;border:1px solid #e0e6ed;vertical-align:top;line-height:1.45;}' +
+    'td.num{text-align:center;font-weight:700;color:#7a8aa1;width:30px;} td.caseno{font-family:monospace;font-weight:700;color:#062a52;white-space:nowrap;}' +
+    'td.date{white-space:nowrap;color:#455a64;} td.io-col{font-weight:600;}' +
+    '.footer{margin-top:18px;padding-top:10px;border-top:1px solid #c9d4e3;font-size:9px;color:#7a8aa1;text-align:center;}' +
+    '.print-bar{position:fixed;top:12px;right:12px;background:#062a52;color:#fff;padding:10px 16px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:9999;}' +
+    '.print-bar button{background:#f5b942;color:#062a52;border:none;padding:8px 16px;border-radius:4px;font-weight:800;cursor:pointer;font-size:13px;margin-left:10px;font-family:inherit;}' +
+    '.print-bar button.close-btn{background:#fff;color:#062a52;border:1px solid #c9d4e3;}' +
+    '@media print{.no-print{display:none !important;} body{font-size:10px;}}' +
+    '</style></head><body>' +
+    '<div class="print-bar no-print">📄 Print dialog में "Save as PDF" चुनें' +
+      '<button onclick="window.print()">' + actionLabel + '</button>' +
+      '<button class="close-btn" onclick="window.close()">✕ Close</button></div>' +
+    '<div class="header"><div><div class="crest">🛡 EOW BHOPAL</div><div class="title">📊 Reports</div>' +
+      '<div class="sub">Economic Offences Wing · SP Office Bhopal · MP Police</div></div>' +
+      '<div class="stamp">Generated: <strong>' + stampDate + '</strong><br><div class="count-pill">' + rows.length + ' Records</div></div></div>' +
+    '<table><thead><tr>' + cols.map(function(c){ return '<th' + (c[1]?(' style="width:'+c[1]+';"'):'') + '>' + c[0] + '</th>'; }).join('') + '</tr></thead>' +
+    '<tbody>' + rowsHTML + '</tbody></table>' +
+    '<div class="footer">EOW Bhopal Dashboard · System-generated report · ' + stampDate + '</div>' +
+    '</body></html>');
+  printWindow.document.close();
+  setTimeout(function(){ try { printWindow.focus(); if (mode !== 'preview') printWindow.print(); } catch(e){} }, 300);
+}
+
 function _repRunAndShow(){
   var computed = _repCompute(_repF);
+  _repLastComputed = computed;
+  _repExportSheetOpen = false;
   var el = document.getElementById('rep-style-results'); if (!el) return;
   if (!computed.total) {
     var anySelected = (_repF.types.length>0) || _repF.includeCourt || _repF.tagIds.length || _repF.officers.length || _repF.statuses.length || _repF.dateFrom || _repF.dateTo;
@@ -53594,7 +53730,8 @@ function _repRunAndShow(){
   var previewComputed = { enq: previewEnq, court: previewCourt, total: previewEnq.length + previewCourt.length };
   el.innerHTML = '<div class="rep-results-hd">📄 ' + computed.total + ' प्रकरण मिले</div>' +
     '<div id="rep-results-preview">' + _repRenderResultsHTML(previewComputed, 'rp-pv-') + '</div>' +
-    (computed.total > previewComputed.total ? ('<button class="rep-expand-btn" onclick="repToggleExpand(this)">▾ पूरी सूची देखें (' + computed.total + ')</button><div id="rep-results-full" style="display:none;">' + _repRenderResultsHTML(computed, 'rp-') + '</div>') : '');
+    (computed.total > previewComputed.total ? ('<button class="rep-expand-btn" onclick="repToggleExpand(this)">▾ पूरी सूची देखें (' + computed.total + ')</button><div id="rep-results-full" style="display:none;">' + _repRenderResultsHTML(computed, 'rp-') + '</div>') : '') +
+    (computed.enq.length ? ('<button class="rep-exp-btn" onclick="event.stopPropagation();repExportOpen()">📄 Export करें ▾</button><div id="rep-export-sheet" class="rep-exp-sheet" style="display:none;"></div>') : '');
 }
 function repToggleExpand(btn){
   var prev = document.getElementById('rep-results-preview');
