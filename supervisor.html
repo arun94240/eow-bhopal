@@ -23343,6 +23343,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .rep-chip.dept{ background:#dcfce7; color:#166534; }
 .rep-chip.dept.on{ background:#16a34a; color:#fff; }
 .rep-results-hd{ font-size:11.5px; font-weight:900; color:#062a52; margin:12px 0 8px; padding-top:10px; border-top:1px dashed #e2e8f0; }
+.rep-expand-btn{ width:100%; background:#eef2f7; border:none; border-radius:8px; padding:9px; font-size:11px; font-weight:800; color:#334155; cursor:pointer; margin-top:6px; }
+.rep-expand-btn:hover{ background:#e2e8f0; }
+.rep-prag-sec{ margin-top:14px; padding-top:12px; border-top:1.5px dashed #cbd5e1; }
+
 
 .rep-tpl-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
 .rep-tpl-card{ border-radius:10px; padding:12px 10px; color:#fff; font-size:11px; font-weight:800; cursor:pointer; text-align:center; }
@@ -53473,7 +53477,7 @@ var REP_HEAD_LABELS = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs
 
 // filters: default = everything included until narrowed
 function _repDefaultFilters(){
-  return { types: REP_HEADS.slice(), includeCourt:true, dateFrom:'', dateTo:'', statuses:[], officers:[], tagIds:[] };
+  return { types: [], includeCourt:false, dateFrom:'', dateTo:'', statuses:[], officers:[], tagIds:[] };
 }
 var _repF = _repDefaultFilters();
 
@@ -53485,7 +53489,7 @@ function _repRowMatchesTags(r, tagIds){
 function _repCompute(filters){
   var f = filters || _repF;
   var enqResults = [];
-  (f.types.length ? f.types : REP_HEADS).forEach(function(type){
+  (f.types || []).forEach(function(type){ // v294: no fallback — empty selection means truly blank
     (state.enquiries[type] || []).forEach(function(r){
       if (f.dateFrom || f.dateTo) {
         var d = r.date; if (!d) return;
@@ -53578,8 +53582,27 @@ function repOpenStyle(styleId){
 }
 function _repRunAndShow(){
   var computed = _repCompute(_repF);
-  var el = document.getElementById('rep-style-results');
-  if (el) el.innerHTML = '<div class="rep-results-hd">📄 ' + computed.total + ' प्रकरण मिले</div>' + _repRenderResultsHTML(computed, 'rp-');
+  var el = document.getElementById('rep-style-results'); if (!el) return;
+  if (!computed.total) {
+    var anySelected = (_repF.types.length>0) || _repF.includeCourt || _repF.tagIds.length || _repF.officers.length || _repF.statuses.length || _repF.dateFrom || _repF.dateTo;
+    el.innerHTML = anySelected ? '<div class="rep-results-hd">कोई मिलान प्रकरण नहीं</div>' : '';
+    return;
+  }
+  // Preview = first 3 rows (mixing enq+court in their natural order); rest only shown on expand.
+  var previewEnq = computed.enq.slice(0, 3);
+  var previewCourt = computed.enq.length >= 3 ? [] : computed.court.slice(0, 3 - computed.enq.length);
+  var previewComputed = { enq: previewEnq, court: previewCourt, total: previewEnq.length + previewCourt.length };
+  el.innerHTML = '<div class="rep-results-hd">📄 ' + computed.total + ' प्रकरण मिले</div>' +
+    '<div id="rep-results-preview">' + _repRenderResultsHTML(previewComputed, 'rp-pv-') + '</div>' +
+    (computed.total > previewComputed.total ? ('<button class="rep-expand-btn" onclick="repToggleExpand(this)">▾ पूरी सूची देखें (' + computed.total + ')</button><div id="rep-results-full" style="display:none;">' + _repRenderResultsHTML(computed, 'rp-') + '</div>') : '');
+}
+function repToggleExpand(btn){
+  var prev = document.getElementById('rep-results-preview');
+  var full = document.getElementById('rep-results-full'); if (!full) return;
+  var isOpen = full.style.display !== 'none';
+  full.style.display = isOpen ? 'none' : 'block';
+  if (prev) prev.style.display = isOpen ? 'block' : 'none';
+  btn.textContent = isOpen ? '▾ पूरी सूची देखें' : '▴ संक्षिप्त करें';
 }
 
 function _repChipsFor(kind){
@@ -53607,6 +53630,57 @@ function _repChipsFor(kind){
     }).join('');
   }
   return '';
+}
+var _repTagCat = 'designation';
+function repSetTagCat(cat){ _repTagCat = cat; _repRenderStyleBody(_repCurrentStyle); }
+function repToggleTag(tagId){
+  var i = _repF.tagIds.indexOf(tagId);
+  if (i>-1) _repF.tagIds.splice(i,1); else _repF.tagIds.push(tagId);
+  _repRenderStyleBody(_repCurrentStyle); _repRunAndShow();
+}
+function _repTagFilterHTML(){
+  var catsWithData = TAG_CATS.filter(function(c){ return c.k !== '__other'; });
+  var catSel = '<select onchange="repSetTagCat(this.value)">' + catsWithData.map(function(c){
+    return '<option value="' + c.k + '"' + (c.k===_repTagCat?' selected':'') + '>' + c.lbl + '</option>';
+  }).join('') + '</select>';
+  var tagsInCat = (state.tags || []).filter(function(t){ return _tagCatOf(t) === _repTagCat; });
+  var chips = tagsInCat.length ? tagsInCat.map(function(t){
+    var on = _repF.tagIds.indexOf(t.id) > -1;
+    return '<span class="rep-chip' + (on?' on':'') + '" onclick="event.stopPropagation();repToggleTag(\'' + t.id + '\')">' + escapeHtml(t.name) + '</span>';
+  }).join('') : '<span class="rep-chip" style="opacity:.6;">इस समूह में कोई tag नहीं</span>';
+  var selectedChips = _repF.tagIds.length ? ('<div class="rep-mini-row"><span class="rep-mini-lbl">चुने गए</span><div class="rep-chips">' +
+    _repF.tagIds.map(function(id){ var t=getTagById(id); return t ? ('<span class="rep-chip on" onclick="event.stopPropagation();repToggleTag(\''+id+'\')">'+escapeHtml(t.name)+' ✕</span>') : ''; }).join('') +
+    '</div></div>') : '';
+  return '<div class="rep-mini-row"><span class="rep-mini-lbl">🏷️ Tags</span>' + catSel + '</div>' +
+    '<div class="rep-chips">' + chips + '</div>' + selectedChips;
+}
+var _repPragF = { io:'', from:'', to:'' };
+function repPragSet(field, val){ _repPragF[field] = val; }
+function repPragSearch(){
+  var io = (document.getElementById('rep-prag-io')||{}).value || '';
+  var from = (document.getElementById('rep-prag-from')||{}).value || '';
+  var to = (document.getElementById('rep-prag-to')||{}).value || '';
+  var rows = (state.ioUpdates || []).filter(function(u){
+    if (io && u.io_name !== io) return false;
+    var d = u.created_at || u.update_date; if (!d) return !from && !to ? true : false;
+    var dm = new Date(d).getTime();
+    if (from && dm < new Date(from).getTime()) return false;
+    if (to && dm > new Date(to + 'T23:59:59').getTime()) return false;
+    return true;
+  });
+  var el = document.getElementById('rep-prag-results'); if (!el) return;
+  if (!rows.length) { el.innerHTML = '<div class="rep-results-hd">कोई प्रगति नहीं मिली</div>'; return; }
+  var preview = rows.slice(0,3).map(_mddPragatiItemHTML).join('');
+  var full = rows.map(_mddPragatiItemHTML).join('');
+  el.innerHTML = '<div class="rep-results-hd">📈 ' + rows.length + ' प्रगति मिलीं</div>' +
+    '<div class="mpf-feed">' + preview + '</div>' +
+    (rows.length > 3 ? ('<button class="rep-expand-btn" onclick="repPragExpand(this)" data-full="0">▾ पूरी सूची देखें (' + rows.length + ')</button><div id="rep-prag-full" style="display:none;" class="mpf-feed">' + full + '</div>') : '');
+}
+function repPragExpand(btn){
+  var full = document.getElementById('rep-prag-full'); if (!full) return;
+  var isOpen = full.style.display !== 'none';
+  full.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? ('▾ पूरी सूची देखें') : '▴ संक्षिप्त करें';
 }
 function repToggleType(t){
   if (t==='court') { _repF.includeCourt = !_repF.includeCourt; }
@@ -53637,11 +53711,17 @@ function _repRenderStyleBody(styleId){
   var body = document.getElementById('rep-style-body'); if (!body) return;
   var html = '';
   if (styleId === 'cards') {
-    html = '<div class="rep-cards-hd">📇 सरल Cards — डिफ़ॉल्ट सभी</div>' +
+    html = '<div class="rep-cards-hd">📇 सरल Cards — डिफ़ॉल्ट रूप से पूरी तरह खाली, जो चुनें वही खोजेगा</div>' +
       '<div class="rep-mini-row"><span class="rep-mini-lbl">📅 समय</span><input type="date" onchange="repSetDate(\'from\',this.value)"><span>—</span><input type="date" onchange="repSetDate(\'to\',this.value)"></div>' +
       '<div class="rep-mini-row"><span class="rep-mini-lbl">📁 प्रकार</span><div class="rep-chips">' + _repChipsFor('types') + '</div></div>' +
       '<div class="rep-mini-row"><span class="rep-mini-lbl">🟢 स्थिति</span><div class="rep-chips">' + _repChipsFor('status') + '</div></div>' +
-      '<div class="rep-mini-row"><span class="rep-mini-lbl">👮 IO</span><div class="rep-chips">' + _repChipsFor('officers') + '</div></div>';
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">👮 IO</span><div class="rep-chips">' + _repChipsFor('officers') + '</div></div>' +
+      _repTagFilterHTML() +
+      '<div class="rep-prag-sec"><div class="rep-cards-hd" style="margin-top:6px;">📈 प्रगति प्रतिवेदन खोजें (अलग से)</div>' +
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">👮 IO</span><select id="rep-prag-io"><option value="">— सभी —</option> ' + (typeof getActiveIONames==='function'?getActiveIONames():[]).map(function(n){return '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>';}).join('') + '</select></div>' +
+      '<div class="rep-mini-row"><span class="rep-mini-lbl">📅 कब से</span><input type="date" id="rep-prag-from"><span class="rep-mini-lbl">कब तक</span><input type="date" id="rep-prag-to"></div>' +
+      '<button class="rep-gen-btn" onclick="event.stopPropagation();repPragSearch()">🔍 प्रगति खोजें</button>' +
+      '<div id="rep-prag-results"></div></div>';
   } else if (styleId === 'templates') {
     html = '<div class="rep-cards-hd">🖼️ तैयार Templates</div>' +
       '<div class="rep-tpl-grid">' +
