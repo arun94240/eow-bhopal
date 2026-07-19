@@ -22583,16 +22583,14 @@ body.role-staff #mydaily-box{ display:none !important; }
 
 /* Attendance permanent box above कार्यालय + notice collapsed summary (v205) */
 .att-live-box{ margin:0 0 12px; }
-/* ═══ Merged प्रगति split-bar tile (v283) ═══ */
+/* ═══ Daily Life Monitoring mini-pill row (v284) — sized identically to
+   .mas-pill (attendance-live tiles); no separate opm-half sizing needed,
+   the pills here ARE .mas-pill so any future .mas-pill tweak stays in sync. ═══ */
 .opm-tile{ margin-bottom:0; }
 .opm-hd{ font-size:11px; font-weight:900; color:#062a52; padding:0 2px 6px; }
-.opm-split{ display:flex; border-radius:11px; overflow:hidden; box-shadow:0 2px 8px rgba(6,42,82,.08); }
-.opm-half{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:11px 8px; color:#fff !important; cursor:pointer; min-height:auto !important; width:auto !important; margin:0 !important; border:none !important; }
-.opm-half.opm-g{ background:linear-gradient(135deg,#16a34a,#15803d) !important; }
-.opm-half.opm-r{ background:linear-gradient(135deg,#dc2626,#b91c1c) !important; }
-.opm-half.is-active{ box-shadow:inset 0 0 0 3px #f5b942; }
-.opm-num{ font-size:19px; font-weight:900; line-height:1; }
-.opm-lbl{ font-size:9px; font-weight:700; opacity:.92; margin-top:3px; text-align:center; }
+.opm-row3{ box-shadow:0 2px 8px rgba(6,42,82,.08); border-radius:9px; }
+.mas-pill.is-active{ box-shadow:0 0 0 2px #fff inset, 0 3px 8px rgba(0,0,0,.25); }
+.mas-pill.ovstats-tile-open{ box-shadow:0 0 0 2px #fff inset, 0 3px 8px rgba(0,0,0,.25); }
 
 /* ═══ Independent top search bar (Home) — plain white, no header/label ═══ */
 .cs-top-bar{ background:#fff; border-radius:13px; padding:13px 17px; display:flex; align-items:center; gap:10px; box-shadow:0 3px 12px rgba(6,42,82,.13); margin-bottom:10px; border:1.5px solid #e2e8f0; }
@@ -23799,35 +23797,30 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                 </div>
                 <div class="cmd-chips" id="ovstats-chips-tags"></div>
               </div>
-              <!-- MERGED (v283): प्रगति प्रतिवेदन + प्रगति नहीं — one split-bar tile.
-                   Each half keeps its ORIGINAL classes/ids so ovstatsNavTile()'s
-                   querySelector + the active-state clear-loop keep working unchanged. -->
+              <!-- v284: Daily Life Monitoring mini-row — प्रतिवेदन दिया / प्रगति नहीं (30+) / Notice आज —
+                   sized to match the attendance-live .mas-pill tiles exactly, so more such
+                   compact parameter-pills can be added here later. Each pill keeps its
+                   ORIGINAL classes/ids/onclick so ovstatsNavTile()/ovTileToggle() keep working. -->
               <div class="opm-tile cmd-metric-wide" id="ovstats-tile-pragati-merged">
-                <div class="opm-hd">📈 आज की प्रगति</div>
-                <div class="opm-split">
-                  <div class="cmd-metric ovstats-tile ovstats-tile-pragati ovstats-tile-compact opm-half opm-g" onclick="event.stopPropagation();ovstatsNavTile('pragati',event)">
+                <div class="opm-hd">📊 Daily Life Monitoring</div>
+                <div class="mas-pills opm-row3">
+                  <div class="ovstats-tile ovstats-tile-pragati mas-pill mp-present" onclick="event.stopPropagation();ovstatsNavTile('pragati',event)">
                     <div class="cmd-metric-icon" id="ovstats-pragati-cal" style="display:none;"></div>
-                    <div class="opm-num" id="ovstats-cnt-pragati">0</div>
-                    <div class="opm-lbl">प्रतिवेदन दिया</div>
+                    <div class="n" id="ovstats-cnt-pragati">0</div>
+                    <div class="l">प्रतिवेदन दिया</div>
                   </div>
-                  <div class="cmd-metric ovstats-tile ovstats-tile-nopr ovstats-tile-compact opm-half opm-r" onclick="event.stopPropagation();ovstatsNavTile('nopr',event)">
+                  <div class="ovstats-tile ovstats-tile-nopr mas-pill mp-absent" onclick="event.stopPropagation();ovstatsNavTile('nopr',event)">
                     <div class="cmd-metric-icon" id="ovstats-nopr-cal" style="display:none;"></div>
-                    <div class="opm-num" id="ovstats-cnt-nopr">0</div>
-                    <div class="opm-lbl">प्रगति नहीं</div>
+                    <div class="n" id="ovstats-cnt-nopr">0</div>
+                    <div class="l">प्रगति नहीं (30+)</div>
+                  </div>
+                  <div class="ovstats-tile ovstats-tile-notice mas-pill mp-out" onclick="event.stopPropagation();ovTileToggle('notice',event)">
+                    <div class="cmd-metric-icon" id="cc-cal-notice" style="display:none;"></div>
+                    <div class="n" id="ov-cnt-notice">0</div>
+                    <div class="l">Notice आज</div>
                   </div>
                 </div>
                 <div class="cmd-chips" id="ovstats-chips-pragati"></div>
-              </div>
-              <!-- MOVED from My Dashboard: Notice लंबित -->
-              <div class="cmd-metric ovstats-tile ovstats-tile-notice ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovTileToggle('notice',event)">
-                <div class="cmd-metric-top">
-                  <div class="cmd-metric-icon" id="cc-cal-notice"></div>
-                  <div class="cmd-metric-body">
-                    <div class="cmd-metric-label">Notice</div>
-                    <div class="cmd-metric-num" id="ov-cnt-notice">0</div>
-                  </div>
-                </div>
-                <div class="cmd-chips"></div>
               </div>
             </div>
           </div>
@@ -35931,8 +35924,12 @@ function _ovccRows(which) {
 function ovccRefreshCounts() {
   function setN(id, v){ var e = document.getElementById(id); if (e) e.textContent = v; }
   setN('ov-cnt-leave', _ovLeaveCurrent().length);
+  // Notice tile: show ONLY today's issued notices (not pending-service count)
   var ntc = 0;
-  try { ntc = (typeof _noticeBucket === 'function') ? _noticeBucket('taameeli').length : (state.notices || []).filter(function(n){ return !n.tameel_result && n.status !== 'Archived'; }).length; } catch(e){}
+  try {
+    var _todayNo = todayISO();
+    ntc = (state.notices || []).filter(function(n){ return String(n.notice_date||'').slice(0,10) === _todayNo; }).length;
+  } catch(e){}
   setN('ov-cnt-notice', ntc);
   // if panel currently open on leave/notice, refresh its list live
   if (typeof _ovccActive !== 'undefined' && (_ovccActive === 'leave' || _ovccActive === 'notice') && typeof ovccRenderList === 'function') ovccRenderList(_ovccActive);
