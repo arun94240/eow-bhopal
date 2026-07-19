@@ -23362,6 +23362,56 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .do-hit.desig .do-hit-tag{ background:#2563eb; } .do-hit.dept .do-hit-tag{ background:#16a34a; }
 .do-hit-nm{ font-size:11px; font-weight:700; flex:1; }
 .do-hit-ct{ font-size:10.5px; font-weight:900; color:#94a3b8; }
+
+/* ═══ v279 — bigger tiles, rich glimpses, smooth open, robust close ═══ */
+.rep-glimpse{ height:auto !important; min-height:88px; padding:9px 10px; display:flex; flex-direction:column; justify-content:center; }
+.rep-hub-grid{ grid-template-columns:repeat(auto-fit,minmax(175px,1fr)) !important; gap:13px !important; }
+@keyframes ssrOpen{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+.ssr-anim{ animation:ssrOpen .25s cubic-bezier(.22,.61,.36,1); }
+
+/* g1 cards */
+.gp-row{ display:flex; align-items:center; gap:5px; background:rgba(255,255,255,.16); border-radius:6px; padding:4px 7px; margin-bottom:4px; font-size:8px; color:#fff; font-weight:700; }
+.gp-no{ font-family:ui-monospace,monospace; background:rgba(255,255,255,.25); border-radius:3px; padding:1px 4px; flex:0 0 auto; }
+.gp-txt{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* g2 templates */
+.gp-chips{ display:flex; flex-wrap:wrap; gap:5px; }
+.gp-chip{ padding:4px 7px; border-radius:6px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.4); font-size:7.5px; font-weight:800; color:#fff; }
+.gp-chip.d{ background:rgba(255,255,255,.22); } .gp-chip.p{ background:rgba(255,255,255,.35); }
+/* g3 matrix */
+.gp-mtxtop{ font-size:7px; color:#fff; opacity:.85; margin-bottom:4px; font-weight:700; }
+.gp-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:3px; margin-bottom:5px; }
+.gp-cell{ height:9px; border-radius:3px; background:rgba(255,255,255,.22); }
+.gp-cell.on{ background:#f5b942; }
+.gp-num{ font-size:16px; font-weight:900; color:#f5b942; line-height:1; }
+.gp-numlbl{ font-size:7px; color:#fff; opacity:.85; }
+/* g4 timeline */
+.gp-dates{ display:flex; justify-content:space-between; font-size:7.5px; color:#fff; font-weight:800; margin-bottom:7px; }
+.gp-track{ height:5px; background:rgba(255,255,255,.3); border-radius:3px; position:relative; margin:0 3px; }
+.gp-fill{ position:absolute; left:15%; right:35%; top:0; bottom:0; background:#fff; border-radius:3px; }
+.gp-handle{ position:absolute; top:50%; width:11px; height:11px; border-radius:50%; background:#f5b942; border:2px solid #fff; transform:translate(-50%,-50%); }
+.gp-sel{ font-size:7px; color:#fff; opacity:.9; margin-top:7px; text-align:center; }
+/* g5 compare */
+.gp-split{ display:flex; gap:6px; align-items:center; }
+.gp-side{ flex:1; background:rgba(255,255,255,.16); border-radius:8px; padding:6px; display:flex; flex-direction:column; align-items:center; }
+.gp-vs{ font-size:9px; font-weight:900; color:#f5b942; }
+/* g6 chat */
+.gp-bub{ border-radius:8px; padding:3px 8px; font-size:7px; color:#fff; margin-bottom:3px; max-width:82%; font-weight:700; }
+.gp-bub.bot{ background:rgba(255,255,255,.2); } .gp-bub.user{ background:rgba(255,255,255,.4); margin-left:auto; }
+/* dg1 grid (dept/officers) */
+.gp-mtxtop + .gp-chips{ margin-bottom:4px; }
+/* dg2 cloud */
+.gp-cloud{ display:flex; flex-wrap:wrap; gap:4px; align-items:center; justify-content:center; }
+.gp-cbub{ border-radius:999px; background:rgba(255,255,255,.28); color:#fff; font-weight:900; }
+/* dg3 rolodex */
+.gp-cards{ display:flex; gap:5px; }
+.gp-card{ flex:1; background:rgba(255,255,255,.2); border-radius:4px 8px 8px 4px; padding:6px 5px; position:relative; }
+.gp-card::before{ content:''; position:absolute; left:0; top:4px; bottom:4px; width:3px; background:#f5b942; border-radius:2px 0 0 2px; }
+.gp-clbl{ font-size:7px; font-weight:800; color:#fff; }
+.gp-cnum{ font-size:11px; font-weight:900; color:#f5b942; margin-top:1px; }
+/* dg4 search */
+.gp-bar{ background:rgba(255,255,255,.9); border-radius:7px; padding:5px 8px; font-size:8px; font-weight:700; color:#062a52; margin-bottom:5px; }
+.gp-hit{ display:flex; align-items:center; gap:5px; padding:2px 6px; background:rgba(255,255,255,.15); border-radius:5px; margin-bottom:3px; font-size:7px; color:#fff; font-weight:700; }
+.gp-tag{ background:#f5b942; color:#062a52; border-radius:3px; padding:0 4px; font-size:6px; }
 </style>
 </head>
 <body>
@@ -46877,11 +46927,39 @@ var _csQ='', _csDeb2=null;
 var _csScope='all', _csRowOpenMap={};
 function _csFindEnq(t,id){ return ((state.enquiries&&state.enquiries[t])||[]).find(function(r){return r.id===id;}); }
 var _CS_SCOPE_CAT={ enq:'c-cmp', court:'c-court', io:'c-io', leave:'c-lv', notice:'c-not', tag:'c-tag' };
+function _ssrPanelIds(){ return ['reports-home-content','do-hub-host','report-hub-host']; }
+function _ssrTileEl(panelId){
+  if (panelId==='reports-home-content') return document.querySelector('.rep-pchip-cs');
+  if (panelId==='do-hub-host') return document.querySelector('.rep-pchip-dept');
+  if (panelId==='report-hub-host') return document.querySelector('.rep-pchip-reports');
+  return null;
+}
+// Close ONE panel exactly where it is — never bounces through any intermediate view first.
+function _ssrClose(panelId){
+  var el = document.getElementById(panelId); if (!el) return;
+  el.style.display = 'none';
+  var tile = _ssrTileEl(panelId); if (tile) tile.classList.remove('is-active');
+}
+// Open ONE panel — expands the outer collapsible box, closes the other two panels
+// in this same box (only one open at a time), then hands control to the caller.
+function _ssrOpen(panelId){
+  var wrap = document.getElementById('reports-summary-wrap'); if (wrap) wrap.classList.remove('collapsed');
+  _ssrPanelIds().forEach(function(id){ if (id !== panelId) _ssrClose(id); });
+  var el = document.getElementById(panelId); if (!el) return null;
+  el.style.display = 'block';
+  el.classList.remove('ssr-anim'); void el.offsetWidth; el.classList.add('ssr-anim');
+  var tile = _ssrTileEl(panelId); if (tile) tile.classList.add('is-active');
+  return el;
+}
+function _ssrIsOpen(panelId){
+  var el = document.getElementById(panelId);
+  return !!el && el.style.display !== 'none' && el.style.display !== '';
+}
 function openComprehensiveSearch(){
-  var wrap=document.getElementById('reports-summary-wrap'); if(wrap) wrap.classList.remove('collapsed');
-  var host=document.getElementById('reports-home-content'); if(!host) return;
+  // Re-tapping while already open closes it exactly here — no jump to any other view.
+  if (_ssrIsOpen('reports-home-content')) { _ssrClose('reports-home-content'); return; }
+  var host = _ssrOpen('reports-home-content'); if (!host) return;
   invalidateSearchIndex();
-  host.classList.remove('rh-anim-in'); void host.offsetWidth; host.classList.add('rh-anim-in');
   _csRenderSearch();
   try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
   setTimeout(function(){ var i=document.getElementById('cs-input'); if(i) i.focus(); },120);
@@ -52973,13 +53051,25 @@ var REP_STYLES = [
   { id:'chat', ic:'💬', ttl:'सवाल-जवाब से बनाएँ', desc:'कोई form नहीं — बातचीत से', cls:'g6' }
 ];
 function repOpenHub(){
-  var host = document.getElementById('report-hub-host');
-  var chip = document.querySelector('.rep-pchip-reports');
-  var isOpen = host.style.display === 'block';
-  var open = !isOpen;
-  host.style.display = open ? 'block' : 'none';
-  if (chip) chip.classList.toggle('is-active', open);
-  if (open) { _repRenderHub(); setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60); }
+  // Re-tapping the OUTER Reports tile ALWAYS fully closes — no matter whether the
+  // hub-of-6 or a specific style-view is currently showing inside it.
+  if (_ssrIsOpen('report-hub-host')) { _ssrClose('report-hub-host'); return; }
+  var host = _ssrOpen('report-hub-host'); if (!host) return;
+  _repRenderHub();
+  setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60);
+}
+function _hubGlimpseHTML(styleId){
+  if (styleId==='cards') return '<div class="gp-row"><span class="gp-no">C-522</span><span class="gp-txt">देवेंद्र मिश्रा...</span></div><div class="gp-row"><span class="gp-no">RC-241</span><span class="gp-txt">राकेश साहू...</span></div><div class="gp-row"><span class="gp-no">STR-45</span><span class="gp-txt">बैंक खाता...</span></div>';
+  if (styleId==='templates') return '<div class="gp-chips"><span class="gp-chip">📋 मासिक</span><span class="gp-chip">⏰ लंबित 90+</span><span class="gp-chip">👮 अधि.-वार</span><span class="gp-chip">🏛️ विभा.-वार</span></div>';
+  if (styleId==='matrix') return '<div class="gp-mtxtop">प्रकार · ज़िला · स्थिति</div><div class="gp-grid">' + Array(10).fill(0).map(function(_,i){ return '<span class="gp-cell'+([0,3,6,9].indexOf(i)>-1?' on':'')+'"></span>'; }).join('') + '</div><div class="gp-num">142</div><div class="gp-numlbl">मिलान प्रकरण</div>';
+  if (styleId==='timeline') return '<div class="gp-dates"><span>मार्च 2024</span><span>जुल 2026</span></div><div class="gp-track"><div class="gp-fill"></div><div class="gp-handle" style="left:15%;"></div><div class="gp-handle" style="left:65%;"></div></div><div class="gp-sel">27 माह की अवधि</div>';
+  if (styleId==='compare') return '<div class="gp-split"><div class="gp-side"><div class="gp-num" style="font-size:18px;">318</div><div class="gp-numlbl">इस वर्ष</div></div><span class="gp-vs">VS</span><div class="gp-side"><div class="gp-num" style="font-size:18px;">276</div><div class="gp-numlbl">पिछला वर्ष</div></div></div>';
+  if (styleId==='chat') return '<div class="gp-bub bot">किस बारे में report?</div><div class="gp-bub user">RCs, भोपाल</div><div class="gp-bub bot">कब से कब तक?</div>';
+  if (styleId==='grid') return '<div class="gp-mtxtop">पदनाम</div><div class="gp-chips"><span class="gp-chip d">IAS · 29</span><span class="gp-chip d">IPS · 2</span></div><div class="gp-mtxtop">विभाग</div><div class="gp-chips"><span class="gp-chip p">राजस्व · 18</span><span class="gp-chip p">PWD · 7</span></div>';
+  if (styleId==='cloud') return '<div class="gp-cloud"><span class="gp-cbub" style="font-size:15px;padding:8px 13px;">IAS·29</span><span class="gp-cbub" style="font-size:11px;padding:5px 10px;">राजस्व·18</span><span class="gp-cbub" style="font-size:9px;padding:4px 8px;">PWD·7</span><span class="gp-cbub" style="font-size:8px;padding:3px 7px;">IFS·6</span></div>';
+  if (styleId==='rolodex') return '<div class="gp-cards"><div class="gp-card"><div class="gp-clbl">IAS</div><div class="gp-cnum">29</div></div><div class="gp-card"><div class="gp-clbl">राजस्व</div><div class="gp-cnum">18</div></div><div class="gp-card"><div class="gp-clbl">PWD</div><div class="gp-cnum">7</div></div></div>';
+  if (styleId==='search') return '<div class="gp-bar">🔍 रा...</div><div class="gp-hit"><span class="gp-tag">विभाग</span><span>राजस्व · 18</span></div><div class="gp-hit"><span class="gp-tag">पदनाम</span><span>भाजपा नेता · 4</span></div>';
+  return '';
 }
 function _repRenderHub(){
   var host = document.getElementById('report-hub-host'); if (!host) return;
@@ -52988,7 +53078,7 @@ function _repRenderHub(){
     '<div class="rep-hub-grid">' +
     REP_STYLES.map(function(s){
       return '<div class="rep-hub-tile" onclick="event.stopPropagation();repOpenStyle(\'' + s.id + '\')">' +
-        '<div class="rep-glimpse ' + s.cls + '"><span class="rep-glimpse-ic">' + s.ic + '</span></div>' +
+        '<div class="rep-glimpse ' + s.cls + '">' + _hubGlimpseHTML(s.id) + '</div>' +
         '<div class="rep-hub-info"><div class="rep-hub-ttl">' + s.ic + ' ' + s.ttl + '</div><div class="rep-hub-desc">' + s.desc + '</div></div>' +
       '</div>';
     }).join('') +
@@ -53148,12 +53238,11 @@ function _doTagCounts(category){
   }).sort(function(a,b){ return b.count - a.count; });
 }
 function doOpenHub(){
-  var host = document.getElementById('do-hub-host');
-  var tile = document.querySelector('.rep-pchip-cao, .rep-pchip-dept');
-  var isOpen = host.style.display === 'block';
-  var open = !isOpen;
-  host.style.display = open ? 'block' : 'none';
-  if (open) { _doRenderHub(); setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60); }
+  // Same rule: re-tapping the OUTER tile ALWAYS fully closes from wherever it is.
+  if (_ssrIsOpen('do-hub-host')) { _ssrClose('do-hub-host'); return; }
+  var host = _ssrOpen('do-hub-host'); if (!host) return;
+  _doRenderHub();
+  setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60);
 }
 function _doRenderHub(){
   var host = document.getElementById('do-hub-host'); if (!host) return;
@@ -53162,7 +53251,7 @@ function _doRenderHub(){
     '<div class="rep-hub-grid">' +
     DO_STYLES.map(function(s){
       return '<div class="rep-hub-tile" onclick="event.stopPropagation();doOpenStyle(\'' + s.id + '\')">' +
-        '<div class="rep-glimpse ' + s.cls + '"><span class="rep-glimpse-ic">' + s.ic + '</span></div>' +
+        '<div class="rep-glimpse ' + s.cls + '">' + _hubGlimpseHTML(s.id) + '</div>' +
         '<div class="rep-hub-info"><div class="rep-hub-ttl">' + s.ic + ' ' + s.ttl + '</div><div class="rep-hub-desc">' + s.desc + '</div></div>' +
       '</div>';
     }).join('') +
