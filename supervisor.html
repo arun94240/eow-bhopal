@@ -23059,6 +23059,8 @@ body.view-mobile img, body.view-mobile video, body.view-mobile table, body.view-
 /* Tag picker — श्रेणी-वार grouping (v247) */
 .itw-cat{ margin:8px 0 4px; }
 .itw-cat-h{ display:flex; align-items:center; gap:7px; font-size:10.5px; font-weight:900; color:#0a3a6e; text-transform:none; margin-bottom:5px; }
+.itw-cat-h-collapsible{ cursor:pointer; }
+.itw-cat-caret{ font-size:9px; color:#94a3b8; transition:transform .15s; }
 .itw-cat-n{ background:#e6edf5; color:#12325c; border-radius:999px; padding:0 7px; font-size:9px; font-weight:800; }
 .itw-cat-add{ margin-left:auto; background:#0d9488; color:#fff; border:none; border-radius:999px; padding:3px 10px; font-size:10px; font-weight:800; cursor:pointer; }
 .itw-cat-add:hover{ background:#0f766e; }
@@ -60301,6 +60303,13 @@ var TAG_CATS = [
   { k:'__other',     lbl:'🏷️ अन्य', col:'gray' }
 ];
 function _tagCatOf(t){ var c=((t&&t.category)||'').trim(); if(c) return c; return (/^@/.test((t&&t.name)||''))?'reference':'__other'; }
+function _itwToggleCat(headerEl){
+  var wrap = headerEl.nextElementSibling; if (!wrap) return;
+  var isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : '';
+  var caret = headerEl.querySelector('.itw-cat-caret');
+  if (caret) caret.textContent = isOpen ? '▸' : '▾';
+}
 function renderTagsWidget(containerId, appliedIds, onChange) {
   var container = document.getElementById(containerId);
   if (!container) return;
@@ -60347,9 +60356,10 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
     var items = available.filter(function(t){ return _tagCatOf(t)===cat.k; });
     if (cat.k==='__other' && items.length===0) return;   // hide empty "अन्य"
     html += '<div class="itw-cat">';
-    html += '<div class="itw-cat-h">' + cat.lbl + ' <span class="itw-cat-n">' + items.length + '</span>' +
-            '<button type="button" class="itw-cat-add" data-cat="' + cat.k + '">＋ जोड़ें</button></div>';
-    html += '<div class="itw-chips-wrap">';
+    html += '<div class="itw-cat-h itw-cat-h-collapsible" onclick="event.stopPropagation();_itwToggleCat(this)">' +
+            '<span class="itw-cat-caret">▸</span> ' + cat.lbl + ' <span class="itw-cat-n">' + items.length + '</span>' +
+            '<button type="button" class="itw-cat-add" data-cat="' + cat.k + '" onclick="event.stopPropagation();">＋ जोड़ें</button></div>';
+    html += '<div class="itw-chips-wrap" style="display:none;">';
     if (items.length === 0) { html += '<span class="itw-empty" style="font-size:10px;opacity:.7;">— इस श्रेणी में उपलब्ध नहीं —</span>'; }
     else { html += items.map(function(t){ return renderTagChip(t, { isAvailable: true, dataAction: 'add' }); }).join(''); }
     html += '</div></div>';
