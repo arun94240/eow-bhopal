@@ -34464,7 +34464,17 @@ function setTodoView(mode){
   if (cb) cb.classList.toggle('active', mode === 'cards');
   renderTodoList();
 }
+function _agendaUpdateCalBadge(){
+  try{
+    var el = document.getElementById('agenda-cal'); if (!el) return;
+    var MO = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    var WD = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    var nd = new Date();
+    el.innerHTML = '<div class="m">' + MO[nd.getMonth()] + '</div><div class="d">' + nd.getDate() + '</div><div class="w">' + WD[nd.getDay()] + '</div>';
+  } catch(e){}
+}
 function renderTodoList(){
+  _agendaUpdateCalBadge();
   var tasks = (state.myOfficeTasks || []).slice();
   tasks.sort(function(a,b){ return String(a.task_date||'9999').localeCompare(String(b.task_date||'9999')); });
   var lh = document.getElementById('todo-list-host'), ch = document.getElementById('todo-cards-host');
