@@ -23527,7 +23527,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .todo-no{ background:#fff; border-bottom:2px solid #062a52; text-align:center; font-family:ui-monospace,monospace; font-size:11px; font-weight:900; color:#062a52; padding:6px 4px; }
 .todo-pr{ flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:8px; font-weight:900; text-align:center; padding:4px; }
 .todo-body{ flex:1; min-width:0; padding:9px 11px; display:flex; flex-direction:column; gap:6px; justify-content:center; }
-.todo-title{ font-size:12.5px; font-weight:800; color:#0f2542; }
+.todo-title{ font-size:12.5px; font-weight:800; color:#0f2542; line-height:1.4; }
 .todo-meta-grid{ grid-template-columns:1fr 1fr; }
 .todo-right{ flex:0 0 42px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#062a52,#0a3a6e); }
 .todo-done-btn{ width:28px; height:28px; border-radius:8px; background:rgba(255,255,255,.12); border:1.5px solid #f5b942; color:#f5b942; font-size:13px; cursor:pointer; }
@@ -23535,13 +23535,14 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .todo-expand-row{ padding:0; }
 
 /* ── Cards (Docket Card) ── */
-.todo-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; }
-.todo-card{ border:1.5px solid #e2e8f0; border-radius:11px; overflow:hidden; }
-.todo-card:hover{ border-color:#f5b942; box-shadow:0 5px 14px rgba(245,185,66,.18); }
+.todo-cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:11px; }
+.todo-card-brief{ background:#fff; border-top:1px solid #eef2f7; padding:10px 11px 11px; }
+.todo-card{ background:#fff; border:1.5px solid #e2e8f0; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(6,42,82,.08); transition:all .15s; }
+.todo-card:hover{ border-color:#f5b942; box-shadow:0 6px 16px rgba(245,185,66,.22); transform:translateY(-2px); }
 .todo-card-done{ opacity:.55; }
 .todo-card-head{ cursor:pointer; }
 .todo-card-top{ color:#fff; padding:6px 10px; font-size:8.5px; font-weight:900; }
-.todo-card-body{ padding:9px 10px; display:flex; flex-direction:column; gap:6px; }
+.todo-card-body{ background:#fff; padding:10px 11px; display:flex; flex-direction:column; gap:7px; }
 
 /* ── reference chip (linked case, or IO fallback) ── */
 .todo-ref-chip{ font-size:10px; font-weight:800; padding:3px 10px; border-radius:20px; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; cursor:pointer; }
