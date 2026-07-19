@@ -53263,45 +53263,57 @@ function doOpenStyle(styleId){
   host.innerHTML = '<div class="rep-style-view">' + back + '<div id="do-style-body"></div><div id="do-style-results"></div></div>';
   _doRenderStyleBody(styleId);
 }
+// Department counts use the REAL, already-working mechanism (_deptMatrixCompute —
+// parses department mentions out of non_complainant free-text) instead of tags,
+// since department tags have never actually been applied to any case yet.
+function _doDeptCounts(){
+  var arr = []; try { arr = _deptMatrixCompute() || []; } catch(e){}
+  return arr.map(function(x){ return { name: x.dept, count: x.cases.length, cases: x.cases }; });
+}
 function _doRenderStyleBody(styleId){
   var body = document.getElementById('do-style-body'); if (!body) return;
   var desig = _doTagCounts('designation');
-  var dept = _doTagCounts('department');
+  var dept = _doDeptCounts();
   var html = '';
   if (styleId === 'grid') {
     html = '<div class="do-catlbl">🎖️ पदनाम</div><div class="rep-chips">' +
       desig.map(function(x){ return '<span class="rep-chip" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>'; }).join('') +
       '</div><div class="do-catlbl">🏛️ विभाग</div><div class="rep-chips">' +
-      dept.map(function(x){ return '<span class="rep-chip dept" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>'; }).join('') +
+      (dept.length ? dept.map(function(x){ return '<span class="rep-chip dept" onclick="event.stopPropagation();doSelectDept(\'' + x.name.replace(/'/g,"\\'") + '\')">' + escapeHtml(x.name) + ' · ' + x.count + '</span>'; }).join('') : '<span class="rep-chip" style="opacity:.6;">अभी कोई विभाग-वार लंबित प्रकरण नहीं</span>') +
       '</div>';
   } else if (styleId === 'cloud') {
-    var all = desig.concat(dept);
+    var all = desig.map(function(x){ return {name:x.tag.name, count:x.count, dept:false, id:x.tag.id}; })
+      .concat(dept.map(function(x){ return {name:x.name, count:x.count, dept:true}; }));
     var maxCt = Math.max.apply(null, all.map(function(x){return x.count;}).concat([1]));
-    html = '<div class="do-cloud">' + all.map(function(x){
+    html = all.length ? ('<div class="do-cloud">' + all.map(function(x){
       var size = 10 + Math.round((x.count / maxCt) * 12);
-      return '<span class="do-cloud-chip" style="font-size:' + size + 'px;padding:' + (size*0.4) + 'px ' + (size*0.7) + 'px;" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>';
-    }).join('') + '</div>';
+      var oc = x.dept ? ("doSelectDept('" + x.name.replace(/'/g,"\'") + "')") : ("doSelectTag('" + x.id + "')");
+      return '<span class="do-cloud-chip" style="font-size:' + size + 'px;padding:' + (size*0.4) + 'px ' + (size*0.7) + 'px;" onclick="event.stopPropagation();' + oc + '">' + escapeHtml(x.name) + ' · ' + x.count + '</span>';
+    }).join('') + '</div>') : '<div class="empty-state" style="padding:10px;"><h3>कोई data नहीं</h3></div>';
   } else if (styleId === 'rolodex') {
-    var all2 = desig.concat(dept);
+    var all2 = desig.map(function(x){ return {name:x.tag.name, count:x.count, dept:false, id:x.tag.id}; })
+      .concat(dept.map(function(x){ return {name:x.name, count:x.count, dept:true}; }));
     html = '<div class="do-shelf">' + all2.map(function(x){
-      var cls = x.tag.category === 'department' ? 'dept' : 'desig';
-      return '<div class="do-card ' + cls + '" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')"><div class="do-card-lbl">' + escapeHtml(x.tag.name) + '</div><div class="do-card-num">' + x.count + '</div></div>';
+      var cls = x.dept ? 'dept' : 'desig';
+      var oc = x.dept ? ("doSelectDept('" + x.name.replace(/'/g,"\'") + "')") : ("doSelectTag('" + x.id + "')");
+      return '<div class="do-card ' + cls + '" onclick="event.stopPropagation();' + oc + '"><div class="do-card-lbl">' + escapeHtml(x.name) + '</div><div class="do-card-num">' + x.count + '</div></div>';
     }).join('') + '</div>';
   } else if (styleId === 'search') {
     html = '<div class="do-search-bar">🔍 <input type="text" placeholder="अधिकारी या विभाग टाइप करें..." oninput="doSearchFilter(this.value)"></div><div id="do-search-dd"></div>';
   }
   body.innerHTML = html;
 }
-var _doAllTagsCache = null;
 function doSearchFilter(q){
   var dd = document.getElementById('do-search-dd'); if (!dd) return;
   q = (q||'').trim().toLowerCase();
   if (!q) { dd.innerHTML=''; return; }
-  var all = _doTagCounts('designation').concat(_doTagCounts('department'));
-  var hits = all.filter(function(x){ return x.tag.name.toLowerCase().indexOf(q) > -1; });
+  var hits = [];
+  _doTagCounts('designation').forEach(function(x){ if (x.tag.name.toLowerCase().indexOf(q) > -1) hits.push({ name:x.tag.name, count:x.count, dept:false, id:x.tag.id }); });
+  _doDeptCounts().forEach(function(x){ if (x.name.toLowerCase().indexOf(q) > -1) hits.push({ name:x.name, count:x.count, dept:true }); });
   dd.innerHTML = hits.map(function(x){
-    var cls = x.tag.category === 'department' ? 'dept' : 'desig';
-    return '<div class="do-hit ' + cls + '" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')"><span class="do-hit-tag">' + (cls==='dept'?'विभाग':'पदनाम') + '</span><span class="do-hit-nm">' + escapeHtml(x.tag.name) + '</span><span class="do-hit-ct">' + x.count + '</span></div>';
+    var cls = x.dept ? 'dept' : 'desig';
+    var oc = x.dept ? ("doSelectDept('" + x.name.replace(/'/g,"\'") + "')") : ("doSelectTag('" + x.id + "')");
+    return '<div class="do-hit ' + cls + '" onclick="event.stopPropagation();' + oc + '"><span class="do-hit-tag">' + (cls==='dept'?'विभाग':'पदनाम') + '</span><span class="do-hit-nm">' + escapeHtml(x.name) + '</span><span class="do-hit-ct">' + x.count + '</span></div>';
   }).join('') || '<div class="empty-state" style="padding:10px;"><h3>कोई मिलान नहीं</h3></div>';
 }
 function doSelectTag(tagId){
@@ -53310,6 +53322,17 @@ function doSelectTag(tagId){
   var tag = getTagById(tagId);
   var el = document.getElementById('do-style-results');
   if (el) el.innerHTML = '<div class="rep-results-hd">📄 ' + escapeHtml(tag ? tag.name : '') + ' — ' + computed.total + ' प्रकरण</div>' + _repRenderResultsHTML(computed, 'do-');
+}
+function doSelectDept(deptName){
+  var dept = _doDeptCounts().find(function(x){ return x.name === deptName; });
+  var cases = dept ? dept.cases : [];
+  // De-dupe by case id — a single case can mention the same department for
+  // more than one accused person, which must still show as ONE result row.
+  var seenIds = {}; var uniqueCases = [];
+  cases.forEach(function(c){ if (!seenIds[c.r.id]) { seenIds[c.r.id] = true; uniqueCases.push(c); } });
+  var computed = { enq: uniqueCases.map(function(c){ return { type: c.type, row: c.r }; }), court: [], total: uniqueCases.length };
+  var el = document.getElementById('do-style-results');
+  if (el) el.innerHTML = '<div class="rep-results-hd">📄 ' + escapeHtml(deptName) + ' — ' + computed.total + ' प्रकरण</div>' + _repRenderResultsHTML(computed, 'do-');
 }
 
 function renderTotalCases() {
