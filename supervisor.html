@@ -51602,6 +51602,9 @@ function _ioComputeBreakdown(ioName){
 }
 
 function _ioBuildCaseListHTML(ioName, cat){
+  // Same LIST display everywhere (universal pattern) — Docket rows, not cards,
+  // scoped with an 'io-' prefix so ids never collide with the main list or
+  // Total Cases, using the same .docket-list-host wrapper toggleExpand needs.
   if (cat === 'court') {
     var crows = (state.courts || []).filter(function(c){
       var officer = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : '';
@@ -51609,12 +51612,12 @@ function _ioBuildCaseListHTML(ioName, cat){
     });
     if (typeof chronoCompareCourt === 'function') crows.sort(chronoCompareCourt);
     if (!crows.length) return '<div class="empty-state"><h3>कोई case नहीं</h3></div>';
-    return '<div class="io-inline-cards-grid">' + crows.map(function(c){ return _buildCourtCard(c); }).join('') + '</div>';
+    return '<div class="docket-list-host">' + crows.map(function(c){ return _buildCourtRow(c, 'io-'); }).join('') + '</div>';
   }
   var erows = (state.enquiries[cat] || []).filter(function(r){ return r.io_name === ioName; });
   if (typeof numCompareEntry === 'function') erows.sort(numCompareEntry);
   if (!erows.length) return '<div class="empty-state"><h3>कोई case नहीं</h3></div>';
-  return '<div class="io-inline-cards-grid">' + erows.map(function(r){ return _buildEnquiryCard(cat, r, false); }).join('') + '</div>';
+  return '<div class="docket-list-host">' + erows.map(function(r,i){ return _buildEnquiryRow(cat, r, i, 'io-'); }).join('') + '</div>';
 }
 
 function _ioBuildPanelHTML(ioName, d, activeCat){
@@ -51641,23 +51644,26 @@ function _ioBuildPanelHTML(ioName, d, activeCat){
 }
 
 function _ioInsertInlinePanel(triggerEl, html){
-  var tr = triggerEl.closest('tr');
-  if (tr) {
-    var wrapperTr = document.createElement('tr');
-    wrapperTr.className = 'io-inline-panel-row';
-    var td = document.createElement('td');
-    td.style.padding = '0';
-    td.innerHTML = html;
-    wrapperTr.appendChild(td);
-    tr.parentNode.insertBefore(wrapperTr, tr.nextSibling);
-    return wrapperTr;
-  }
-  var card = triggerEl.closest('.docket-card') || triggerEl.closest('.court-card-wrap') || triggerEl.closest('.enq-card') || triggerEl.parentElement;
+  // Find the nearest REAL row/card container — must check list-row wrappers
+  // (.enq-tr / .crt-tr) FIRST, since those are the correct outer container in
+  // List view; falling straight to a small inner div (e.g. a meta-grid cell)
+  // is what caused the panel to render inside the wrong, cramped spot.
+  var container = triggerEl.closest('.enq-tr') || triggerEl.closest('.crt-tr') ||
+                   triggerEl.closest('.docket-card') || triggerEl.closest('.court-card-wrap') ||
+                   triggerEl.closest('.enq-card') || triggerEl.parentElement;
   var div = document.createElement('div');
   div.className = 'io-inline-panel-row';
   div.innerHTML = html;
-  if (card && card.parentNode) card.parentNode.insertBefore(div, card.nextSibling);
-  else triggerEl.insertAdjacentElement('afterend', div);
+  if (container && container.parentNode) {
+    // If this row has its own expand-row sibling right after it, insert AFTER that too
+    var afterEl = container.nextSibling;
+    if (afterEl && afterEl.classList && (afterEl.classList.contains('enq-expand-row') || afterEl.classList.contains('crt-expand-row'))) {
+      afterEl = afterEl.nextSibling;
+    }
+    container.parentNode.insertBefore(div, afterEl);
+  } else {
+    triggerEl.insertAdjacentElement('afterend', div);
+  }
   return div;
 }
 
@@ -53149,12 +53155,12 @@ function _docketActions(type, r){
 // Reusable enquiry row builder (used by category tables AND Total Cases).
 // scoped=true → 'tc-' prefixed ids + sibling-based expand (no id collision with category sections)
 function _buildEnquiryRow(type, r, i, scoped) {
-  var pfx = scoped ? 'tc-' : '';
+  var pfx = (typeof scoped === 'string') ? scoped : (scoped ? 'tc-' : '');
   var rowId = pfx + 'enq-row-' + r.id;
   var cardId = pfx + 'enq-exp-' + r.id;
   var dimCls = isEntryDimmed(r) ? ' enq-tr-dim' : '';
   var expandHandler = scoped
-    ? ('tcToggleExpand(\''+type+'\',\''+r.id+'\',event)')
+    ? ('_docketScopedToggle(\''+pfx+'\',\''+type+'\',\''+r.id+'\',event)')
     : ('toggleEnquiryExpand(\''+type+'\',\''+r.id+'\')');
   var cat = _docketCat[type] || { label:(type||'').toUpperCase(), cls:'cat-complaints' };
   var no = formatEntryNo(type, r.no, r.entry_year);
@@ -53196,10 +53202,10 @@ function _buildEnquiryRow(type, r, i, scoped) {
 }
 
 // Scoped expand for Total Cases — finds the expand row via DOM sibling (no getElementById collision)
-function tcToggleExpand(type, id, ev) {
+function _docketScopedToggle(prefix, type, id, ev) {
   var rec = (state.enquiries[type] || []).find(function(x){ return x.id === id; });
   if (!rec) return;
-  var rowEl = ev && ev.currentTarget ? ev.currentTarget : document.getElementById('tc-enq-row-' + id);
+  var rowEl = ev && ev.currentTarget ? ev.currentTarget : document.getElementById(prefix + 'enq-row-' + id);
   if (!rowEl) return;
   var card = rowEl.nextElementSibling;
   if (!card || !card.classList.contains('enq-expand-row')) return;
@@ -53223,6 +53229,7 @@ function tcToggleExpand(type, id, ev) {
     }, 50);
   }
 }
+function tcToggleExpand(type, id, ev) { return _docketScopedToggle('tc-', type, id, ev); }
 
 // Scoped card-brief toggle for Total Cases (scoped traversal, no id collision)
 function tcToggleCard(type, id, ev) {
@@ -56548,6 +56555,84 @@ function _courtTierInfo(tier){
 function _courtStatusChip(isDisp){
   return isDisp ? '<span class="m-chip m-status disp">निराकृत</span>' : '<span class="m-chip m-status">सक्रिय</span>';
 }
+function _buildCourtRow(c, prefix){
+  var pfx = prefix || '';
+  var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
+  var courtDisplay = cm ? cm.name : '— Unassigned —';
+  var tier = cm ? (cm.tier || '') : '';
+  var tinfo = _courtTierInfo(tier);
+  var ioObj = (state.ioMaster || []).find(function(x){ return x.id === c.incharge_io_id; });
+  var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : (ioObj ? ((ioObj.rank ? ioObj.rank + ' ' : '') + ioObj.name) : '');
+  var typeDisplay = (c.case_type || '') + '-' + (c.case_no || '');
+  var rowId = pfx + 'crt-row-' + c.id;
+  var cardId = pfx + 'crt-exp-' + c.id;
+  var isDisp = (c.case_status && /dispos|निरस्त|खारिज|withdraw/i.test(c.case_status)) || c.disposed === true;
+  var petChip = _docketCompChip(c.petitioner);
+  var respChip = _docketNcompChip(c.respondent);
+  var vsSep = (petChip && respChip) ? '<span class="p-vs">Vs</span>' : '';
+  var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 अगली: '+escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing)+'</span>') : '<span class="m-chip m-empty">📅 अगली: —</span>';
+  var cnrCell = c.cnr_no ? ('<span class="m-chip m-cnr">🔗 '+escapeHtml(c.cnr_no)+(c.cnr_no.indexOf('SN-')===-1?' <a href="javascript:void(0)" class="cc-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\''+c.id+'\', event)" title="court site पर खोलें">🔍</a>':'')+'</span>') : '<span class="m-chip m-empty">🔗 CNR: —</span>';
+  var statusCell = _courtStatusChip(isDisp);
+  var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 '+escapeHtml(officerDisplay)+'</span>') : '<span class="m-chip m-empty">👮 IO: —</span>';
+  var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
+  var reviewActionBtn = isDisp ? '' : ('<button class="a-btn a-review" onclick="event.stopPropagation();openReviewModal(\'court\',\''+c.id+'\')">⭐ समीक्षा</button>');
+  var card = '<div class="docket-row-inner">'+
+    '<div class="stamp-wrap">'+
+      '<div class="stamp">'+
+        '<div class="stamp-no"><div class="no">'+escapeHtml(typeDisplay)+renderEnquiryIcon(c)+renderSupTagBadges(c)+renderCourtLinkBadge(c)+'</div>'+(relCell?('<div class="rel-sub">'+relCell+'</div>'):'')+'</div>'+
+        '<div class="stamp-date">'+escapeHtml(courtDisplay)+'</div>'+
+        '<div class="stamp-cat '+tinfo.cls+'">'+tinfo.label+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="body">'+
+      '<div class="parties-wrap">'+petChip+vsSep+respChip+'</div>'+
+      '<div class="docket-meta-grid">'+
+        '<div class="dmg-cell">'+hearCell+'</div>'+
+        '<div class="dmg-cell dmg-right"></div>'+
+        '<div class="dmg-cell">'+statusCell+'</div>'+
+        '<div class="dmg-cell dmg-right">'+ioCell+'</div>'+
+      '</div>'+
+      '<div class="actions">'+
+        '<button class="a-btn a-link" onclick="event.stopPropagation();openCourtLinkPicker(\''+c.id+'\')">🔗 Link Enquiry</button>'+
+        (c.cnr_no ? ('<button class="a-btn a-cnr" onclick="event.stopPropagation();'+(c.cnr_no.indexOf('SN-')===-1?('openEcourtsForCase(\''+c.id+'\', event)'):'void(0)')+'">🔍 CNR: '+escapeHtml(c.cnr_no)+'</button>') : '<span class="a-btn a-cnr a-cnr-empty">CNR: —</span>')+
+        reviewActionBtn+
+      '</div>'+
+    '</div>'+
+    '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">✎</button></div>'+
+  '</div>';
+  var expandHandler = prefix ? ('_docketScopedToggleCourt(\''+pfx+'\',\''+c.id+'\',event)') : ('toggleCourtExpand(\''+c.id+'\')');
+  return '<div class="crt-tr'+(isDisp?' crt-tr-dim':'')+'" id="' + rowId + '" onclick="'+expandHandler+'">'+
+    card+
+  '</div>'+
+  '<div class="crt-expand-row" id="' + cardId + '" style="display:none;"></div>';
+}
+function _docketScopedToggleCourt(prefix, id, ev) {
+  var c = state.courts.find(function(x){ return x.id === id; });
+  if (!c) return;
+  var rowEl = ev && ev.currentTarget ? ev.currentTarget : document.getElementById(prefix + 'crt-row-' + id);
+  if (!rowEl) return;
+  var card = rowEl.nextElementSibling;
+  if (!card || !card.classList.contains('crt-expand-row')) return;
+  var isOpen = card.style.display !== 'none';
+  var host = card.closest('.docket-list-host') || card.parentElement;
+  if (host) {
+    host.querySelectorAll('.crt-expand-row').forEach(function(cc){ cc.style.display = 'none'; });
+    host.querySelectorAll('.crt-tr.active').forEach(function(rr){ rr.classList.remove('active'); });
+  }
+  if (!isOpen) {
+    card.innerHTML = buildCourtExpandCard(c);
+    card.style.display = '';
+    rowEl.classList.add('active');
+    setTimeout(function(){
+      var expRect = card.getBoundingClientRect();
+      var rowRect = rowEl.getBoundingClientRect();
+      var vh = window.innerHeight;
+      if (expRect.bottom > vh - 20) {
+        window.scrollTo({ top: window.scrollY + rowRect.top - 80, behavior: 'smooth' });
+      }
+    }, 50);
+  }
+}
 function renderCourtTable() {
   // Render tier sub-tabs first (always)
   renderCourtTierTabs();
@@ -56628,57 +56713,7 @@ function renderCourtTable() {
   
   var tbody = document.getElementById('court-body');
   if (!rows.length) { tbody.innerHTML = '<div class="empty-state"><h3>No court cases yet</h3></div>'; return; }
-  tbody.innerHTML = rows.map(function(c, i){
-    // Look up court name from courts_master
-    var cm = (state.courtsMaster || []).find(function(x){ return x.id === c.court_id; });
-    var courtDisplay = cm ? cm.name : '— Unassigned —';
-    var tier = cm ? (cm.tier || '') : '';
-    var tinfo = _courtTierInfo(tier);
-    // Look up officer from io_master
-    var ioObj = (state.ioMaster || []).find(function(x){ return x.id === c.incharge_io_id; });
-    var officerDisplay = (typeof getCourtICDisplay === 'function') ? getCourtICDisplay(c) : (ioObj ? ((ioObj.rank ? ioObj.rank + ' ' : '') + ioObj.name) : '');
-    var typeDisplay = (c.case_type || '') + '-' + (c.case_no || '');
-    var rowId = 'crt-row-' + c.id;
-    var cardId = 'crt-exp-' + c.id;
-    var isDisp = (c.case_status && /dispos|निरस्त|खारिज|withdraw/i.test(c.case_status)) || c.disposed === true;
-    var petChip = _docketCompChip(c.petitioner);
-    var respChip = _docketNcompChip(c.respondent);
-    var vsSep = (petChip && respChip) ? '<span class="p-vs">Vs</span>' : '';
-    var hearCell = c.next_hearing ? ('<span class="m-chip m-hear">📅 अगली: '+escapeHtml((typeof fmtDateShort==='function')?fmtDateShort(c.next_hearing):c.next_hearing)+'</span>') : '<span class="m-chip m-empty">📅 अगली: —</span>';
-    var cnrCell = c.cnr_no ? ('<span class="m-chip m-cnr">🔗 '+escapeHtml(c.cnr_no)+(c.cnr_no.indexOf('SN-')===-1?' <a href="javascript:void(0)" class="cc-ecourts" onclick="event.stopPropagation();openEcourtsForCase(\''+c.id+'\', event)" title="court site पर खोलें">🔍</a>':'')+'</span>') : '<span class="m-chip m-empty">🔗 CNR: —</span>';
-    var statusCell = _courtStatusChip(isDisp);
-    var ioCell = officerDisplay ? ('<span class="m-chip m-io">👮 '+escapeHtml(officerDisplay)+'</span>') : '<span class="m-chip m-empty">👮 IO: —</span>';
-    var relCell = (typeof renderRelatedToCell==='function') ? renderRelatedToCell(c) : '';
-    var reviewActionBtn = isDisp ? '' : ('<button class="a-btn a-review" onclick="event.stopPropagation();openReviewModal(\'court\',\''+c.id+'\')">⭐ समीक्षा</button>');
-    var card = '<div class="docket-row-inner">'+
-      '<div class="stamp-wrap">'+
-        '<div class="stamp">'+
-          '<div class="stamp-no"><div class="no">'+escapeHtml(typeDisplay)+renderEnquiryIcon(c)+renderSupTagBadges(c)+renderCourtLinkBadge(c)+'</div>'+(relCell?('<div class="rel-sub">'+relCell+'</div>'):'')+'</div>'+
-          '<div class="stamp-date">'+escapeHtml(courtDisplay)+'</div>'+
-          '<div class="stamp-cat '+tinfo.cls+'">'+tinfo.label+'</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="body">'+
-        '<div class="parties-wrap">'+petChip+vsSep+respChip+'</div>'+
-        '<div class="docket-meta-grid">'+
-          '<div class="dmg-cell">'+hearCell+'</div>'+
-          '<div class="dmg-cell dmg-right"></div>'+
-          '<div class="dmg-cell">'+statusCell+'</div>'+
-          '<div class="dmg-cell dmg-right">'+ioCell+'</div>'+
-        '</div>'+
-        '<div class="actions">'+
-          '<button class="a-btn a-link" onclick="event.stopPropagation();openCourtLinkPicker(\''+c.id+'\')">🔗 Link Enquiry</button>'+
-          (c.cnr_no ? ('<button class="a-btn a-cnr" onclick="event.stopPropagation();'+(c.cnr_no.indexOf('SN-')===-1?('openEcourtsForCase(\''+c.id+'\', event)'):'void(0)')+'">🔍 CNR: '+escapeHtml(c.cnr_no)+'</button>') : '<span class="a-btn a-cnr a-cnr-empty">CNR: —</span>')+
-          reviewActionBtn+
-        '</div>'+
-      '</div>'+
-      '<div class="right"><button class="edit" title="Open / Edit" onclick="event.stopPropagation();preserveScrollContext();openCourtModal(\''+c.id+'\')">✎</button></div>'+
-    '</div>';
-    return '<div class="crt-tr'+(isDisp?' crt-tr-dim':'')+'" id="' + rowId + '" onclick="toggleCourtExpand(\''+c.id+'\')">'+
-      card+
-    '</div>'+
-    '<div class="crt-expand-row" id="' + cardId + '" style="display:none;"></div>';
-  }).join('');
+  tbody.innerHTML = rows.map(function(c, i){ return _buildCourtRow(c); }).join('');
   // ─── Also render Cards view (toggled via setCourtView) ───
   renderCourtCards(rows);
 }
