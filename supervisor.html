@@ -25708,7 +25708,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                 <span class="rep-ic">🔍</span><span class="rep-lbl">Search All</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-dept" onclick="event.stopPropagation();doOpenHub()">
-                <span class="rep-ic">👮🏛️</span><span class="rep-lbl">Search by Department and Officers</span>
+                <span class="rep-ic">👮🏛️</span><span class="rep-lbl">Search By Officers &amp; Deptt</span>
               </div>
               <div class="hdr-counter rep-pchip rep-pchip-reports" onclick="event.stopPropagation();repOpenHub()">
                 <span class="rep-ic">📊</span><span class="rep-lbl">Reports</span><span class="rep-sub-n">↗</span>
@@ -34892,7 +34892,7 @@ function mtxRefresh() {
         '</div>' +
         '<div class="mtx-list" id="mtx-name-list-' + tid + '"></div>';
     }).join('');
-    if (title) title.style.display = tagIds.length ? 'block' : 'none';
+    if (title) title.style.display = 'none'; // v293: legacy @name grouping — permanently hidden (was re-showing itself every refresh, causing the dark-on-dark contrast bug)
     Object.keys(openIds).forEach(function(id){
       var l=_mtxEl(id); if (l) { l.style.display='block'; mtxNameRender(id.replace('mtx-name-list-','')); var c=_mtxEl('mtx-name-caret-'+id.replace('mtx-name-list-','')); if (c) c.textContent='▴'; }
     });
@@ -34917,7 +34917,7 @@ function mtxRefresh() {
         '</div>' +
         '<div class="mtx-list" id="mtx-io-list-' + i + '"></div>';
     }).join('');
-    if (ioTitle) ioTitle.style.display = _mtxIoOrder.length ? 'block' : 'none';
+    if (ioTitle) ioTitle.style.display = 'none'; // v293: legacy IO grouping — permanently hidden (same bug)
     Object.keys(openIo).forEach(function(id){ var l=_mtxEl(id); if (l) { l.style.display='block'; var i=id.replace('mtx-io-list-',''); mtxIoRender(i); var c=_mtxEl('mtx-io-caret-'+i); if (c) c.textContent='▴'; } });
   }
 }
@@ -53535,11 +53535,12 @@ var REP_STYLES = [
   { id:'chat', ic:'💬', ttl:'सवाल-जवाब से बनाएँ', desc:'कोई form नहीं — बातचीत से', cls:'g6' }
 ];
 function repOpenHub(){
-  // Re-tapping the OUTER Reports tile ALWAYS fully closes — no matter whether the
-  // hub-of-6 or a specific style-view is currently showing inside it.
+  // v293: only one style (सरल Cards) remains — open/close it directly, no hub screen.
   if (_ssrIsOpen('report-hub-host')) { _ssrClose('report-hub-host'); return; }
   var host = _ssrOpen('report-hub-host'); if (!host) return;
-  _repRenderHub();
+  host.innerHTML = '<div class="rep-style-view"><div id="rep-style-body"></div><div id="rep-style-results"></div></div>';
+  _repF = _repDefaultFilters();
+  _repRenderStyleBody('cards');
   setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60);
 }
 function _hubGlimpseHTML(styleId){
@@ -53722,10 +53723,12 @@ function _doTagCounts(category){
   }).sort(function(a,b){ return b.count - a.count; });
 }
 function doOpenHub(){
-  // Same rule: re-tapping the OUTER tile ALWAYS fully closes from wherever it is.
+  // v293: only one style (Combined Grid) remains — open/close it directly, no hub screen.
   if (_ssrIsOpen('do-hub-host')) { _ssrClose('do-hub-host'); return; }
   var host = _ssrOpen('do-hub-host'); if (!host) return;
-  _doRenderHub();
+  host.innerHTML = '<div class="rep-style-view"><div id="do-style-body"></div><div id="do-style-results"></div></div>';
+  _doDateFrom = ''; _doDateTo = '';
+  _doRenderStyleBody('grid');
   setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60);
 }
 function _doRenderHub(){
@@ -53754,13 +53757,19 @@ function _doDeptCounts(){
   var arr = []; try { arr = _deptMatrixCompute() || []; } catch(e){}
   return arr.map(function(x){ return { name: x.dept, count: x.cases.length, cases: x.cases }; });
 }
+var _doDateFrom = '', _doDateTo = '';
+function doSetDateRange(which, val){
+  if (which === 'from') _doDateFrom = val; else _doDateTo = val;
+}
 function _doRenderStyleBody(styleId){
   var body = document.getElementById('do-style-body'); if (!body) return;
   var desig = _doTagCounts('designation');
   var dept = _doDeptCounts();
   var html = '';
   if (styleId === 'grid') {
-    html = '<div class="do-catlbl">🎖️ पदनाम</div><div class="rep-chips">' +
+    html = '<div class="do-catlbl">📅 समय-सीमा (वैकल्पिक)</div>' +
+      '<div class="rep-mini-row"><input type="date" value="' + _doDateFrom + '" onchange="doSetDateRange(\'from\',this.value)"><span>—</span><input type="date" value="' + _doDateTo + '" onchange="doSetDateRange(\'to\',this.value)"></div>' +
+      '<div class="do-catlbl">🎖️ पदनाम</div><div class="rep-chips">' +
       desig.map(function(x){ return '<span class="rep-chip" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>'; }).join('') +
       '</div><div class="do-catlbl">🏛️ विभाग</div><div class="rep-chips">' +
       (dept.length ? dept.map(function(x){ return '<span class="rep-chip dept" onclick="event.stopPropagation();doSelectDept(\'' + x.name.replace(/'/g,"\\'") + '\')">' + escapeHtml(x.name) + ' · ' + x.count + '</span>'; }).join('') : '<span class="rep-chip" style="opacity:.6;">अभी कोई विभाग-वार लंबित प्रकरण नहीं</span>') +
@@ -53801,7 +53810,7 @@ function doSearchFilter(q){
   }).join('') || '<div class="empty-state" style="padding:10px;"><h3>कोई मिलान नहीं</h3></div>';
 }
 function doSelectTag(tagId){
-  var f = _repDefaultFilters(); f.tagIds = [tagId];
+  var f = _repDefaultFilters(); f.tagIds = [tagId]; f.dateFrom = _doDateFrom; f.dateTo = _doDateTo;
   var computed = _repCompute(f);
   var tag = getTagById(tagId);
   var el = document.getElementById('do-style-results');
@@ -53814,6 +53823,16 @@ function doSelectDept(deptName){
   // more than one accused person, which must still show as ONE result row.
   var seenIds = {}; var uniqueCases = [];
   cases.forEach(function(c){ if (!seenIds[c.r.id]) { seenIds[c.r.id] = true; uniqueCases.push(c); } });
+  // Apply the optional date-range filter (on the case's registration date)
+  if (_doDateFrom || _doDateTo) {
+    uniqueCases = uniqueCases.filter(function(c){
+      var d = c.r.date; if (!d) return false;
+      var dm = new Date(d).getTime();
+      if (_doDateFrom && dm < new Date(_doDateFrom).getTime()) return false;
+      if (_doDateTo && dm > new Date(_doDateTo + 'T23:59:59').getTime()) return false;
+      return true;
+    });
+  }
   var computed = { enq: uniqueCases.map(function(c){ return { type: c.type, row: c.r }; }), court: [], total: uniqueCases.length };
   var el = document.getElementById('do-style-results');
   if (el) el.innerHTML = '<div class="rep-results-hd">📄 ' + escapeHtml(deptName) + ' — ' + computed.total + ' प्रकरण</div>' + _repRenderResultsHTML(computed, 'do-');
