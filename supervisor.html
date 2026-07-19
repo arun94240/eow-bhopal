@@ -23404,6 +23404,32 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .do-hit.desig .do-hit-tag{ background:#2563eb; } .do-hit.dept .do-hit-tag{ background:#16a34a; }
 .do-hit-nm{ font-size:11px; font-weight:700; flex:1; }
 .do-hit-ct{ font-size:10.5px; font-weight:900; color:#94a3b8; }
+/* ═══ Settings Tile (v296) — Profile card + Search + Rich grouped list ═══ */
+.set-profile{ background:linear-gradient(135deg,#062a52,#0a3a6e); border-radius:13px; padding:14px; display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.set-avatar{ width:44px; height:44px; border-radius:50%; background:#f5b942; color:#062a52; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:900; flex:0 0 auto; }
+.set-pname{ font-size:12.5px; font-weight:900; color:#fff; }
+.set-prole{ font-size:9.5px; color:#cfe0f3; margin-top:2px; }
+.set-search{ background:#eef2f7; border-radius:9px; padding:2px 4px; margin-bottom:13px; }
+.set-search input{ width:100%; border:none; background:transparent; padding:8px 10px; font-size:11px; font-family:inherit; outline:none; }
+.set-sechd{ font-size:9px; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:.04em; margin:12px 3px 6px; }
+.set-sechd:first-child{ margin-top:0; }
+.set-group{ background:#f8f9fc; border-radius:13px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.set-row{ display:flex; align-items:center; gap:11px; padding:11px 13px; border-bottom:1px solid #eceef3; cursor:pointer; }
+.set-row:last-child{ border-bottom:none; }
+.set-icbox{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff; flex:0 0 auto; box-shadow:0 2px 5px rgba(0,0,0,.15); }
+.set-txt{ flex:1; min-width:0; }
+.set-ttl{ font-size:11.5px; font-weight:700; color:#0f2542; }
+.set-sub{ font-size:9px; color:#94a3b8; margin-top:1px; }
+.set-chev{ color:#c7c7cc; font-size:13px; flex:0 0 auto; }
+.set-detail{ padding:10px 13px 12px 56px; font-size:10.5px; color:#455a64; line-height:1.6; background:#fff; border-bottom:1px solid #eceef3; }
+.set-detail.set-soon{ color:#b45309; background:#fffbeb; }
+.set-detail b{ color:#062a52; }
+.cblue{ background:linear-gradient(135deg,#60a5fa,#3b82f6); } .cgreen{ background:linear-gradient(135deg,#4ade80,#16a34a); }
+.cpurple{ background:linear-gradient(135deg,#a78bfa,#7c3aed); } .corange{ background:linear-gradient(135deg,#fb923c,#ea580c); }
+.cteal{ background:linear-gradient(135deg,#2dd4bf,#0d9488); } .cred{ background:linear-gradient(135deg,#f87171,#dc2626); }
+.cgray{ background:linear-gradient(135deg,#94a3b8,#64748b); } .cpink{ background:linear-gradient(135deg,#f472b6,#db2777); }
+.cindigo{ background:linear-gradient(135deg,#818cf8,#4f46e5); } .camber{ background:linear-gradient(135deg,#fbbf24,#d97706); }
+
 
 /* ═══ v279 — bigger tiles, rich glimpses, smooth open, robust close ═══ */
 .rep-glimpse{ height:auto !important; min-height:88px; padding:9px 10px; display:flex; flex-direction:column; justify-content:center; }
@@ -25732,7 +25758,11 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
               <div class="hdr-counter rep-pchip rep-pchip-reports" onclick="event.stopPropagation();repOpenHub()">
                 <span class="rep-ic">📊</span><span class="rep-lbl">Reports</span><span class="rep-sub-n">↗</span>
               </div>
+              <div class="hdr-counter rep-pchip rep-pchip-settings" onclick="event.stopPropagation();settingsOpenHub()">
+                <span class="rep-ic">⚙️</span><span class="rep-lbl">Settings</span>
+              </div>
             </div>
+            <div class="settings-hub-host" id="settings-hub-host" style="display:none;" onclick="event.stopPropagation();"></div>
             <!-- New Hub hosts (v278) -->
             <div class="do-hub-host" id="do-hub-host" style="display:none;" onclick="event.stopPropagation();"></div>
             <div class="report-hub-host" id="report-hub-host" style="display:none;" onclick="event.stopPropagation();"></div>
@@ -47375,11 +47405,12 @@ var _csQ='', _csDeb2=null;
 var _csScope='all', _csRowOpenMap={};
 function _csFindEnq(t,id){ return ((state.enquiries&&state.enquiries[t])||[]).find(function(r){return r.id===id;}); }
 var _CS_SCOPE_CAT={ enq:'c-cmp', court:'c-court', io:'c-io', leave:'c-lv', notice:'c-not', tag:'c-tag' };
-function _ssrPanelIds(){ return ['reports-home-content','do-hub-host','report-hub-host']; }
+function _ssrPanelIds(){ return ['reports-home-content','do-hub-host','report-hub-host','settings-hub-host']; }
 function _ssrTileEl(panelId){
   if (panelId==='reports-home-content') return document.querySelector('.rep-pchip-cs');
   if (panelId==='do-hub-host') return document.querySelector('.rep-pchip-dept');
   if (panelId==='report-hub-host') return document.querySelector('.rep-pchip-reports');
+  if (panelId==='settings-hub-host') return document.querySelector('.rep-pchip-settings');
   return null;
 }
 // Close ONE panel exactly where it is — never bounces through any intermediate view first.
@@ -53939,6 +53970,99 @@ function _doTagCounts(category){
     return { tag: t, count: ct };
   }).sort(function(a,b){ return b.count - a.count; });
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ⚙️ Settings — Profile card (English) + Search + Rich grouped list (v296)
+   Same smooth open/close as Search/Officers&Deptt/Reports (_ssrOpen/
+   _ssrClose, registered in _ssrPanelIds). Each row expands its own
+   inline detail on tap — real data where the app already has it,
+   an honest "coming soon" note for features not yet built.
+   ═══════════════════════════════════════════════════════════════════ */
+var SETTINGS_ITEMS = [
+  { id:'profile', grp:'Profile & Security', ic:'👤', cls:'cblue', ttl:'My Profile', sub:'Name, designation, contact details' },
+  { id:'pin', grp:'Profile & Security', ic:'🔐', cls:'cgray', ttl:'Change PIN', sub:'Update your login PIN' },
+  { id:'access', grp:'Profile & Security', ic:'🛡️', cls:'cindigo', ttl:'Staff Access Levels', sub:'PA / Steno dashboard permissions' },
+  { id:'repfields', grp:'Reports & Documents', ic:'📄', cls:'corange', ttl:'Default Report Fields', sub:'Columns always included in PDF/Print' },
+  { id:'letterhead', grp:'Reports & Documents', ic:'🛡️', cls:'cred', ttl:'Letterhead / Office Details', sub:'Name & address shown on PDFs' },
+  { id:'tags', grp:'Data Management', ic:'🏷️', cls:'cteal', ttl:'Tags Management', sub:'Add / edit groups and tags' },
+  { id:'iolist', grp:'Data Management', ic:'👮', cls:'cpurple', ttl:'IO / Staff List', sub:'Manage the officer roster' },
+  { id:'review', grp:'Data Management', ic:'⭐', cls:'camber', ttl:'Review Intervals', sub:'Days-threshold per case type' },
+  { id:'craft', grp:'Sync & Reminders', ic:'🔄', cls:'cpink', ttl:'Craft Sync', sub:'Craft workspace connection' },
+  { id:'reminder', grp:'Sync & Reminders', ic:'⏰', cls:'cgreen', ttl:'Reminder Defaults', sub:'Default time & notification priority' },
+  { id:'view', grp:'Display & Language', ic:'🖥️', cls:'cblue', ttl:'Default View', sub:'List or Cards — which opens first' },
+  { id:'about', grp:'Display & Language', ic:'ℹ️', cls:'cgray', ttl:'About / Version', sub:'App version and support' }
+];
+var _settingsQuery = '';
+var _settingsOpenRow = null;
+
+function settingsOpenHub(){
+  if (_ssrIsOpen('settings-hub-host')) { _ssrClose('settings-hub-host'); return; }
+  var host = _ssrOpen('settings-hub-host'); if (!host) return;
+  _settingsQuery = ''; _settingsOpenRow = null;
+  _settingsRender();
+  setTimeout(function(){ try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }, 60);
+}
+function settingsSearchInput(v){
+  _settingsQuery = (v || '').trim().toLowerCase();
+  _settingsRenderList();
+}
+function settingsToggleRow(id){
+  _settingsOpenRow = (_settingsOpenRow === id) ? null : id;
+  _settingsRenderList();
+}
+function _settingsDetailHTML(id){
+  if (id === 'iolist') {
+    var n = (state.ioMaster || []).filter(function(x){ return x.is_io; }).length;
+    return '<div class="set-detail">वर्तमान में <b>' + n + '</b> सक्रिय IO पंजीकृत हैं।</div>';
+  }
+  if (id === 'tags') {
+    var n = (state.tags || []).length;
+    var cats = {}; (state.tags||[]).forEach(function(t){ cats[t.category||'other']=(cats[t.category||'other']||0)+1; });
+    return '<div class="set-detail">कुल <b>' + n + '</b> tags, ' + Object.keys(cats).length + ' समूहों में।</div>';
+  }
+  if (id === 'about') {
+    return '<div class="set-detail">EOW Bhopal Supervision Dashboard — <b>v296</b><br>Economic Offences Wing · SP Office Bhopal · MP Police</div>';
+  }
+  return '<div class="set-detail set-soon">🚧 यह सेटिंग जल्द जोड़ी जाएगी — अभी इस पर कार्य होना बाक़ी है।</div>';
+}
+function _settingsRenderList(){
+  var host = document.getElementById('settings-list-host'); if (!host) return;
+  var items = SETTINGS_ITEMS.filter(function(it){
+    if (!_settingsQuery) return true;
+    return (it.ttl + ' ' + it.sub).toLowerCase().indexOf(_settingsQuery) > -1;
+  });
+  if (!items.length) { host.innerHTML = '<div class="empty-state"><h3>कोई मिलान setting नहीं</h3></div>'; return; }
+  var groups = [];
+  items.forEach(function(it){
+    var g = groups.find(function(x){ return x.name === it.grp; });
+    if (!g) { g = { name: it.grp, items: [] }; groups.push(g); }
+    g.items.push(it);
+  });
+  host.innerHTML = groups.map(function(g){
+    return '<div class="set-sechd">' + escapeHtml(g.name) + '</div><div class="set-group">' +
+      g.items.map(function(it){
+        var open = _settingsOpenRow === it.id;
+        return '<div class="set-row" onclick="event.stopPropagation();settingsToggleRow(\'' + it.id + '\')">' +
+          '<span class="set-icbox ' + it.cls + '">' + it.ic + '</span>' +
+          '<div class="set-txt"><div class="set-ttl">' + escapeHtml(it.ttl) + '</div><div class="set-sub">' + escapeHtml(it.sub) + '</div></div>' +
+          '<span class="set-chev">' + (open ? '▾' : '›') + '</span>' +
+        '</div>' + (open ? _settingsDetailHTML(it.id) : '');
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+function _settingsRender(){
+  var host = document.getElementById('settings-hub-host'); if (!host) return;
+  host.innerHTML =
+    '<div class="set-profile">' +
+      '<div class="set-avatar">AK</div>' +
+      '<div><div class="set-pname">Arun Kumar Mishra</div><div class="set-prole">SP · Economic Offences Wing, Bhopal</div></div>' +
+    '</div>' +
+    '<div class="set-search"><input type="text" placeholder="🔍 Search settings..." oninput="settingsSearchInput(this.value)"></div>' +
+    '<div id="settings-list-host"></div>';
+  _settingsRenderList();
+}
+
 function doOpenHub(){
   // v293: only one style (Combined Grid) remains — open/close it directly, no hub screen.
   if (_ssrIsOpen('do-hub-host')) { _ssrClose('do-hub-host'); return; }
