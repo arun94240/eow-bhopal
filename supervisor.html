@@ -24163,7 +24163,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
             <div id="mydd-craft-sync" class="mydd-craftsync-host"></div>
           </div>
         </div>
-        <div id="mydd-brief"></div>
+        
         <div id="mydd-reminder-panel" class="mydd-toppanel" style="display:none;"></div>
         <div id="mydd-calendar-panel" class="mydd-toppanel" style="display:none;"></div>
         <div class="mydd-tiles">
@@ -24175,8 +24175,6 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
             <div class="mddq-host" id="mydd-addhost-review"></div>
             <div id="mtx-body" style="display:none;">
             <!-- legacy hidden markers kept (harmless, unused) so any stray references never error -->
-            <span id="mtx-ag-today" style="display:none;">0</span><span id="mtx-ag-week" style="display:none;">0</span><span id="mtx-ag-caret" style="display:none;"></span>
-            <div class="mtx-list" id="mtx-agenda-panel" style="display:none;"></div>
             <span id="mtx-cnt-dg" style="display:none;">0</span><span id="mtx-cnt-disc" style="display:none;">0</span><span id="mtx-cnt-rv" style="display:none;">0</span><span id="mtx-cnt-td" style="display:none;">0</span>
             <span id="mtx-grp-tot-dir" style="display:none;">0</span><span id="mtx-grp-tot-work" style="display:none;">0</span>
             <span id="mtx-caret-dg" style="display:none;"></span><span id="mtx-caret-disc" style="display:none;"></span>
@@ -34281,83 +34279,6 @@ function _briefEnqToggleRow(k){
   b.style.display=open?'block':'none';
   var row=b.previousElementSibling; if(row){ var c=row.querySelector('.mbr-caret'); if(c) c.textContent=open?'\u25b4':'\u25be'; }
 }
-var _briefPill=null;
-function _briefPillTap(k){ _briefPill=(_briefPill===k)?null:k; try{ mddRenderBrief(); }catch(e){} }
-function mddRenderBrief(){
-  var host=document.getElementById('mydd-brief'); if(!host) return;
-  var today=_mddYMD(new Date());
-  var wkEnd=_mddYMD(new Date(Date.now()+7*86400000));
-  var items=[]; try{ items=(_mtxAgendaItems()||[]); }catch(e){ items=[]; }
-  var overdue=items.filter(function(a){ return a.date<today; });
-  var todayItems=items.filter(function(a){ return a.date===today; });
-  var weekArr=items.filter(function(a){ return a.date>today && a.date<=wkEnd; });
-  var MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  var WD=['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  var nd=new Date();
-  var cal='<div class="n-cal"><div class="m">'+MO[nd.getMonth()]+'</div><div class="d">'+nd.getDate()+'</div><div class="w">'+WD[nd.getDay()]+'</div></div>';
-  var _bk=0;
-  function item(a){
-    var openJs=a.open||'';
-    var k=++_bk;
-    var _rc=(a.caseType && a.caseId && a.caseType!=='court') ? {type:a.caseType,id:a.caseId} : null;
-    if(!_rc){ try{ _rc=_briefResolveCase(a.caseType,a.caseId,(a.lbl||'')+' '+(a.meta||'')); }catch(e){ _rc=null; } if(_rc && _rc.type==='court') _rc=null; }
-    if(_rc){
-      // WHOLE row clickable → case brief inline (brief → ✎ Open/Edit → modal)
-      return '<div class="mbr-item mbr-item-case">'+
-        '<div class="n-it mbr-click mbr-caserow" onclick="event.stopPropagation();_briefEnqToggleRow('+k+')">'+
-          '<span class="d">'+(a.ico||'📋')+'</span>'+
-          '<span class="t">'+_mddEsc(String(a.lbl||''))+' <span class="mbr-cnum">📋 '+_mddEsc(_briefEnqLabel(_rc.type,_rc.id))+'</span></span>'+
-          '<span class="mbr-caret car">▾</span>'+
-        '</div>'+
-        '<div class="mbr-cbrief" id="mbr-cb-'+k+'" data-type="'+_mddEsc(_rc.type)+'" data-id="'+_mddEsc(_rc.id)+'" style="display:none;"></div>'+
-      '</div>';
-    }
-    // non-case item → meta toggle (+ open/edit if provided)
-    return '<div class="mbr-item">'+
-      '<div class="n-it mbr-click" onclick="event.stopPropagation();mbrToggle(this)">'+
-        '<span class="d">'+(a.ico||'•')+'</span>'+
-        '<span class="t">'+_mddEsc(String(a.lbl||''))+'</span>'+
-        '<span class="mbr-caret car">▾</span>'+
-      '</div>'+
-      '<div class="mbr-bb" style="display:none;">'+
-        (a.meta?'<div class="mbr-bmeta">'+_mddEsc(a.meta)+'</div>':'')+
-        '<div class="mbr-bmeta2">'+_mddEsc(a.kind||'')+' · '+_briefEnDate(a.date)+'</div>'+
-        (a.craftLink ? '<a class="mbr-craftlink" href="'+_mddEsc(a.craftLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation();">🔗 Craft note</a>' : '')+
-        (openJs?'<button class="mbr-oe" onclick="event.stopPropagation();(function(){try{'+openJs+';}catch(e){}})();">✎ Open / Edit</button>':'')+
-      '</div>'+
-    '</div>';
-  }
-  function dateBlock(ds){
-    if(ds<today) return '<div class="n-db over">⚠ Overdue · '+_briefDShort(ds)+'</div>';
-    return '<div class="n-db week">📅 '+_briefDShort(ds)+'</div>';
-  }
-  function listOf(arr){
-    var out='',last=null;
-    arr.forEach(function(a){ if(a.date!==last){ out+=dateBlock(a.date); last=a.date; } out+=item(a); });
-    return out;
-  }
-  // ── header + compact tappable-collapsible pills ──
-  function pill(k,cls,lbl,cnt){
-    var on=(_briefPill===k);
-    return '<span class="n-pill '+cls+(on?' on':'')+'" onclick="event.stopPropagation();_briefPillTap(\''+k+'\')"><b>'+cnt+'</b> '+lbl+' <i>'+(on?'▴':'▾')+'</i></span>';
-  }
-  // update the STATIC calendar badge (header lives outside #mydd-brief, never wiped)
-  try{ var _c=document.getElementById('agenda-cal'); if(_c){ _c.innerHTML='<div class="m">'+MO[nd.getMonth()]+'</div><div class="d">'+nd.getDate()+'</div><div class="w">'+WD[nd.getDay()]+'</div>'; } }catch(e){}
-  var html='<div class="mbr-brief">'+
-    '<div class="n-pills">'+pill('today','a','आज',todayItems.length)+pill('over','o','Overdue',overdue.length)+pill('week','w','सप्ताह',weekArr.length)+'</div>';
-  // ── single list under whichever pill is active (default: all collapsed) ──
-  html+='<div class="mbr-body-c">';
-  if(_briefPill==='today'){
-    html+= todayItems.length ? '<div class="n-daylbl">📅 आज · '+_briefDShort(today)+'</div>'+listOf(todayItems) : '<div class="mbr-empty">आज कोई agenda नहीं — दिन नियंत्रण में ✅</div>';
-  } else if(_briefPill==='over'){
-    html+= overdue.length ? '<div class="n-daylbl">⚠ Overdue · '+overdue.length+'</div>'+listOf(overdue) : '<div class="mbr-empty">कोई overdue नहीं ✅</div>';
-  } else if(_briefPill==='week'){
-    html+= weekArr.length ? '<div class="n-daylbl">🗓️ इस सप्ताह · '+weekArr.length+'</div>'+listOf(weekArr) : '<div class="mbr-empty">इस सप्ताह कुछ नहीं</div>';
-  }
-  html+='</div>';
-  html+='</div>';
-  host.innerHTML=html;
-}
 function hctOpenReports(){
   try {
     if (typeof hctInit === 'function') hctInit();
@@ -34572,7 +34493,7 @@ function agendaToggleCollapse(ev){
 
 
 function renderMyDailyBox() {
-  try { mddRenderBrief(); mddRenderAttStrip(); mddAttStartLive(); hctOpenReports(); } catch(e){}
+  try { mddRenderAttStrip(); mddAttStartLive(); hctOpenReports(); } catch(e){}
   try { renderDeptMatrix(); } catch(e){}
   try { renderCraftSyncBtn(); } catch(e){}
   var box = document.getElementById('mydaily-box');
@@ -34960,12 +34881,6 @@ function mtxRefresh() {
     if (ioTitle) ioTitle.style.display = _mtxIoOrder.length ? 'block' : 'none';
     Object.keys(openIo).forEach(function(id){ var l=_mtxEl(id); if (l) { l.style.display='block'; var i=id.replace('mtx-io-list-',''); mtxIoRender(i); var c=_mtxEl('mtx-io-caret-'+i); if (c) c.textContent='▴'; } });
   }
-  // agenda chips
-  var ag = _mtxAgendaItems();
-  var todayY = _mddYMD(new Date());
-  var wk = _mddYMD(new Date(Date.now() + 6*86400000));
-  setN('mtx-ag-today', ag.filter(function(i){ return i.date <= todayY; }).length);
-  setN('mtx-ag-week', ag.filter(function(i){ return i.date <= wk; }).length);
 }
 function _mtxAgendaItems() {
   var out = [];
@@ -34977,34 +34892,6 @@ function _mtxAgendaItems() {
   } catch(e) {}
   out.sort(function(a,b){ return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
   return out;
-}
-function mtxAgendaToggle() {
-  var p = _mtxEl('mtx-agenda-panel'); if (!p) return;
-  var open = !_mtxOpen(p);
-  p.style.display = open ? 'block' : 'none';
-  var c = _mtxEl('mtx-ag-caret'); if (c) c.textContent = open ? '▴' : '▾';
-  if (!open) return;
-  var items = _mtxAgendaItems().filter(function(i){ return i.date <= _mddYMD(new Date(Date.now() + 29*86400000)); });
-  if (!items.length) { p.innerHTML = '<div class="mydd-empty">कोई आगामी आइटम नहीं</div>'; return; }
-  var todayY = _mddYMD(new Date()); var last = null; var html = '';
-  items.slice(0, 60).forEach(function(it){
-    if (it.date !== last) { html += '<div class="mydd-tp-day">' + _mddDayLabel(it.date) + '</div>'; last = it.date; }
-    var kc = (it.kind === 'DG' ? 'dg' : it.kind === 'समीक्षा' ? 'rv' : 'td');
-    html += '<div class="mydd-item">' +
-      '<div class="mydd-item-head" onclick="event.stopPropagation();mddRowToggle(this);">' +
-        '<span class="mydd-tp-ico">' + it.ico + '</span>' +
-        '<span class="mydd-item-title">' + _mddEsc(it.lbl) + '</span>' +
-        '<span class="mtx-kind k-' + kc + '">' + it.kind + '</span>' +
-        '<span class="mydd-tp-date' + (it.date < todayY ? ' ovd' : '') + '">' + _mddDayLabel(it.date) + '</span>' +
-      '</div>' +
-      '<div class="mydd-item-brief" style="display:none;">' +
-        '<div class="mydd-brief-row">' + _mddEsc(it.lbl) + '</div>' +
-        '<div class="mydd-brief-row"><b>प्रकार:</b> ' + _mddEsc(it.kind) + ' &nbsp;·&nbsp; <b>तिथि:</b> ' + _mddDayLabel(it.date) + '</div>' +
-        '<button class="mydd-oe-btn" onclick="event.stopPropagation();(function(){try{' + it.open + ';}catch(e){}})();">✎ Open / Edit</button>' +
-      '</div>' +
-    '</div>';
-  });
-  p.innerHTML = html;
 }
 function mtxGroupTab(which, other){
   var lw=document.getElementById('mtx-list-'+which);
@@ -35103,7 +34990,6 @@ function mtxToggleAll() {
   Array.prototype.forEach.call(lists, function(l){
     l.style.display = open ? 'block' : 'none';
     if (!open) return;
-    if (l.id === 'mtx-agenda-panel') { l.style.display = 'none'; return; } // agenda stays via its own tap
     if (l.id === 'mtx-list-dg') mtxRenderList('dg');
     else if (l.id === 'mtx-list-rv') mtxRenderList('rv');
     else if (l.id === 'mtx-list-td') mtxRenderList('td');
