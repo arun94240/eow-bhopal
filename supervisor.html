@@ -23440,6 +23440,18 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
    📝 To-Do — Docket Stamp (List) + Docket Card (v286)
    ═══════════════════════════════════════════════════════════════ */
 .agenda-collapse-car{ font-size:10px; margin-left:4px; opacity:.8; }
+/* ═══ Agenda header v2 — Bottom Tab Strip (Option 8) ═══ */
+.agenda-hdr-v2{ padding:12px 13px 0 !important; display:block !important; }
+.agenda-hdr-top{ display:flex; align-items:center; gap:10px; padding-bottom:11px; }
+.agenda-total-count{ font-size:11px; font-weight:900; color:#f5b942; }
+.agenda-tabstrip{ display:flex; background:#fff; border-radius:12px 12px 0 0; overflow:hidden; margin:0 -13px; }
+.agenda-tab{ flex:1; text-align:center; padding:9px 4px; font-size:9px; font-weight:800; color:#64748b; border-right:1px solid #eef2f7; cursor:pointer; }
+.agenda-tab:last-child{ border-right:none; }
+.agenda-tab:hover{ background:#f7fafd; }
+.agenda-tab .ic{ display:block; font-size:14px; margin-bottom:2px; }
+.agenda-tab-gold{ background:#f5b942 !important; color:#062a52 !important; font-weight:900; }
+.agenda-search-row{ background:#f7fafd; padding:10px 13px; margin:0 -13px; }
+
 .agenda-title{ cursor:pointer; }
 
 .todo-view-toggle{ display:flex; gap:6px; margin:6px 0 10px; }
@@ -24143,21 +24155,28 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
       <!-- ════════════════════════════════════════════════════════════ -->
       <div id="staff-live-host" class="staff-live-host"><div class="slh-head">📋 आज की जानकारी — Live</div></div>
       <div class="mydd-box" id="mydaily-box">
-        <div class="agenda-hdr" id="agenda-hdr">
-          <div class="n-cal agenda-cal" id="agenda-cal"><div class="m">—</div><div class="d">—</div><div class="w">—</div></div>
-          <div class="agenda-title" onclick="event.stopPropagation();agendaToggleCollapse(event);">🗓️ Agenda <span id="agenda-collapse-car" class="agenda-collapse-car">▾</span></div>
-          <div class="agenda-tools-wrap" id="agenda-tools-wrap">
-            <div class="mydd-dg-toprow mydd-toprow-tap" onclick="event.stopPropagation();mtxToggleBox();">
+        <div class="agenda-hdr agenda-hdr-v2" id="agenda-hdr">
+          <div class="agenda-hdr-top">
+            <div class="n-cal agenda-cal" id="agenda-cal"><div class="m">—</div><div class="d">—</div><div class="w">—</div></div>
+            <div class="agenda-title" onclick="event.stopPropagation();agendaToggleCollapse(event);">🗓️ Agenda <span class="agenda-total-count" id="agenda-total-count"></span> <span id="agenda-collapse-car" class="agenda-collapse-car">▾</span></div>
+          </div>
+          <div class="agenda-tabstrip">
+            <div class="agenda-tab" onclick="event.stopPropagation();agendaToggleSearchTab();"><span class="ic">🔍</span>Search</div>
+            <div class="agenda-tab" onclick="event.stopPropagation();openAgendaSubscribeModal();"><span class="ic">📆</span>Subscribe</div>
+            <div class="agenda-tab" onclick="event.stopPropagation();craftOpenTaskList();"><span class="ic">🔄</span>Craft</div>
+            <div class="agenda-tab agenda-tab-gold" onclick="event.stopPropagation();mtxAddPick('task');"><span class="ic">＋</span>Add</div>
+          </div>
+          <div class="agenda-search-row" id="agenda-search-row" style="display:none;">
+            <div class="mtx-search mtx-blk-keyword mtx-search-inline" onclick="event.stopPropagation();">
+              <span class="mtx-ico mtx-ico-keyword">🔍</span>
+              <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="Search..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
+              <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
+            </div>
+          </div>
+          <div class="agenda-tools-wrap" id="agenda-tools-wrap" style="display:none;">
+            <div class="mydd-dg-toprow mydd-toprow-tap">
               <span class="mydd-tcal" style="display:none;"><span class="tc-mo">—</span><span class="tc-dy">—</span></span>
               <span class="mydd-tnum" id="mydd-cnt-mytask" style="display:none;">0</span>
-              <div class="mtx-search mtx-blk-keyword mtx-search-inline" onclick="event.stopPropagation();">
-                <span class="mtx-ico mtx-ico-keyword">🔍</span>
-                <input type="text" id="mtx-search-inp" class="mtx-search-inp" placeholder="खोजें..." autocomplete="off" onclick="event.stopPropagation()" oninput="mtxSearch(this.value)">
-                <span class="mtx-search-clr" id="mtx-search-clr" style="display:none;" onclick="event.stopPropagation();document.getElementById('mtx-search-inp').value='';mtxSearch('');">✕</span>
-              </div>
-              <button class="mtx-add-btn" onclick="event.stopPropagation();mtxAddPick('task');">＋ Add To-Do</button>
-              <button class="mtx-tool-btn mtx-tool-sub" onclick="event.stopPropagation();openAgendaSubscribeModal();" title="Subscribe (Apple/Google Calendar)"><span class="ttl-ic">📆</span><span class="ttl-lbl">Subscribe</span></button>
-              <button class="mtx-tool-btn mtx-tool-craft" onclick="event.stopPropagation();craftOpenTaskList();" title="Open in Craft (live)"><span class="ttl-ic">🔄</span><span class="ttl-lbl">Open in Craft</span></button>
               <div class="mtx-add-menu" id="mtx-add-menu" style="display:none;"></div>
             </div>
             <div id="mydd-craft-sync" class="mydd-craftsync-host"></div>
@@ -34472,6 +34491,16 @@ function _agendaUpdateCalBadge(){
     var nd = new Date();
     el.innerHTML = '<div class="m">' + MO[nd.getMonth()] + '</div><div class="d">' + nd.getDate() + '</div><div class="w">' + WD[nd.getDay()] + '</div>';
   } catch(e){}
+  try{
+    var cnt = document.getElementById('agenda-total-count');
+    if (cnt) { var n = (state.myOfficeTasks || []).length; cnt.textContent = n ? ('· ' + n) : ''; }
+  } catch(e){}
+}
+function agendaToggleSearchTab(){
+  var row = document.getElementById('agenda-search-row'); if (!row) return;
+  var open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : 'block';
+  if (!open) { var i = document.getElementById('mtx-search-inp'); if (i) { try{ i.focus(); }catch(e){} } }
 }
 function renderTodoList(){
   _agendaUpdateCalBadge();
