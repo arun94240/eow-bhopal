@@ -23043,6 +23043,32 @@ body.role-staff #mydaily-box{ display:none !important; }
 #nopr-panel-content .nopr-feed .nopr-row{ background:#fff; }
 #nopr-panel-content .nopr-feed .mpf-periods{ margin-top:11px; }
 
+/* ══════════ दैनिक प्रगति-अनुपालन — आज प्रगति नहीं (v315) ══════════ */
+.ovstats-tile-dpc{ background:linear-gradient(135deg,#ef4444 0%,#b91c1c 100%) !important; }
+.ovstats-tile-dpc .n{ color:#fff !important; }
+.ovstats-tile-dpc .l{ color:#fff !important; }
+#ovstats-panel-dpc .ovstats-panel-body{ padding:6px; }
+#dpc-panel-content .dpc-feed{ background:linear-gradient(160deg,#062a52,#0a3a6e); border-radius:12px; padding:11px 13px; box-shadow:0 6px 18px rgba(6,42,82,0.25); }
+.dpc-note{ font-size:10px; color:#cfe0f3; line-height:1.5; margin-bottom:11px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:7px 9px; }
+.dpc-note-final{ color:#ffd479; border-color:rgba(245,185,66,.35); background:rgba(245,185,66,.08); }
+.dpc-allok{ text-align:center; color:#bbf7d0; font-size:12px; font-weight:800; padding:14px 6px; }
+.dpc-card{ background:linear-gradient(135deg,#fff5f5,#fee2e2); border:1.5px solid #fecaca; border-left:4px solid #dc2626; border-radius:12px; padding:10px 11px; margin-bottom:9px; }
+.dpc-card:last-child{ margin-bottom:0; }
+.dpc-top{ display:flex; align-items:center; gap:9px; }
+.dpc-av{ width:34px; height:34px; border-radius:50%; background:#dc2626; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; flex:0 0 auto; }
+.dpc-nm{ flex:1; min-width:0; }
+.dpc-nm .nn{ font-size:12px; font-weight:900; color:#7f1d1d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dpc-nm .rk{ font-size:9px; color:#b91c1c; font-weight:600; }
+.dpc-frac{ text-align:right; flex:0 0 auto; }
+.dpc-frac .big{ font-size:18px; font-weight:900; color:#dc2626; line-height:1; }
+.dpc-frac .sm{ font-size:8px; color:#b91c1c; font-weight:700; }
+.dpc-miss{ display:flex; gap:5px; flex-wrap:wrap; margin-top:9px; }
+.dpc-chip{ font-size:9px; font-weight:800; border-radius:7px; padding:3px 8px; }
+.dpc-chip.done{ background:#dcfce7; color:#15803d; }
+.dpc-chip.miss{ background:#fee2e2; color:#b91c1c; border:1px dashed #f87171; }
+.dpc-wa{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top:10px; background:#25d366; color:#fff; font-size:10.5px; font-weight:900; padding:8px; border-radius:9px; border:none; cursor:pointer; font-family:inherit; }
+.dpc-wa:active{ transform:scale(.98); }
+
 /* #3 — Agenda group chip inline ＋ add button (v241) */
 #mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
 #mydaily-box .mtx-chip-add:hover{ background:#fff; transform:scale(1.12); }
@@ -24027,6 +24053,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                     <div class="n" id="ov-cnt-notice">0</div>
                     <div class="l">Notice आज</div>
                   </div>
+                  <div class="ovstats-tile ovstats-tile-dpc mas-pill" onclick="event.stopPropagation();ovstatsNavTile('dpc',event)" title="आज निर्धारित प्रगति (2 शिकायत + 1 RC + 1 सूत्र/STR/PE) न देने वाले IO">
+                    <div class="n" id="ovstats-cnt-dpc">0</div>
+                    <div class="l">आज प्रगति नहीं</div>
+                  </div>
                 </div>
                 <div class="cmd-chips" id="ovstats-chips-pragati"></div>
               </div>
@@ -24172,6 +24202,16 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
               </div>
               <div class="ovstats-panel-body">
                 <div id="nopr-panel-content"></div>
+              </div>
+            </div>
+            <div class="ovstats-panel" id="ovstats-panel-dpc" style="display:none;">
+              <div class="ovstats-panel-head">
+                <span class="ovstats-panel-icon">⛔</span>
+                <span class="ovstats-panel-title">आज प्रगति नहीं देने वाले IO</span>
+                <span class="ovstats-grand-total" id="dpc-grand-total">Total: 0</span>
+              </div>
+              <div class="ovstats-panel-body">
+                <div id="dpc-panel-content"></div>
               </div>
             </div>
             <div class="ovstats-panel" id="ovstats-panel-pragati" style="display:none;">
@@ -40602,7 +40642,8 @@ function ovstatsNavTile(tile, evt) {
     tags: '.ovstats-tile-tags',
     pragati: '.ovstats-tile-pragati',
     roster: '.ovstats-tile-roster',
-    nopr: '.ovstats-tile-nopr'
+    nopr: '.ovstats-tile-nopr',
+    dpc: '.ovstats-tile-dpc'
   };
   var tileEl = document.querySelector('#ovstats-tile-row ' + tileMap[tile]);
   if (tileEl) tileEl.classList.add('is-active');
@@ -40631,6 +40672,7 @@ function ovstatsNavTile(tile, evt) {
   else if (tile === 'tags' && typeof ovstatsRenderTagsSummary === 'function') ovstatsRenderTagsSummary();
   else if (tile === 'pragati' && typeof ovstatsRenderPragatiSummary === 'function') ovstatsRenderPragatiSummary();
   else if (tile === 'nopr' && typeof ovstatsRenderNoPragati === 'function') ovstatsRenderNoPragati();
+  else if (tile === 'dpc' && typeof ovstatsRenderDPC === 'function') ovstatsRenderDPC();
   else if (tile === 'roster') { if (typeof refreshStaffPulse === 'function') refreshStaffPulse(); if (typeof renderEstabRoster === 'function') renderEstabRoster(); }
   
   // Smart scroll — bring panel into view
@@ -53040,6 +53082,110 @@ var _noprBucketSel=null;
 function noprBucketSelect(bk){ _noprBucketSel=(_noprBucketSel===bk)?null:bk; _noprRowOpen={}; ovstatsRenderNoPragati(); }
 function noprRowToggle(rk,type,id){ _noprRowOpen[rk]=!_noprRowOpen[rk]; ovstatsRenderNoPragati(); }
 
+// ═══════════════════════════════════════════════════════════════════
+// 📊 दैनिक प्रगति-अनुपालन (Daily Progress Compliance) — v315
+// नियम: हर active IO प्रतिदिन ≥2 शिकायत + ≥1 RC + ≥1 {STR/सूत्र/PE} प्रकरणों
+// में प्रगति दर्ज करे (कुल ≥4)। शाम 8 बजे तक पूरा न करने वाले IO डिफॉल्टर-सूची में।
+// ═══════════════════════════════════════════════════════════════════
+var DPC_MIN_COMPLAINTS = 2, DPC_MIN_RC = 1, DPC_MIN_FLEX = 1;
+var DPC_FLEX_TYPES = ['strs','sutra','pes'];   // इनमें से किसी एक में प्रगति चलेगी
+var DPC_DEADLINE_HR = 20;                        // शाम 8:00 बजे
+function _dpcLocalYMD(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function _dpcTodayUpdates(){
+  var ymd=_dpcLocalYMD();
+  return (state.ioUpdates||[]).filter(function(u){
+    if(!u.case_type||!u.case_id) return false;
+    var d=String(u.update_date||u.created_at||'').slice(0,10);
+    return d===ymd;
+  });
+}
+// per-IO compliance for today
+function _dpcCompute(){
+  var ios=(state.ioMaster||[]).filter(function(s){ return s.is_io===true && (s.status==='Active'||!s.status); });
+  if(typeof sortIOsByRank==='function'){ try{ ios=sortIOsByRank(ios.slice()); }catch(e){} }
+  var ups=_dpcTodayUpdates();
+  return ios.map(function(io){
+    var mine=ups.filter(function(u){ return _prIoMatch(u, io.name); });
+    var cSet={}, rSet={}, fSet={}, allSet={};
+    mine.forEach(function(u){
+      allSet[u.case_type+'|'+u.case_id]=true;                 // distinct प्रकरण
+      if(u.case_type==='complaints') cSet[u.case_id]=true;
+      else if(u.case_type==='rcs') rSet[u.case_id]=true;
+      else if(DPC_FLEX_TYPES.indexOf(u.case_type)>=0) fSet[u.case_id]=true;
+    });
+    var c=Object.keys(cSet).length, r=Object.keys(rSet).length, f=Object.keys(fSet).length, total=Object.keys(allSet).length;
+    var missing=[];
+    if(c<DPC_MIN_COMPLAINTS) missing.push({k:'complaints', need:(DPC_MIN_COMPLAINTS-c), lbl:(DPC_MIN_COMPLAINTS-c)+' शिकायत'});
+    if(r<DPC_MIN_RC) missing.push({k:'rc', need:(DPC_MIN_RC-r), lbl:'RC'});
+    if(f<DPC_MIN_FLEX) missing.push({k:'flex', need:(DPC_MIN_FLEX-f), lbl:'सूत्र सूचना/STR/PE'});
+    var need=DPC_MIN_COMPLAINTS+DPC_MIN_RC+DPC_MIN_FLEX;      // 4
+    var got=Math.min(c,DPC_MIN_COMPLAINTS)+Math.min(r,DPC_MIN_RC)+Math.min(f,DPC_MIN_FLEX);
+    return { name:io.name, disp:(typeof getDisplayIOName==='function'?getDisplayIOName(io):io.name), rank:(io.rank||''),
+             complaints:c, rc:r, flex:f, total:total, need:need, got:got, ok:(missing.length===0), missing:missing };
+  });
+}
+function _dpcDefaulters(){ return _dpcCompute().filter(function(x){ return !x.ok; }); }
+function _dpcTileCount(){ try{ return _dpcDefaulters().length; }catch(e){ return 0; } }
+function renderDPCTile(){ try{ var el=document.getElementById('ovstats-cnt-dpc'); if(el) el.textContent=_dpcTileCount(); }catch(e){} }
+function _dpcInitials(name){
+  var n=(typeof _prStripRank==='function')?_prStripRank(String(name||'')):String(name||'');
+  var p=n.trim().split(/\s+/).filter(Boolean);
+  if(!p.length) return '—';
+  return (p[0].charAt(0)+(p[1]?p[1].charAt(0):'')).toUpperCase();
+}
+function _dpcDateStr(){
+  var d=new Date(); var mons=['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+  return String(d.getDate()).padStart(2,'0')+' '+mons[d.getMonth()];
+}
+function _dpcMsg(x){
+  var nm=x.disp||x.name||'महोदय/महोदया'; var dstr=_dpcDateStr(); var body;
+  if(x.got===0){
+    body=nm+' जी, आज ('+dstr+') आपके द्वारा कोई भी दैनिक प्रगति दर्ज नहीं की गई। निर्धारित 4 प्रगति (2 शिकायत + 1 RC + 1 सूत्र सूचना/STR/PE) — भविष्य में ध्यान रखें।';
+  } else {
+    var miss=x.missing.map(function(m){ return m.lbl; }).join(' व ');
+    body=nm+' जी, आज ('+dstr+') आपके द्वारा निर्धारित 4 में से केवल '+x.got+' प्रगति दर्ज हुई। शेष — '+miss+' — भविष्य में ध्यान रखें।';
+  }
+  return '🏛 आर्थिक अपराध शाखा, भोपाल\n\n'+body+'\n\n— कार्यालय अधीक्षक पुलिस, EOW भोपाल';
+}
+function ovstatsRenderDPC(){
+  var host=document.getElementById('dpc-panel-content'); if(!host) return;
+  var list=_dpcDefaulters();
+  var gt=document.getElementById('dpc-grand-total'); if(gt) gt.textContent='Total: '+list.length;
+  renderDPCTile();
+  var now=new Date(); var hr=now.getHours();
+  var clk=String(hr).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  var lockNote = (hr<DPC_DEADLINE_HR)
+    ? '<div class="dpc-note">🕗 अंतिम सूची शाम 8:00 बजे lock होगी — यह अभी ('+clk+') तक की स्थिति है।</div>'
+    : '<div class="dpc-note dpc-note-final">🔒 शाम 8:00 बजे बाद — आज की अंतिम डिफॉल्टर सूची।</div>';
+  if(!list.length){
+    host.innerHTML='<div class="dpc-feed">'+lockNote+'<div class="dpc-allok">✅ आज सभी IO ने निर्धारित प्रगति पूरी कर ली।</div></div>';
+    return;
+  }
+  var cards=list.map(function(x){
+    var chips='';
+    chips += (x.complaints>=DPC_MIN_COMPLAINTS)
+      ? '<span class="dpc-chip done">✓ '+DPC_MIN_COMPLAINTS+' शिकायत</span>'
+      : '<span class="dpc-chip miss">✗ '+(DPC_MIN_COMPLAINTS-x.complaints)+' शिकायत बाकी</span>';
+    chips += (x.rc>=DPC_MIN_RC)
+      ? '<span class="dpc-chip done">✓ 1 RC</span>'
+      : '<span class="dpc-chip miss">✗ RC बाकी</span>';
+    chips += (x.flex>=DPC_MIN_FLEX)
+      ? '<span class="dpc-chip done">✓ सूत्र/STR/PE</span>'
+      : '<span class="dpc-chip miss">✗ सूत्र/STR/PE बाकी</span>';
+    var b64=(typeof _b64u==='function')?_b64u(_dpcMsg(x)):'';
+    return '<div class="dpc-card">'+
+      '<div class="dpc-top">'+
+        '<div class="dpc-av">'+_mddEsc(_dpcInitials(x.name))+'</div>'+
+        '<div class="dpc-nm"><div class="nn">'+_mddEsc(x.disp)+'</div><div class="rk">'+_mddEsc(x.rank||'IO')+'</div></div>'+
+        '<div class="dpc-frac"><div class="big">'+x.got+'/'+x.need+'</div><div class="sm">दर्ज</div></div>'+
+      '</div>'+
+      '<div class="dpc-miss">'+chips+'</div>'+
+      '<button class="dpc-wa" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">📋 WhatsApp अनुस्मारक — copy करें</button>'+
+    '</div>';
+  }).join('');
+  host.innerHTML='<div class="dpc-feed">'+lockNote+cards+'</div>';
+}
+
 function renderOverview() {
   Object.keys(ENQ_LABELS).forEach(function(t){
     var arr = state.enquiries[t] || [];
@@ -53074,6 +53220,7 @@ function renderOverview() {
   try{ _nsRefreshCounts(); }catch(e){}
   try{ if(typeof mddRenderAttStrip==='function') mddRenderAttStrip(); if(typeof mddAttStartLive==='function') mddAttStartLive(); }catch(e){}
   try{ if(typeof renderNoPragati==='function') renderNoPragati(); }catch(e){}
+  try{ if(typeof renderDPCTile==='function') renderDPCTile(); }catch(e){}
   var ovIOTotal = document.getElementById('ov-iomaster-total');
   if (ovIOTotal) ovIOTotal.textContent = state.ioMaster.length + ' total establishment';
   var today = todayISO();
