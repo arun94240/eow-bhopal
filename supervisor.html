@@ -54163,10 +54163,10 @@ function _doRenderStyleBody(styleId){
   if (styleId === 'grid') {
     html = '<div class="do-catlbl">📅 समय-सीमा (वैकल्पिक)</div>' +
       '<div class="rep-mini-row"><input type="date" value="' + _doDateFrom + '" onchange="doSetDateRange(\'from\',this.value)"><span>—</span><input type="date" value="' + _doDateTo + '" onchange="doSetDateRange(\'to\',this.value)"></div>' +
-      '<div class="do-catlbl">🎖️ पदनाम</div><div class="rep-chips">' +
+      '<div class="do-catlbl">🎖️ By Post</div><div class="rep-chips">' +
       desig.map(function(x){ return '<span class="rep-chip" onclick="event.stopPropagation();doSelectTag(\'' + x.tag.id + '\')">' + escapeHtml(x.tag.name) + ' · ' + x.count + '</span>'; }).join('') +
-      '</div><div class="do-catlbl">🏛️ विभाग</div><div class="rep-chips">' +
-      (dept.length ? dept.map(function(x){ return '<span class="rep-chip dept" onclick="event.stopPropagation();doSelectDept(\'' + x.name.replace(/'/g,"\\'") + '\')">' + escapeHtml(x.name) + ' · ' + x.count + '</span>'; }).join('') : '<span class="rep-chip" style="opacity:.6;">अभी कोई विभाग-वार लंबित प्रकरण नहीं</span>') +
+      '</div><div class="do-catlbl">🏛️ By Department</div><div class="rep-chips">' +
+      (dept.length ? dept.map(function(x){ return '<span class="rep-chip dept" onclick="event.stopPropagation();doSelectDept(\'' + x.name.replace(/'/g,"\\'") + '\')">' + escapeHtml(x.name) + ' · ' + x.count + '</span>'; }).join('') : '<span class="rep-chip" style="opacity:.6;">No department-wise pending cases yet</span>') +
       '</div>';
   } else if (styleId === 'cloud') {
     var all = desig.map(function(x){ return {name:x.tag.name, count:x.count, dept:false, id:x.tag.id}; })
@@ -54186,7 +54186,7 @@ function _doRenderStyleBody(styleId){
       return '<div class="do-card ' + cls + '" onclick="event.stopPropagation();' + oc + '"><div class="do-card-lbl">' + escapeHtml(x.name) + '</div><div class="do-card-num">' + x.count + '</div></div>';
     }).join('') + '</div>';
   } else if (styleId === 'search') {
-    html = '<div class="do-search-bar">🔍 <input type="text" placeholder="अधिकारी या विभाग टाइप करें..." oninput="doSearchFilter(this.value)"></div><div id="do-search-dd"></div>';
+    html = '<div class="do-search-bar">🔍 <input type="text" placeholder="Type officer or department..." oninput="doSearchFilter(this.value)"></div><div id="do-search-dd"></div>';
   }
   body.innerHTML = html;
 }
@@ -54200,11 +54200,11 @@ function doSearchFilter(q){
   dd.innerHTML = hits.map(function(x){
     var cls = x.dept ? 'dept' : 'desig';
     var oc = x.dept ? ("doSelectDept('" + x.name.replace(/'/g,"\'") + "')") : ("doSelectTag('" + x.id + "')");
-    return '<div class="do-hit ' + cls + '" onclick="event.stopPropagation();' + oc + '"><span class="do-hit-tag">' + (cls==='dept'?'विभाग':'पदनाम') + '</span><span class="do-hit-nm">' + escapeHtml(x.name) + '</span><span class="do-hit-ct">' + x.count + '</span></div>';
+    return '<div class="do-hit ' + cls + '" onclick="event.stopPropagation();' + oc + '"><span class="do-hit-tag">' + (cls==='dept'?'Department':'Post') + '</span><span class="do-hit-nm">' + escapeHtml(x.name) + '</span><span class="do-hit-ct">' + x.count + '</span></div>';
   }).join('') || '<div class="empty-state" style="padding:10px;"><h3>कोई मिलान नहीं</h3></div>';
 }
 function doSelectTag(tagId){
-  var f = _repDefaultFilters(); f.tagIds = [tagId]; f.dateFrom = _doDateFrom; f.dateTo = _doDateTo;
+  var f = _repDefaultFilters(); f.types = REP_HEADS.slice(); f.tagIds = [tagId]; f.dateFrom = _doDateFrom; f.dateTo = _doDateTo;
   var computed = _repCompute(f);
   var tag = getTagById(tagId);
   var el = document.getElementById('do-style-results');
@@ -60631,14 +60631,14 @@ function _renderTagUsageItem(srcKey, r) {
 // ════════════════════════════════════════════════════════════════════
 
 var TAG_CATS = [
-  { k:'designation', lbl:'🎖️ पदनाम', col:'blue' },
-  { k:'party',       lbl:'🏛️ राजनीतिक दल', col:'orange' },
-  { k:'district',    lbl:'📍 ज़िला', col:'teal' },
-  { k:'department',  lbl:'🏢 विभाग', col:'green' },
-  { k:'priority',    lbl:'⚡ महत्व / प्रकृति', col:'purple' },
+  { k:'designation', lbl:'🎖️ Designation', col:'blue' },
+  { k:'party',       lbl:'🏛️ Political Party', col:'orange' },
+  { k:'district',    lbl:'📍 District', col:'teal' },
+  { k:'department',  lbl:'🏢 Department', col:'green' },
+  { k:'priority',    lbl:'⚡ Priority / Nature', col:'purple' },
   { k:'system',      lbl:'⚙️ System', col:'blue' },
   { k:'reference',   lbl:'👤 References (@name)', col:'gray' },
-  { k:'__other',     lbl:'🏷️ अन्य', col:'gray' }
+  { k:'__other',     lbl:'🏷️ Other', col:'gray' }
 ];
 function _tagCatOf(t){ var c=((t&&t.category)||'').trim(); if(c) return c; return (/^@/.test((t&&t.name)||''))?'reference':'__other'; }
 function _itwToggleCat(headerEl){
@@ -60676,7 +60676,7 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
   
   // ─── Section 1: Applied chips ───
   html += '<div class="itw-section">';
-  html += '<div class="itw-label">🏷️ लगाए गए <span class="badge">' + applied.length + '</span></div>';
+  html += '<div class="itw-label">🏷️ Applied <span class="badge">' + applied.length + '</span></div>';
   html += '<div class="itw-chips-wrap">';
   if (applied.length === 0) {
     html += '<span class="itw-empty">कोई tag नहीं — नीचे से चुनें</span>';
@@ -60689,7 +60689,7 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
   
   // ─── Section 2: Available chips — श्रेणी-वार (grouped) ───
   html += '<div class="itw-section">';
-  html += '<div class="itw-label">➕ उपलब्ध — श्रेणी-वार <span class="badge">' + available.length + '</span></div>';
+  html += '<div class="itw-label">➕ Available — by category <span class="badge">' + available.length + '</span></div>';
   TAG_CATS.forEach(function(cat){
     var items = available.filter(function(t){ return _tagCatOf(t)===cat.k; });
     if (cat.k==='__other' && items.length===0) return;   // hide empty "अन्य"
@@ -60698,7 +60698,7 @@ function renderTagsWidget(containerId, appliedIds, onChange) {
             '<span class="itw-cat-caret">▸</span> ' + cat.lbl + ' <span class="itw-cat-n">' + items.length + '</span>' +
             '<button type="button" class="itw-cat-add" data-cat="' + cat.k + '" onclick="event.stopPropagation();">＋ जोड़ें</button></div>';
     html += '<div class="itw-chips-wrap" style="display:none;">';
-    if (items.length === 0) { html += '<span class="itw-empty" style="font-size:10px;opacity:.7;">— इस श्रेणी में उपलब्ध नहीं —</span>'; }
+    if (items.length === 0) { html += '<span class="itw-empty" style="font-size:10px;opacity:.7;">— None in this category —</span>'; }
     else { html += items.map(function(t){ return renderTagChip(t, { isAvailable: true, dataAction: 'add' }); }).join(''); }
     html += '</div></div>';
   });
