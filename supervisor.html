@@ -24043,6 +24043,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                     <div class="n" id="ovstats-cnt-pragati">0</div>
                     <div class="l">प्रतिवेदन दिया</div>
                   </div>
+                  <div class="ovstats-tile ovstats-tile-dpc mas-pill" onclick="event.stopPropagation();ovstatsNavTile('dpc',event)" title="आज निर्धारित प्रगति (2 शिकायत + 1 RC + 1 सूत्र/STR/PE) न देने वाले IO">
+                    <div class="n" id="ovstats-cnt-dpc">0</div>
+                    <div class="l">आज प्रगति नहीं</div>
+                  </div>
                   <div class="ovstats-tile ovstats-tile-nopr mas-pill mp-absent" onclick="event.stopPropagation();ovstatsNavTile('nopr',event)" title="30+ दिन से प्रगति दर्ज नहीं">
                     <div class="cmd-metric-icon" id="ovstats-nopr-cal" style="display:none;"></div>
                     <div class="n" id="ovstats-cnt-nopr">0</div>
@@ -24052,10 +24056,6 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                     <div class="cmd-metric-icon" id="cc-cal-notice" style="display:none;"></div>
                     <div class="n" id="ov-cnt-notice">0</div>
                     <div class="l">Notice आज</div>
-                  </div>
-                  <div class="ovstats-tile ovstats-tile-dpc mas-pill" onclick="event.stopPropagation();ovstatsNavTile('dpc',event)" title="आज निर्धारित प्रगति (2 शिकायत + 1 RC + 1 सूत्र/STR/PE) न देने वाले IO">
-                    <div class="n" id="ovstats-cnt-dpc">0</div>
-                    <div class="l">आज प्रगति नहीं</div>
                   </div>
                 </div>
                 <div class="cmd-chips" id="ovstats-chips-pragati"></div>
@@ -53180,7 +53180,7 @@ function ovstatsRenderDPC(){
         '<div class="dpc-frac"><div class="big">'+x.got+'/'+x.need+'</div><div class="sm">दर्ज</div></div>'+
       '</div>'+
       '<div class="dpc-miss">'+chips+'</div>'+
-      '<button class="dpc-wa" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">📋 WhatsApp अनुस्मारक — copy करें</button>'+
+      '<button class="dpc-wa" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">📋 WhatsApp reminder — copy करें</button>'+
     '</div>';
   }).join('');
   host.innerHTML='<div class="dpc-feed">'+lockNote+cards+'</div>';
