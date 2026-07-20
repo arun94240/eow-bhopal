@@ -23427,6 +23427,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .set-chev{ color:#c7c7cc; font-size:13px; flex:0 0 auto; }
 .set-detail{ padding:10px 13px 12px 56px; font-size:10.5px; color:#455a64; line-height:1.6; background:#fff; border-bottom:1px solid #eceef3; }
 .set-detail.set-soon{ color:#b45309; background:#fffbeb; }
+  .set-kb-inline{ padding:10px 8px 12px; background:#fff; border-bottom:1px solid #eceef3; }
+  .set-kb-inline .kb-section-wrap{ margin:0 !important; padding:0 !important; }
+  .set-kb-inline .kb-section-header{ display:none !important; }
+  .set-kb-inline #kb-sec-tile-row{ grid-template-columns:repeat(2,1fr) !important; }
 .set-detail b{ color:#062a52; }
 .cblue{ background:linear-gradient(135deg,#60a5fa,#3b82f6); } .cgreen{ background:linear-gradient(135deg,#4ade80,#16a34a); }
 .cpurple{ background:linear-gradient(135deg,#a78bfa,#7c3aed); } .corange{ background:linear-gradient(135deg,#fb923c,#ea580c); }
@@ -26865,7 +26869,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
   
   <!-- 📚 KNOWLEDGE BASE & FILES SECTION — Procedures, Guides & Reference Files (dedicated tab) -->
   <section id="knowledge-base" class="section">
-    <div class="kb-section-wrap">
+    <div class="kb-section-wrap" id="kb-files-wrap">
       
       <!-- Section header -->
       <div class="kb-section-header">
@@ -53986,7 +53990,7 @@ function _doTagCounts(category){
    ═══════════════════════════════════════════════════════════════════ */
 var SETTINGS_ITEMS = [
   { id:'linksforms', grp:'Forms & Knowledge Base', ic:'🔗', cls:'cindigo', ttl:'Links & Forms', sub:'Pragati · Leave · Notice · Attendance — staff & IO forms', nav:'links' },
-  { id:'kbfiles', grp:'Forms & Knowledge Base', ic:'📚', cls:'corange', ttl:'Knowledge Base & Files', sub:'Step-by-step procedures · guides · reference files', nav:'knowledge-base' },
+  { id:'kbfiles', grp:'Forms & Knowledge Base', ic:'📚', cls:'corange', ttl:'Knowledge Base & Files', sub:'Step-by-step procedures · guides · reference files' },
   { id:'profile', grp:'Profile & Security', ic:'👤', cls:'cblue', ttl:'My Profile', sub:'Name, designation, contact details' },
   { id:'pin', grp:'Profile & Security', ic:'🔐', cls:'cgray', ttl:'Change PIN', sub:'Update your login PIN' },
   { id:'access', grp:'Profile & Security', ic:'🛡️', cls:'cindigo', ttl:'Staff Access Levels', sub:'PA / Steno dashboard permissions' },
@@ -54019,10 +54023,14 @@ function settingsToggleRow(id){
   _settingsRenderList();
 }
 function settingsNavTo(sec){
+  try { _kbInlineHomeRestore(); } catch(e){}
   try { _ssrClose('settings-hub-host'); } catch(e){}
   if (typeof switchSection === 'function') switchSection(sec);
 }
 function _settingsDetailHTML(id){
+  if (id === 'kbfiles') {
+    return '<div id="settings-kb-host" class="set-kb-inline"></div>';
+  }
   if (id === 'iolist') {
     var n = (state.ioMaster || []).filter(function(x){ return x.is_io; }).length;
     return '<div class="set-detail">वर्तमान में <b>' + n + '</b> सक्रिय IO पंजीकृत हैं।</div>';
@@ -54037,7 +54045,19 @@ function _settingsDetailHTML(id){
   }
   return '<div class="set-detail set-soon">🚧 यह सेटिंग जल्द जोड़ी जाएगी — अभी इस पर कार्य होना बाक़ी है।</div>';
 }
+function _kbInlineHomeRestore(){
+  var wrap = document.getElementById('kb-files-wrap');
+  var home = document.getElementById('knowledge-base');
+  if (wrap && home && wrap.parentNode !== home) home.appendChild(wrap);
+}
+function _kbInlineMount(){
+  var host = document.getElementById('settings-kb-host');
+  var wrap = document.getElementById('kb-files-wrap');
+  if (host && wrap && wrap.parentNode !== host) host.appendChild(wrap);
+  try { if (typeof refreshKbSection === 'function') refreshKbSection(); } catch(e){}
+}
 function _settingsRenderList(){
+  _kbInlineHomeRestore();
   var host = document.getElementById('settings-list-host'); if (!host) return;
   var items = SETTINGS_ITEMS.filter(function(it){
     if (!_settingsQuery) return true;
@@ -54069,8 +54089,10 @@ function _settingsRenderList(){
       }).join('') +
     '</div>';
   }).join('');
+  if (_settingsOpenRow === 'kbfiles') _kbInlineMount();
 }
 function _settingsRender(){
+  _kbInlineHomeRestore();
   var host = document.getElementById('settings-hub-host'); if (!host) return;
   host.innerHTML =
     '<div class="set-profile">' +
