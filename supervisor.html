@@ -23069,9 +23069,9 @@ body.role-staff #mydaily-box{ display:none !important; }
 .dpc-wa{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top:10px; background:#25d366; color:#fff; font-size:10.5px; font-weight:900; padding:8px; border-radius:9px; border:none; cursor:pointer; font-family:inherit; }
 .dpc-wa:active{ transform:scale(.98); }
 /* view-switcher (floating chips, collapsible) v317 */
-.dpc-vswitch{ display:flex; gap:7px; justify-content:center; margin-bottom:11px; flex-wrap:wrap; }
-.dpc-vchip{ font-size:10.5px; font-weight:800; padding:7px 14px; border-radius:20px; background:rgba(255,255,255,.10); color:#dbe7f5; border:1px solid rgba(255,255,255,.18); cursor:pointer; }
-.dpc-vchip .cx{ font-size:8px; opacity:.85; }
+.dpc-vswitch{ display:flex; gap:9px; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+.dpc-vchip{ font-size:13px; font-weight:800; padding:10px 20px; border-radius:22px; background:rgba(255,255,255,.10); color:#dbe7f5; border:1px solid rgba(255,255,255,.18); cursor:pointer; }
+.dpc-vchip .cx{ font-size:9px; opacity:.85; }
 .dpc-vchip.on{ background:#f5b942; color:#062a52; border-color:#f5b942; box-shadow:0 3px 9px rgba(245,185,66,.35); }
 .dpc-vhint{ text-align:center; color:#9db4d0; font-size:10px; padding:12px 6px; }
 .dpc-vbody{ margin-top:2px; }
@@ -23088,6 +23088,10 @@ body.role-staff #mydaily-box{ display:none !important; }
 .dpc-mtx .tot.bad{ color:#dc2626; font-weight:900; }
 .dpc-mtx tr.fail:active{ background:#fff1f1; }
 .dpc-mtxhint{ font-size:8.5px; color:#9db4d0; margin-top:8px; text-align:center; }
+.dpc-mtxwrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:9px; }
+.dpc-mtxwrap .dpc-mtx{ width:auto; min-width:100%; white-space:nowrap; }
+.dpc-mtx td.hh{ color:#16a34a; font-weight:900; }
+.dpc-mtx td.hz{ color:#cbd5e1; font-weight:700; }
 .dpc-lrow{ display:flex; align-items:center; gap:9px; background:#fff; border:1px solid #fecaca; border-left:3px solid #dc2626; border-radius:9px; padding:8px 10px; margin-bottom:6px; }
 .dpc-lrow:last-child{ margin-bottom:0; }
 .dpc-lav{ width:28px; height:28px; border-radius:50%; background:#dc2626; color:#fff; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; flex:0 0 auto; }
@@ -24072,7 +24076,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                     <div class="n" id="ovstats-cnt-pragati">0</div>
                     <div class="l">प्रतिवेदन दिया</div>
                   </div>
-                  <div class="ovstats-tile ovstats-tile-dpc mas-pill" onclick="event.stopPropagation();ovstatsNavTile('dpc',event)" title="आज निर्धारित प्रगति (2 शिकायत + 1 RC + 1 सूत्र/STR/PE) न देने वाले IO">
+                  <div class="ovstats-tile ovstats-tile-dpc mas-pill" onclick="event.stopPropagation();ovstatsNavTile('dpc',event)" title="आज निर्धारित प्रगति (2 शिकायत + 1 RC + 1 सूत्र/STR/PE/R-Comp) न देने वाले IO">
                     <div class="n" id="ovstats-cnt-dpc">0</div>
                     <div class="l">आज प्रगति नहीं</div>
                   </div>
@@ -53117,7 +53121,7 @@ function noprRowToggle(rk,type,id){ _noprRowOpen[rk]=!_noprRowOpen[rk]; ovstatsR
 // में प्रगति दर्ज करे (कुल ≥4)। शाम 8 बजे तक पूरा न करने वाले IO डिफॉल्टर-सूची में।
 // ═══════════════════════════════════════════════════════════════════
 var DPC_MIN_COMPLAINTS = 2, DPC_MIN_RC = 1, DPC_MIN_FLEX = 1;
-var DPC_FLEX_TYPES = ['strs','sutra','pes'];   // इनमें से किसी एक में प्रगति चलेगी
+var DPC_FLEX_TYPES = ['strs','sutra','pes','rcomplaints'];   // इनमें से किसी एक में प्रगति चलेगी (R-Comp सहित)
 var DPC_DEADLINE_HR = 20;                        // शाम 8:00 बजे
 function _dpcLocalYMD(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _dpcTodayUpdates(){
@@ -53135,22 +53139,24 @@ function _dpcCompute(){
   var ups=_dpcTodayUpdates();
   return ios.map(function(io){
     var mine=ups.filter(function(u){ return _prIoMatch(u, io.name); });
-    var cSet={}, rSet={}, fSet={}, allSet={};
+    var HEADS=['complaints','rcomplaints','rcs','pes','strs','sutra'];
+    var hset={}; HEADS.forEach(function(h){ hset[h]={}; }); var allSet={};
     mine.forEach(function(u){
       allSet[u.case_type+'|'+u.case_id]=true;                 // distinct प्रकरण
-      if(u.case_type==='complaints') cSet[u.case_id]=true;
-      else if(u.case_type==='rcs') rSet[u.case_id]=true;
-      else if(DPC_FLEX_TYPES.indexOf(u.case_type)>=0) fSet[u.case_id]=true;
+      if(hset[u.case_type]) hset[u.case_type][u.case_id]=true;
     });
-    var c=Object.keys(cSet).length, r=Object.keys(rSet).length, f=Object.keys(fSet).length, total=Object.keys(allSet).length;
+    var heads={}; HEADS.forEach(function(h){ heads[h]=Object.keys(hset[h]).length; });
+    var c=heads.complaints, r=heads.rcs;
+    var f=0; DPC_FLEX_TYPES.forEach(function(t){ f+=(heads[t]||0); });   // strs+sutra+pes+rcomplaints
+    var total=Object.keys(allSet).length;
     var missing=[];
     if(c<DPC_MIN_COMPLAINTS) missing.push({k:'complaints', need:(DPC_MIN_COMPLAINTS-c), lbl:(DPC_MIN_COMPLAINTS-c)+' शिकायत'});
     if(r<DPC_MIN_RC) missing.push({k:'rc', need:(DPC_MIN_RC-r), lbl:'RC'});
-    if(f<DPC_MIN_FLEX) missing.push({k:'flex', need:(DPC_MIN_FLEX-f), lbl:'सूत्र सूचना/STR/PE'});
+    if(f<DPC_MIN_FLEX) missing.push({k:'flex', need:(DPC_MIN_FLEX-f), lbl:'सूत्र/STR/PE/R-Comp'});
     var need=DPC_MIN_COMPLAINTS+DPC_MIN_RC+DPC_MIN_FLEX;      // 4
     var got=Math.min(c,DPC_MIN_COMPLAINTS)+Math.min(r,DPC_MIN_RC)+Math.min(f,DPC_MIN_FLEX);
     return { name:io.name, disp:(typeof getDisplayIOName==='function'?getDisplayIOName(io):io.name), rank:(io.rank||''),
-             complaints:c, rc:r, flex:f, total:total, need:need, got:got, ok:(missing.length===0), missing:missing };
+             complaints:c, rc:r, flex:f, heads:heads, total:total, need:need, got:got, ok:(missing.length===0), missing:missing };
   });
 }
 function _dpcDefaulters(){ return _dpcCompute().filter(function(x){ return !x.ok; }); }
@@ -53169,7 +53175,7 @@ function _dpcDateStr(){
 function _dpcMsg(x){
   var nm=x.disp||x.name||'महोदय/महोदया'; var dstr=_dpcDateStr(); var body;
   if(x.got===0){
-    body=nm+' जी, आज ('+dstr+') आपके द्वारा कोई भी दैनिक प्रगति दर्ज नहीं की गई। निर्धारित 4 प्रगति (2 शिकायत + 1 RC + 1 सूत्र सूचना/STR/PE) — भविष्य में ध्यान रखें।';
+    body=nm+' जी, आज ('+dstr+') आपके द्वारा कोई भी दैनिक प्रगति दर्ज नहीं की गई। निर्धारित 4 प्रगति (2 शिकायत + 1 RC + 1 सूत्र/STR/PE/R-Comp) — भविष्य में ध्यान रखें।';
   } else {
     var miss=x.missing.map(function(m){ return m.lbl; }).join(' व ');
     body=nm+' जी, आज ('+dstr+') आपके द्वारा निर्धारित 4 में से केवल '+x.got+' प्रगति दर्ज हुई। शेष — '+miss+' — भविष्य में ध्यान रखें।';
@@ -53186,7 +53192,7 @@ function _dpcCardHTML(list){
     var chips='';
     chips += (x.complaints>=DPC_MIN_COMPLAINTS) ? '<span class="dpc-chip done">✓ '+DPC_MIN_COMPLAINTS+' शिकायत</span>' : '<span class="dpc-chip miss">✗ '+(DPC_MIN_COMPLAINTS-x.complaints)+' शिकायत बाकी</span>';
     chips += (x.rc>=DPC_MIN_RC) ? '<span class="dpc-chip done">✓ 1 RC</span>' : '<span class="dpc-chip miss">✗ RC बाकी</span>';
-    chips += (x.flex>=DPC_MIN_FLEX) ? '<span class="dpc-chip done">✓ सूत्र/STR/PE</span>' : '<span class="dpc-chip miss">✗ सूत्र/STR/PE बाकी</span>';
+    chips += (x.flex>=DPC_MIN_FLEX) ? '<span class="dpc-chip done">✓ सूत्र/STR/PE/R-Comp</span>' : '<span class="dpc-chip miss">✗ सूत्र/STR/PE/R-Comp बाकी</span>';
     return '<div class="dpc-card">'+
       '<div class="dpc-top">'+
         '<div class="dpc-av">'+_mddEsc(_dpcInitials(x.name))+'</div>'+
@@ -53197,18 +53203,18 @@ function _dpcCardHTML(list){
     '</div>';
   }).join('');
 }
+var DPC_MTX_HEADS = [['complaints','शिका'],['rcomplaints','R-Comp'],['rcs','RC'],['pes','PE'],['strs','STR'],['sutra','सूत्र']];
 function _dpcMatrixHTML(list){
   var rows=list.map(function(x){
     var b64=(typeof _b64u==='function')?_b64u(_dpcMsg(x)):'';
-    var cc=(x.complaints>=DPC_MIN_COMPLAINTS)?'<td class="yes">✓</td>':'<td class="no">✗</td>';
-    var rr=(x.rc>=DPC_MIN_RC)?'<td class="yes">✓</td>':'<td class="no">✗</td>';
-    var ff=(x.flex>=DPC_MIN_FLEX)?'<td class="yes">✓</td>':'<td class="no">✗</td>';
+    var cells=DPC_MTX_HEADS.map(function(h){ var n=(x.heads&&x.heads[h[0]])||0; return '<td class="'+(n>0?'hh':'hz')+'">'+n+'</td>'; }).join('');
     return '<tr class="fail" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">'+
       '<td class="nm">'+_mddEsc(x.disp)+' <span class="wa">📋</span><span class="rk">'+_mddEsc(x.rank||'IO')+'</span></td>'+
-      cc+rr+ff+'<td class="tot bad">'+x.got+'/'+x.need+'</td></tr>';
+      cells+'<td class="tot bad">'+x.got+'/'+x.need+'</td></tr>';
   }).join('');
-  return '<table class="dpc-mtx"><thead><tr><th>IO</th><th>शिका.×2</th><th>RC</th><th>सूत्र/STR/PE</th><th>कुल</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-    '<div class="dpc-mtxhint">किसी IO पर tap → उसका WhatsApp reminder copy। ✓ पूर्ण · ✗ बाकी।</div>';
+  var thead='<th>IO</th>'+DPC_MTX_HEADS.map(function(h){ return '<th>'+h[1]+'</th>'; }).join('')+'<th>कुल</th>';
+  return '<div class="dpc-mtxwrap"><table class="dpc-mtx"><thead><tr>'+thead+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="dpc-mtxhint">प्रत्येक शीर्ष में आज दर्ज प्रकरण-संख्या (हरा = दर्ज)। किसी IO पर tap → WhatsApp reminder copy।</div>';
 }
 function _dpcListHTML(list){
   return list.map(function(x){
