@@ -23367,6 +23367,16 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .rep-exp-actrow{ display:flex; gap:6px; margin-top:11px; }
 .rep-exp-abtn{ flex:1; text-align:center; padding:8px 4px; border-radius:8px; font-size:9.5px; font-weight:800; background:#fff; border:1.5px solid #dbe3ee; color:#334155; cursor:pointer; }
 .rep-exp-abtn.gold{ background:#f5b942; color:#062a52; border-color:#f5b942; }
+  /* v309 item6: inline live report preview */
+  .rep-inprev{ margin-top:11px; }
+  .rep-inprev-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid #e2e8f0; border-radius:9px; }
+  .rep-inprev-tbl{ width:100%; border-collapse:collapse; font-size:10.5px; background:#fff; }
+  .rep-inprev-tbl thead{ background:#062a52; color:#fff; }
+  .rep-inprev-tbl th{ padding:7px 8px; text-align:left; font-weight:700; white-space:nowrap; font-size:9.5px; }
+  .rep-inprev-tbl td{ padding:6px 8px; border-bottom:1px solid #eef2f7; color:#1f2d3d; vertical-align:top; }
+  .rep-inprev-tbl td.cno{ font-family:ui-monospace,monospace; font-weight:800; color:#062a52; white-space:nowrap; }
+  .rep-inprev-tbl tbody tr:nth-child(even){ background:#f8fafc; }
+  .rep-inprev-empty{ padding:14px; text-align:center; color:#64748b; font-size:11.5px; }
 
 
 
@@ -53667,6 +53677,7 @@ var _repExportSheetOpen = false;
 function repToggleExportField(key){
   _repExportFields[key] = !_repExportFields[key];
   _repRenderExportSheet();
+  if (_repPreviewOpen) { var _h=document.getElementById('rep-export-preview'); if(_h){ _h.style.display='block'; _h.innerHTML=_repInlinePreviewHTML(); } }
 }
 function repExportOpen(){
   _repExportSheetOpen = !_repExportSheetOpen;
@@ -53698,10 +53709,33 @@ function _repRenderExportSheet(){
       return '<span class="rep-chip' + (on?' on':'') + '" onclick="event.stopPropagation();repToggleExportField(\'' + f[0] + '\')">' + f[1] + '</span>';
     }).join('') + '</div>' +
     '<div class="rep-exp-actrow">' +
-      '<button class="rep-exp-abtn" onclick="event.stopPropagation();repExportGenerate(\'preview\')">👁️ Preview</button>' +
+      '<button class="rep-exp-abtn" onclick="event.stopPropagation();repTogglePreview()">👁️ Preview</button>' +
       '<button class="rep-exp-abtn" onclick="event.stopPropagation();repExportGenerate(\'pdf\')">📄 PDF</button>' +
       '<button class="rep-exp-abtn gold" onclick="event.stopPropagation();repExportGenerate(\'print\')">🖨️ Print</button>' +
-    '</div>';
+    '</div>' +
+    '<div id="rep-export-preview" class="rep-inprev" style="display:' + (_repPreviewOpen?'block':'none') + ';">' + (_repPreviewOpen ? _repInlinePreviewHTML() : '') + '</div>';
+}
+var _repPreviewOpen=false;
+function _repInlinePreviewHTML(){
+  var rows=_repExportRows(); var f=_repExportFields;
+  if(!rows.length) return '<div class="rep-inprev-empty">कोई प्रकरण नहीं</div>';
+  var cols=['#','Case No','Date']; if(f.io)cols.push('I/O'); if(f.complainant)cols.push('शिकायतकर्ता'); if(f.nonComplainant)cols.push('अनावेदक'); if(f.sections)cols.push('धाराएं'); if(f.status)cols.push('स्थिति'); if(f.tags)cols.push('Tags');
+  var body=rows.map(function(x,i){ var r=x.r;
+    var td=['<td>'+(i+1)+'</td>','<td class="cno">'+escapeHtml(formatEntryNo(x.type,r.no,r.entry_year))+'</td>','<td>'+(r.date?fmtDateShort(r.date):'—')+'</td>'];
+    if(f.io)td.push('<td>'+escapeHtml(r.io_name||'—')+'</td>');
+    if(f.complainant)td.push('<td>'+escapeHtml(r.complainant||'—')+'</td>');
+    if(f.nonComplainant)td.push('<td>'+escapeHtml((typeof ncompDisplay==='function'?ncompDisplay(r.non_complainant):r.non_complainant)||'—')+'</td>');
+    if(f.sections)td.push('<td>'+escapeHtml(r.sections||'—')+'</td>');
+    if(f.status)td.push('<td>'+escapeHtml(r.case_status||'Active')+'</td>');
+    if(f.tags){ var tn=(Array.isArray(r.tag_ids)?r.tag_ids:[]).map(function(id){var t=getTagById(id);return t?t.name:'';}).filter(Boolean).join(', '); td.push('<td>'+escapeHtml(tn||'—')+'</td>'); }
+    return '<tr>'+td.join('')+'</tr>'; }).join('');
+  return '<div class="rep-inprev-scroll"><table class="rep-inprev-tbl"><thead><tr>'+cols.map(function(c){return '<th>'+escapeHtml(c)+'</th>';}).join('')+'</tr></thead><tbody>'+body+'</tbody></table></div>';
+}
+function repTogglePreview(){
+  _repPreviewOpen=!_repPreviewOpen;
+  var h=document.getElementById('rep-export-preview'); if(!h) return;
+  h.style.display=_repPreviewOpen?'block':'none';
+  if(_repPreviewOpen) h.innerHTML=_repInlinePreviewHTML();
 }
 function repExportGenerate(mode){
   var rows = _repExportRows();
