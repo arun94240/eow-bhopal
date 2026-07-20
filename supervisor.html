@@ -53543,7 +53543,7 @@ var REP_HEAD_LABELS = { complaints:'Complaints', rcomplaints:'R-Complaints', rcs
 
 // filters: default = everything included until narrowed
 function _repDefaultFilters(){
-  return { types: [], includeCourt:false, dateFrom:'', dateTo:'', statuses:[], officers:[], tagIds:[] };
+  return { types: [], includeCourt:false, dateFrom:'', dateTo:'', statuses:[], officers:[], tagIds:[], supervision:[] };
 }
 var _repF = _repDefaultFilters();
 
@@ -53551,6 +53551,10 @@ function _repRowMatchesTags(r, tagIds){
   if (!tagIds || !tagIds.length) return true;
   var rt = Array.isArray(r.tag_ids) ? r.tag_ids : [];
   return tagIds.some(function(id){ return rt.indexOf(id) > -1; });
+}
+function _repMatchesSup(r, sup){
+  if (!sup || !sup.length) return true;
+  return sup.some(function(x){ return (x==='dg' && r.is_dg_eow_task===true) || (x==='sp' && r.is_sp_imp===true); });
 }
 function _repCompute(filters){
   var f = filters || _repF;
@@ -53566,6 +53570,7 @@ function _repCompute(filters){
       if (f.statuses && f.statuses.length && f.statuses.indexOf(r.case_status || 'Active') === -1) return;
       if (f.officers && f.officers.length && f.officers.indexOf(r.io_name) === -1) return;
       if (!_repRowMatchesTags(r, f.tagIds)) return;
+      if (!_repMatchesSup(r, f.supervision)) return;
       enqResults.push({ type: type, row: r });
     });
   });
@@ -53580,6 +53585,7 @@ function _repCompute(filters){
         if (f.officers.indexOf(officer) === -1) return;
       }
       if (!_repRowMatchesTags(c, f.tagIds)) return;
+      if (!_repMatchesSup(c, f.supervision)) return;
       courtResults.push(c);
     });
   }
@@ -53826,6 +53832,12 @@ function repToggleTag(tagId){
   if (i>-1) _repF.tagIds.splice(i,1); else _repF.tagIds.push(tagId);
   _repRenderStyleBody(_repCurrentStyle); _repRunAndShow();
 }
+function repToggleSup(x){
+  if(!_repF.supervision) _repF.supervision=[];
+  var i = _repF.supervision.indexOf(x);
+  if (i>-1) _repF.supervision.splice(i,1); else _repF.supervision.push(x);
+  _repRenderStyleBody(_repCurrentStyle); _repRunAndShow();
+}
 function _repTagFilterHTML(){
   var catsWithData = TAG_CATS.filter(function(c){ return c.k !== '__other'; });
   var catSel = '<select onchange="repSetTagCat(this.value)">' + catsWithData.map(function(c){
@@ -53839,7 +53851,9 @@ function _repTagFilterHTML(){
   var selectedChips = _repF.tagIds.length ? ('<div class="rep-mini-row"><span class="rep-mini-lbl">चुने गए</span><div class="rep-chips">' +
     _repF.tagIds.map(function(id){ var t=getTagById(id); return t ? ('<span class="rep-chip on" onclick="event.stopPropagation();repToggleTag(\''+id+'\')">'+escapeHtml(t.name)+' ✕</span>') : ''; }).join('') +
     '</div></div>') : '';
-  return '<div class="rep-mini-row"><span class="rep-mini-lbl">🏷️ Tags</span>' + catSel + '</div>' +
+  var _supChips = ['dg','sp'].map(function(x){ var on=(_repF.supervision||[]).indexOf(x)>-1; var lbl=(x==='dg'?'🏛 DG EOW':'★ SP IMP'); return '<span class="rep-chip'+(on?' on':'')+'" onclick="event.stopPropagation();repToggleSup(\''+x+'\')">'+lbl+'</span>'; }).join('');
+  return '<div class="rep-mini-row"><span class="rep-mini-lbl">🎯 Supervision</span><div class="rep-chips">' + _supChips + '</div></div>' +
+    '<div class="rep-mini-row"><span class="rep-mini-lbl">🏷️ Tags</span>' + catSel + '</div>' +
     '<div class="rep-chips">' + chips + '</div>' + selectedChips;
 }
 var _repPragF = { io:'', from:'', to:'' };
