@@ -23068,6 +23068,35 @@ body.role-staff #mydaily-box{ display:none !important; }
 .dpc-chip.miss{ background:#fee2e2; color:#b91c1c; border:1px dashed #f87171; }
 .dpc-wa{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top:10px; background:#25d366; color:#fff; font-size:10.5px; font-weight:900; padding:8px; border-radius:9px; border:none; cursor:pointer; font-family:inherit; }
 .dpc-wa:active{ transform:scale(.98); }
+/* view-switcher (floating chips, collapsible) v317 */
+.dpc-vswitch{ display:flex; gap:7px; justify-content:center; margin-bottom:11px; flex-wrap:wrap; }
+.dpc-vchip{ font-size:10.5px; font-weight:800; padding:7px 14px; border-radius:20px; background:rgba(255,255,255,.10); color:#dbe7f5; border:1px solid rgba(255,255,255,.18); cursor:pointer; }
+.dpc-vchip .cx{ font-size:8px; opacity:.85; }
+.dpc-vchip.on{ background:#f5b942; color:#062a52; border-color:#f5b942; box-shadow:0 3px 9px rgba(245,185,66,.35); }
+.dpc-vhint{ text-align:center; color:#9db4d0; font-size:10px; padding:12px 6px; }
+.dpc-vbody{ margin-top:2px; }
+.dpc-mtx{ width:100%; border-collapse:collapse; font-size:10px; background:#fff; border-radius:9px; overflow:hidden; }
+.dpc-mtx th{ background:#041f3d; color:#dbe7f5; font-size:8.3px; font-weight:800; padding:7px 2px; text-align:center; }
+.dpc-mtx th:first-child{ text-align:left; padding-left:9px; }
+.dpc-mtx td{ padding:8px 2px; text-align:center; border-bottom:1px solid #eef2f7; }
+.dpc-mtx tr:last-child td{ border-bottom:none; }
+.dpc-mtx td.nm{ text-align:left; padding-left:9px; font-weight:800; color:#b91c1c; font-size:10px; cursor:pointer; }
+.dpc-mtx td.nm .wa{ color:#25d366; font-size:11px; margin-left:2px; }
+.dpc-mtx td.nm .rk{ display:block; font-size:7.5px; color:#94a3b8; font-weight:600; }
+.dpc-mtx .yes{ color:#16a34a; font-weight:900; font-size:12px; }
+.dpc-mtx .no{ color:#e2e8f0; font-weight:900; font-size:12px; }
+.dpc-mtx .tot.bad{ color:#dc2626; font-weight:900; }
+.dpc-mtx tr.fail:active{ background:#fff1f1; }
+.dpc-mtxhint{ font-size:8.5px; color:#9db4d0; margin-top:8px; text-align:center; }
+.dpc-lrow{ display:flex; align-items:center; gap:9px; background:#fff; border:1px solid #fecaca; border-left:3px solid #dc2626; border-radius:9px; padding:8px 10px; margin-bottom:6px; }
+.dpc-lrow:last-child{ margin-bottom:0; }
+.dpc-lav{ width:28px; height:28px; border-radius:50%; background:#dc2626; color:#fff; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; flex:0 0 auto; }
+.dpc-lmain{ flex:1; min-width:0; }
+.dpc-lnm{ font-size:11px; font-weight:900; color:#7f1d1d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dpc-lrk{ font-size:8.5px; color:#94a3b8; font-weight:600; }
+.dpc-lmiss{ font-size:8.8px; color:#b91c1c; margin-top:1px; }
+.dpc-lfr{ font-size:13px; font-weight:900; color:#dc2626; flex:0 0 auto; }
+.dpc-wa-mini{ width:30px; height:30px; border-radius:8px; background:#25d366; color:#fff; font-size:13px; border:none; cursor:pointer; flex:0 0 auto; }
 
 /* #3 — Agenda group chip inline ＋ add button (v241) */
 #mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
@@ -40672,7 +40701,7 @@ function ovstatsNavTile(tile, evt) {
   else if (tile === 'tags' && typeof ovstatsRenderTagsSummary === 'function') ovstatsRenderTagsSummary();
   else if (tile === 'pragati' && typeof ovstatsRenderPragatiSummary === 'function') ovstatsRenderPragatiSummary();
   else if (tile === 'nopr' && typeof ovstatsRenderNoPragati === 'function') ovstatsRenderNoPragati();
-  else if (tile === 'dpc' && typeof ovstatsRenderDPC === 'function') ovstatsRenderDPC();
+  else if (tile === 'dpc') { _dpcView = null; if (typeof ovstatsRenderDPC === 'function') ovstatsRenderDPC(); }
   else if (tile === 'roster') { if (typeof refreshStaffPulse === 'function') refreshStaffPulse(); if (typeof renderEstabRoster === 'function') renderEstabRoster(); }
   
   // Smart scroll — bring panel into view
@@ -53147,6 +53176,51 @@ function _dpcMsg(x){
   }
   return '🏛 आर्थिक अपराध शाखा, भोपाल\n\n'+body+'\n\n— कार्यालय अधीक्षक पुलिस, EOW भोपाल';
 }
+// view-switcher state — null = तीनों collapsed (default); 'card' | 'matrix' | 'list'
+var _dpcView = null;
+function dpcSetView(v){ _dpcView = (_dpcView===v) ? null : v; ovstatsRenderDPC(); }
+function _dpcWaBtnBig(x){ var b64=(typeof _b64u==='function')?_b64u(_dpcMsg(x)):''; return '<button class="dpc-wa" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">📋 WhatsApp reminder — copy करें</button>'; }
+function _dpcWaMini(x){ var b64=(typeof _b64u==='function')?_b64u(_dpcMsg(x)):''; return '<button class="dpc-wa-mini" title="WhatsApp reminder copy" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">📋</button>'; }
+function _dpcCardHTML(list){
+  return list.map(function(x){
+    var chips='';
+    chips += (x.complaints>=DPC_MIN_COMPLAINTS) ? '<span class="dpc-chip done">✓ '+DPC_MIN_COMPLAINTS+' शिकायत</span>' : '<span class="dpc-chip miss">✗ '+(DPC_MIN_COMPLAINTS-x.complaints)+' शिकायत बाकी</span>';
+    chips += (x.rc>=DPC_MIN_RC) ? '<span class="dpc-chip done">✓ 1 RC</span>' : '<span class="dpc-chip miss">✗ RC बाकी</span>';
+    chips += (x.flex>=DPC_MIN_FLEX) ? '<span class="dpc-chip done">✓ सूत्र/STR/PE</span>' : '<span class="dpc-chip miss">✗ सूत्र/STR/PE बाकी</span>';
+    return '<div class="dpc-card">'+
+      '<div class="dpc-top">'+
+        '<div class="dpc-av">'+_mddEsc(_dpcInitials(x.name))+'</div>'+
+        '<div class="dpc-nm"><div class="nn">'+_mddEsc(x.disp)+'</div><div class="rk">'+_mddEsc(x.rank||'IO')+'</div></div>'+
+        '<div class="dpc-frac"><div class="big">'+x.got+'/'+x.need+'</div><div class="sm">दर्ज</div></div>'+
+      '</div>'+
+      '<div class="dpc-miss">'+chips+'</div>'+ _dpcWaBtnBig(x)+
+    '</div>';
+  }).join('');
+}
+function _dpcMatrixHTML(list){
+  var rows=list.map(function(x){
+    var b64=(typeof _b64u==='function')?_b64u(_dpcMsg(x)):'';
+    var cc=(x.complaints>=DPC_MIN_COMPLAINTS)?'<td class="yes">✓</td>':'<td class="no">✗</td>';
+    var rr=(x.rc>=DPC_MIN_RC)?'<td class="yes">✓</td>':'<td class="no">✗</td>';
+    var ff=(x.flex>=DPC_MIN_FLEX)?'<td class="yes">✓</td>':'<td class="no">✗</td>';
+    return '<tr class="fail" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">'+
+      '<td class="nm">'+_mddEsc(x.disp)+' <span class="wa">📋</span><span class="rk">'+_mddEsc(x.rank||'IO')+'</span></td>'+
+      cc+rr+ff+'<td class="tot bad">'+x.got+'/'+x.need+'</td></tr>';
+  }).join('');
+  return '<table class="dpc-mtx"><thead><tr><th>IO</th><th>शिका.×2</th><th>RC</th><th>सूत्र/STR/PE</th><th>कुल</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<div class="dpc-mtxhint">किसी IO पर tap → उसका WhatsApp reminder copy। ✓ पूर्ण · ✗ बाकी।</div>';
+}
+function _dpcListHTML(list){
+  return list.map(function(x){
+    var miss=x.missing.map(function(m){ return m.lbl; }).join(', ');
+    return '<div class="dpc-lrow">'+
+      '<div class="dpc-lav">'+_mddEsc(_dpcInitials(x.name))+'</div>'+
+      '<div class="dpc-lmain"><div class="dpc-lnm">'+_mddEsc(x.disp)+' <span class="dpc-lrk">'+_mddEsc(x.rank||'IO')+'</span></div>'+
+        '<div class="dpc-lmiss">शेष: '+_mddEsc(miss||'—')+'</div></div>'+
+      '<div class="dpc-lfr">'+x.got+'/'+x.need+'</div>'+ _dpcWaMini(x)+
+    '</div>';
+  }).join('');
+}
 function ovstatsRenderDPC(){
   var host=document.getElementById('dpc-panel-content'); if(!host) return;
   var list=_dpcDefaulters();
@@ -53161,29 +53235,14 @@ function ovstatsRenderDPC(){
     host.innerHTML='<div class="dpc-feed">'+lockNote+'<div class="dpc-allok">✅ आज सभी IO ने निर्धारित प्रगति पूरी कर ली।</div></div>';
     return;
   }
-  var cards=list.map(function(x){
-    var chips='';
-    chips += (x.complaints>=DPC_MIN_COMPLAINTS)
-      ? '<span class="dpc-chip done">✓ '+DPC_MIN_COMPLAINTS+' शिकायत</span>'
-      : '<span class="dpc-chip miss">✗ '+(DPC_MIN_COMPLAINTS-x.complaints)+' शिकायत बाकी</span>';
-    chips += (x.rc>=DPC_MIN_RC)
-      ? '<span class="dpc-chip done">✓ 1 RC</span>'
-      : '<span class="dpc-chip miss">✗ RC बाकी</span>';
-    chips += (x.flex>=DPC_MIN_FLEX)
-      ? '<span class="dpc-chip done">✓ सूत्र/STR/PE</span>'
-      : '<span class="dpc-chip miss">✗ सूत्र/STR/PE बाकी</span>';
-    var b64=(typeof _b64u==='function')?_b64u(_dpcMsg(x)):'';
-    return '<div class="dpc-card">'+
-      '<div class="dpc-top">'+
-        '<div class="dpc-av">'+_mddEsc(_dpcInitials(x.name))+'</div>'+
-        '<div class="dpc-nm"><div class="nn">'+_mddEsc(x.disp)+'</div><div class="rk">'+_mddEsc(x.rank||'IO')+'</div></div>'+
-        '<div class="dpc-frac"><div class="big">'+x.got+'/'+x.need+'</div><div class="sm">दर्ज</div></div>'+
-      '</div>'+
-      '<div class="dpc-miss">'+chips+'</div>'+
-      '<button class="dpc-wa" onclick="event.stopPropagation();copyLeaveMsgB64(\''+b64+'\')">📋 WhatsApp reminder — copy करें</button>'+
-    '</div>';
-  }).join('');
-  host.innerHTML='<div class="dpc-feed">'+lockNote+cards+'</div>';
+  function chip(v,ic,lb){ return '<div class="dpc-vchip'+(_dpcView===v?' on':'')+'" onclick="event.stopPropagation();dpcSetView(\''+v+'\')">'+ic+' '+lb+' <span class="cx">'+(_dpcView===v?'▴':'▾')+'</span></div>'; }
+  var chipsBar='<div class="dpc-vswitch">'+chip('card','🗂','कार्ड')+chip('matrix','▦','मैट्रिक्स')+chip('list','📋','सूची')+'</div>';
+  var body;
+  if(_dpcView==='card') body='<div class="dpc-vbody">'+_dpcCardHTML(list)+'</div>';
+  else if(_dpcView==='matrix') body='<div class="dpc-vbody">'+_dpcMatrixHTML(list)+'</div>';
+  else if(_dpcView==='list') body='<div class="dpc-vbody">'+_dpcListHTML(list)+'</div>';
+  else body='<div class="dpc-vhint">👆 ऊपर से कोई एक रूप चुनें — कार्ड · मैट्रिक्स · सूची</div>';
+  host.innerHTML='<div class="dpc-feed">'+lockNote+chipsBar+body+'</div>';
 }
 
 function renderOverview() {
