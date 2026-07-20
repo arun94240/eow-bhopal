@@ -23430,7 +23430,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
   .set-kb-inline{ padding:10px 8px 12px; background:#fff; border-bottom:1px solid #eceef3; }
   .set-kb-inline .kb-section-wrap{ margin:0 !important; padding:0 !important; }
   .set-kb-inline .kb-section-header{ display:none !important; }
-  .set-kb-inline #kb-sec-tile-row{ grid-template-columns:repeat(2,1fr) !important; }
+  .set-kb-inline #kb-sec-tile-row, .set-kb-inline #kb-links-tile-row, .set-kb-inline #kb-testforms-tile-row{ grid-template-columns:repeat(2,1fr) !important; }
 .set-detail b{ color:#062a52; }
 .cblue{ background:linear-gradient(135deg,#60a5fa,#3b82f6); } .cgreen{ background:linear-gradient(135deg,#4ade80,#16a34a); }
 .cpurple{ background:linear-gradient(135deg,#a78bfa,#7c3aed); } .corange{ background:linear-gradient(135deg,#fb923c,#ea580c); }
@@ -26747,7 +26747,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
   <!-- ════════════════════════════════════════════════════════════════════ -->
   <!-- 🔗 LINKS SECTION — Forms for Staff/IO (dedicated tab) -->
   <section id="links" class="section">
-    <div class="kb-section-wrap">
+    <div class="kb-section-wrap" id="links-forms-wrap">
       
       <!-- Section header -->
       <div class="kb-section-header">
@@ -36631,6 +36631,7 @@ function switchSection(id) {
 
 // Internal switch logic — called by both manual switchSection and navGoBack
 function _switchSectionInternal(id) {
+  try { if (typeof _settingsInlineRestoreAll === 'function') _settingsInlineRestoreAll(); } catch(e){}
   if (typeof _ioNavOpen!=='undefined' && _ioNavOpen && id!=='officers-nav') { try{ _closeIONavInline(); }catch(e){} }
   document.querySelectorAll('.section-tab').forEach(function(t){ t.classList.remove('active'); });
   document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
@@ -53989,7 +53990,7 @@ function _doTagCounts(category){
    an honest "coming soon" note for features not yet built.
    ═══════════════════════════════════════════════════════════════════ */
 var SETTINGS_ITEMS = [
-  { id:'linksforms', grp:'Forms & Knowledge Base', ic:'🔗', cls:'cindigo', ttl:'Links & Forms', sub:'Pragati · Leave · Notice · Attendance — staff & IO forms', nav:'links' },
+  { id:'linksforms', grp:'Forms & Knowledge Base', ic:'🔗', cls:'cindigo', ttl:'Links & Forms', sub:'Pragati · Leave · Notice · Attendance — staff & IO forms' },
   { id:'kbfiles', grp:'Forms & Knowledge Base', ic:'📚', cls:'corange', ttl:'Knowledge Base & Files', sub:'Step-by-step procedures · guides · reference files' },
   { id:'profile', grp:'Profile & Security', ic:'👤', cls:'cblue', ttl:'My Profile', sub:'Name, designation, contact details' },
   { id:'pin', grp:'Profile & Security', ic:'🔐', cls:'cgray', ttl:'Change PIN', sub:'Update your login PIN' },
@@ -54023,13 +54024,13 @@ function settingsToggleRow(id){
   _settingsRenderList();
 }
 function settingsNavTo(sec){
-  try { _kbInlineHomeRestore(); } catch(e){}
+  try { _settingsInlineRestoreAll(); } catch(e){}
   try { _ssrClose('settings-hub-host'); } catch(e){}
   if (typeof switchSection === 'function') switchSection(sec);
 }
 function _settingsDetailHTML(id){
-  if (id === 'kbfiles') {
-    return '<div id="settings-kb-host" class="set-kb-inline"></div>';
+  if (SETTINGS_INLINE[id]) {
+    return '<div id="settings-inline-host-' + id + '" class="set-kb-inline"></div>';
   }
   if (id === 'iolist') {
     var n = (state.ioMaster || []).filter(function(x){ return x.is_io; }).length;
@@ -54045,19 +54046,24 @@ function _settingsDetailHTML(id){
   }
   return '<div class="set-detail set-soon">🚧 यह सेटिंग जल्द जोड़ी जाएगी — अभी इस पर कार्य होना बाक़ी है।</div>';
 }
-function _kbInlineHomeRestore(){
-  var wrap = document.getElementById('kb-files-wrap');
-  var home = document.getElementById('knowledge-base');
-  if (wrap && home && wrap.parentNode !== home) home.appendChild(wrap);
+var SETTINGS_INLINE = {
+  linksforms: { wrapId:'links-forms-wrap', homeId:'links', refresh:'refreshKbSection' },
+  kbfiles:    { wrapId:'kb-files-wrap',    homeId:'knowledge-base', refresh:'refreshKbSection' }
+};
+function _settingsInlineRestoreAll(){
+  for (var k in SETTINGS_INLINE){ if(!SETTINGS_INLINE.hasOwnProperty(k)) continue;
+    var c=SETTINGS_INLINE[k], w=document.getElementById(c.wrapId), h=document.getElementById(c.homeId);
+    if (w && h && w.parentNode !== h) h.appendChild(w);
+  }
 }
-function _kbInlineMount(){
-  var host = document.getElementById('settings-kb-host');
-  var wrap = document.getElementById('kb-files-wrap');
-  if (host && wrap && wrap.parentNode !== host) host.appendChild(wrap);
-  try { if (typeof refreshKbSection === 'function') refreshKbSection(); } catch(e){}
+function _settingsInlineMount(itemId){
+  var c=SETTINGS_INLINE[itemId]; if(!c) return;
+  var host=document.getElementById('settings-inline-host-'+itemId), w=document.getElementById(c.wrapId);
+  if (host && w && w.parentNode !== host) host.appendChild(w);
+  try { if (c.refresh && typeof window[c.refresh]==='function') window[c.refresh](); } catch(e){}
 }
 function _settingsRenderList(){
-  _kbInlineHomeRestore();
+  _settingsInlineRestoreAll();
   var host = document.getElementById('settings-list-host'); if (!host) return;
   var items = SETTINGS_ITEMS.filter(function(it){
     if (!_settingsQuery) return true;
@@ -54089,10 +54095,10 @@ function _settingsRenderList(){
       }).join('') +
     '</div>';
   }).join('');
-  if (_settingsOpenRow === 'kbfiles') _kbInlineMount();
+  if (SETTINGS_INLINE[_settingsOpenRow]) _settingsInlineMount(_settingsOpenRow);
 }
 function _settingsRender(){
-  _kbInlineHomeRestore();
+  _settingsInlineRestoreAll();
   var host = document.getElementById('settings-hub-host'); if (!host) return;
   host.innerHTML =
     '<div class="set-profile">' +
