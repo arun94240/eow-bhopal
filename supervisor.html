@@ -23108,7 +23108,10 @@ body.view-mobile img, body.view-mobile video, body.view-mobile table, body.view-
 .cs-repb:hover{ background:rgba(245,185,66,.2); }
 .cs-row{ position:relative; } .cs-rcar{ font-size:10px; color:#94a3b8; flex:0 0 auto; margin-left:2px; }
 .cs-row.open{ background:#eef5fd; box-shadow:0 0 0 2px rgba(37,99,235,.25) inset; }
-.cs-brief{ background:#f7fafd; border:1px solid #dbe7f5; border-radius:10px; padding:11px 12px; margin:-2px 0 7px; }
+.cs-brief{ background:#f7fafd; border:1px solid #dbe7f5; border-radius:10px; padding:11px 12px; margin:-2px 0 7px; color:#1e293b; }
+  /* v306 item3: dark-theme brief text was light-on-light inside the light search brief — force readable dark */
+  .cs-brief .mbr-cb-row{ color:#1f2d3d; }
+  .cs-brief .mbr-cb-brief{ color:#475569; }
 .cs-brief-mini .cs-bt{ font-size:13px; font-weight:800; color:#12325c; } .cs-brief-mini .cs-bs{ font-size:11px; color:#64748b; margin-top:2px; }
 .cs-oe{ margin-top:9px; background:#2563eb; color:#fff; border:none; border-radius:8px; padding:6px 13px; font-size:12px; font-weight:800; cursor:pointer; }
 .cs-brief .mbr-cb-row,.cs-brief .mbr-oe{ }
