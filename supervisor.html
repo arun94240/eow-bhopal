@@ -2397,6 +2397,9 @@ tbody tr:hover { background: var(--surface-alt); }
 .quick-add-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: #062a52; text-align: left; transition: all 0.1s; }
 .quick-add-item:hover { background: #eef4fa; transform: translateX(2px); }
 .quick-add-item span { font-size: 18px; flex-shrink: 0; }
+/* v310 item7: grouped, scrollable Add-Entry menu */
+.qa-grouplbl{ font-size:9px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:.05em; padding:9px 12px 3px; }
+.quick-add-menu{ max-height:72vh; overflow-y:auto; }
 
 /* Sort order toggle button */
 .link-input-group { display: flex; gap: 6px; margin-bottom: 6px; }
@@ -23781,16 +23784,21 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
         <span class="qab-label">Add Entry</span>
       </button>
       <div class="quick-add-menu" id="quick-add-menu">
-        <div class="quick-add-title">Choose section to add entry:</div>
+        <div class="quick-add-title">➕ Add Entry — कौन-से head में?</div>
+        <div class="qa-grouplbl">Enquiries</div>
         <button class="quick-add-item" onclick="quickAdd('complaints')"><span>📝</span> Complaints</button>
         <button class="quick-add-item" onclick="quickAdd('rcomplaints')"><span>📑</span> R-Complaints</button>
         <button class="quick-add-item" onclick="quickAdd('rcs')"><span>📂</span> RCs</button>
         <button class="quick-add-item" onclick="quickAdd('pes')"><span>🔍</span> PEs</button>
         <button class="quick-add-item" onclick="quickAdd('strs')"><span>📋</span> STRs</button>
         <button class="quick-add-item" onclick="quickAdd('sutra')"><span>🕵</span> Sutra Suchna</button>
+        <div class="qa-grouplbl">Court &amp; Establishment</div>
         <button class="quick-add-item" onclick="quickAdd('court')"><span>⚖</span> Court Case</button>
         <button class="quick-add-item" onclick="quickAdd('leaves')"><span>🏖</span> Leave</button>
         <button class="quick-add-item" onclick="quickAdd('iomaster')"><span>👮</span> Establishment Member</button>
+        <div class="qa-grouplbl">Progress &amp; Notices</div>
+        <button class="quick-add-item" onclick="quickAdd('ioupdate')"><span>📈</span> IO Update / प्रगति</button>
+        <button class="quick-add-item" onclick="quickAdd('notice')"><span>🔔</span> Notice</button>
       </div>
     </div>
   </div>
@@ -58316,11 +58324,27 @@ function restoreCourtViewMode() {
 
 
 function toggleQuickAdd() {
-  document.getElementById('quick-add-menu').classList.toggle('active');
+  var menu = document.getElementById('quick-add-menu'); if(!menu) return;
+  var willOpen = !menu.classList.contains('active');
+  menu.classList.toggle('active');
+  if (willOpen) {
+    setTimeout(function(){
+      document.addEventListener('click', function _qaCloseOnce(e){
+        var m=document.getElementById('quick-add-menu');
+        var btn=document.querySelector('.quick-add-tab-btn');
+        if (m && !m.contains(e.target) && (!btn || !btn.contains(e.target))) {
+          m.classList.remove('active');
+          document.removeEventListener('click', _qaCloseOnce);
+        }
+      });
+    }, 0);
+  }
 }
 
 function quickAdd(section) {
   document.getElementById('quick-add-menu').classList.remove('active');
+  if (section === 'notice') { if (typeof openNoticeModal==='function') openNoticeModal(); return; }
+  if (section === 'ioupdate') { if (typeof mddPragatiAdd==='function') mddPragatiAdd(); return; }
   // Switch to section first, then open the appropriate add modal
   switchSection(section);
   setTimeout(function(){
@@ -64832,7 +64856,7 @@ if (supa) {
   // Close quick-add menu when clicking outside (moved here for safety)
   document.addEventListener('click', function(e){
     var menu = document.getElementById('quick-add-menu');
-    var btn = document.querySelector('.quick-add-btn');
+    var btn = document.querySelector('.quick-add-tab-btn');
     if (menu && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
       menu.classList.remove('active');
     }
