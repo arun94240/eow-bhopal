@@ -34083,6 +34083,25 @@ function waShareText(t){
 }
 function _b64u(x){ try{ return btoa(unescape(encodeURIComponent(String(x||'')))); }catch(e){ return ''; } }
 function waShareB64(b){ try{ waShareText(decodeURIComponent(escape(atob(b)))); }catch(e){} }
+function _copyFallback(t){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.top='-1000px'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }catch(e){} }
+function copyLeaveMsg(text){
+  function done(){ try{ if(typeof toast==='function') toast('📋 WhatsApp संदेश copy हो गया — group में paste करें'); }catch(e){} }
+  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done, function(){ _copyFallback(text); done(); }); return; } }catch(e){}
+  _copyFallback(text); done();
+}
+function copyLeaveMsgB64(b){ try{ copyLeaveMsg(decodeURIComponent(escape(atob(b)))); }catch(e){} }
+function leaveDecisionMsg(l, decision){
+  if(!l) return '';
+  var nm = l.officer_name || 'महोदय/महोदया';
+  var typ = l.leave_type || 'अवकाश';
+  var df=(typeof _mddDate==='function'); var range = (l.from_date===l.to_date) ? (df?_mddDate(l.from_date):l.from_date) : ((df?_mddDate(l.from_date):l.from_date)+' से '+(df?_mddDate(l.to_date):l.to_date));
+  var days = (l.days!=null) ? (' ('+l.days+' दिवस)') : '';
+  var body;
+  if(decision==='reject'){ body = nm+' जी, आपका '+typ+' आवेदन ('+range+days+') निरस्त किया गया है।'+(l.decision_remarks?(' कारण: '+l.decision_remarks):''); }
+  else if(decision==='approve'){ body = nm+' जी, आपका '+typ+' आवेदन ('+range+days+') स्वीकृत कर दिया गया है।'; }
+  else { body = nm+' जी, आपका '+typ+' आवेदन ('+range+days+') प्राप्त हुआ है।'; }
+  return '🏛 आर्थिक अपराध शाखा, भोपाल\n\n'+body+'\n\n— कार्यालय अधीक्षक पुलिस, EOW भोपाल';
+}
 function _mddPragatiItemHTML(u){
   var prak = (typeof _cmdFormatUpdatePrakaran === 'function') ? _cmdFormatUpdatePrakaran(u) : (u.case_display || '');
   var act = (u.action_taken || u.note || '—');
@@ -34091,13 +34110,11 @@ function _mddPragatiItemHTML(u){
   var fresh = (rel === 'अभी-अभी');
   var rc=null; try{ rc=_briefResolveCase(u.case_type,u.case_id,(prak||'')+' '+(u.case_display||'')); }catch(e){}
   var caseChip = rc ? '<span class="mpf-case" onclick="event.stopPropagation();_mddPragatiCaseToggle(this,\''+rc.type+'\',\''+rc.id+'\')">📋 '+_mddEsc(_briefEnqLabel(rc.type,rc.id))+' <span class="mpf-car">▾</span></span>' : '';
-  var _waMsg = '\ud83d\udcc8 EOW \u092a\u094d\u0930\u0917\u0924\u093f \u092a\u094d\u0930\u0924\u093f\u0935\u0947\u0926\u0928\n' + (prak?('\ud83d\udccb '+prak+'\n'):'') + (u.io_name?('\ud83d\udc6e '+u.io_name+'\n'):'') + '\ud83d\udccc '+act + (rel?('\n\ud83d\udd50 '+rel):'') + '\n\n\u2014 EOW Bhopal';
   return '<div class="mpf-item' + (rc?' mpf-item-case':'') + '">' +
     '<span class="mpf-av">' + _mddEsc(_mddInitials(u.io_name)) + '</span>' +
     '<div class="mpf-body"><div class="mpf-main">' + _mddEsc(main.slice(0,90)) + ' ' + caseChip + '</div>' +
       '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div>' +
       '<div class="mpf-casebrief" style="display:none;"></div></div>' +
-    '<button class="wa-share-btn" title="WhatsApp \u092a\u0930 \u092d\u0947\u091c\u0947\u0902" onclick="event.stopPropagation();waShareB64(\'' + _b64u(_waMsg) + '\')">\ud83d\udcf2</button>' +
   '</div>';
 }
 function _mddPragatiCaseToggle(el, type, id){
@@ -41387,7 +41404,7 @@ function renderEstabLeaves() {
   
   function _leaveRow(l) {
     var fmtRange = (l.from_date === l.to_date) ? l.from_date : (l.from_date + ' → ' + l.to_date);
-    var _waMsg = '\ud83c\udfd6 EOW \u0905\u0935\u0915\u093e\u0936\n\ud83d\udc64 '+(l.officer_name||'—')+'\n\ud83d\udccb '+(l.leave_type||'Leave')+(l.cause?(' · '+l.cause):'')+'\n\ud83d\udcc5 '+fmtRange+'\n\u23f1 '+(l.days||'?')+' \u0926\u093f\u0928\n\n\u2014 EOW Bhopal';
+    var _lmsg = leaveDecisionMsg(l, 'approve');
     return '<div class="estab-leave-row" onclick="estabLeaveRowClick(\'' + l.id + '\',event)">' +
       '<div class="estab-leave-staff">' +
         '<div class="estab-leave-staff-name">' + escapeHtml(l.officer_name || '—') + '</div>' +
@@ -41395,7 +41412,7 @@ function renderEstabLeaves() {
       '</div>' +
       '<span class="estab-leave-dates">' + escapeHtml(fmtRange) + '</span>' +
       '<span class="estab-leave-days">' + (l.days || '?') + 'd</span>' +
-      '<button class="wa-share-btn" title="WhatsApp \u092a\u0930 \u092d\u0947\u091c\u0947\u0902" onclick="event.stopPropagation();waShareB64(\'' + _b64u(_waMsg) + '\')">\ud83d\udcf2</button>' +
+      '<button class="wa-share-btn" title="WhatsApp संदेश copy" onclick="event.stopPropagation();copyLeaveMsgB64(\'' + _b64u(_lmsg) + '\')">📋</button>' +
     '</div>';
   }
   
@@ -41708,6 +41725,7 @@ async function estabQuickApprove(id) {
     }).eq('id', id);
     if (r.error) throw r.error;
     toast('✅ Approved');
+    try{ copyLeaveMsg(leaveDecisionMsg(l,'approve')); }catch(e){}
     await loadAllFromCloud();
     if (_estabActiveTile === 'pending') renderEstabPending();
     refreshEstabTileCounts();
@@ -59851,6 +59869,7 @@ async function decideApproval(decision) {
     if (r.error) throw r.error;
     
     toast(decision === 'approve' ? '✅ Approved' : '❌ Rejected');
+    try{ copyLeaveMsg(leaveDecisionMsg(Object.assign({}, currentApproval, {decision_remarks: remarks}), decision)); }catch(e){}
     closeModal('approvalModal');
     await loadAllFromCloud();
   } catch(e) { showError('Approval', e); }
