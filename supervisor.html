@@ -23497,12 +23497,18 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 .agenda-hdr-v2{ padding:12px 13px 0 !important; display:block !important; }
 .agenda-hdr-top{ display:flex; align-items:center; gap:10px; padding-bottom:11px; }
 .agenda-total-count{ font-size:11px; font-weight:900; color:#f5b942; }
-.agenda-tabstrip{ display:flex; background:#fff; border-radius:12px 12px 0 0; overflow:hidden; margin:0 -13px; }
-.agenda-tab{ flex:1; text-align:center; padding:9px 4px; font-size:9px; font-weight:800; color:#64748b; border-right:1px solid #eef2f7; cursor:pointer; }
-.agenda-tab:last-child{ border-right:none; }
-.agenda-tab:hover{ background:#f7fafd; }
-.agenda-tab .ic{ display:block; font-size:14px; margin-bottom:2px; }
-.agenda-tab-gold{ background:#f5b942 !important; color:#062a52 !important; font-weight:900; }
+/* Elevated Cards — floating white strip, per-tab colour top-accent (v304) */
+.agenda-tabstrip{ display:flex; gap:7px; background:#fff; border-radius:14px; padding:8px; margin:2px 0 4px; box-shadow:0 6px 16px rgba(0,0,0,.22); }
+.agenda-tab{ flex:1; text-align:center; padding:9px 3px 8px; font-size:9.5px; font-weight:800; color:#475569; cursor:pointer; position:relative; background:#f8fafc; border-radius:10px; transition:background .15s, transform .1s; }
+.agenda-tab:hover{ background:#eef4fb; }
+.agenda-tab:active{ transform:scale(.97); }
+.agenda-tab .bar{ position:absolute; top:0; left:14%; right:14%; height:3px; border-radius:0 0 3px 3px; }
+.agenda-tab .ic{ display:block; font-size:19px; margin:5px 0 4px; }
+.agenda-tab.at-search .bar{ background:#3b82f6; }
+.agenda-tab.at-sub .bar{ background:#0d9488; }
+.agenda-tab.at-craft .bar{ background:#16a34a; }
+.agenda-tab.at-add .bar{ background:#f5b942; }
+.agenda-tab-gold{ background:#fff7e6 !important; color:#7a5310 !important; font-weight:900; }
 .agenda-search-row{ background:#f7fafd; padding:10px 13px; margin:0 -13px; }
 
 .agenda-title{ cursor:pointer; }
@@ -24215,10 +24221,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
             <div class="agenda-title" onclick="event.stopPropagation();agendaToggleCollapse(event);">🗓️ Agenda <span class="agenda-total-count" id="agenda-total-count"></span> <span id="agenda-collapse-car" class="agenda-collapse-car">▾</span></div>
           </div>
           <div class="agenda-tabstrip">
-            <div class="agenda-tab" onclick="event.stopPropagation();agendaToggleSearchTab();"><span class="ic">🔍</span>Search</div>
-            <div class="agenda-tab" onclick="event.stopPropagation();openAgendaSubscribeModal();"><span class="ic">📆</span>Subscribe</div>
-            <div class="agenda-tab" onclick="event.stopPropagation();craftOpenTaskList();"><span class="ic">🔄</span>Craft</div>
-            <div class="agenda-tab agenda-tab-gold" onclick="event.stopPropagation();mtxAddPick('task');"><span class="ic">＋</span>Add</div>
+            <div class="agenda-tab at-search" onclick="event.stopPropagation();agendaToggleSearchTab();"><span class="bar"></span><span class="ic">🔍</span>Search</div>
+            <div class="agenda-tab at-sub" onclick="event.stopPropagation();openAgendaSubscribeModal();"><span class="bar"></span><span class="ic">📆</span>Subscribe</div>
+            <div class="agenda-tab at-craft" onclick="event.stopPropagation();craftOpenTaskList();"><span class="bar"></span><span class="ic">🔄</span>Craft</div>
+            <div class="agenda-tab agenda-tab-gold at-add" onclick="event.stopPropagation();mtxAddPick('task');"><span class="bar"></span><span class="ic">＋</span>Add</div>
           </div>
           <div class="agenda-search-row" id="agenda-search-row" style="display:none;">
             <div class="mtx-search mtx-blk-keyword mtx-search-inline" onclick="event.stopPropagation();">
