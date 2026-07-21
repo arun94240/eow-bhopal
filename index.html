@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EOW Office Bhopal</title>
-<meta http-equiv="refresh" content="0; url=supervisor.html">
 <link rel="canonical" href="supervisor.html">
 
 <!-- PWA: Manifest + Theme -->
@@ -41,7 +40,9 @@ h1 { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
 p { font-size: 13px; opacity: 0.85; }
 </style>
 <script>
-window.location.replace('supervisor.html');
+// Preserve query (?sn=…) and hash when redirecting — the secure-note PIN link
+// depends on ?sn=<token> reaching supervisor.html. Dropping it opened the full app.
+window.location.replace('supervisor.html' + window.location.search + window.location.hash);
 </script>
 </head>
 <body>
