@@ -23102,6 +23102,22 @@ body.role-staff #mydaily-box{ display:none !important; }
 .dpc-lfr{ font-size:13px; font-weight:900; color:#dc2626; flex:0 0 auto; }
 .dpc-wa-mini{ width:30px; height:30px; border-radius:8px; background:#25d366; color:#fff; font-size:13px; border:none; cursor:pointer; flex:0 0 auto; }
 
+/* 🔒 secure-note viewer (PIN-gated one-to-one notice) v319 */
+body.sn-lock{ overflow:hidden; }
+.sn-ov{ position:fixed; inset:0; z-index:999999; background:linear-gradient(160deg,#062a52,#08213f); display:flex; align-items:center; justify-content:center; padding:18px; }
+.sn-card{ width:100%; max-width:400px; background:#fff; border-radius:16px; box-shadow:0 18px 50px rgba(0,0,0,.45); overflow:hidden; }
+.sn-hd{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; font-size:14px; font-weight:900; text-align:center; padding:16px 14px; letter-spacing:.02em; }
+.sn-for{ background:#f5b942; color:#062a52; font-size:13px; font-weight:900; text-align:center; padding:10px 12px; border-bottom:2px solid #062a52; }
+.sn-gate{ padding:20px 18px; text-align:center; }
+.sn-lbl{ font-size:12.5px; color:#334155; font-weight:700; margin-bottom:12px; }
+.sn-pin{ width:100%; max-width:220px; text-align:center; font-size:22px; letter-spacing:8px; font-weight:900; color:#062a52; border:2px solid #cbd5e1; border-radius:11px; padding:12px 10px; outline:none; font-family:inherit; }
+.sn-pin:focus{ border-color:#f5b942; }
+.sn-btn{ display:block; width:100%; max-width:220px; margin:14px auto 0; background:#062a52; color:#fff; font-size:14px; font-weight:900; border:none; border-radius:11px; padding:13px; cursor:pointer; font-family:inherit; }
+.sn-btn:disabled{ opacity:.6; }
+.sn-err{ color:#dc2626; font-size:11.5px; font-weight:700; margin-top:11px; min-height:15px; }
+.sn-msg{ padding:20px 18px; font-size:14px; line-height:1.7; color:#0f2542; white-space:pre-wrap; background:#f7fafd; }
+.sn-foot{ padding:12px 14px; text-align:center; font-size:10px; color:#94a3b8; border-top:1px solid #eef2f7; }
+
 /* #3 — Agenda group chip inline ＋ add button (v241) */
 #mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
 #mydaily-box .mtx-chip-add:hover{ background:#fff; transform:scale(1.12); }
@@ -28681,8 +28697,17 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 } else {
   try {
     supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    // Config loaded — now check login
-    checkLoginAndShowApp();
+    // 🔒 Secure-note viewer: if URL has ?sn=<token>, show the PIN-gate and skip login.
+    // Token detection is inlined (snCheckAndShow is defined later in the file), and
+    // the viewer is run once the DOM/scripts are ready.
+    if (/[?&]sn=/.test(location.search || '')) {
+      var _snRun = function(){ try { snCheckAndShow(); } catch(e) { try{ checkLoginAndShowApp(); }catch(_){} } };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _snRun);
+      else _snRun();
+    } else {
+      // Config loaded — now check login
+      checkLoginAndShowApp();
+    }
   } catch(e) {
     alert('Failed to initialize Supabase: ' + e.message);
   }
@@ -34174,6 +34199,93 @@ function leaveDecisionMsg(l, decision){
   else if(decision==='approve'){ body = nm+' जी, आपका '+typ+' आवेदन ('+range+days+') स्वीकृत कर दिया गया है।'; }
   else { body = nm+' जी, आपका '+typ+' आवेदन ('+range+days+') प्राप्त हुआ है।'; }
   return '🏛 आर्थिक अपराध शाखा, भोपाल\n\n'+body+'\n\n— कार्यालय अधीक्षक पुलिस, EOW भोपाल';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 🔒 Secure PIN-protected leave notice (v319)
+// SP approve/reject करते ही एक link बनता है (copy) → group में paste →
+// संबंधित IO अपनी PIN से खोलकर पढ़े; बाकी सदस्य content नहीं देख सकते।
+// ═══════════════════════════════════════════════════════════════════
+var SN_BASE = 'https://eow-bhopal.vercel.app/';
+async function leaveSecureLink(l, decision){
+  try{
+    if(!l){ return; }
+    var body = leaveDecisionMsg(l, decision);
+    var res = await supa.functions.invoke('secure-note', { body: {
+      action:'create', io_id: (l.officer_id||null), io_name: (l.officer_name||''),
+      title:'अवकाश सूचना — EOW भोपाल', body: body, kind:('leave_'+decision)
+    }});
+    var tok = res && res.data && res.data.token;
+    if(!tok){ throw new Error('token'); }
+    var link = SN_BASE + '?sn=' + tok;
+    var who = l.officer_name || 'संबंधित अधिकारी';
+    var caption = '🔒 EOW गोपनीय सूचना — '+who+' हेतु\nकेवल संबंधित अधिकारी अपनी PIN से खोलें 👇\n'+link;
+    if(typeof copyLeaveMsg==='function') copyLeaveMsg(caption);
+    else if(typeof toast==='function') toast('Link: '+link);
+  }catch(e){ try{ if(typeof toast==='function') toast('🔒 Secure link नहीं बना — दोबारा प्रयास करें', true); }catch(_){}}
+}
+function leaveSecureLinkById(id){
+  var pool = (state.leaves||[]).concat(state.pendingApprovals||[]);
+  var l = pool.find(function(x){ return x.id===id; });
+  if(!l){ try{ if(typeof toast==='function') toast('Leave नहीं मिला', true); }catch(e){} return; }
+  var dec = (String(l.status||'').toLowerCase()==='rejected') ? 'reject' : 'approve';
+  leaveSecureLink(l, dec);
+}
+
+// ---- PIN-gated viewer (opens when URL has ?sn=<token>) ----
+function _snParam(){ try{ var m=(location.search||'').match(/[?&]sn=([^&]+)/); return m?decodeURIComponent(m[1]):''; }catch(e){ return ''; } }
+async function snCheckAndShow(){
+  var tok=_snParam(); if(!tok) return false;
+  var ov=document.createElement('div'); ov.className='sn-ov'; ov.id='sn-overlay';
+  ov.innerHTML =
+    '<div class="sn-card">'+
+      '<div class="sn-hd">🛡 EOW भोपाल — गोपनीय सूचना</div>'+
+      '<div class="sn-for" id="sn-for">…</div>'+
+      '<div class="sn-gate" id="sn-gate">'+
+        '<div class="sn-lbl">कृपया अपनी PIN डालें</div>'+
+        '<input id="sn-pin" class="sn-pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••">'+
+        '<button class="sn-btn" id="sn-open">खोलें</button>'+
+        '<div class="sn-err" id="sn-err"></div>'+
+      '</div>'+
+      '<div class="sn-msg" id="sn-msg" style="display:none;"></div>'+
+      '<div class="sn-foot">यह सूचना केवल संबंधित अधिकारी हेतु है।</div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  document.body.classList.add('sn-lock');
+  var btn=document.getElementById('sn-open'); if(btn) btn.onclick=function(){ snSubmit(tok); };
+  var pin=document.getElementById('sn-pin');
+  if(pin){ pin.addEventListener('keydown',function(e){ if(e.key==='Enter'){ snSubmit(tok); } }); setTimeout(function(){ try{pin.focus();}catch(e){} }, 200); }
+  try{
+    var r=await supa.functions.invoke('secure-note',{ body:{ action:'meta', token:tok } });
+    var nm=(r&&r.data&&r.data.io_name)||'';
+    var fe=document.getElementById('sn-for'); if(fe) fe.textContent = nm ? ('यह सूचना — '+nm+' हेतु') : 'गोपनीय सूचना';
+  }catch(e){ var fe2=document.getElementById('sn-for'); if(fe2) fe2.textContent='गोपनीय सूचना'; }
+  return true;
+}
+async function snSubmit(tok){
+  var pinEl=document.getElementById('sn-pin'), errEl=document.getElementById('sn-err'), btn=document.getElementById('sn-open');
+  var pin=((pinEl&&pinEl.value)||'').trim();
+  if(!pin){ if(errEl) errEl.textContent='PIN डालें'; return; }
+  if(errEl) errEl.textContent='';
+  if(btn){ btn.disabled=true; btn.textContent='खोल रहे…'; }
+  try{
+    var r=await supa.functions.invoke('secure-note',{ body:{ action:'view', token:tok, pin:pin } });
+    var d=(r&&r.data)||{};
+    if(d.ok && d.body){
+      var g=document.getElementById('sn-gate'); if(g) g.style.display='none';
+      var msg=document.getElementById('sn-msg'); if(msg){ msg.style.display='block'; msg.textContent=d.body; }
+      var fe=document.getElementById('sn-for'); if(fe && d.io_name) fe.textContent='यह सूचना — '+d.io_name+' हेतु';
+      return;
+    }
+    var code=d.error||'';
+    var m = code==='wrong_pin' ? 'गलत PIN — दोबारा प्रयास करें'
+      : code==='no_pin' ? 'इस अधिकारी की PIN सेट नहीं है — कार्यालय से संपर्क करें'
+      : code==='locked' ? 'बहुत बार गलत PIN — यह link अस्थायी रूप से बंद है'
+      : code==='not_found' ? 'यह link अमान्य या समाप्त है'
+      : 'नहीं खुल सका — दोबारा प्रयास करें';
+    if(errEl) errEl.textContent=m;
+  }catch(e){ if(errEl) errEl.textContent='नेटवर्क समस्या — दोबारा प्रयास करें'; }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='खोलें'; } }
 }
 function _mddPragatiItemHTML(u){
   var prak = (typeof _cmdFormatUpdatePrakaran === 'function') ? _cmdFormatUpdatePrakaran(u) : (u.case_display || '');
@@ -41479,7 +41591,6 @@ function renderEstabLeaves() {
   
   function _leaveRow(l) {
     var fmtRange = (l.from_date === l.to_date) ? l.from_date : (l.from_date + ' → ' + l.to_date);
-    var _lmsg = leaveDecisionMsg(l, 'approve');
     return '<div class="estab-leave-row" onclick="estabLeaveRowClick(\'' + l.id + '\',event)">' +
       '<div class="estab-leave-staff">' +
         '<div class="estab-leave-staff-name">' + escapeHtml(l.officer_name || '—') + '</div>' +
@@ -41487,7 +41598,7 @@ function renderEstabLeaves() {
       '</div>' +
       '<span class="estab-leave-dates">' + escapeHtml(fmtRange) + '</span>' +
       '<span class="estab-leave-days">' + (l.days || '?') + 'd</span>' +
-      '<button class="wa-share-btn" title="WhatsApp संदेश copy" onclick="event.stopPropagation();copyLeaveMsgB64(\'' + _b64u(_lmsg) + '\')">📋</button>' +
+      '<button class="wa-share-btn" title="🔒 Secure PIN-link copy" onclick="event.stopPropagation();leaveSecureLinkById(\'' + l.id + '\')">🔒</button>' +
     '</div>';
   }
   
@@ -41799,8 +41910,8 @@ async function estabQuickApprove(id) {
       decided_at: new Date().toISOString()
     }).eq('id', id);
     if (r.error) throw r.error;
-    toast('✅ Approved');
-    try{ copyLeaveMsg(leaveDecisionMsg(l,'approve')); }catch(e){}
+    toast('✅ Approved — 🔒 secure link copy हो रहा है');
+    try{ leaveSecureLink(l,'approve'); }catch(e){}
     await loadAllFromCloud();
     if (_estabActiveTile === 'pending') renderEstabPending();
     refreshEstabTileCounts();
@@ -60081,7 +60192,7 @@ async function decideApproval(decision) {
     if (r.error) throw r.error;
     
     toast(decision === 'approve' ? '✅ Approved' : '❌ Rejected');
-    try{ copyLeaveMsg(leaveDecisionMsg(Object.assign({}, currentApproval, {decision_remarks: remarks}), decision)); }catch(e){}
+    try{ leaveSecureLink(Object.assign({}, currentApproval, {decision_remarks: remarks}), decision); }catch(e){}
     closeModal('approvalModal');
     await loadAllFromCloud();
   } catch(e) { showError('Approval', e); }
