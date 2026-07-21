@@ -28808,6 +28808,8 @@ async function sha256Hex(str) {
 }
 
 function checkLoginAndShowApp() {
+  // 🔒 If a secure-note token is in the URL, NEVER show the app/login — only the PIN gate.
+  if (/[?&]sn=/.test(location.search||'')) { try{ if(typeof snCheckAndShow==='function') snCheckAndShow(); }catch(e){} return; }
   // Check if user is already logged in (session in localStorage)
   var saved = localStorage.getItem('eow_user');
   if (saved) {
@@ -28922,6 +28924,8 @@ async function doLogin() {
 }
 
 function showMainApp() {
+  // 🔒 Never open the app when a secure-note token is present — the PIN gate must own the page.
+  if (/[?&]sn=/.test(location.search||'')) { return; }
   // Apply view mode FIRST (before content load) — checks localStorage or shows modal
   try{ localStorage.removeItem('eow_view_mode'); }catch(e){}  // migrate to auto-responsive
   applyViewMode();
@@ -34335,6 +34339,8 @@ async function snCheckAndShow(){
     '</div>';
   document.body.appendChild(ov);
   document.body.classList.add('sn-lock');
+  // force the app/login out of view — the gate owns the page
+  try{ var _ma=document.getElementById('mainApp'); if(_ma) _ma.style.display='none'; var _ls=document.getElementById('loginScreen'); if(_ls) _ls.style.display='none'; var _cs=document.getElementById('configScreen'); if(_cs) _cs.style.display='none'; }catch(e){}
   var btn=document.getElementById('sn-open'); if(btn) btn.onclick=function(){ snSubmit(tok); };
   var pin=document.getElementById('sn-pin');
   if(pin){ pin.addEventListener('keydown',function(e){ if(e.key==='Enter'){ snSubmit(tok); } }); setTimeout(function(){ try{pin.focus();}catch(e){} }, 200); }
