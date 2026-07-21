@@ -23141,6 +23141,19 @@ body.sn-lock{ overflow:hidden; }
 .sc-gen:disabled{ opacity:.6; }
 .sc-hint{ text-align:center; font-size:11.5px; font-weight:700; margin-top:10px; min-height:15px; }
 .sc-hint.ok{ color:#15803d; } .sc-hint.err{ color:#dc2626; }
+.sc-av{ width:36px; height:36px; border-radius:50%; background:#f5b942; color:#062a52; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; flex:0 0 auto; }
+.sc-hd-tt{ flex:1; display:flex; flex-direction:column; line-height:1.25; }
+.sc-tpl-lbl{ font-size:10.5px; font-weight:800; color:#64748b; margin:2px 2px 8px; }
+.sc-tpls{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:13px; }
+.sc-tpl{ display:inline-flex; align-items:center; gap:5px; background:#eef4fb; color:#0a3a6e; border:1px solid #d6e4f5; border-radius:20px; padding:7px 12px; font-size:11.5px; font-weight:800; cursor:pointer; }
+.sc-tpl:active{ transform:scale(.97); }
+.sc-tpl-user{ background:#fff7e6; border-color:#f5d894; color:#7a5310; }
+.sc-tpl-x{ font-size:9px; color:#b45309; opacity:.7; }
+.sc-tpl-load{ font-size:11px; color:#94a3b8; }
+.sc-save{ width:100%; margin-top:10px; background:#eef2f7; color:#334155; font-size:12px; font-weight:800; border:1px dashed #cbd5e1; border-radius:10px; padding:9px; cursor:pointer; font-family:inherit; }
+.dpc-sec{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-top:8px; background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; font-size:10.5px; font-weight:900; padding:8px; border-radius:9px; border:none; cursor:pointer; font-family:inherit; }
+.mdd-sec-btn,.crt-sec-btn{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; border:none; border-radius:8px; width:30px; height:30px; font-size:14px; cursor:pointer; flex:0 0 auto; box-shadow:0 2px 5px rgba(6,42,82,.22); }
+.mdd-sec-btn:active,.crt-sec-btn:active{ transform:scale(.94); }
 
 /* #3 — Agenda group chip inline ＋ add button (v241) */
 #mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
@@ -34321,7 +34334,25 @@ function _secComposePanel(io){
       '🔒 निजी संदेश भेजें<span class="sc-open-sub">केवल यह अधिकारी अपनी PIN से पढ़ पाएँगे</span>'+
     '</button></div>';
 }
+var __scTemplates = null;
+function _scInitials(name){
+  var n=(typeof _prStripRank==='function')?_prStripRank(String(name||'')):String(name||'');
+  var p=n.trim().split(/\s+/).filter(Boolean);
+  if(!p.length) return '👤';
+  return (p[0].charAt(0)+(p[1]?p[1].charAt(0):'')).toUpperCase();
+}
+function _scResolveIo(nameOrId){
+  var ios=state.ioMaster||[];
+  var byId=ios.find(function(s){ return s.id===nameOrId; });
+  if(byId) return { id:byId.id, disp:(typeof getDisplayIOName==='function'?getDisplayIOName(byId):((byId.rank?byId.rank+' ':'')+byId.name)) };
+  var raw=String(nameOrId||''); var stripped=(typeof _prStripRank==='function')?_prStripRank(raw):raw;
+  var m=ios.find(function(s){ var n=s.name||''; return n===raw || n===stripped || raw.indexOf(n)>=0 || (typeof _prStripRank==='function' && _prStripRank(n)===stripped); });
+  if(m) return { id:m.id, disp:(typeof getDisplayIOName==='function'?getDisplayIOName(m):((m.rank?m.rank+' ':'')+m.name)) };
+  return { id:null, disp:raw };
+}
 function openSecureComposeB64(ioId, b64name){ var nm=''; try{ nm=decodeURIComponent(escape(atob(b64name))); }catch(e){} openSecureCompose(ioId, nm); }
+function openSecureComposeByName(nameOrId){ var r=_scResolveIo(nameOrId); openSecureCompose(r.id, r.disp); }
+function openSecureComposeByNameB64(b64){ var nm=''; try{ nm=decodeURIComponent(escape(atob(b64))); }catch(e){} if(nm) openSecureComposeByName(nm); }
 function openSecureCompose(ioId, ioName){
   var old=document.getElementById('sc-modal'); if(old) old.remove();
   __scIo = { id: ioId||null, name: ioName||'' };
@@ -34329,19 +34360,57 @@ function openSecureCompose(ioId, ioName){
   ov.onclick=function(e){ if(e.target===ov) scClose(); };
   ov.innerHTML=
     '<div class="sc-card">'+
-      '<div class="sc-hd">🔒 निजी संदेश <span class="sc-hd-for">'+_mddEsc(ioName||'अधिकारी')+' हेतु</span>'+
-        '<button class="sc-x" onclick="scClose()">✕</button></div>'+
+      '<div class="sc-hd">'+
+        '<span class="sc-av">'+_mddEsc(_scInitials(ioName))+'</span>'+
+        '<span class="sc-hd-tt">🔒 निजी संदेश<span class="sc-hd-for">'+_mddEsc(ioName||'अधिकारी')+' हेतु</span></span>'+
+        '<button class="sc-x" onclick="scClose()">✕</button>'+
+      '</div>'+
       '<div class="sc-body">'+
-        '<div class="sc-note">यह संदेश केवल <b>'+_mddEsc(ioName||'यह अधिकारी')+'</b> अपनी PIN से पढ़ पाएँगे। आप जो लिखेंगे, WhatsApp group में एक सुरक्षित link के रूप में paste होगा — content छुपा रहेगा।</div>'+
-        '<textarea id="sc-text" class="sc-text" rows="6" placeholder="यहाँ संदेश लिखें…"></textarea>'+
+        '<div class="sc-note">केवल <b>'+_mddEsc(ioName||'यह अधिकारी')+'</b> अपनी PIN से पढ़ पाएँगे — group में सुरक्षित link के रूप में जाएगा।</div>'+
+        '<div class="sc-tpl-lbl">✨ तैयार-संदेश — tap करके भरें</div>'+
+        '<div class="sc-tpls" id="sc-tpls"><span class="sc-tpl-load">लोड हो रहे…</span></div>'+
+        '<textarea id="sc-text" class="sc-text" rows="5" placeholder="यहाँ संदेश लिखें, या ऊपर से कोई तैयार-संदेश चुनें…"></textarea>'+
+        '<button class="sc-save" onclick="scSaveTemplate()">💾 इसे तैयार-संदेश में सहेजें</button>'+
         '<button class="sc-gen" id="sc-gen" onclick="scGenerate()">🔒 Secure link बनाएँ व copy करें</button>'+
         '<div class="sc-hint" id="sc-hint"></div>'+
       '</div>'+
     '</div>';
   document.body.appendChild(ov);
+  scRenderTpls();
   setTimeout(function(){ try{ document.getElementById('sc-text').focus(); }catch(e){} }, 150);
 }
 function scClose(){ var m=document.getElementById('sc-modal'); if(m) m.remove(); }
+async function scLoadTemplates(force){
+  if(__scTemplates && !force) return __scTemplates;
+  try{ var r=await supa.from('sc_templates').select('id,label,body,is_default,sort').order('sort',{ascending:true}).order('created_at',{ascending:true});
+    __scTemplates=(r&&r.data)||[]; }catch(e){ __scTemplates=[]; }
+  return __scTemplates;
+}
+async function scRenderTpls(){
+  var host=document.getElementById('sc-tpls'); if(!host) return;
+  var t=await scLoadTemplates();
+  if(!t.length){ host.innerHTML='<span class="sc-tpl-load">कोई तैयार-संदेश नहीं</span>'; return; }
+  host.innerHTML=t.map(function(x,i){
+    var del=x.is_default?'':'<span class="sc-tpl-x" onclick="event.stopPropagation();scDelTemplate(\''+x.id+'\')">✕</span>';
+    return '<span class="sc-tpl'+(x.is_default?'':' sc-tpl-user')+'" onclick="scUseTemplate('+i+')">'+_mddEsc(x.label)+del+'</span>';
+  }).join('');
+}
+function scUseTemplate(i){ var t=(__scTemplates||[])[i]; if(!t) return; var ta=document.getElementById('sc-text'); if(ta){ ta.value=t.body; ta.focus(); } }
+async function scSaveTemplate(){
+  var ta=document.getElementById('sc-text'), hint=document.getElementById('sc-hint');
+  var body=((ta&&ta.value)||'').trim();
+  if(!body){ if(hint){ hint.textContent='पहले संदेश लिखें, फिर सहेजें।'; hint.className='sc-hint err'; } return; }
+  var label=prompt('इस तैयार-संदेश का नाम:', body.slice(0,20));
+  if(label===null) return; label=(String(label||'').trim())||body.slice(0,20);
+  try{ await supa.from('sc_templates').insert({ label:label, body:body, is_default:false, sort:200 });
+    await scLoadTemplates(true); scRenderTpls();
+    if(hint){ hint.textContent='✅ तैयार-संदेश सहेजा गया।'; hint.className='sc-hint ok'; }
+  }catch(e){ if(hint){ hint.textContent='सहेजा नहीं जा सका।'; hint.className='sc-hint err'; } }
+}
+async function scDelTemplate(id){
+  if(!confirm('यह तैयार-संदेश हटाएँ?')) return;
+  try{ await supa.from('sc_templates').delete().eq('id',id); await scLoadTemplates(true); scRenderTpls(); }catch(e){}
+}
 async function scGenerate(){
   var io=__scIo||{}; var ta=document.getElementById('sc-text'), hint=document.getElementById('sc-hint'), btn=document.getElementById('sc-gen');
   var msg=((ta&&ta.value)||'').trim();
@@ -34372,6 +34441,7 @@ function _mddPragatiItemHTML(u){
     '<div class="mpf-body"><div class="mpf-main">' + _mddEsc(main.slice(0,90)) + ' ' + caseChip + '</div>' +
       '<div class="mpf-sub">' + _mddEsc(u.io_name || '') + (rel ? ' · <span class="' + (fresh?'mpf-fresh':'') + '">' + rel + '</span>' : '') + '</div>' +
       '<div class="mpf-casebrief" style="display:none;"></div></div>' +
+    (u.io_name ? '<button class="mdd-sec-btn" title="🔒 निजी संदेश भेजें" onclick="event.stopPropagation();openSecureComposeByNameB64(\''+_b64u(u.io_name)+'\')">🔒</button>' : '') +
   '</div>';
 }
 function _mddPragatiCaseToggle(el, type, id){
@@ -39744,6 +39814,8 @@ function _ccRenderCourtRow(c) {
   var courtName = c.court_name || c.court || '—';
   var d = c.next_hearing ? new Date(c.next_hearing) : null;
   var dStr = (d && !isNaN(d.getTime())) ? d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'2-digit' }) : '';
+  var _cio = c.incharge_io_id ? (state.ioMaster||[]).find(function(x){ return x.id===c.incharge_io_id; }) : null;
+  var _cioBtn = _cio ? '<button class="crt-sec-btn" title="🔒 प्रभारी IO को निजी संदेश" onclick="event.stopPropagation();openSecureComposeB64(\''+_cio.id+'\',\''+_b64u((typeof getDisplayIOName==='function'?getDisplayIOName(_cio):_cio.name))+'\')">🔒</button>' : '';
   return '<div class="cc-card" id="cc-card-' + c.id + '">' +
     '<div class="cc-row cc-row-court" onclick="event.stopPropagation();toggleCaseCardBrief(\'cc\',\'court\',\'' + c.id + '\')">' +
     '<span class="cc-row-icon cc-icon-court">⚖</span>' +
@@ -39752,6 +39824,7 @@ function _ccRenderCourtRow(c) {
       '<div class="cc-row-desc">' + escapeHtml(courtName) + '</div>' +
     '</div>' +
     '<span class="cc-row-meta">Next: ' + dStr + '</span>' +
+    _cioBtn +
     '<span class="cc-row-arrow">▾</span>' +
   '</div>' +
   '<div class="cc-card-brief" id="cc-brief-' + c.id + '" style="display:none;"></div>' +
@@ -53339,7 +53412,7 @@ function _dpcCompute(){
     if(f<DPC_MIN_FLEX) missing.push({k:'flex', need:(DPC_MIN_FLEX-f), lbl:'सूत्र/STR/PE/R-Comp'});
     var need=DPC_MIN_COMPLAINTS+DPC_MIN_RC+DPC_MIN_FLEX;      // 4
     var got=Math.min(c,DPC_MIN_COMPLAINTS)+Math.min(r,DPC_MIN_RC)+Math.min(f,DPC_MIN_FLEX);
-    return { name:io.name, disp:(typeof getDisplayIOName==='function'?getDisplayIOName(io):io.name), rank:(io.rank||''),
+    return { name:io.name, id:io.id, disp:(typeof getDisplayIOName==='function'?getDisplayIOName(io):io.name), rank:(io.rank||''),
              complaints:c, rc:r, flex:f, heads:heads, total:total, need:need, got:got, ok:(missing.length===0), missing:missing };
   });
 }
@@ -53384,6 +53457,7 @@ function _dpcCardHTML(list){
         '<div class="dpc-frac"><div class="big">'+x.got+'/'+x.need+'</div><div class="sm">दर्ज</div></div>'+
       '</div>'+
       '<div class="dpc-miss">'+chips+'</div>'+ _dpcWaBtnBig(x)+
+      '<button class="dpc-sec" onclick="event.stopPropagation();openSecureComposeB64(\''+(x.id||'')+'\',\''+_b64u(x.disp)+'\')">🔒 निजी संदेश (PIN-link)</button>'+
     '</div>';
   }).join('');
 }
