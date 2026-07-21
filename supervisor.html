@@ -15351,6 +15351,33 @@ body.view-mobile #mydaily-box .mydd-toolbar{ position:static; margin-bottom:10px
 #mydaily-box .mydd-link-none{ font-size:11px; color:#64748b; font-style:italic; margin-top:4px; }
 #mydaily-box .mddq-host{ padding:0 10px; }
 #mydaily-box .mddq-form{ background:#fff; border:1px solid #cbd5e1; border-radius:10px; padding:10px; margin-top:7px; display:flex; flex-direction:column; gap:7px; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+
+/* ── Smooth Add-To-Do sheet (v325): open as a stable bottom-sheet/centered dialog
+   with internal scroll, so the box never abruptly grows and the form can't run around ── */
+body.mddq-locked{ overflow:hidden; }
+#mydaily-box .mddq-host.mddq-modal{
+  position:fixed; inset:0; z-index:4000; padding:0 !important; margin:0;
+  background:rgba(6,20,40,.55);
+  display:flex; align-items:flex-end; justify-content:center;
+  animation:mddqFade .18s ease;
+}
+@media(min-width:640px){ #mydaily-box .mddq-host.mddq-modal{ align-items:center; padding:20px !important; } }
+#mydaily-box .mddq-host.mddq-modal .mddq-form{
+  width:100%; max-width:520px; margin:0;
+  max-height:88vh; max-height:88dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  border-radius:16px 16px 0 0; box-shadow:0 -10px 40px rgba(0,0,0,.4);
+  animation:mddqSlideUp .28s cubic-bezier(.22,.61,.36,1);
+  overscroll-behavior:contain;
+}
+@media(min-width:640px){
+  #mydaily-box .mddq-host.mddq-modal .mddq-form{ border-radius:16px; max-height:86vh; max-height:86dvh; animation:mddqPop .24s cubic-bezier(.22,.61,.36,1); box-shadow:0 20px 60px rgba(0,0,0,.45); }
+}
+#mydaily-box .mddq-host.mddq-modal .mddq-formttl{
+  position:sticky; top:0; z-index:3; background:#fff; margin:-10px -10px 4px; padding:12px 12px 9px; border-bottom:1px solid #eef2f7;
+}
+@keyframes mddqFade{ from{opacity:0} to{opacity:1} }
+@keyframes mddqSlideUp{ from{ transform:translateY(30px); opacity:.5 } to{ transform:translateY(0); opacity:1 } }
+@keyframes mddqPop{ from{ transform:scale(.97); opacity:.5 } to{ transform:scale(1); opacity:1 } }
 #mydaily-box .mddq-inp{ width:100%; box-sizing:border-box; font-size:13px; padding:7px 9px; border:1px solid #cbd5e1; border-radius:7px; color:#0f2238; font-family:inherit; }
 #mydaily-box .mddq-ta{ resize:vertical; }
 #mydaily-box .mddq-row2{ display:flex; gap:8px; }
@@ -35292,7 +35319,7 @@ function mddReviewAddPicker() {
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'mydd-addhost-review\');">Cancel</button>' +
       '</div>' +
     '</div>';
-  try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+  try { if(!(host.classList&&host.classList.contains('mddq-modal'))) host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
 async function mddReviewAddGo2() {
   var tp = ((document.getElementById('mddq-rev-type') || {}).value || '');
@@ -35633,7 +35660,7 @@ function mddKeywordAddOpen() {
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'mtx-addhost-task\');">Cancel</button>' +
       '</div>' +
     '</div>';
-  try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+  try { if(!(host.classList&&host.classList.contains('mddq-modal'))) host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
 function _mddKwLoad() {
   var tp = ((document.getElementById('mddq-kw-type') || {}).value || '');
@@ -35703,7 +35730,7 @@ function mddRefTaskFormOpen(preTid) {
         '<button class="mddq-cancel" onclick="event.stopPropagation();mddTaskFormClose(\'mtx-addhost-task\');">Cancel</button>' +
       '</div>' +
     '</div>';
-  try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+  try { if(!(host.classList&&host.classList.contains('mddq-modal'))) host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
 async function mddRefNameCreate() {
   var inp = document.getElementById('mddq-newname'); if (!inp) return;
@@ -35796,11 +35823,14 @@ function mtSubAdd(which) {
 
 // ── Inline Task add form (To-Dos / Office / Reference) — host-based, opens inline ──
 function _mddTaskHostFor(which) { return which === 'todos' ? 'mydd-addhost-todos' : (which === 'office' ? 'mydd-addhost-office' : which); }
+function _mddModalOff(h){ if(h){ try{ h.classList.remove('mddq-modal'); h.onclick=null; }catch(e){} } }
+function _mddBodyUnlock(){ try{ document.body.classList.remove('mddq-locked'); }catch(e){} }
 function _mddCloseAllTaskForms() {
-  Array.prototype.forEach.call(document.querySelectorAll('#mydaily-box .mddq-host'), function(h){ h.innerHTML = ''; h.setAttribute('data-open', ''); });
+  Array.prototype.forEach.call(document.querySelectorAll('#mydaily-box .mddq-host'), function(h){ h.innerHTML = ''; h.setAttribute('data-open', ''); _mddModalOff(h); });
+  _mddBodyUnlock();
   var am = document.getElementById('mydd-add-menu'); if (am) am.style.display = 'none';
 }
-function mddTaskFormClose(hostId) { _mddTaskEditId = null; var h = document.getElementById(hostId); if (h) { h.innerHTML = ''; h.setAttribute('data-open', ''); } }
+function mddTaskFormClose(hostId) { _mddTaskEditId = null; var h = document.getElementById(hostId); if (h) { h.innerHTML = ''; h.setAttribute('data-open', ''); _mddModalOff(h); } _mddBodyUnlock(); }
 var _mddTaskEditId = null;
 function _mddCombineReminder(dateVal, timeVal){
   if (!dateVal) return null;
@@ -35860,6 +35890,10 @@ function mddTaskFormOpen(hostId, task) {
   if (host.getAttribute('data-open') === '1' && !task) { mddTaskFormClose(hostId); return; }
   _mddCloseAllTaskForms();
   host.setAttribute('data-open', '1');
+  // open as a smooth, stable bottom-sheet/centered dialog (v325)
+  host.classList.add('mddq-modal');
+  try{ document.body.classList.add('mddq-locked'); }catch(e){}
+  host.onclick = function(e){ if(e.target===host) mddTaskFormClose(hostId); };
   _mddTaskEditId = (task && task.id) ? task.id : null;
   _mddTaskAttachments = (task && task.attachments) ? (Array.isArray(task.attachments) ? task.attachments.slice() : []) : [];
   var today = new Date().toISOString().slice(0, 10);
@@ -35968,7 +36002,7 @@ function mddTaskFormOpen(hostId, task) {
   if (typeof renderTagsWidget === 'function') renderTagsWidget('todo-tags-widget', v.tagIds, function(){});
   todoRenderAttachThumbs();
   var ti = document.getElementById('mddq-title'); if (ti) { try { ti.focus(); } catch(e){} }
-  try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+  try { if(!(host.classList&&host.classList.contains('mddq-modal'))) host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
 
 /* ═══ To-Do form v2 — supporting functions (priority/repeat/pencil/attachments) ═══ */
@@ -36224,7 +36258,7 @@ function mddDiscInlineAdd() {
       '</div>' +
     '</div>';
   var ti = document.getElementById('mddd-title'); if (ti) { try { ti.focus(); } catch(e){} }
-  try { host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
+  try { if(!(host.classList&&host.classList.contains('mddq-modal'))) host.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e){}
 }
 function mddDiscInlineCancel() {
   var host = document.getElementById('mydd-addhost-disc');
@@ -36384,7 +36418,8 @@ function mddCloseAllLists() {
   Array.prototype.forEach.call(document.querySelectorAll('#mydaily-box .mydd-pill'), function(p){ p.classList.remove('active'); });
   var am2 = document.getElementById('mydd-add-menu'); if (am2) am2.style.display = 'none';
   if (typeof mtxCloseAll === 'function') mtxCloseAll();
-  Array.prototype.forEach.call(document.querySelectorAll('#mydaily-box .mddq-host'), function(h){ h.innerHTML = ''; h.setAttribute('data-open', ''); });
+  Array.prototype.forEach.call(document.querySelectorAll('#mydaily-box .mddq-host'), function(h){ h.innerHTML = ''; h.setAttribute('data-open', ''); if(typeof _mddModalOff==='function') _mddModalOff(h); });
+  if(typeof _mddBodyUnlock==='function') _mddBodyUnlock();
 }
 
 // ── Top-right Reminder / Calendar pills ──
