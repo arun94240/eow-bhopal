@@ -23107,7 +23107,7 @@ body.sn-lock{ overflow:hidden; }
 .sn-ov{ position:fixed; inset:0; z-index:999999; background:linear-gradient(160deg,#062a52,#08213f); display:flex; align-items:center; justify-content:center; padding:18px; }
 .sn-card{ width:100%; max-width:400px; background:#fff; border-radius:16px; box-shadow:0 18px 50px rgba(0,0,0,.45); overflow:hidden; }
 .sn-hd{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; font-size:14px; font-weight:900; text-align:center; padding:16px 14px; letter-spacing:.02em; }
-.sn-for{ background:#f5b942; color:#062a52; font-size:13px; font-weight:900; text-align:center; padding:10px 12px; border-bottom:2px solid #062a52; }
+.sn-for{ background:linear-gradient(135deg,#f7c65a,#f5b942); color:#062a52; font-size:16px; font-weight:900; text-align:center; padding:16px 14px; }
 .sn-gate{ padding:20px 18px; text-align:center; }
 .sn-lbl{ font-size:12.5px; color:#334155; font-weight:700; margin-bottom:12px; }
 .sn-pin{ width:100%; max-width:220px; text-align:center; font-size:22px; letter-spacing:8px; font-weight:900; color:#062a52; border:2px solid #cbd5e1; border-radius:11px; padding:12px 10px; outline:none; font-family:inherit; }
@@ -23117,6 +23117,30 @@ body.sn-lock{ overflow:hidden; }
 .sn-err{ color:#dc2626; font-size:11.5px; font-weight:700; margin-top:11px; min-height:15px; }
 .sn-msg{ padding:20px 18px; font-size:14px; line-height:1.7; color:#0f2542; white-space:pre-wrap; background:#f7fafd; }
 .sn-foot{ padding:12px 14px; text-align:center; font-size:10px; color:#94a3b8; border-top:1px solid #eef2f7; }
+
+/* 🔒 secure-compose (SP writes a private message → PIN link) v320 */
+.sc-panel{ padding:0 !important; background:transparent !important; box-shadow:none !important; border:none !important; margin-bottom:12px; }
+.sc-open-btn{ width:100%; display:flex; flex-direction:column; align-items:center; gap:2px; background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; border:none; border-radius:12px; padding:13px 14px; font-size:13.5px; font-weight:900; cursor:pointer; font-family:inherit; box-shadow:0 4px 12px rgba(6,42,82,.28); }
+.sc-open-btn:active{ transform:scale(.99); }
+.sc-open-sub{ font-size:9.5px; font-weight:600; color:#cfe0f3; }
+.prv-sec-btn{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; border:none; border-radius:9px; width:34px; height:34px; font-size:15px; cursor:pointer; flex:0 0 auto; box-shadow:0 2px 6px rgba(6,42,82,.25); }
+.prv-sec-btn:active{ transform:scale(.95); }
+.sc-ov{ position:fixed; inset:0; z-index:1000000; background:rgba(6,20,40,.62); display:flex; align-items:flex-end; justify-content:center; padding:0; }
+@media(min-width:520px){ .sc-ov{ align-items:center; padding:18px; } }
+.sc-card{ width:100%; max-width:460px; background:#fff; border-radius:16px 16px 0 0; box-shadow:0 -8px 40px rgba(0,0,0,.4); overflow:hidden; }
+@media(min-width:520px){ .sc-card{ border-radius:16px; } }
+.sc-hd{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; font-size:14px; font-weight:900; padding:14px 16px; display:flex; align-items:center; gap:7px; }
+.sc-hd-for{ color:#f5b942; font-weight:800; flex:1; font-size:12.5px; }
+.sc-x{ background:rgba(255,255,255,.15); color:#fff; border:none; border-radius:8px; width:28px; height:28px; font-size:13px; cursor:pointer; flex:0 0 auto; }
+.sc-body{ padding:15px 16px 18px; }
+.sc-note{ font-size:11px; color:#475569; line-height:1.55; background:#f1f5f9; border-radius:9px; padding:9px 11px; margin-bottom:12px; }
+.sc-note b{ color:#062a52; }
+.sc-text{ width:100%; border:1.5px solid #cbd5e1; border-radius:11px; padding:12px; font-size:14px; font-family:inherit; color:#0f2542; outline:none; resize:vertical; line-height:1.6; box-sizing:border-box; }
+.sc-text:focus{ border-color:#f5b942; }
+.sc-gen{ width:100%; margin-top:12px; background:#25d366; color:#fff; font-size:14px; font-weight:900; border:none; border-radius:11px; padding:13px; cursor:pointer; font-family:inherit; }
+.sc-gen:disabled{ opacity:.6; }
+.sc-hint{ text-align:center; font-size:11.5px; font-weight:700; margin-top:10px; min-height:15px; }
+.sc-hint.ok{ color:#15803d; } .sc-hint.err{ color:#dc2626; }
 
 /* #3 — Agenda group chip inline ＋ add button (v241) */
 #mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
@@ -34239,7 +34263,6 @@ async function snCheckAndShow(){
   var ov=document.createElement('div'); ov.className='sn-ov'; ov.id='sn-overlay';
   ov.innerHTML =
     '<div class="sn-card">'+
-      '<div class="sn-hd">🛡 EOW भोपाल — गोपनीय सूचना</div>'+
       '<div class="sn-for" id="sn-for">…</div>'+
       '<div class="sn-gate" id="sn-gate">'+
         '<div class="sn-lbl">कृपया अपनी PIN डालें</div>'+
@@ -34258,7 +34281,7 @@ async function snCheckAndShow(){
   try{
     var r=await supa.functions.invoke('secure-note',{ body:{ action:'meta', token:tok } });
     var nm=(r&&r.data&&r.data.io_name)||'';
-    var fe=document.getElementById('sn-for'); if(fe) fe.textContent = nm ? ('यह सूचना — '+nm+' हेतु') : 'गोपनीय सूचना';
+    var fe=document.getElementById('sn-for'); if(fe) fe.textContent = nm ? (nm+' हेतु') : 'गोपनीय सूचना';
   }catch(e){ var fe2=document.getElementById('sn-for'); if(fe2) fe2.textContent='गोपनीय सूचना'; }
   return true;
 }
@@ -34274,7 +34297,7 @@ async function snSubmit(tok){
     if(d.ok && d.body){
       var g=document.getElementById('sn-gate'); if(g) g.style.display='none';
       var msg=document.getElementById('sn-msg'); if(msg){ msg.style.display='block'; msg.textContent=d.body; }
-      var fe=document.getElementById('sn-for'); if(fe && d.io_name) fe.textContent='यह सूचना — '+d.io_name+' हेतु';
+      var fe=document.getElementById('sn-for'); if(fe && d.io_name) fe.textContent=d.io_name+' हेतु';
       return;
     }
     var code=d.error||'';
@@ -34286,6 +34309,55 @@ async function snSubmit(tok){
     if(errEl) errEl.textContent=m;
   }catch(e){ if(errEl) errEl.textContent='नेटवर्क समस्या — दोबारा प्रयास करें'; }
   finally{ if(btn){ btn.disabled=false; btn.textContent='खोलें'; } }
+}
+
+// ---- Secure compose: SP writes ANY private message to an IO → PIN link ----
+var __scIo = null;
+function _secComposePanel(io){
+  if(!io) return '';
+  var disp = (typeof getDisplayIOName==='function') ? getDisplayIOName(io) : ((io.rank?io.rank+' ':'')+(io.name||''));
+  return '<div class="iopp-panel sc-panel">'+
+    '<button class="sc-open-btn" onclick="openSecureComposeB64(\''+(io.id||'')+'\',\''+_b64u(disp)+'\')">'+
+      '🔒 निजी संदेश भेजें<span class="sc-open-sub">केवल यह अधिकारी अपनी PIN से पढ़ पाएँगे</span>'+
+    '</button></div>';
+}
+function openSecureComposeB64(ioId, b64name){ var nm=''; try{ nm=decodeURIComponent(escape(atob(b64name))); }catch(e){} openSecureCompose(ioId, nm); }
+function openSecureCompose(ioId, ioName){
+  var old=document.getElementById('sc-modal'); if(old) old.remove();
+  __scIo = { id: ioId||null, name: ioName||'' };
+  var ov=document.createElement('div'); ov.id='sc-modal'; ov.className='sc-ov';
+  ov.onclick=function(e){ if(e.target===ov) scClose(); };
+  ov.innerHTML=
+    '<div class="sc-card">'+
+      '<div class="sc-hd">🔒 निजी संदेश <span class="sc-hd-for">'+_mddEsc(ioName||'अधिकारी')+' हेतु</span>'+
+        '<button class="sc-x" onclick="scClose()">✕</button></div>'+
+      '<div class="sc-body">'+
+        '<div class="sc-note">यह संदेश केवल <b>'+_mddEsc(ioName||'यह अधिकारी')+'</b> अपनी PIN से पढ़ पाएँगे। आप जो लिखेंगे, WhatsApp group में एक सुरक्षित link के रूप में paste होगा — content छुपा रहेगा।</div>'+
+        '<textarea id="sc-text" class="sc-text" rows="6" placeholder="यहाँ संदेश लिखें…"></textarea>'+
+        '<button class="sc-gen" id="sc-gen" onclick="scGenerate()">🔒 Secure link बनाएँ व copy करें</button>'+
+        '<div class="sc-hint" id="sc-hint"></div>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  setTimeout(function(){ try{ document.getElementById('sc-text').focus(); }catch(e){} }, 150);
+}
+function scClose(){ var m=document.getElementById('sc-modal'); if(m) m.remove(); }
+async function scGenerate(){
+  var io=__scIo||{}; var ta=document.getElementById('sc-text'), hint=document.getElementById('sc-hint'), btn=document.getElementById('sc-gen');
+  var msg=((ta&&ta.value)||'').trim();
+  if(!msg){ if(hint){ hint.textContent='पहले संदेश लिखें।'; hint.className='sc-hint err'; } return; }
+  if(btn){ btn.disabled=true; btn.textContent='बना रहे…'; }
+  try{
+    var full='🏛 आर्थिक अपराध शाखा, भोपाल\n\n'+msg+'\n\n— कार्यालय अधीक्षक पुलिस, EOW भोपाल';
+    var res=await supa.functions.invoke('secure-note',{ body:{ action:'create', io_id:(io.id||null), io_name:(io.name||''), title:'निजी सूचना — EOW भोपाल', body:full, kind:'custom' }});
+    var tok=res&&res.data&&res.data.token; if(!tok) throw new Error('token');
+    var link=SN_BASE+'?sn='+tok;
+    var caption='🔒 EOW गोपनीय सूचना — '+(io.name||'संबंधित अधिकारी')+' हेतु\nकेवल संबंधित अधिकारी अपनी PIN से खोलें 👇\n'+link;
+    if(typeof copyLeaveMsg==='function') copyLeaveMsg(caption);
+    if(hint){ hint.textContent='✅ Secure link copy हो गया — group में paste करें।'; hint.className='sc-hint ok'; }
+    if(btn){ btn.textContent='✅ Copy हो गया'; }
+    setTimeout(scClose, 1500);
+  }catch(e){ if(hint){ hint.textContent='नहीं बना — दोबारा प्रयास करें।'; hint.className='sc-hint err'; } if(btn){ btn.disabled=false; btn.textContent='🔒 Secure link बनाएँ व copy करें'; } }
 }
 function _mddPragatiItemHTML(u){
   var prak = (typeof _cmdFormatUpdatePrakaran === 'function') ? _cmdFormatUpdatePrakaran(u) : (u.case_display || '');
@@ -37977,6 +38049,7 @@ function renderPrvIosView() {
         '<div class="prv-row-name">'+escapeHtml(displayName)+statusBadge+'</div>' +
         '<div class="prv-row-meta">📁 '+totalCases+' cases · आखिरी प्रगति: '+escapeHtml(lastTxt)+'</div>' +
       '</div>' +
+      '<button class="prv-sec-btn" title="🔒 निजी संदेश भेजें" onclick="event.stopPropagation();openSecureComposeB64(\''+io.id+'\',\''+_b64u(displayName)+'\')">🔒</button>' +
       '<div class="prv-row-arrow">›</div>' +
     '</div>';
   }).join('');
@@ -59812,7 +59885,7 @@ function renderIOProfilePanels(io) {
     '</div>'+
   '</div>';
   
-  host.innerHTML = leavesHTML + noticesHTML;
+  host.innerHTML = _secComposePanel(io) + leavesHTML + noticesHTML;
 }
 
 // Toggle View/Edit mode for IO Master
