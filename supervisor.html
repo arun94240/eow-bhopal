@@ -34294,7 +34294,7 @@ function leaveDecisionMsg(l, decision){
 // SP approve/reject करते ही एक link बनता है (copy) → group में paste →
 // संबंधित IO अपनी PIN से खोलकर पढ़े; बाकी सदस्य content नहीं देख सकते।
 // ═══════════════════════════════════════════════════════════════════
-var SN_BASE = 'https://eow-bhopal.vercel.app/';
+var SN_BASE = 'https://eow-bhopal.vercel.app/supervisor.html';   // direct → no index.html redirect (keeps ?sn= intact)
 async function leaveSecureLink(l, decision){
   try{
     if(!l){ return; }
