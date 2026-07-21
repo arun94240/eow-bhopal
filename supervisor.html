@@ -23155,6 +23155,33 @@ body.sn-lock{ overflow:hidden; }
 .mdd-sec-btn,.crt-sec-btn{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; border:none; border-radius:8px; width:30px; height:30px; font-size:14px; cursor:pointer; flex:0 0 auto; box-shadow:0 2px 5px rgba(6,42,82,.22); }
 .mdd-sec-btn:active,.crt-sec-btn:active{ transform:scale(.94); }
 
+/* 👮 IO Directory — header button + directory panel (v322) */
+.iodir-btn{ margin-left:auto; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1.5px solid #f5b942; border-radius:22px; padding:6px 12px; cursor:pointer; }
+.iodir-btn-ic{ font-size:14px; }
+.iodir-btn-tx{ color:#fff; font-size:11.5px; font-weight:900; white-space:nowrap; }
+.iodir-btn-cnt{ background:#f5b942; color:#062a52; font-size:10px; font-weight:900; border-radius:20px; padding:1px 7px; }
+.iodir-btn-car{ color:#f5b942; font-size:9px; }
+.iodir-btn.is-open{ background:#f5b942; }
+.iodir-btn.is-open .iodir-btn-tx{ color:#062a52; }
+.iodir-btn.is-open .iodir-btn-cnt{ background:#062a52; color:#f5b942; }
+.iodir-btn.is-open .iodir-btn-car{ color:#062a52; }
+.iodir-panel{ margin:10px 4px 4px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:10px; }
+.iodir-srch{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); border-radius:10px; padding:9px 11px; margin-bottom:10px; }
+.iodir-srch input{ flex:1; background:transparent; border:none; outline:none; color:#fff; font-size:12px; font-family:inherit; }
+.iodir-srch input::placeholder{ color:#9db4d0; }
+.iodir-mag{ font-size:14px; }
+.iodir-list{ max-height:340px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.iodir-row{ display:flex; align-items:center; gap:10px; background:#fff; border-radius:10px; padding:8px 10px; margin-bottom:6px; }
+.iodir-row:last-child{ margin-bottom:0; }
+.iodir-av{ width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#f7c65a,#f5b942); color:#062a52; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; flex:0 0 auto; }
+.iodir-main{ flex:1; min-width:0; }
+.iodir-nm{ font-size:12px; font-weight:900; color:#0f2542; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.iodir-meta{ font-size:9px; color:#94a3b8; font-weight:600; }
+.iodir-dot{ font-size:8.5px; font-weight:800; padding:2px 7px; border-radius:20px; flex:0 0 auto; }
+.iodir-dot.dot-ok{ background:#dcfce7; color:#15803d; } .iodir-dot.dot-no{ background:#fee2e2; color:#b91c1c; }
+.iodir-send{ background:linear-gradient(135deg,#062a52,#0a3a6e); color:#fff; border:none; border-radius:9px; width:34px; height:34px; font-size:15px; flex:0 0 auto; cursor:pointer; box-shadow:0 2px 6px rgba(6,42,82,.3); }
+.iodir-empty{ text-align:center; color:#9db4d0; font-size:11px; padding:14px; }
+
 /* #3 — Agenda group chip inline ＋ add button (v241) */
 #mydaily-box .mtx-chip-add{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,.85); color:#062a52; font-weight:900; font-size:13px; line-height:1; cursor:pointer; margin-left:2px; margin-right:1px; flex:0 0 auto; box-shadow:0 1px 3px rgba(0,0,0,.2); }
 #mydaily-box .mtx-chip-add:hover{ background:#fff; transform:scale(1.12); }
@@ -24052,6 +24079,14 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
               <div class="ov-section-title">🏢 कार्यालय — Overview</div>
               <span class="dgeow-total-pill">Total: <strong id="ovstats-cnt-total">0</strong></span>
               <span class="ovstats-bday-chip" id="ovstats-bday-chip" style="display:none;" onclick="event.stopPropagation();" title="आज जन्मदिन"></span>
+              <button class="iodir-btn" id="iodir-btn" onclick="iodirToggle(event)" title="IO को सुरक्षित निजी संदेश भेजें">
+                <span class="iodir-btn-ic">👮</span><span class="iodir-btn-tx">IO को संदेश</span>
+                <span class="iodir-btn-cnt" id="iodir-cnt">0</span><span class="iodir-btn-car" id="iodir-car">▾</span>
+              </button>
+            </div>
+            <div class="iodir-panel" id="iodir-panel" style="display:none;" onclick="event.stopPropagation();">
+              <div class="iodir-srch"><span class="iodir-mag">🔎</span><input id="iodir-input" placeholder="IO खोजें — नाम या पद…" oninput="iodirSearch(this.value)"></div>
+              <div class="iodir-list" id="iodir-list"></div>
             </div>
             <!-- 6 CMD-style wide tiles (Year, Enq, IO, Court, Attendance, Leaves) -->
             <div class="ovstats-tile-row" id="ovstats-tile-row">
@@ -34410,6 +34445,55 @@ async function scSaveTemplate(){
 async function scDelTemplate(id){
   if(!confirm('यह तैयार-संदेश हटाएँ?')) return;
   try{ await supa.from('sc_templates').delete().eq('id',id); await scLoadTemplates(true); scRenderTpls(); }catch(e){}
+}
+
+// ---- 👮 IO Directory (कार्यालय-Overview header → tap-tap → IO list + 🔒) ----
+var _iodirQuery='';
+function iodirToggle(e){
+  if(e&&e.stopPropagation) e.stopPropagation();
+  var p=document.getElementById('iodir-panel'); if(!p) return;
+  var open=(p.style.display==='none' || !p.style.display);
+  p.style.display=open?'block':'none';
+  var btn=document.getElementById('iodir-btn'); if(btn) btn.classList.toggle('is-open',open);
+  var car=document.getElementById('iodir-car'); if(car) car.textContent=open?'▴':'▾';
+  if(open){
+    var inp=document.getElementById('iodir-input'); if(inp){ inp.value=''; }
+    _iodirQuery=''; iodirRenderList();
+    if(inp) setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 150);
+  }
+}
+function iodirSearch(v){ _iodirQuery=String(v||'').toLowerCase(); iodirRenderList(); }
+function _iodirCases(id,name){
+  var n=0;
+  ['complaints','rcomplaints','rcs','pes','strs','sutra'].forEach(function(h){
+    (((state.enquiries||{})[h])||[]).forEach(function(r){ if(r.io_id===id || (r.io_name && name && r.io_name.indexOf(name)>=0)) n++; });
+  });
+  (state.courts||[]).forEach(function(c){ if(c.incharge_io_id===id) n++; });
+  return n;
+}
+function iodirRenderList(){
+  var host=document.getElementById('iodir-list'); if(!host) return;
+  var list=(typeof _dpcCompute==='function') ? _dpcCompute() : [];
+  var q=_iodirQuery;
+  var rows=list.filter(function(x){ return !q || String(x.disp||'').toLowerCase().indexOf(q)>=0; }).map(function(x){
+    var cases=_iodirCases(x.id, x.name);
+    var dot = x.ok ? '<span class="iodir-dot dot-ok">पूर्ण</span>' : '<span class="iodir-dot dot-no">अपूर्ण '+x.got+'/'+x.need+'</span>';
+    return '<div class="iodir-row">'+
+      '<div class="iodir-av">'+_mddEsc(_scInitials(x.disp))+'</div>'+
+      '<div class="iodir-main"><div class="iodir-nm">'+_mddEsc(x.disp)+'</div>'+
+        '<div class="iodir-meta">📁 '+cases+' प्रकरण · आज प्रगति: '+(x.ok?'✓':'✗')+'</div></div>'+
+      dot+
+      '<button class="iodir-send" title="🔒 निजी संदेश भेजें" onclick="event.stopPropagation();openSecureComposeB64(\''+(x.id||'')+'\',\''+_b64u(x.disp)+'\')">🔒</button>'+
+    '</div>';
+  }).join('');
+  host.innerHTML = rows || '<div class="iodir-empty">कोई IO नहीं मिला</div>';
+}
+function iodirRefreshCount(){
+  try{
+    var el=document.getElementById('iodir-cnt');
+    if(el) el.textContent=(state.ioMaster||[]).filter(function(s){ return s.is_io===true && (s.status==='Active'||!s.status); }).length;
+    var p=document.getElementById('iodir-panel'); if(p && p.style.display==='block') iodirRenderList();
+  }catch(e){}
 }
 async function scGenerate(){
   var io=__scIo||{}; var ta=document.getElementById('sc-text'), hint=document.getElementById('sc-hint'), btn=document.getElementById('sc-gen');
@@ -53544,6 +53628,7 @@ function renderOverview() {
   try{ if(typeof mddRenderAttStrip==='function') mddRenderAttStrip(); if(typeof mddAttStartLive==='function') mddAttStartLive(); }catch(e){}
   try{ if(typeof renderNoPragati==='function') renderNoPragati(); }catch(e){}
   try{ if(typeof renderDPCTile==='function') renderDPCTile(); }catch(e){}
+  try{ if(typeof iodirRefreshCount==='function') iodirRefreshCount(); }catch(e){}
   var ovIOTotal = document.getElementById('ov-iomaster-total');
   if (ovIOTotal) ovIOTotal.textContent = state.ioMaster.length + ' total establishment';
   var today = todayISO();
