@@ -65932,7 +65932,7 @@ if (supa) {
   updateHeader();
   setInterval(updateHeader, 60000);
   loadAllFromCloud();
-  setInterval(loadAllFromCloud, 30000);
+  setInterval(loadAllFromCloud, 180000);  // auto-refresh हर 3 मिनट (पहले 30s था — काम में खलल न पड़े); manual refresh जब चाहें
 
   // Close quick-add menu when clicking outside (moved here for safety)
   document.addEventListener('click', function(e){
