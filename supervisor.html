@@ -34506,7 +34506,7 @@ function iodirRenderList(){
       '<div class="iodir-main"><div class="iodir-nm">'+_mddEsc(x.disp)+'</div>'+
         '<div class="iodir-meta">📁 '+cases+' प्रकरण · आज प्रगति: '+(x.ok?'✓':'✗')+'</div></div>'+
       dot+
-      '<button class="iodir-send" title="📋 निर्देश पत्रक जारी/समीक्षा" onclick="event.stopPropagation();openDirComposeB64(\''+(x.id||'')+'\',\''+_b64u(x.disp)+'\')">📋</button>'+
+      '<button class="iodir-send" title="📋 विवेचक पटल — प्रगति/निर्देश/संदेश" onclick="event.stopPropagation();openIoPanelB64(\''+(x.id||'')+'\',\''+_b64u(x.disp)+'\')">📋</button>'+
       '<button class="iodir-send" title="🔒 निजी संदेश भेजें" onclick="event.stopPropagation();openSecureComposeB64(\''+(x.id||'')+'\',\''+_b64u(x.disp)+'\')">🔒</button>'+
     '</div>';
   }).join('');
@@ -34619,7 +34619,56 @@ function _dirCSS(){
     '.dg-pin2{width:160px;text-align:center;font-size:20px;letter-spacing:6px;padding:11px;border-radius:11px;border:1px solid rgba(255,255,255,.2);background:rgba(4,14,28,.6);color:#fff;font-family:inherit;}'+
     '.dg-btn2{display:block;width:100%;margin-top:13px;background:linear-gradient(160deg,#ffd879,#e9a521);color:#08213f;font-weight:900;font-size:14px;padding:12px;border:0;border-radius:11px;cursor:pointer;font-family:inherit;}'+
     '.dg-err2{color:#f6a2a2;font-size:12px;margin-top:9px;min-height:16px;}'+
-    '.dg-foot2{text-align:center;color:#9db4d0;font-size:11px;padding:2px 14px 15px;}';
+    '.dg-foot2{text-align:center;color:#9db4d0;font-size:11px;padding:2px 14px 15px;}'+
+    /* ═══ कागज़ (light/parchment) re-theme — appended last so it wins ═══ */
+    '.dir-ov{background:rgba(30,22,8,.5);}'+
+    '.dir-card{background:#fbf6ea!important;border:1px solid #e7ddc8;}'+
+    '.dir-hd{border-bottom:1px solid #ece3cf;padding:15px 16px 11px;}'+
+    '.dir-hd .t{color:#2e2a20;} .dir-hd .t small{color:#8a7a5c;}'+
+    '.dir-x{color:#8a7a5c;}'+
+    '.dir-tabs{padding:9px 16px 0;} .dir-tab{background:#f1e9d6;color:#8a7a5c;} .dir-tab.on{background:#fff7e6;color:#a9781a;box-shadow:inset 0 -2px 0 #d99312;}'+
+    '.dir-body{padding:14px 16px 20px;}'+
+    '.dir-lbl{color:#a9781a;margin:17px 0 9px;}'+
+    '.dir-in,.dir-brief,.dir-ta{background:#fffdf7;border:1px solid #e0d4b8;color:#2e2a20;padding:11px 12px;}'+
+    '.dir-brief{line-height:1.7;}'+
+    '.dir-kv{background:#fffdf7;border:1px solid #e7ddc8;color:#4a4230;padding:11px 13px;} .dir-kv b{color:#2e2a20;}'+
+    '.dir-sar{background:#fffdf7;border:1px solid #e7ddc8;border-left:4px solid #d99312;border-radius:12px;color:#2e2a20;padding:12px 13px;line-height:1.7;}'+
+    '.dir-pt{background:#fffdf7;border:1px solid #e7ddc8;box-shadow:0 2px 9px rgba(120,90,20,.06);padding:13px;margin-bottom:12px;}'+
+    '.dir-pt-n{background:#c9971f;color:#fff;}'+
+    '.dir-sel{background:#f6efe0;border:1px solid #d9c79a;color:#7a5c1f;}'+
+    '.dir-rm{color:#b09;color:#b98;}'+
+    '.dir-add{background:#f7edd6;border:1px dashed #d9b24a;color:#a9781a;}'+
+    '.dir-suggest{background:#f3ead5;border:1px solid #d9c79a;color:#7a5c1f;}'+
+    '.dir-hint{color:#8a7a5c;} .dir-hint.ok{color:#2e7d4f;} .dir-hint.err{color:#c0392b;} .dir-hint.ai{color:#8a6a1e;}'+
+    '.dir-type{background:#f4ecd8!important;color:#7a5c1f!important;border:1px solid #d9c79a!important;}'+
+    '.dir-row2{color:#8a7a5c;}'+
+    /* review */
+    '.drv-item{background:#fffdf7;border:1px solid #e7ddc8;} .drv-item .cs{color:#2e2a20;} .drv-item .m{color:#8a7a5c;}'+
+    '.b-issued{background:#fbeecb;color:#a9781a;border:1px solid #d9b24a;} .b-reported{background:#e4f7ee;color:#178a54;border:1px solid #9ad9ba;} .b-reviewed{background:#e7eefb;color:#3a63b8;border:1px solid #a9c3ee;}'+
+    '.drv-empty{color:#8a7a5c;} .drv-link{background:#eef3fb;color:#3a63b8;border:1px solid #b9d0ee;}'+
+    '.drv-pt{background:#fffdf7;border:1px solid #e7ddc8;} .drv-pt .q{color:#2e2a20;} .drv-pt .a{color:#4a4230;border-left:2px solid #cdbd8f;}'+
+    '.st-pending{background:#f0ece0;color:#8a7a5c;border:1px solid #ded2b8;} .st-progress{background:#fbeecb;color:#a9781a;border:1px solid #d9b24a;} .st-done{background:#e4f7ee;color:#178a54;border:1px solid #9ad9ba;}'+
+    '.drv-act button{background:#f6efe0;border:1px solid #ddd0b0;color:#8a7a5c;} .drv-act .sat.on{border-color:#57c281;color:#178a54;background:#e4f7ee;} .drv-act .redo.on{border-color:#e0a0a0;color:#c0392b;background:#fbeaea;}'+
+    /* gate */
+    '.dg-ov{background:#efe7d4;} .dg-card{background:#fbf6ea!important;border:1px solid #e7ddc8!important;} .dg-lbl2{color:#5a4e33!important;} .dg-pin2{background:#fffdf7!important;border:1px solid #d9c79a!important;color:#2e2a20!important;} .dg-foot2{color:#8a7a5c!important;} .dg-inner{padding:15px 16px;}'+
+    '.dg-io-pt{background:#fffdf7;border:1px solid #e7ddc8;padding:13px;margin-bottom:11px;} .dg-io-pt .txt{color:#2e2a20;line-height:1.6;}'+
+    '.dg-stbtn{background:#f6efe0;border:1px solid #ddd0b0;color:#8a7a5c;} .dg-stbtn.on-p{border-color:#d9b24a;color:#a9781a;background:#fbeecb;} .dg-stbtn.on-d{border-color:#57c281;color:#178a54;background:#e4f7ee;}'+
+    /* per-point attach (IO) */
+    '.dg-att{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed #e7ddc8;}'+
+    '.dg-att .addbtn{font-size:11.5px;font-weight:700;color:#1560b8;background:#eef3fb;border:1px solid #b9d0ee;border-radius:9px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}'+
+    '.dg-att .chip{font-size:10.5px;background:#eef3fb;border:1px solid #b9d0ee;color:#1560b8;border-radius:8px;padding:4px 8px;display:inline-flex;gap:6px;align-items:center;max-width:150px;}'+
+    '.dg-att .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} .dg-att .chip .rm{cursor:pointer;color:#c0392b;font-weight:800;flex:none;}'+
+    '.dg-att .busy{font-size:10.5px;color:#8a7a5c;}'+
+    /* विवेचक पटल (compact chips) */
+    '.iop-ov{position:fixed;inset:0;z-index:100050;background:rgba(30,22,8,.5);display:flex;align-items:flex-end;justify-content:center;}'+
+    '.iop-card{width:100%;max-width:470px;background:#fbf6ea;border:1px solid #e7ddc8;border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.4);overflow:hidden;animation:dirUp .26s cubic-bezier(.2,.8,.2,1);}'+
+    '.iop-prof{display:flex;align-items:center;gap:11px;padding:15px 16px;background:linear-gradient(135deg,#123c6e,#0a2a52);color:#fff;}'+
+    '.iop-av{width:46px;height:46px;border-radius:13px;background:#e0a52b;color:#0a2a52;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center;flex:none;}'+
+    '.iop-nm{font-size:15px;font-weight:800;} .iop-sub{font-size:11.5px;opacity:.88;margin-top:2px;} .iop-x{margin-left:auto;background:none;border:0;color:#fff;font-size:20px;cursor:pointer;}'+
+    '.iop-chips{display:flex;flex-wrap:wrap;gap:9px;padding:16px 16px 8px;}'+
+    '.iop-chip{font-size:12.5px;font-weight:800;padding:12px 15px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;border:1px solid;font-family:inherit;}'+
+    '.iop-chip.b{background:#eef3fb;color:#1560b8;border-color:#b9d0ee;} .iop-chip.g{background:#fff7e6;color:#a9781a;border-color:#e2c169;} .iop-chip.w{background:#e9f8f0;color:#178a54;border-color:#9ad9ba;} .iop-chip.d{background:#f2ecfb;color:#6b4bbd;border-color:#cdbdf0;}'+
+    '.iop-foot{padding:6px 16px 18px;font-size:12px;color:#5a4e33;} .iop-foot b{color:#2e2a20;}';
   document.head.appendChild(s);
 }
 
@@ -34652,6 +34701,47 @@ function _dirIoCases(io){
   });
   (state.courts||[]).forEach(function(c){ if(id && c.incharge_io_id===id){ var cc=_dirFindCase('court', c.id); if(cc) out.push(cc); } });
   return out;
+}
+
+/* ---- 👮 विवेचक पटल (compact) — 📋 से खुलता है: प्रगति / निर्देश / WhatsApp / संदेश ---- */
+function openIoPanelB64(ioId, b64){ var nm=''; try{ nm=decodeURIComponent(escape(atob(b64))); }catch(e){} openIoPanel(ioId, nm); }
+function openIoPanel(ioId, ioName){
+  _dirCSS();
+  var r=_scResolveIo(ioId||ioName);
+  var io={ id:r.id||ioId||null, name:(ioName||r.disp||'') };
+  var master=(state.ioMaster||[]).find(function(s){ return s.id===io.id; })||{};
+  var mobile=String(master.mobile||'').replace(/[^0-9]/g,'');
+  var cases=_dirIoCases(io).length;
+  var dpc=null; try{ var l=(typeof _dpcCompute==='function')?_dpcCompute():[]; dpc=l.find(function(x){ return x.id===io.id; }); }catch(e){}
+  var okTxt = dpc ? (dpc.ok?'✓ पूर्ण':('✗ अपूर्ण '+dpc.got+'/'+dpc.need)) : '—';
+  var wa = mobile ? ('https://wa.me/91'+mobile) : '';
+  var old=document.getElementById('iop-modal'); if(old) old.remove();
+  var ov=document.createElement('div'); ov.id='iop-modal'; ov.className='iop-ov';
+  ov.onclick=function(e){ if(e.target===ov) iopClose(); };
+  ov.innerHTML=
+    '<div class="iop-card">'+
+      '<div class="iop-prof"><span class="iop-av">'+_mddEsc(_scInitials(io.name))+'</span>'+
+        '<div><div class="iop-nm">'+_mddEsc(io.name||'अधिकारी')+'</div>'+
+          '<div class="iop-sub">📁 '+cases+' प्रकरण · आज प्रगति: '+okTxt+(mobile?(' · 📞 '+mobile):'')+'</div></div>'+
+        '<button class="iop-x" onclick="iopClose()">✕</button></div>'+
+      '<div class="iop-chips">'+
+        '<span class="iop-chip b" onclick="iopProgress(\''+(io.id||'')+'\')">📊 प्रगति</span>'+
+        '<span class="iop-chip g" onclick="iopDir(\''+(io.id||'')+'\',\''+_b64u(io.name)+'\')">📋 निर्देश जारी</span>'+
+        (wa?('<a class="iop-chip w" href="'+wa+'" target="_blank" rel="noopener">💬 WhatsApp</a>'):'<span class="iop-chip w" style="opacity:.45">💬 नंबर नहीं</span>')+
+        '<span class="iop-chip d" onclick="iopMsg(\''+(io.id||'')+'\',\''+_b64u(io.name)+'\')">🔒 गोपनीय संदेश</span>'+
+      '</div>'+
+      '<div class="iop-foot" id="iop-foot">एक ही जगह से — प्रगति देखें, निर्देश जारी करें, संदेश करें।</div>'+
+    '</div>';
+  document.body.appendChild(ov);
+}
+function iopClose(){ var m=document.getElementById('iop-modal'); if(m) m.remove(); }
+function iopDir(id,b64){ iopClose(); openDirComposeB64(id,b64); }
+function iopMsg(id,b64){ iopClose(); openSecureComposeB64(id,b64); }
+function iopProgress(id){
+  var foot=document.getElementById('iop-foot'); if(!foot) return;
+  var dpc=null; try{ var l=(typeof _dpcCompute==='function')?_dpcCompute():[]; dpc=l.find(function(x){ return x.id===id; }); }catch(e){}
+  if(!dpc){ foot.textContent='आज की प्रगति जानकारी उपलब्ध नहीं।'; return; }
+  foot.innerHTML='<b>आज की प्रगति:</b> '+(dpc.ok?'✓ पूर्ण':'✗ अपूर्ण')+' — शिकायत '+(dpc.complaints||0)+' · RC '+(dpc.rc||0)+' · अन्य '+(dpc.flex||0)+' <span style="color:#8a7a5c">(आवश्यक '+dpc.need+', मिले '+dpc.got+')</span>';
 }
 
 /* ---- SP compose modal (opened from IO directory 📋) ---- */
@@ -34702,10 +34792,10 @@ function dirRenderNew(){
         (sel.non_complainant?'<div>अनावेदक: '+_mddEsc(String(sel.non_complainant).split(/\n/)[0]).slice(0,60)+'</div>':'')+
         (sel.sections?'<div>धाराएँ: '+_mddEsc(sel.sections)+'</div>':'')+
       '</div>'):'')+
-    '<div class="dir-lbl">✍️ संक्षिप्त विवरण</div>'+
-    '<textarea class="dir-brief" id="dir-brief" rows="3" placeholder="प्रकरण किस बारे में है — संक्षेप में…">'+_mddEsc(sel?(sel.brief||sel.main_allegations||''):'')+'</textarea>'+
-    '<div class="dir-lbl">🎯 निर्देश बिंदु</div>'+
-    '<button class="dir-suggest" id="dir-suggest" onclick="dirSuggest()">🧠 शिकायत से बिंदु सुझाएँ</button>'+
+    '<div class="dir-lbl">📄 शिकायत का सार <small style="color:#8a7a5c;font-weight:600;text-transform:none">(IO पढ़ते ही समझ ले)</small></div>'+
+    '<textarea class="dir-brief dir-sar" id="dir-brief" rows="4" placeholder="AI संलग्न शिकायत पढ़कर सार भरेगा — या स्वयं लिखें…">'+_mddEsc(sel?(sel.brief||sel.main_allegations||''):'')+'</textarea>'+
+    '<div class="dir-lbl">🎯 जाँच-निर्देश <small style="color:#8a7a5c;font-weight:600;text-transform:none">(आदेशात्मक — क्रमवार)</small></div>'+
+    '<button class="dir-suggest" id="dir-suggest" onclick="dirSuggest()">🧠 शिकायत/फ़ाइल पढ़कर सार व बिंदु बनाएँ</button>'+
     '<div class="dir-hint" id="dir-src" style="display:none"></div>'+
     '<div id="dir-pts"></div>'+
     '<button class="dir-add" onclick="dirAddPt()">＋ बिंदु जोड़ें</button>'+
@@ -34754,6 +34844,7 @@ async function dirSuggest(){
     if(d.ok && d.points && d.points.length){
       __dir.pts=d.points.map(function(p){ return { type:(DIR_TYPES.indexOf(p.type)>=0?p.type:'अन्य'), text:String(p.text||'') }; });
       dirRenderPts();
+      if(d.summary){ var bf=document.getElementById('dir-brief'); if(bf && !bf.value.trim()){ bf.value=d.summary; } else if(bf && d.source==='ai'){ bf.value=d.summary; } }
       var nread=(d.read_files||[]).length;
       if(src){ src.style.display='block'; src.className='dir-hint '+(d.source==='ai'?'ai':'ok');
         src.textContent=(d.source==='ai'
@@ -34839,6 +34930,7 @@ function dirOpenReview(id){
         '<div class="q"><b>'+(i+1)+'.</b> <span class="dir-type">'+_mddEsc(p.type||'')+'</span>'+_mddEsc(p.text||'')+
           '<span class="st-chip '+stc+'">'+stl+'</span></div>'+
         (p.io_note?('<div class="a">'+_mddEsc(p.io_note)+'</div>'):'')+
+        (Array.isArray(p.io_attachments)&&p.io_attachments.length?('<div style="margin-top:7px;display:flex;flex-wrap:wrap;gap:6px">'+p.io_attachments.map(function(a){ return '<a href="'+encodeURI(a.url||'#')+'" target="_blank" rel="noopener" style="text-decoration:none;font-size:10.5px;background:#eef3fb;border:1px solid #b9d0ee;color:#1560b8;border-radius:8px;padding:4px 9px">📎 '+_mddEsc(a.name||'फ़ाइल')+'</a>'; }).join('')+'</div>'):'')+
         '<div class="drv-act">'+
           '<button class="sat'+(p.sp_review==='satisfactory'?' on':'')+'" onclick="dirSetReview(\''+d.id+'\','+i+',\'satisfactory\')">✓ संतोषजनक</button>'+
           '<button class="redo'+(p.sp_review==='redo'?' on':'')+'" onclick="dirSetReview(\''+d.id+'\','+i+',\'redo\')">↻ पुनः</button>'+
@@ -34913,7 +35005,7 @@ async function dirGateSubmit(tok){
     var r=await supa.functions.invoke('direction-secure',{ body:{ action:'view', token:tok, pin:pin } });
     var d=(r&&r.data)||{};
     if(d.ok){
-      __dgIo={ tok:tok, pts:(Array.isArray(d.points)?d.points.map(function(p){ return { seq:p.seq, type:p.type, text:p.text, status:p.status||'pending', io_note:p.io_note||'' }; }):[]) };
+      __dgIo={ tok:tok, pts:(Array.isArray(d.points)?d.points.map(function(p){ return { seq:p.seq, type:p.type, text:p.text, status:p.status||'pending', io_note:p.io_note||'', io_attachments:(Array.isArray(p.io_attachments)?p.io_attachments:[]) }; }):[]) };
       dirRenderIoSheet(d);
       return;
     }
@@ -34943,6 +35035,7 @@ function dirRenderIoSheet(d){
           '<span class="dg-stbtn'+(p.status==='done'?' on-d':'')+'" onclick="dirIoStatus('+i+',\'done\')">✓ पूर्ण</span>'+
         '</div>'+
         '<textarea class="dir-ta" rows="2" oninput="dirIoNote('+i+',this.value)" placeholder="क्या किया / क्या शेष — लिखें…">'+_mddEsc(p.io_note||'')+'</textarea>'+
+        '<div class="dg-att" id="dg-att-'+i+'">'+_dgAttHtml(i)+'</div>'+
       '</div>';
     }).join('')+
     '<button class="dir-issue" id="dg-submit" onclick="dirIoSubmit()">✅ प्रतिवेदन SP को भेजें</button>'+
@@ -34950,6 +35043,26 @@ function dirRenderIoSheet(d){
 }
 function dirIoStatus(i,st){ if(!__dgIo.pts[i]) return; __dgIo.pts[i].status=st; dirRenderIoSheet2(); }
 function dirIoNote(i,v){ if(__dgIo.pts[i]) __dgIo.pts[i].io_note=v; }
+// per-point attachments (IO) — any file via existing uploadFileToStorage()
+function _dgAttHtml(i){
+  var p=__dgIo.pts[i]||{}; var atts=p.io_attachments||[];
+  var chips=atts.map(function(a,j){ return '<span class="chip"><span>📎 '+_mddEsc(a.name||'फ़ाइल')+'</span><span class="rm" onclick="dirIoRemoveFile('+i+','+j+')">✕</span></span>'; }).join('');
+  return chips+'<label class="addbtn">📎 दस्तावेज़/फोटो संलग्न<input type="file" style="display:none" onchange="dirIoAddFile('+i+',this)"></label>';
+}
+function dgAttRefresh(i){ var host=document.getElementById('dg-att-'+i); if(host) host.innerHTML=_dgAttHtml(i); }
+async function dirIoAddFile(i, input){
+  var f=input&&input.files&&input.files[0]; if(!f){ return; }
+  var host=document.getElementById('dg-att-'+i);
+  var busy=document.createElement('span'); busy.className='busy'; busy.textContent=' ⏳ अपलोड हो रहा…'; if(host) host.appendChild(busy);
+  try{
+    var up=await uploadFileToStorage(f);
+    if(!__dgIo.pts[i].io_attachments) __dgIo.pts[i].io_attachments=[];
+    __dgIo.pts[i].io_attachments.push({ name:up.name, url:up.url, type:up.type });
+    dgAttRefresh(i);
+  }catch(e){ if(busy){ busy.textContent=' ❌ अपलोड विफल'; } setTimeout(function(){ try{ if(busy&&busy.parentNode) busy.parentNode.removeChild(busy); }catch(_){} },1600); }
+  try{ input.value=''; }catch(_){}
+}
+function dirIoRemoveFile(i,j){ if(__dgIo.pts[i]&&__dgIo.pts[i].io_attachments){ __dgIo.pts[i].io_attachments.splice(j,1); dgAttRefresh(i); } }
 function dirRenderIoSheet2(){
   // re-render only the status chips (keep textarea focus) — light approach: update classes
   var host=document.getElementById('dg-sheet'); if(!host) return;
@@ -34961,7 +35074,7 @@ async function dirIoSubmit(){
   var btn=document.getElementById('dg-submit'), hint=document.getElementById('dg-hint');
   if(btn){ btn.disabled=true; btn.textContent='भेज रहे…'; }
   try{
-    var payload=__dgIo.pts.map(function(p){ return { seq:p.seq, status:p.status||'pending', io_note:p.io_note||'' }; });
+    var payload=__dgIo.pts.map(function(p){ return { seq:p.seq, status:p.status||'pending', io_note:p.io_note||'', io_attachments:(p.io_attachments||[]) }; });
     var r=await supa.functions.invoke('direction-secure',{ body:{ action:'submit', token:__dgIo.tok, pin:((document.getElementById('dg-pin')||{}).value||'').trim(), points:payload } });
     var d=(r&&r.data)||{};
     if(d.ok){ if(hint){ hint.className='dir-hint ok'; hint.textContent='✅ प्रतिवेदन SP को भेज दिया गया — धन्यवाद।'; } if(btn){ btn.textContent='✅ भेज दिया'; } return; }
