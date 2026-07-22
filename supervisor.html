@@ -23340,6 +23340,29 @@ body.view-mobile { padding-bottom:0 !important; }
 @media (max-width: 860px){
   #mydaily-box .agenda-tools-wrap{ width:100% !important; margin-left:0 !important; justify-content:flex-start !important; margin-top:8px; }
 }
+/* ═══ 🔎 जाँच एवं विवेचना — Board A (KPI + IO पटल) ═══ */
+.jv-board{ margin:12px 4px 4px; }
+.jv-kpis{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.jv-kpi{ border-radius:13px; padding:11px 10px; border:1px solid; cursor:pointer; text-align:left; transition:transform .12s; }
+.jv-kpi:active{ transform:scale(.97); }
+.jv-kpi .k{ font-size:21px; font-weight:900; line-height:1.05; } .jv-kpi .l{ font-size:9.5px; margin-top:4px; font-weight:800; }
+.jv-blue{ background:#eef4fd; border-color:#c9def7; color:#1560b8; } .jv-green{ background:#e9f8f0; border-color:#a5ddc0; color:#178a54; }
+.jv-red{ background:#fdecec; border-color:#f0b6b6; color:#c0392b; } .jv-amber{ background:#fff6e0; border-color:#ecca7e; color:#b07d0e; }
+.jv-purple{ background:#f1ecfb; border-color:#cdbdf0; color:#6b4bbd; } .jv-slate{ background:#eef1f6; border-color:#cfd8e4; color:#42597a; }
+.jv-seclab{ font-size:11px; font-weight:800; color:#fff; letter-spacing:.3px; margin:14px 2px 8px; display:flex; align-items:center; gap:6px; }
+.jv-seclab .c{ margin-left:auto; font-size:10px; color:#f5b942; font-weight:800; }
+.jv-iorow{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.95); border:1px solid #e6ecf4; border-radius:12px; padding:9px 11px; margin-bottom:8px; cursor:pointer; }
+.jv-iorow:active{ background:#f4f8fd; }
+.jv-av{ width:38px; height:38px; border-radius:10px; background:#0a2a52; color:#e0a52b; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; flex:none; }
+.jv-nm{ font-size:12.5px; font-weight:800; color:#12304f; } .jv-mt{ font-size:10px; color:#6a7f99; margin-top:2px; }
+.jv-dot{ font-size:9.5px; font-weight:800; padding:3px 9px; border-radius:999px; flex:none; }
+.jv-ok{ background:#e4f7ee; color:#178a54; border:1px solid #9ad9ba; } .jv-no{ background:#fdecec; color:#c0392b; border:1px solid #f0b6b6; }
+.jv-detail-toggle{ display:block; width:calc(100% - 8px); margin:10px 4px 2px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.22); color:#dbe7f5; font-family:inherit; font-weight:800; font-size:11.5px; padding:9px; border-radius:10px; cursor:pointer; }
+/* attendance date-chart bar */
+.ov-att-datebar{ display:flex; gap:8px; align-items:center; margin:0 0 10px; }
+.ov-att-datebar input{ flex:1; background:#f6f9fd; border:1px solid #cfd8e4; border-radius:9px; padding:8px 10px; font-family:inherit; font-size:12.5px; color:#12304f; }
+.ov-att-datebtn{ font-size:11.5px; font-weight:800; background:#0a2a52; color:#fff; border-radius:9px; padding:9px 13px; cursor:pointer; white-space:nowrap; }
+
 /* Command-Center / कार्यालय-overview tiles: as many columns as the width allows
    (phone→1-2, iPad→3, desktop→more) instead of a hardcoded 2 that wastes iPad space */
 body.view-mobile .cmd-metrics{ grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)) !important; }
@@ -24133,7 +24156,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
           <div class="ov-section-titles">
             <div class="sup-title-row dgeow-title-row">
               <span class="sup-mini-cal" id="ovstats-mini-cal"><span class="smc-mo">—</span><span class="smc-dy">—</span></span>
-              <div class="ov-section-title">🏢 कार्यालय — Overview</div>
+              <div class="ov-section-title">🔎 जाँच एवं विवेचना</div>
               <span class="dgeow-total-pill">Total: <strong id="ovstats-cnt-total">0</strong></span>
               <span class="ovstats-bday-chip" id="ovstats-bday-chip" style="display:none;" onclick="event.stopPropagation();" title="आज जन्मदिन"></span>
               <button class="iodir-btn" id="iodir-btn" onclick="iodirToggle(event)" title="IO को सुरक्षित निजी संदेश भेजें">
@@ -24145,6 +24168,9 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
               <div class="iodir-srch"><span class="iodir-mag">🔎</span><input id="iodir-input" placeholder="IO खोजें — नाम या पद…" oninput="iodirSearch(this.value)"></div>
               <div class="iodir-list" id="iodir-list"></div>
             </div>
+            <!-- 🔎 जाँच एवं विवेचना — Board A (KPI + IO पटल) — new monitoring hero -->
+            <div class="jv-board" id="jv-board" onclick="event.stopPropagation();"></div>
+            <button class="jv-detail-toggle" id="jv-detail-toggle" onclick="jvToggleDetail(event)">📂 विस्तृत आँकड़े (Year/Type/Court/Staff/Tags) ▾</button>
             <!-- 6 CMD-style wide tiles (Year, Enq, IO, Court, Attendance, Leaves) -->
             <div class="ovstats-tile-row" id="ovstats-tile-row">
               <div class="cmd-metric ovstats-tile ovstats-tile-year ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovstatsNavTile('year',event)">
@@ -41738,6 +41764,8 @@ function ovstatsAttendanceChart(ymd) {
   '</div>';
   return html;
 }
+// re-render the attendance chart for any chosen date (date-picker in attendance view)
+function ovstatsAttSet(ymd){ var s=document.getElementById('ov-att-chart-slot'); if(s) s.innerHTML=ovstatsAttendanceChart(ymd||new Date().toISOString().slice(0,10)); }
 function ovstatsRenderAttendance() {
   var host = document.getElementById('ovstats-host-attendance');
   if (!host) return;
@@ -41752,7 +41780,9 @@ function ovstatsRenderAttendance() {
       var estabBody = estabPanel.querySelector('.ovstats-panel-body') || estabPanel;
       // Clone innerHTML — replicates UI but with same IDs (which is acceptable since
       // estab panel is hidden when ovstats panel is visible)
-      host.innerHTML = ovstatsAttendanceChart() +
+      var _atToday = new Date().toISOString().slice(0,10);
+      host.innerHTML = '<div class="ov-att-datebar"><input type="date" id="ov-att-date" value="'+_atToday+'" max="'+_atToday+'" onchange="event.stopPropagation();ovstatsAttSet(this.value)"><span class="ov-att-datebtn" onclick="event.stopPropagation();var _d=document.getElementById(\'ov-att-date\');ovstatsAttSet(_d?_d.value:\'\')">📊 उस दिन का chart</span></div>' +
+                       '<div id="ov-att-chart-slot">' + ovstatsAttendanceChart(_atToday) + '</div>' +
                        '<div class="ovstats-mirror-note">📌 विस्तृत सूची (Establishment) · <button type="button" class="ovstats-mirror-link" onclick="event.stopPropagation();ovstatsJumpToEstab(\'attendance\')">Open in Establishment →</button></div>' +
                        estabBody.innerHTML;
     } else {
@@ -41928,6 +41958,59 @@ function refreshOvStatsTotal() {
   
   // NEW: refresh mirrored counts (Attendance + Leaves) from estab
   if (typeof ovstatsRefreshMirrorCounts === 'function') ovstatsRefreshMirrorCounts();
+  // 🔎 जाँच एवं विवेचना — Board A
+  if (typeof renderJvBoard === 'function') renderJvBoard();
+}
+
+/* ═══ 🔎 जाँच एवं विवेचना — Board A (KPI + IO पटल) ═══ */
+var _jvDetailInit=false, _jvDetailShown=false;
+function jvToggleDetail(e){ if(e&&e.stopPropagation) e.stopPropagation();
+  _jvDetailShown=!_jvDetailShown;
+  ['ovstats-tile-row','ovstats-tile-pragati-merged'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display=_jvDetailShown?'':'none'; });
+  var b=document.getElementById('jv-detail-toggle'); if(b) b.textContent=_jvDetailShown?'📂 विस्तृत आँकड़े ▴ (छिपाएँ)':'📂 विस्तृत आँकड़े (Year/Type/Court/Staff/Tags) ▾';
+}
+async function _jvLoadDirections(){
+  if(!window.supa){ window.__jvDirs=[]; return; }
+  try{ var r=await supa.from('directions').select('id,status,deadline').limit(800); window.__jvDirs=(r&&r.data)||[]; }
+  catch(e){ if(!Array.isArray(window.__jvDirs)) window.__jvDirs=[]; }
+  if(typeof renderJvBoard==='function') renderJvBoard();
+}
+function jvScrollIoPatal(){ var el=document.getElementById('jv-io-patal'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }
+function renderJvBoard(){
+  var host=document.getElementById('jv-board'); if(!host) return;
+  if(!_jvDetailInit){ _jvDetailInit=true; ['ovstats-tile-row','ovstats-tile-pragati-merged'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; }); }
+  var today=new Date().toISOString().slice(0,10);
+  var active=0;
+  ['complaints','rcomplaints','rcs','pes','strs','sutra'].forEach(function(h){
+    (((state.enquiries||{})[h])||[]).forEach(function(r){ var st=String(r.case_status||'Active').toLowerCase(); if(st!=='closed' && st!=='disposed') active++; });
+  });
+  var dpc=[]; try{ dpc=(typeof _dpcCompute==='function')?_dpcCompute():[]; }catch(e){}
+  var okN=dpc.filter(function(x){return x.ok;}).length, noN=dpc.filter(function(x){return !x.ok;}).length;
+  var dirs=window.__jvDirs; var dirLoading=(dirs===undefined);
+  if(dirLoading){ _jvLoadDirections(); dirs=[]; }
+  var nLambit=dirs.filter(function(d){return d.status==='issued';}).length;
+  var nLaute=dirs.filter(function(d){return d.status==='reported';}).length;
+  var nOver=dirs.filter(function(d){return d.status==='issued' && d.deadline && String(d.deadline)<today;}).length;
+  var courtToday=((state.courts)||[]).filter(function(c){ return c.next_hearing===today; }).length;
+  var lz=dirLoading?'…':'';
+  function kpi(cls,val,lbl,onclick){ return '<div class="jv-kpi '+cls+'" onclick="event.stopPropagation();'+(onclick||'')+'"><div class="k">'+val+'</div><div class="l">'+lbl+'</div></div>'; }
+  var kpis='<div class="jv-kpis">'+
+    kpi('jv-blue',active,'कुल सक्रिय',"ovstatsNavTile('enqtype',event)")+
+    kpi('jv-green',okN,'आज प्रगति',"ovstatsNavTile('pragati',event)")+
+    kpi('jv-red',noN,'आज प्रगति नहीं',"ovstatsNavTile('dpc',event)")+
+    kpi('jv-amber',(dirLoading?lz:(nLambit+(nOver?(' <span style=\"font-size:11px\">· '+nOver+'⏰</span>'):''))),'निर्देश लंबित','jvScrollIoPatal()')+
+    kpi('jv-purple',(dirLoading?lz:nLaute),'प्रतिवेदन लौटे','jvScrollIoPatal()')+
+    kpi('jv-slate',courtToday,'न्यायालय आज',"ovstatsNavTile('court',event)")+
+  '</div>';
+  var rows=dpc.slice().sort(function(a,b){ return (a.ok?1:0)-(b.ok?1:0); });
+  var ioHtml=rows.map(function(x){
+    var dot=x.ok?'<span class="jv-dot jv-ok">✓ प्रगति</span>':'<span class="jv-dot jv-no">✗ आज नहीं</span>';
+    var cases=0; try{ cases=(typeof _iodirCases==='function')?_iodirCases(x.id,x.name):0; }catch(e){}
+    return '<div class="jv-iorow" onclick="event.stopPropagation();openIoPanelB64(\''+(x.id||'')+'\',\''+_b64u(x.disp||'')+'\')">'+
+      '<span class="jv-av">'+_mddEsc(_scInitials(x.disp||''))+'</span>'+
+      '<div style="flex:1"><div class="jv-nm">'+_mddEsc(x.disp||'')+'</div><div class="jv-mt">📁 '+cases+' प्रकरण · प्रगति '+x.got+'/'+x.need+'</div></div>'+dot+'</div>';
+  }).join('');
+  host.innerHTML=kpis+'<div class="jv-seclab" id="jv-io-patal">👮 विवेचक पटल<span class="c">'+dpc.length+' सक्रिय</span></div>'+(ioHtml||'<div style="color:#dbe7f5;font-size:11px;padding:6px">कोई सक्रिय विवेचक नहीं</div>');
 }
 
 // Refresh active panel content (called by refreshAll)
