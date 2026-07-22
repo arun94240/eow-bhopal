@@ -19770,6 +19770,51 @@ body.view-mobile .mobile-case-item.is-selected::before {
 /* End Case Timeline CSS */
 
 /* ════════════════════════════════════════════════════════════
+   ✨ Case Timeline RESKIN (bright rail + dot, uniform cards)
+   Overrides the base look above; keeps all JS/markup intact.
+   ════════════════════════════════════════════════════════════ */
+.case-timeline-toolbar{ background:#f3f7fc; border-bottom:1px solid #e0e8f2; border-radius:12px 12px 0 0; padding:11px 14px; }
+.case-timeline-summary{ color:#0a2a52; font-weight:700; }
+.case-timeline-sort-btn{ background:#0a2a52; color:#ffd879; border-radius:9px; }
+/* left rail on the main timeline list */
+.case-timeline-list{ position:relative; padding-left:27px; }
+.case-timeline-list::before{ content:''; position:absolute; left:10px; top:16px; bottom:16px; width:2px; background:#e4ebf3; }
+/* bright uniform cards */
+.case-timeline-item{ position:relative; background:#fffdfb; border:1px solid #e6ecf4; border-radius:13px !important; margin-top:11px; box-shadow:0 2px 10px rgba(30,60,100,.05); }
+.case-timeline-list .case-timeline-item{ overflow:visible !important; }
+.case-timeline-item .ctl-details{ border-radius:0 0 13px 13px; }
+.case-timeline-item:first-child{ margin-top:14px; }
+.case-timeline-item:hover{ border-color:#c7d6ea; }
+.case-timeline-item.expanded{ border-color:#e0a52b; box-shadow:0 4px 16px rgba(200,140,20,.14); }
+/* type accents re-declared (win over base) */
+.case-timeline-item.cte-pragati{ border-left:4px solid #16a34a; }
+.case-timeline-item.cte-directive{ border-left:4px solid #e0a52b; }
+.case-timeline-item.cte-transfer{ border-left:4px solid #94a3b8; }
+.case-timeline-item.cte-hearing{ border-left:4px solid #7c3aed; }
+.case-timeline-item.cte-hearing-next{ border-left:4px solid #7c3aed; background:#fbf8ff; }
+.case-timeline-item.cte-review{ border-left:4px solid #4338ca; }
+/* icon → circular dot sitting on the rail */
+.case-timeline-list .cte-icon{ position:absolute; left:-29px; top:11px; width:24px; height:24px; border-radius:50%; background:#fff; border:2px solid #cdd8e6; display:flex; align-items:center; justify-content:center; font-size:12px; box-shadow:0 0 0 3px #eef2f7; z-index:2; }
+.case-timeline-list .cte-pragati .cte-icon{ border-color:#16a34a; background:#eafaf0; }
+.case-timeline-list .cte-directive .cte-icon{ border-color:#e0a52b; background:#fff7e6; }
+.case-timeline-list .cte-hearing .cte-icon{ border-color:#7c3aed; background:#f3ecfd; }
+.case-timeline-list .cte-hearing-next .cte-icon{ border-color:#7c3aed; background:#f3ecfd; }
+.case-timeline-list .cte-review .cte-icon{ border-color:#4338ca; background:#ecebfb; }
+.case-timeline-list .cte-transfer .cte-icon{ border-color:#94a3b8; background:#eef1f5; }
+/* summary row */
+.ctl-summary{ padding:12px 13px 12px 12px; gap:9px; }
+.ctl-summary:hover{ background:#f8fbff; }
+.ctl-date{ background:#eef2f7 !important; color:#33506f !important; font-family:inherit !important; font-weight:800; border-radius:8px; }
+.ctl-action{ color:#12304f; font-weight:700; }
+.cte-type-tag{ border-radius:999px; }
+.ctl-chevron{ color:#93a6bd; }
+.case-timeline-item.expanded .ctl-chevron{ color:#e0a52b; }
+/* expanded details — brighter */
+.ctl-details{ background:#fafcfe; }
+.ctl-io,.ctl-detail,.ctl-next{ color:#3a4f6b; }
+.ctl-att{ display:inline-block; font-size:11px; background:#eef3fb; color:#1560b8; border:1px solid #b9d0ee; border-radius:8px; padding:3px 9px; margin-top:4px; }
+
+/* ════════════════════════════════════════════════════════════
    PRAGATI + IO REVIEW MEGA TOGGLE
    ════════════════════════════════════════════════════════════ */
 
