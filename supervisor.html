@@ -34588,6 +34588,7 @@ function _dirCSS(){
     '.b-reviewed{background:rgba(125,182,245,.15);color:#9cc7f7;border:1px solid rgba(125,182,245,.4);}'+
     '.drv-item .m{font-size:11px;color:#9db4d0;margin-top:3px;}'+
     '.drv-empty{font-size:12px;color:#9db4d0;text-align:center;padding:16px;}'+
+    '.drv-link{background:rgba(125,182,245,.14);border:1px solid rgba(125,182,245,.4);color:#9cc7f7;border-radius:8px;padding:3px 9px;font-size:13px;cursor:pointer;margin-left:6px;}'+
     '.drv-pt{background:rgba(4,14,28,.42);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:9px 10px;margin-bottom:8px;}'+
     '.drv-pt .q{font-size:12px;color:#eaf2fb;line-height:1.5;}'+
     '.drv-pt .q b{color:#fff;}'+
@@ -34626,7 +34627,7 @@ function _dirCSS(){
 function _dirFindCase(caseType, caseId){
   if(caseType==='court'){
     var c=(state.courts||[]).find(function(x){ return x.id===caseId; });
-    if(c) return { _court:true, id:c.id, case_type:'court', display:((c.case_type||'')+' '+(c.case_no||'')).trim(), complainant:c.petitioner||'', non_complainant:c.respondent||'', sections:'', brief:c.notes||'', main_allegations:'' };
+    if(c) return { _court:true, id:c.id, case_type:'court', display:((c.case_type||'')+' '+(c.case_no||'')).trim(), complainant:c.petitioner||'', non_complainant:c.respondent||'', sections:'', brief:c.notes||'', main_allegations:'', attachments:(c.attachments||[]) };
     return null;
   }
   var arr=((state.enquiries||{})[caseType])||[];
@@ -34637,7 +34638,8 @@ function _dirFindCase(caseType, caseId){
   if(!disp) disp=(e.no||e.serial||'')+(e.entry_year?('/'+e.entry_year):'');
   return { _court:false, id:e.id, category:caseType, case_type:caseType, display:disp,
     complainant:e.complainant||'', non_complainant:e.non_complainant||'', sections:e.sections||'',
-    brief:e.brief||'', main_allegations:e.main_allegations||'', io_name:e.io_name||'', io_id:e.io_id||null };
+    brief:e.brief||'', main_allegations:e.main_allegations||'', io_name:e.io_name||'', io_id:e.io_id||null,
+    attachments:(e.attachments||[]) };
 }
 function _dirIoCases(io){
   var out=[]; var id=io&&io.id, nm=io&&io.name;
@@ -34739,18 +34741,24 @@ async function dirSuggest(){
   var sel=__dir.caseSel, btn=document.getElementById('dir-suggest'), src=document.getElementById('dir-src');
   if(!sel){ if(src){ src.style.display='block'; src.className='dir-hint err'; src.textContent='पहले प्रकरण चुनें।'; } return; }
   var brief=((document.getElementById('dir-brief')||{}).value)||sel.brief||'';
-  if(btn){ btn.disabled=true; btn.textContent='🧠 सुझा रहे…'; }
+  var atts=(sel.attachments||[]).filter(function(a){ return a&&a.url; }).map(function(a){ return { url:a.url, name:a.name||'', type:a.type||'' }; });
+  if(btn){ btn.disabled=true; btn.textContent=atts.length?('📎 '+atts.length+' संलग्न शिकायत पढ़ रहे…'):'🧠 सुझा रहे…'; }
+  if(src){ src.style.display='block'; src.className='dir-hint ai'; src.textContent=atts.length?('📎 संलग्न फ़ाइल पढ़कर विश्लेषण हो रहा है — कुछ क्षण…'):'🧠 विश्लेषण हो रहा है…'; }
   try{
     var res=await supa.functions.invoke('suggest-directions',{ body:{
       case_display:sel.display, category:sel.category||sel.case_type, complainant:sel.complainant,
-      non_complainant:sel.non_complainant, sections:sel.sections, main_allegations:sel.main_allegations, brief:brief
+      non_complainant:sel.non_complainant, sections:sel.sections, main_allegations:sel.main_allegations, brief:brief,
+      attachments:atts
     }});
     var d=(res&&res.data)||{};
     if(d.ok && d.points && d.points.length){
       __dir.pts=d.points.map(function(p){ return { type:(DIR_TYPES.indexOf(p.type)>=0?p.type:'अन्य'), text:String(p.text||'') }; });
       dirRenderPts();
+      var nread=(d.read_files||[]).length;
       if(src){ src.style.display='block'; src.className='dir-hint '+(d.source==='ai'?'ai':'ok');
-        src.textContent=(d.source==='ai'?'🧠 AI-सुझाव — आवश्यकतानुसार edit करें':'📎 keyword-सुझाव — edit करें (AI हेतु key जोड़ें)'); }
+        src.textContent=(d.source==='ai'
+          ? (nread? ('🧠 AI-सुझाव — '+nread+' संलग्न शिकायत पढ़कर · edit करें') : '🧠 AI-सुझाव — आवश्यकतानुसार edit करें')
+          : (nread? ('📎 '+nread+' फ़ाइल पढ़ी, keyword-सुझाव — edit करें') : '📎 keyword-सुझाव — edit करें')); }
     } else { if(src){ src.style.display='block'; src.className='dir-hint err'; src.textContent='सुझाव नहीं बन सका — बिंदु स्वयं जोड़ें।'; } }
   }catch(e){ if(src){ src.style.display='block'; src.className='dir-hint err'; src.textContent='नेटवर्क समस्या — बिंदु स्वयं जोड़ें।'; } }
   finally{ if(btn){ btn.disabled=false; btn.textContent='🧠 शिकायत से बिंदु सुझाएँ'; } }
@@ -34802,7 +34810,8 @@ async function dirRenderReviewList(){
       var blbl=d.status==='reported'?'प्रतिवेदित':(d.status==='reviewed'?'समीक्षित':'जारी');
       return '<div class="drv-item" onclick="dirOpenReview(\''+d.id+'\')">'+
         '<div class="h"><span class="cs">'+_mddEsc(d.case_display||'प्रकरण')+'</span>'+
-          '<span class="drv-badge '+bcls+'">'+blbl+'</span></div>'+
+          '<span class="drv-badge '+bcls+'">'+blbl+'</span>'+
+          '<button class="drv-link" title="🔗 link दोबारा copy करें" onclick="event.stopPropagation();dirCopyLink(\''+d.id+'\')">🔗</button></div>'+
         '<div class="m">'+done+'/'+pts.length+' बिंदु पूर्ण · '+_mddEsc(String(d.issued_at||'').slice(0,10))+(d.deadline?(' · समय-सीमा '+_mddEsc(String(d.deadline).slice(0,10))):'')+'</div>'+
       '</div>';
     }).join('');
@@ -34817,6 +34826,7 @@ function dirOpenReview(id){
   var pct=pts.length?Math.round(done*100/pts.length):0;
   body.innerHTML=
     '<button class="dir-add" style="border-style:solid;margin-bottom:10px" onclick="dirTab(\'rev\')">← सूची पर वापस</button>'+
+    '<button class="dir-suggest" style="margin-bottom:10px" onclick="dirCopyLink(\''+d.id+'\')">🔗 IO को link दोबारा भेजें (copy करें)</button>'+
     '<div class="dir-kv"><b>'+_mddEsc(d.case_display||'')+'</b> · '+_mddEsc(d.io_name||'')+'<br>'+
       (d.brief?_mddEsc(d.brief):'—')+'</div>'+
     '<div style="height:7px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin:10px 0 4px"><i style="display:block;height:100%;width:'+pct+'%;background:linear-gradient(90deg,#ffd879,#e9a521)"></i></div>'+
@@ -34847,6 +34857,15 @@ async function dirSetReview(id, idx, verdict){
     d.points=pts; d.status='reviewed'; __dirRevCache[id]=d;
     dirOpenReview(id);
   }catch(e){ if(hint){ hint.className='dir-hint err'; hint.textContent='सहेजा नहीं जा सका।'; } }
+}
+// re-copy the secure link for an already-issued direction (id = directions.id = ?dir= token)
+function dirCopyLink(id){
+  var d=__dirRevCache[id]||{};
+  var link=DIR_BASE+'?dir='+id;
+  var cap='🔒 EOW निर्देश पत्रक — '+(d.io_name||'विवेचक')+' हेतु\nप्रकरण: '+(d.case_display||'')+'\nकेवल संबंधित विवेचक अपनी PIN से खोलें 👇\n'+link;
+  try{ if(typeof copyLeaveMsg==='function') copyLeaveMsg(cap); else if(navigator.clipboard) navigator.clipboard.writeText(cap); }catch(e){}
+  if(typeof toast==='function') toast('🔗 link copy हो गया — group में paste करें');
+  var h=document.getElementById('dir-rev-hint'); if(h){ h.className='dir-hint ok'; h.textContent='🔗 link copy हो गया — group में paste करें।'; }
 }
 
 /* ---- IO PIN-gated view (opens when URL has ?dir=<token>) ---- */
