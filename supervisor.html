@@ -23340,25 +23340,54 @@ body.view-mobile { padding-bottom:0 !important; }
 @media (max-width: 860px){
   #mydaily-box .agenda-tools-wrap{ width:100% !important; margin-left:0 !important; justify-content:flex-start !important; margin-top:8px; }
 }
-/* ═══ 🔎 जाँच एवं विवेचना — Board A (KPI + IO पटल) ═══ */
-.jv-board{ margin:12px 4px 4px; }
-.jv-kpis{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-.jv-kpi{ border-radius:13px; padding:11px 10px; border:1px solid; cursor:pointer; text-align:left; transition:transform .12s; }
-.jv-kpi:active{ transform:scale(.97); }
-.jv-kpi .k{ font-size:21px; font-weight:900; line-height:1.05; } .jv-kpi .l{ font-size:9.5px; margin-top:4px; font-weight:800; }
-.jv-blue{ background:#eef4fd; border-color:#c9def7; color:#1560b8; } .jv-green{ background:#e9f8f0; border-color:#a5ddc0; color:#178a54; }
-.jv-red{ background:#fdecec; border-color:#f0b6b6; color:#c0392b; } .jv-amber{ background:#fff6e0; border-color:#ecca7e; color:#b07d0e; }
-.jv-purple{ background:#f1ecfb; border-color:#cdbdf0; color:#6b4bbd; } .jv-slate{ background:#eef1f6; border-color:#cfd8e4; color:#42597a; }
-.jv-seclab{ font-size:11px; font-weight:800; color:#fff; letter-spacing:.3px; margin:14px 2px 8px; display:flex; align-items:center; gap:6px; }
-.jv-seclab .c{ margin-left:auto; font-size:10px; color:#f5b942; font-weight:800; }
-.jv-iorow{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.95); border:1px solid #e6ecf4; border-radius:12px; padding:9px 11px; margin-bottom:8px; cursor:pointer; }
-.jv-iorow:active{ background:#f4f8fd; }
-.jv-av{ width:38px; height:38px; border-radius:10px; background:#0a2a52; color:#e0a52b; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; flex:none; }
-.jv-nm{ font-size:12.5px; font-weight:800; color:#12304f; } .jv-mt{ font-size:10px; color:#6a7f99; margin-top:2px; }
-.jv-dot{ font-size:9.5px; font-weight:800; padding:3px 9px; border-radius:999px; flex:none; }
-.jv-ok{ background:#e4f7ee; color:#178a54; border:1px solid #9ad9ba; } .jv-no{ background:#fdecec; color:#c0392b; border:1px solid #f0b6b6; }
-.jv-detail-toggle{ display:block; width:calc(100% - 8px); margin:10px 4px 2px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.22); color:#dbe7f5; font-family:inherit; font-weight:800; font-size:11.5px; padding:9px; border-radius:10px; cursor:pointer; }
-/* attendance date-chart bar */
+/* ═══ 🔎 जाँच एवं विवेचना — विवेचक Monitoring (minimalist, from-root v2) ═══ */
+.jv-board{ --jvink:#18212e; --jvmut:#8a96a6; --jvline:#e9edf2; --jvnavy:#143a67; --jvgold:#d99a1a; --jvgreen:#1e9e63; --jvred:#db4d4d; --jvamber:#e0952b;
+  background:#f5f7f9; border-radius:16px; padding:12px; margin:10px 2px 4px; }
+.jv-sum{ display:flex; background:#fff; border:1px solid var(--jvline); border-radius:14px; padding:13px 4px; margin-bottom:12px; box-shadow:0 1px 3px rgba(20,40,80,.04); }
+.jv-sumc{ flex:1; text-align:center; position:relative; cursor:pointer; }
+.jv-sumc+.jv-sumc::before{ content:''; position:absolute; left:0; top:16%; height:68%; width:1px; background:var(--jvline); }
+.jv-sumc .n{ font-size:21px; font-weight:800; letter-spacing:-.5px; color:var(--jvink); }
+.jv-sumc .l{ font-size:10px; color:var(--jvmut); margin-top:3px; font-weight:600; }
+.jv-sumc .n.g{ color:var(--jvgreen); } .jv-sumc .n.r{ color:var(--jvred); } .jv-sumc .n.a{ color:var(--jvamber); }
+.jv-alert{ background:#fff5f5; border:1px solid #f6d5d5; border-radius:14px; padding:12px 13px; margin-bottom:13px; }
+.jv-alert .at{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:800; color:#b3352f; }
+.jv-alert .as{ font-size:11.5px; color:#a06a6a; margin-top:5px; line-height:1.5; }
+.jv-alert .ab{ display:block; width:100%; margin-top:10px; background:var(--jvgreen); color:#fff; border:0; font-family:inherit; font-weight:800; font-size:12.5px; padding:10px; border-radius:11px; cursor:pointer; }
+.jv-lbl{ font-size:10.5px; font-weight:800; color:var(--jvmut); letter-spacing:.5px; text-transform:uppercase; margin:4px 3px 9px; display:flex; align-items:center; }
+.jv-lbl .r{ margin-left:auto; font-size:10px; color:var(--jvnavy); font-weight:700; text-transform:none; }
+.jv-io{ background:#fff; border:1px solid var(--jvline); border-radius:14px; margin-bottom:9px; overflow:hidden; box-shadow:0 1px 3px rgba(20,40,80,.04); transition:box-shadow .18s,border-color .18s; }
+.jv-io.open{ box-shadow:0 6px 18px rgba(20,40,80,.10); border-color:#dbe2ec; }
+.jv-iohd{ display:flex; align-items:center; gap:11px; padding:12px 13px; cursor:pointer; }
+.jv-ioav{ width:40px; height:40px; border-radius:11px; flex:none; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:#fff; }
+.jv-ionm{ font-size:13.5px; font-weight:800; letter-spacing:-.2px; color:var(--jvink); } .jv-iomt{ font-size:10.5px; color:var(--jvmut); margin-top:2px; }
+.jv-pin{ font-size:9.5px; font-weight:800; padding:3px 9px; border-radius:999px; }
+.jv-pin.ok{ background:#e7f6ee; color:var(--jvgreen); } .jv-pin.no{ background:#fdeaea; color:var(--jvred); }
+.jv-cv{ color:#c2ccd8; font-size:12px; transition:transform .2s; margin-left:2px; }
+.jv-io.open .jv-cv{ transform:rotate(180deg); }
+.jv-iobody{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+.jv-io.open .jv-iobody{ max-height:600px; }
+.jv-ioinner{ padding:2px 13px 13px; border-top:1px solid var(--jvline); }
+.jv-prg{ background:#f5f7fa; border-radius:11px; padding:10px 11px; margin-top:11px; }
+.jv-prg .pt{ font-size:9.5px; font-weight:800; color:var(--jvmut); text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; }
+.jv-prg .pl{ font-size:11.5px; color:var(--jvink); line-height:1.55; margin-bottom:5px; } .jv-prg .pl b{ font-weight:800; } .jv-prg .pl .d{ color:var(--jvmut); }
+.jv-prg .none{ font-size:11.5px; color:var(--jvred); font-weight:600; }
+.jv-acts{ display:flex; gap:7px; margin-top:11px; flex-wrap:wrap; }
+.jv-act{ flex:1; min-width:calc(50% - 4px); border:1px solid var(--jvline); background:#fff; border-radius:11px; padding:10px; font-family:inherit; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; transition:transform .12s; }
+.jv-act:active{ transform:scale(.97); }
+.jv-act.gold{ background:#fdf6e8; border-color:#f0dcae; color:#a9781a; } .jv-act.green{ background:#eaf7f0; border-color:#bfe6d0; color:var(--jvgreen); }
+.jv-act.blue{ background:#eef3fb; border-color:#c8dcf3; color:var(--jvnavy); } .jv-act.slate{ background:#f1f4f8; border-color:#dbe2ec; color:#54617a; }
+.jv-detail-toggle{ display:block; width:calc(100% - 4px); margin:10px 2px 2px; background:#eef2f6; border:1px solid #dde4ec; color:#54617a; font-family:inherit; font-weight:800; font-size:11.5px; padding:9px; border-radius:11px; cursor:pointer; }
+/* attendance month calendar */
+.ov-cal{ background:#fff; border:1px solid #e9edf2; border-radius:15px; padding:13px; margin-bottom:12px; }
+.ov-cal-hd{ display:flex; align-items:center; margin-bottom:11px; } .ov-cal-hd .mo{ font-size:13.5px; font-weight:800; color:#18212e; } .ov-cal-nav{ margin-left:auto; display:flex; gap:6px; }
+.ov-cal-nav button{ width:30px;height:30px;border-radius:9px;border:1px solid #e9edf2;background:#fff;color:#143a67;font-size:14px;cursor:pointer;font-family:inherit; }
+.ov-cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.ov-cal-dow{ text-align:center; font-size:9.5px; color:#8a96a6; font-weight:700; padding-bottom:2px; }
+.ov-cal-day{ aspect-ratio:1; border-radius:9px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid transparent; color:#18212e; }
+.ov-cal-day.empty{ cursor:default; } .ov-cal-day.fut{ opacity:.35; cursor:default; }
+.ov-cal-day.g{ background:#eafaf1; } .ov-cal-day.m{ background:#fdf6e8; } .ov-cal-day.l{ background:#fdeeee; } .ov-cal-day.z{ background:#f4f6f8; color:#b6c0cc; }
+.ov-cal-day .dt{ display:flex; gap:2px; margin-top:2px; } .ov-cal-day .dt i{ width:4px;height:4px;border-radius:50%; }
+.ov-cal-day.sel{ border-color:#143a67; }
 .ov-att-datebar{ display:flex; gap:8px; align-items:center; margin:0 0 10px; }
 .ov-att-datebar input{ flex:1; background:#f6f9fd; border:1px solid #cfd8e4; border-radius:9px; padding:8px 10px; font-family:inherit; font-size:12.5px; color:#12304f; }
 .ov-att-datebtn{ font-size:11.5px; font-weight:800; background:#0a2a52; color:#fff; border-radius:9px; padding:9px 13px; cursor:pointer; white-space:nowrap; }
@@ -41766,6 +41795,40 @@ function ovstatsAttendanceChart(ymd) {
 }
 // re-render the attendance chart for any chosen date (date-picker in attendance view)
 function ovstatsAttSet(ymd){ var s=document.getElementById('ov-att-chart-slot'); if(s) s.innerHTML=ovstatsAttendanceChart(ymd||new Date().toISOString().slice(0,10)); }
+// ── attendance month calendar ──
+var _jvCal={ y:null, m:null };
+function _jvAttMarked(ymd){
+  var rows=(state.attendance||[]).filter(function(a){ return a.att_date===ymd; });
+  var byS={}; rows.forEach(function(a){ if(a.staff_id) byS[a.staff_id]=a; });
+  var total=(state.ioMaster||[]).length||1, marked=0;
+  (state.ioMaster||[]).forEach(function(s){ var a=byS[s.id]; if(a&&a.check_in_time) marked++; });
+  return { marked:marked, total:total, ratio: total?marked/total:0 };
+}
+function _pad2(n){ n=String(n); return n.length<2?('0'+n):n; }
+function ovstatsAttCalendar(){
+  var now=new Date();
+  var y=(_jvCal.y!=null)?_jvCal.y:now.getFullYear(); var m=(_jvCal.m!=null)?_jvCal.m:now.getMonth();
+  var start=new Date(y,m,1).getDay(); var days=new Date(y,m+1,0).getDate();
+  var moNames=['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितम्बर','अक्टूबर','नवम्बर','दिसम्बर'];
+  var todayYMD=now.toISOString().slice(0,10); var sel=window._jvCalSel||todayYMD;
+  var dows=['र','सो','मं','बु','गु','शु','श']; var cells='';
+  dows.forEach(function(w){ cells+='<div class="ov-cal-dow">'+w+'</div>'; });
+  for(var i=0;i<start;i++) cells+='<div class="ov-cal-day empty"></div>';
+  for(var d=1;d<=days;d++){
+    var ymd=y+'-'+_pad2(m+1)+'-'+_pad2(d);
+    var fut=ymd>todayYMD; var st=_jvAttMarked(ymd); var cls='z';
+    if(!fut && st.marked>0) cls=(st.ratio>=0.8?'g':(st.ratio>=0.5?'m':'l'));
+    var dots=(!fut && st.marked>0)?'<span class="dt"><i style="background:#1e9e63"></i></span>':'';
+    cells+='<div class="ov-cal-day '+cls+(fut?' fut':'')+((ymd===sel)?' sel':'')+'"'+(fut?'':(' onclick="event.stopPropagation();ovstatsCalPick(\''+ymd+'\',this)"'))+'><span>'+d+'</span>'+dots+'</div>';
+  }
+  return '<div class="ov-cal" id="ov-cal-mount"><div class="ov-cal-hd"><span class="mo">'+moNames[m]+' '+y+'</span><div class="ov-cal-nav"><button onclick="event.stopPropagation();jvCalNav(-1)">‹</button><button onclick="event.stopPropagation();jvCalNav(1)">›</button></div></div><div class="ov-cal-grid">'+cells+'</div></div>';
+}
+function jvCalNav(delta){
+  var base=(_jvCal.y!=null)?new Date(_jvCal.y,_jvCal.m,1):new Date(); base.setMonth(base.getMonth()+delta);
+  _jvCal.y=base.getFullYear(); _jvCal.m=base.getMonth();
+  var mount=document.getElementById('ov-cal-mount'); if(mount){ var tmp=document.createElement('div'); tmp.innerHTML=ovstatsAttCalendar(); mount.parentNode.replaceChild(tmp.firstChild, mount); }
+}
+function ovstatsCalPick(ymd,el){ window._jvCalSel=ymd; var g=el.parentNode; if(g){ g.querySelectorAll('.ov-cal-day.sel').forEach(function(x){x.classList.remove('sel');}); } el.classList.add('sel'); ovstatsAttSet(ymd); }
 function ovstatsRenderAttendance() {
   var host = document.getElementById('ovstats-host-attendance');
   if (!host) return;
@@ -41781,8 +41844,9 @@ function ovstatsRenderAttendance() {
       // Clone innerHTML — replicates UI but with same IDs (which is acceptable since
       // estab panel is hidden when ovstats panel is visible)
       var _atToday = new Date().toISOString().slice(0,10);
-      host.innerHTML = '<div class="ov-att-datebar"><input type="date" id="ov-att-date" value="'+_atToday+'" max="'+_atToday+'" onchange="event.stopPropagation();ovstatsAttSet(this.value)"><span class="ov-att-datebtn" onclick="event.stopPropagation();var _d=document.getElementById(\'ov-att-date\');ovstatsAttSet(_d?_d.value:\'\')">📊 उस दिन का chart</span></div>' +
-                       '<div id="ov-att-chart-slot">' + ovstatsAttendanceChart(_atToday) + '</div>' +
+      window._jvCalSel = window._jvCalSel || _atToday; _jvCal.y=null; _jvCal.m=null;
+      host.innerHTML = ovstatsAttCalendar() +
+                       '<div id="ov-att-chart-slot">' + ovstatsAttendanceChart(window._jvCalSel) + '</div>' +
                        '<div class="ovstats-mirror-note">📌 विस्तृत सूची (Establishment) · <button type="button" class="ovstats-mirror-link" onclick="event.stopPropagation();ovstatsJumpToEstab(\'attendance\')">Open in Establishment →</button></div>' +
                        estabBody.innerHTML;
     } else {
@@ -41976,41 +42040,91 @@ async function _jvLoadDirections(){
   if(typeof renderJvBoard==='function') renderJvBoard();
 }
 function jvScrollIoPatal(){ var el=document.getElementById('jv-io-patal'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }
+function _jvIoName(x){ return x.disp||x.name||''; }
+function _jvRel(d){ if(!d) return ''; var s=String(d).slice(0,10); var diff=Math.floor((Date.now()-new Date(s).getTime())/86400000); if(isNaN(diff)) return s; if(diff<=0) return 'आज'; if(diff===1) return 'कल'; return diff+' दिन पूर्व'; }
+function _jvRecent(name,n){
+  if(!name) return [];
+  var strip=(typeof _prStripRank==='function')?_prStripRank(name):name;
+  var ups=(state.ioUpdates||[]).filter(function(u){ var un=u.io_name||''; return un && (un.indexOf(name)>=0 || (strip && un.indexOf(strip)>=0) || name.indexOf(un)>=0); });
+  ups.sort(function(a,b){ return String(b.update_date||b.created_at||'').localeCompare(String(a.update_date||a.created_at||'')); });
+  return ups.slice(0,n||2);
+}
 function renderJvBoard(){
   var host=document.getElementById('jv-board'); if(!host) return;
   if(!_jvDetailInit){ _jvDetailInit=true; ['ovstats-tile-row','ovstats-tile-pragati-merged'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; }); }
-  var today=new Date().toISOString().slice(0,10);
   var active=0;
   ['complaints','rcomplaints','rcs','pes','strs','sutra'].forEach(function(h){
     (((state.enquiries||{})[h])||[]).forEach(function(r){ var st=String(r.case_status||'Active').toLowerCase(); if(st!=='closed' && st!=='disposed') active++; });
   });
   var dpc=[]; try{ dpc=(typeof _dpcCompute==='function')?_dpcCompute():[]; }catch(e){}
   var okN=dpc.filter(function(x){return x.ok;}).length, noN=dpc.filter(function(x){return !x.ok;}).length;
-  var dirs=window.__jvDirs; var dirLoading=(dirs===undefined);
-  if(dirLoading){ _jvLoadDirections(); dirs=[]; }
+  var dirs=window.__jvDirs; if(dirs===undefined){ _jvLoadDirections(); dirs=[]; }
   var nLambit=dirs.filter(function(d){return d.status==='issued';}).length;
-  var nLaute=dirs.filter(function(d){return d.status==='reported';}).length;
-  var nOver=dirs.filter(function(d){return d.status==='issued' && d.deadline && String(d.deadline)<today;}).length;
-  var courtToday=((state.courts)||[]).filter(function(c){ return c.next_hearing===today; }).length;
-  var lz=dirLoading?'…':'';
-  function kpi(cls,val,lbl,onclick){ return '<div class="jv-kpi '+cls+'" onclick="event.stopPropagation();'+(onclick||'')+'"><div class="k">'+val+'</div><div class="l">'+lbl+'</div></div>'; }
-  var kpis='<div class="jv-kpis">'+
-    kpi('jv-blue',active,'कुल सक्रिय',"ovstatsNavTile('enqtype',event)")+
-    kpi('jv-green',okN,'आज प्रगति',"ovstatsNavTile('pragati',event)")+
-    kpi('jv-red',noN,'आज प्रगति नहीं',"ovstatsNavTile('dpc',event)")+
-    kpi('jv-amber',(dirLoading?lz:(nLambit+(nOver?(' <span style=\"font-size:11px\">· '+nOver+'⏰</span>'):''))),'निर्देश लंबित','jvScrollIoPatal()')+
-    kpi('jv-purple',(dirLoading?lz:nLaute),'प्रतिवेदन लौटे','jvScrollIoPatal()')+
-    kpi('jv-slate',courtToday,'न्यायालय आज',"ovstatsNavTile('court',event)")+
+  function sc(cls,val,lbl,onclick){ return '<div class="jv-sumc" onclick="event.stopPropagation();'+(onclick||'')+'"><div class="n '+cls+'">'+val+'</div><div class="l">'+lbl+'</div></div>'; }
+  var strip='<div class="jv-sum">'+
+    sc('g',okN,'आज प्रगति',"ovstatsNavTile('pragati',event)")+
+    sc('r',noN,'आज प्रगति नहीं',"ovstatsNavTile('dpc',event)")+
+    sc('a',nLambit,'निर्देश लंबित','jvScrollIoPatal()')+
+    sc('',active,'कुल सक्रिय',"ovstatsNavTile('enqtype',event)")+
   '</div>';
+  var defs=dpc.filter(function(x){return !x.ok;});
+  var banner='';
+  if(defs.length){
+    var nms=defs.slice(0,3).map(function(x){ var nm=_jvIoName(x); return _mddEsc((typeof _prStripRank==='function')?_prStripRank(nm):nm); }).join(' · ');
+    if(defs.length>3) nms+=' · +'+(defs.length-3);
+    banner='<div class="jv-alert"><div class="at">🔔 '+defs.length+' विवेचकों ने आज प्रगति नहीं दी</div><div class="as">'+nms+' — रात 8 बजे तक शेष।</div><button class="ab" onclick="event.stopPropagation();jvReminderAll()">🔔 सभी को WhatsApp पर याद दिलाएँ</button></div>';
+  }
   var rows=dpc.slice().sort(function(a,b){ return (a.ok?1:0)-(b.ok?1:0); });
-  var ioHtml=rows.map(function(x){
-    var dot=x.ok?'<span class="jv-dot jv-ok">✓ प्रगति</span>':'<span class="jv-dot jv-no">✗ आज नहीं</span>';
+  var pal=['#143a67','#1e9e63','#6b4bbd','#0e8f8f','#b45309','#c2410c'];
+  var ioHtml=rows.map(function(x,i){
+    var nm=_jvIoName(x); var col=x.ok?pal[i%pal.length]:'#c0392b';
+    var rc=_jvRecent(nm,1); var ago=rc.length?_jvRel(rc[0].update_date||rc[0].created_at):null;
+    var sub=x.ok?('आज '+x.got+' प्रविष्टि'):(ago?('अंतिम प्रगति '+ago):'अभी तक कोई प्रगति नहीं');
+    var pin=x.ok?'<span class="jv-pin ok">✓ प्रगति</span>':'<span class="jv-pin no">आज नहीं</span>';
     var cases=0; try{ cases=(typeof _iodirCases==='function')?_iodirCases(x.id,x.name):0; }catch(e){}
-    return '<div class="jv-iorow" onclick="event.stopPropagation();openIoPanelB64(\''+(x.id||'')+'\',\''+_b64u(x.disp||'')+'\')">'+
-      '<span class="jv-av">'+_mddEsc(_scInitials(x.disp||''))+'</span>'+
-      '<div style="flex:1"><div class="jv-nm">'+_mddEsc(x.disp||'')+'</div><div class="jv-mt">📁 '+cases+' प्रकरण · प्रगति '+x.got+'/'+x.need+'</div></div>'+dot+'</div>';
+    return '<div class="jv-io" id="jvio-'+i+'" data-nm="'+_b64u(nm)+'" data-id="'+(x.id||'')+'">'+
+      '<div class="jv-iohd" onclick="jvIoToggle('+i+')">'+
+        '<span class="jv-ioav" style="background:'+col+'">'+_mddEsc(_scInitials(nm))+'</span>'+
+        '<div style="flex:1"><div class="jv-ionm">'+_mddEsc(nm)+'</div><div class="jv-iomt">📁 '+cases+' प्रकरण · '+sub+'</div></div>'+
+        pin+'<span class="jv-cv">▾</span></div>'+
+      '<div class="jv-iobody"><div class="jv-ioinner" id="jvbody-'+i+'"></div></div>'+
+    '</div>';
   }).join('');
-  host.innerHTML=kpis+'<div class="jv-seclab" id="jv-io-patal">👮 विवेचक पटल<span class="c">'+dpc.length+' सक्रिय</span></div>'+(ioHtml||'<div style="color:#dbe7f5;font-size:11px;padding:6px">कोई सक्रिय विवेचक नहीं</div>');
+  host.innerHTML=strip+banner+'<div class="jv-lbl" id="jv-io-patal">विवेचक सूची<span class="r">'+dpc.length+' सक्रिय · tap → विवरण</span></div>'+(ioHtml||'<div style="color:#8a96a6;font-size:12px;padding:8px;text-align:center">कोई सक्रिय विवेचक नहीं</div>');
+}
+function jvIoToggle(i){
+  var el=document.getElementById('jvio-'+i); if(!el) return;
+  var was=el.classList.contains('open');
+  document.querySelectorAll('.jv-io.open').forEach(function(x){ x.classList.remove('open'); });
+  if(was) return;
+  el.classList.add('open');
+  var body=document.getElementById('jvbody-'+i);
+  if(body && !body.dataset.done){ body.dataset.done='1'; jvIoBody(body, el); }
+}
+function jvIoBody(body, el){
+  var nm=''; try{ nm=decodeURIComponent(escape(atob(el.getAttribute('data-nm')||''))); }catch(e){}
+  var id=el.getAttribute('data-id')||''; var b64=el.getAttribute('data-nm')||'';
+  var ups=_jvRecent(nm,2);
+  var prg = ups.length ? ups.map(function(u){ var lbl=(u.case_serial||u.case_display||''); var det=String(u.detail||u.action||'').split('\n')[0]; return '<div class="pl">'+(lbl?'<b>'+_mddEsc(lbl)+'</b> — ':'')+_mddEsc(det.slice(0,90))+' <span class="d">· '+_mddEsc(_jvRel(u.update_date||u.created_at))+'</span></div>'; }).join('') : '<div class="none">⚠ हाल में कोई प्रगति दर्ज नहीं</div>';
+  var master=(state.ioMaster||[]).find(function(s){ return s.id===id; })||{};
+  var mob=String(master.mobile||'').replace(/[^0-9]/g,'');
+  var wa = mob ? ('<a class="jv-act green" href="https://wa.me/91'+mob+'" target="_blank" rel="noopener" onclick="event.stopPropagation();">💬 WhatsApp</a>') : '<span class="jv-act green" style="opacity:.5">💬 नंबर नहीं</span>';
+  body.innerHTML='<div class="jv-prg"><div class="pt">हाल की प्रगति / प्रतिवेदन</div>'+prg+'</div>'+
+    '<div class="jv-acts">'+
+      '<button class="jv-act gold" onclick="event.stopPropagation();openDirComposeB64(\''+id+'\',\''+b64+'\')">📋 निर्देश जारी</button>'+
+      wa+
+      '<button class="jv-act blue" onclick="event.stopPropagation();openSecureComposeB64(\''+id+'\',\''+b64+'\')">🔒 संदेश</button>'+
+      '<button class="jv-act slate" onclick="event.stopPropagation();openIoPanelB64(\''+id+'\',\''+b64+'\')">📊 पूरी प्रगति</button>'+
+    '</div>';
+}
+function jvReminderAll(){
+  var dpc=[]; try{ dpc=(typeof _dpcCompute==='function')?_dpcCompute():[]; }catch(e){}
+  var defs=dpc.filter(function(x){return !x.ok;});
+  if(!defs.length){ if(typeof toast==='function') toast('आज सभी ने प्रगति दे दी 🎉'); return; }
+  var list=defs.map(function(x,i){ var nm=_jvIoName(x); return (i+1)+'. '+((typeof _prStripRank==='function')?_prStripRank(nm):nm); }).join('\n');
+  var msg='🔔 EOW भोपाल — दैनिक प्रगति स्मरण\n\nनिम्न विवेचकों की आज की प्रगति अभी दर्ज नहीं हुई है। कृपया रात 8 बजे तक न्यूनतम प्रगति दर्ज करें:\n\n'+list+'\n\n— कार्यालय अधीक्षक पुलिस, EOW भोपाल';
+  try{ if(typeof copyLeaveMsg==='function') copyLeaveMsg(msg); else if(navigator.clipboard) navigator.clipboard.writeText(msg); }catch(e){}
+  if(typeof toast==='function') toast('🔔 '+defs.length+' विवेचकों का reminder copy — group में paste करें');
 }
 
 // Refresh active panel content (called by refreshAll)
