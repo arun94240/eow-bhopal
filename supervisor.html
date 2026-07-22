@@ -31300,8 +31300,12 @@ function _mpDeptOptions(sel){
 }
 function ncompParseFull(text){
   if (!text) return [];
-  var sep = text.indexOf('\n') > -1 ? '\n' : ',';
-  return text.split(sep).map(function(s){
+  // Split ONLY on newline. Each non-complainant is a distinct entry, created
+  // explicitly via "+ Add Non-Complainant" (which stores a newline separator).
+  // A comma is a normal character WITHIN one name/description — addresses,
+  // पद-designation, "एवं अन्य", even internal "1. .. 2. .." lists — and must
+  // NEVER start a new entry. However long a single name is, comma नहीं तोड़ेगा।
+  return String(text).replace(/\r/g,'').split('\n').map(function(s){
     var parts = s.split('\t');
     return { name:(parts[0]||'').trim(), dept:(parts[1]||'').trim() };
   }).filter(function(x){ return x.name; });
