@@ -3057,15 +3057,21 @@ tbody tr:hover { background: var(--surface-alt); }
 }
 #ovstats-summary-wrap.ov-section.collapsed{ box-shadow:0 6px 20px rgba(6,42,82,.14) !important; }
 #ovstats-summary-wrap > .ov-section-header{
+  position:relative;
+  display:block !important;              /* let title strip span full width */
   margin:0 !important; border:0 !important; border-radius:0 !important;
   padding:0 !important; background:transparent !important;
 }
 #ovstats-summary-wrap > .ov-section-header:hover{ background:transparent !important; }
-#ovstats-summary-wrap .ov-section-titles{ padding:0; }
-/* navy header bar = the title strip only */
+#ovstats-summary-wrap .ov-section-titles{ padding:0; width:100%; }
+/* navy header bar = the title strip only — thin + full-width edge-to-edge (like Daily Attendance) */
 #ovstats-summary-wrap .sup-title-row.dgeow-title-row{
   background:linear-gradient(135deg,#062a52 0%,#0a3a6e 60%,#134d8a 100%);
-  padding:12px 14px; margin:0; border-radius:0; gap:9px;
+  padding:10px 12px; padding-right:46px; margin:0; border-radius:0; gap:9px;
+}
+/* collapse toggle → float top-right ON the navy strip (was pushing the strip short) */
+#ovstats-summary-wrap > .ov-section-header > .ov-section-toggle{
+  position:absolute; top:9px; right:11px; margin:0 !important; z-index:3;
 }
 /* light body — board sits on the white card */
 #ovstats-summary-wrap .jv-board{ margin:12px !important; }
@@ -15384,7 +15390,22 @@ body.view-mobile .cao-matrix-tile .caom-num {
 /* ═══ Home box uniformity (v200): Agenda — white card + navy header,
    matching Daily Attendance (.ap-box). ═══ */
 #mydaily-box{ background:#fff !important; border:1px solid #e4ebf3 !important; border-radius:15px !important; box-shadow:0 6px 20px rgba(6,42,82,.16) !important; padding:0 !important; overflow:hidden; }
-#mydaily-box .agenda-hdr-v2{ background:linear-gradient(135deg,#062a52 0%,#0a3a6e 60%,#134d8a 100%); padding:12px 14px 12px !important; margin:0; }
+/* only the heading row is navy — thin, full-width edge-to-edge (like Daily Attendance) */
+#mydaily-box .agenda-hdr-v2{ background:transparent !important; padding:0 !important; margin:0; }
+#mydaily-box .agenda-hdr-top{ background:linear-gradient(135deg,#062a52 0%,#0a3a6e 60%,#134d8a 100%); padding:10px 12px !important; margin:0 !important; }
+/* tabs move into the white body as multi-colour tiles (matching att / जाँच KPI tiles) */
+#mydaily-box .agenda-tabstrip{ padding:11px 12px 5px !important; margin:0 !important; gap:8px; }
+#mydaily-box .agenda-tab{ background:#f6f9fd; border:1px solid #e4ebf3; border-radius:12px; box-shadow:0 2px 6px rgba(6,42,82,.06); }
+#mydaily-box .agenda-tab:hover{ background:#eef4fb; }
+#mydaily-box .at-search{ background:#dbeafe !important; border-color:#bfdbfe !important; }
+#mydaily-box .at-search .chip{ background:#bfdbfe !important; } #mydaily-box .at-search .l{ color:#2563eb !important; }
+#mydaily-box .at-sub{ background:#dcfce7 !important; border-color:#bbf7d0 !important; }
+#mydaily-box .at-sub .chip{ background:#bbf7d0 !important; } #mydaily-box .at-sub .l{ color:#16a34a !important; }
+#mydaily-box .at-craft{ background:#ede9fe !important; border-color:#ddd6fe !important; }
+#mydaily-box .at-craft .chip{ background:#ddd6fe !important; } #mydaily-box .at-craft .l{ color:#7c3aed !important; }
+#mydaily-box .agenda-tab-gold.at-add{ background:#fef3c7 !important; border-color:#fde68a !important; }
+#mydaily-box .at-add .chip{ background:#fde68a !important; } #mydaily-box .at-add .l{ color:#b45309 !important; }
+#mydaily-box .agenda-search-row{ margin:0 !important; }
 #mydaily-box > #mydd-reminder-panel, #mydaily-box > #mydd-calendar-panel{ margin-left:12px !important; margin-right:12px !important; }
 #mydaily-box > .mydd-tiles{ padding:12px !important; margin-top:0 !important; }
 /* master "My Tasks" tile → light theme on the white card (was white-on-navy) */
@@ -24450,14 +24471,14 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
       
       <!-- Command box REMOVED — merged into My Dashboard (review/pragati/court/tasks/leave/notice all there now) -->
 
-      <div class="att-live-box" id="att-live-box">
-        <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
-      </div>
       <div class="cs-top-bar" id="cs-top-bar" onclick="event.stopPropagation();">
         <span class="cs-top-mag">🔍</span>
         <input type="text" id="cs-top-input" autocomplete="off" placeholder="Search All" oninput="event.stopPropagation();csTopSearchInput(this.value)">
       </div>
       <div id="cs-top-dd" onclick="event.stopPropagation();"></div>
+      <div class="att-live-box" id="att-live-box">
+        <div id="mydd-att-strip" class="mydd-att-strip-host"></div>
+      </div>
       <div class="ov-section collapsed" id="ovstats-summary-wrap">
         <div class="ov-section-header">
           <div class="ov-section-titles">
