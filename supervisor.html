@@ -22727,8 +22727,21 @@ body.role-staff #mydaily-box{ display:none !important; }
 .ap-seg{ display:flex; gap:4px; background:#eef2f7; border-radius:10px; padding:3px; margin-bottom:10px; }
 .ap-seg button{ flex:1; border:0; background:transparent; font-family:inherit; font-size:10.5px; font-weight:800; color:#6b7d97; padding:7px 2px; border-radius:8px; }
 .ap-seg button.on{ background:#fff; color:#062a52; box-shadow:0 1px 4px rgba(6,42,82,.16); }
-.ap-view{ animation:apFade .22s ease; }
-@keyframes apFade{ from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:none;} }
+/* inline expand — default closed, smooth (v189) */
+.ap-view{ max-height:0; opacity:0; overflow:hidden; margin-top:0; transition:max-height .40s cubic-bezier(.22,.61,.36,1), opacity .3s ease, margin-top .3s ease; }
+.ap-view.open{ max-height:82vh; opacity:1; overflow-y:auto; margin-top:6px; }
+.ap-empty{ text-align:center; color:#6b7d97; font-size:11px; padding:14px 8px; }
+.ap-pend{ display:flex; flex-direction:column; gap:8px; }
+.ap-pend-card{ border:1px solid #e4ebf3; border-left:3px solid #7c3aed; border-radius:10px; padding:9px 10px; background:#faf9ff; }
+.ap-pend-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.ap-pend-nm{ font-size:12px; font-weight:800; color:#062a52; }
+.ap-pend-type{ font-size:9px; font-weight:800; color:#7c3aed; background:#ede9fe; padding:2px 8px; border-radius:999px; flex:none; }
+.ap-pend-range{ font-size:10px; color:#6b7d97; margin:3px 0 7px; }
+.ap-pend-actions{ display:flex; gap:6px; }
+.ap-pb{ flex:1; border:none; border-radius:8px; font-family:inherit; font-size:10px; font-weight:800; padding:6px 4px; cursor:pointer; }
+.ap-pb.view{ background:#eef2f7; color:#334155; }
+.ap-pb.ok{ background:#dcfce7; color:#166534; }
+.ap-pb.no{ background:#fee2e2; color:#991b1b; }
 table.ap-att{ width:100%; border-collapse:collapse; font-size:11px; }
 table.ap-att th{ font-size:8.6px; text-transform:uppercase; letter-spacing:.02em; color:#6b7d97; text-align:left; padding:5px 4px; border-bottom:1.5px solid #e4ebf3; font-weight:800; }
 table.ap-att td{ padding:6px 4px; border-bottom:1px solid #f0f4f8; }
@@ -35449,7 +35462,7 @@ function lateRowToggle(idx){ _lateRowOpen=(_lateRowOpen===idx)?null:idx; _lateRe
 
 // ═══════════ उपस्थिति पटल — Preview A (segmented, date-wise) v188 ═══════════
 var _apDate = null;      // ymd; null = today
-var _apView = 'list';    // list | tl | late | cal
+var _apView = null;      // null=बंद | list | tl | late | cal | pending (v189: default बंद)
 var _apFilter = null;    // present | out | leave | absent
 var _apCalYM = { y:null, m:null };
 function _apTodayYMD(){ return new Date().toISOString().slice(0,10); }
@@ -35537,23 +35550,58 @@ function _apCalHTML(){
   }
   return '<div class="ap-cal"><div class="ap-cal-hd"><span class="mo">'+moNames[m]+' '+y+'</span><div class="ap-cal-nav"><button onclick="event.stopPropagation();apCalNav(-1)">‹</button> <button onclick="event.stopPropagation();apCalNav(1)">›</button></div></div><div class="ap-cal-grid">'+cells+'</div></div><div class="ap-cal-note">रंग = उस दिन कितनों ने उपस्थिति दर्ज की (हरा ≥80% · पीला ≥50% · लाल कम) — किसी दिन पर tap कर विवरण देखें</div>';
 }
-function apSetView(v){ _apView = v; mddRenderAttStrip(); }
-function apPillFilter(k){ _apFilter = (_apFilter===k)?null:k; _apView = 'list'; mddRenderAttStrip(); }
+function _apFmtD(x){ if(!x) return ''; var pr=String(x).slice(0,10).split('-'); return pr.length===3?(pr[2]+'/'+pr[1]):x; }
+function _apPendingHTML(){
+  var pending=((typeof state!=='undefined' && state.pendingApprovals)?state.pendingApprovals:[]).slice().sort(function(a,b){ return String(a.from_date||'').localeCompare(String(b.from_date||'')); });
+  if(!pending.length) return '<div class="ap-empty">✅ कोई pending leave-approval नहीं</div>';
+  return '<div class="ap-pend">'+pending.map(function(l){
+    var range=(l.from_date===l.to_date)?_apFmtD(l.from_date):(_apFmtD(l.from_date)+' → '+_apFmtD(l.to_date));
+    return '<div class="ap-pend-card">'+
+      '<div class="ap-pend-top"><span class="ap-pend-nm">'+_mddEsc(l.officer_name||l.name||'—')+'</span><span class="ap-pend-type">'+_mddEsc(l.leave_type||'Leave')+'</span></div>'+
+      '<div class="ap-pend-range">'+range+' · '+(l.days||'?')+' दिन'+(l.cause?(' · '+_mddEsc(l.cause)):'')+'</div>'+
+      '<div class="ap-pend-actions">'+
+        '<button class="ap-pb view" onclick="event.stopPropagation();estabOpenApproval(\''+l.id+'\')">👁 देखें</button>'+
+        '<button class="ap-pb ok" onclick="event.stopPropagation();estabQuickApprove(\''+l.id+'\')">✅ स्वीकृत</button>'+
+        '<button class="ap-pb no" onclick="event.stopPropagation();estabOpenApproval(\''+l.id+'\',true)">❌ अस्वीकृत</button>'+
+      '</div></div>';
+  }).join('')+'</div>';
+}
+var _apClearT=null;
+// केवल inline-view बदले — पूरा shell दोबारा न बने → open/close smoothly animate हो
+function _apApplyView(){
+  var view=document.getElementById('ap-view'); if(!view) return;
+  document.querySelectorAll('#mydd-att-strip .ap-seg button').forEach(function(btn){ btn.classList.toggle('on', btn.getAttribute('data-v')===_apView); });
+  document.querySelectorAll('#mydd-att-strip .ap-pill[data-k]').forEach(function(pl){ pl.classList.toggle('on', (_apView==='list' && _apFilter===pl.getAttribute('data-k'))); });
+  var pendPill=document.getElementById('ap-pill-pending'); if(pendPill) pendPill.classList.toggle('on', _apView==='pending');
+  if(!_apView){ view.classList.remove('open'); clearTimeout(_apClearT); _apClearT=setTimeout(function(){ if(!_apView){ var v=document.getElementById('ap-view'); if(v) v.innerHTML=''; } },440); return; }
+  var c=_mddAttCompute(_apDate||_apTodayYMD());
+  var body=(_apView==='tl')?_apTimelineHTML(c)
+          :(_apView==='late')?(typeof _lateRenderHTML==='function'?_lateRenderHTML():'')
+          :(_apView==='cal')?_apCalHTML()
+          :(_apView==='pending')?_apPendingHTML()
+          :_apListHTML(c);
+  var wasOpen=view.classList.contains('open');
+  view.innerHTML=body;
+  if(wasOpen){ view.classList.add('open'); }
+  else { void view.offsetWidth; view.classList.add('open'); }
+}
+function apSetView(v){ _apView=(_apView===v)?null:v; _apFilter=null; _apApplyView(); }
+function apPillFilter(k){ if(_apView==='list' && _apFilter===k){ _apView=null; _apFilter=null; } else { _apView='list'; _apFilter=k; } _apApplyView(); }
+function apPending(){ _apView=(_apView==='pending')?null:'pending'; _apFilter=null; _apApplyView(); }
 function apNavDate(delta){
   var base = new Date(_apDate || _apTodayYMD()); base.setDate(base.getDate()+delta);
   var ny = base.toISOString().slice(0,10); if (ny > _apTodayYMD()) return;
-  _apDate = (ny===_apTodayYMD()) ? null : ny; _apFilter = null; mddRenderAttStrip();
+  _apDate = (ny===_apTodayYMD()) ? null : ny; mddRenderAttStrip();
 }
-function apToday(){ _apDate = null; _apFilter = null; mddRenderAttStrip(); }
+function apToday(){ _apDate = null; mddRenderAttStrip(); }
 function apCalNav(delta){
   var now = new Date();
   var y = (_apCalYM.y!=null)?_apCalYM.y:now.getFullYear();
   var m = (_apCalYM.m!=null)?_apCalYM.m:now.getMonth();
   var b = new Date(y,m,1); b.setMonth(b.getMonth()+delta);
-  _apCalYM.y = b.getFullYear(); _apCalYM.m = b.getMonth(); mddRenderAttStrip();
+  _apCalYM.y = b.getFullYear(); _apCalYM.m = b.getMonth(); _apApplyView();
 }
 function apCalPick(ymd){ _apDate = (ymd===_apTodayYMD())?null:ymd; _apView = 'list'; _apFilter = null; mddRenderAttStrip(); }
-function apGotoPending(){ if (typeof mddAttPending==='function') mddAttPending(); }
 function mddRenderAttStrip(){
   var host = document.getElementById('mydd-att-strip'); if (!host) return;
   var ymd = _apDate || _apTodayYMD();
@@ -35567,17 +35615,13 @@ function mddRenderAttStrip(){
   var moShort = okD ? dObj.toLocaleDateString('en-US',{month:'short'}) : '';
   var dayNum = okD ? dObj.getDate() : '';
   var dLabel; try { dLabel = okD ? dObj.toLocaleDateString('hi-IN',{weekday:'short',day:'numeric',month:'long',year:'numeric'}) : ymd; } catch(e){ dLabel = okD ? dObj.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : ymd; }
-  function pill(k,cls,lbl,n){ return '<div class="ap-pill '+cls+(_apFilter===k?' on':'')+'" onclick="event.stopPropagation();apPillFilter(\''+k+'\')"><div class="n">'+n+'</div><div class="l">'+lbl+'</div></div>'; }
-  function seg(v,lbl){ return '<button class="'+(_apView===v?'on':'')+'" onclick="event.stopPropagation();apSetView(\''+v+'\')">'+lbl+'</button>'; }
-  var body = (_apView==='tl') ? _apTimelineHTML(c)
-           : (_apView==='late') ? (typeof _lateRenderHTML==='function'?_lateRenderHTML():'')
-           : (_apView==='cal') ? _apCalHTML()
-           : _apListHTML(c);
+  function pill(k,cls,lbl,n){ return '<div class="ap-pill '+cls+'" data-k="'+k+'" onclick="event.stopPropagation();apPillFilter(\''+k+'\')"><div class="n">'+n+'</div><div class="l">'+lbl+'</div></div>'; }
+  function seg(v,lbl){ return '<button data-v="'+v+'" onclick="event.stopPropagation();apSetView(\''+v+'\')">'+lbl+'</button>'; }
   host.innerHTML =
     '<div class="ap-box">'+
       '<div class="ap-head">'+
         '<div class="ap-cal"><span class="mo">'+moShort+'</span><span class="dy">'+dayNum+'</span></div>'+
-        '<div class="ap-ttl">उपस्थिति एवं दैनिक भ्रमण</div>'+
+        '<div class="ap-ttl">Daily Attendance</div>'+
         (isToday ? ('<div class="ap-live"><span class="dt"></span>Live · '+tm+'</div>')
                  : ('<div class="ap-live ap-past">📅 '+(okD?dObj.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'')+'</div>'))+
       '</div>'+
@@ -35586,7 +35630,7 @@ function mddRenderAttStrip(){
           pill('present','p-g','उपस्थित',p)+
           pill('out','p-b','जा चुके',o)+
           pill('leave','p-a','अवकाश',l)+
-          '<div class="ap-pill p-p" onclick="event.stopPropagation();apGotoPending()"><div class="n">'+pend+'</div><div class="l">Pending</div></div>'+
+          '<div class="ap-pill p-p" id="ap-pill-pending" onclick="event.stopPropagation();apPending()"><div class="n">'+pend+'</div><div class="l">Pending</div></div>'+
           pill('absent','p-r','अनुपस्थित',ab)+
         '</div>'+
         '<div class="ap-bar">'+
@@ -35602,9 +35646,10 @@ function mddRenderAttStrip(){
           '<button class="nav" onclick="event.stopPropagation();apNavDate(1)"'+(isToday?' disabled':'')+'>›</button>'+
         '</div>'+
         '<div class="ap-seg">'+seg('list','📋 सूची')+seg('tl','📊 Timeline')+seg('late','🕥 देर से')+seg('cal','📅 माह')+'</div>'+
-        '<div class="ap-view">'+body+'</div>'+
+        '<div class="ap-view" id="ap-view"></div>'+
       '</div>'+
     '</div>';
+  _apApplyView();
 }
 var _masPendingOpen=false;
 function masPendingToggle(){
@@ -35647,7 +35692,7 @@ var _mddAttTimer = null; var _masOpenGroup = null; var _masTableOpen = false; va
 async function mddAttLiveTick(){
   try { var r = await supa.from('attendance_log').select('*').eq('is_test', false).order('att_date', { ascending:false }); if (r && !r.error) state.attendance = r.data || []; } catch(e){}
   // केवल तब auto-refresh जब आज की सूची/timeline देख रहे हों — देर-से/माह/पुरानी तारीख़ पर बाधा न पड़े
-  if (_apDate == null && (_apView === 'list' || _apView === 'tl')) mddRenderAttStrip();
+  if (_apDate == null && !_apView) mddRenderAttStrip();
 }
 function mddAttStartLive(){ if (_mddAttTimer) return; _mddAttTimer = setInterval(mddAttLiveTick, 60000); }
 function _mddBriefItem(dot, text, tag){
