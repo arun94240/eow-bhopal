@@ -23474,6 +23474,49 @@ body.view-mobile { padding-bottom:0 !important; }
 /* ═══ 🔎 जाँच एवं विवेचना — विवेचक Monitoring (minimalist, from-root v2) ═══ */
 .jv-board{ --jvink:#18212e; --jvmut:#8a96a6; --jvline:#e9edf2; --jvnavy:#143a67; --jvgold:#d99a1a; --jvgreen:#1e9e63; --jvred:#db4d4d; --jvamber:#e0952b;
   background:#f5f7f9; border-radius:16px; padding:12px; margin:10px 2px 4px; }
+/* ═══ v194 — जाँच-विवेचना 3-tab पूर्ण redesign ═══ */
+.jvkpi{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:9px; }
+.jvk{ border:1px solid; border-radius:12px; padding:9px 3px; text-align:center; cursor:pointer; background:#fff; font-family:inherit; }
+.jvk .n{ font-size:18px; font-weight:900; line-height:1; } .jvk .l{ font-size:8.2px; font-weight:700; margin-top:3px; }
+.jvk.g{ background:#eafaf1; border-color:#bfe8d0; color:#1e9e63; } .jvk.r{ background:#fdecec; border-color:#f6cccc; color:#db4d4d; }
+.jvk.a{ background:#fef6e6; border-color:#f3ddab; color:#c2820c; } .jvk.n{ background:#eef2f7; border-color:#dbe4ef; color:#143a67; }
+.jvrule{ font-size:9.2px; color:#6b7d97; background:#fff; border:1px dashed #cdd9e8; border-radius:9px; padding:6px 9px; margin-bottom:10px; }
+.jvrule span{ background:#eef2f7; border-radius:6px; padding:1px 6px; font-weight:800; color:#143a67; } .jvrule b{ color:#143a67; }
+.jvtabs{ display:flex; gap:4px; background:#e9edf2; border-radius:11px; padding:4px; margin-bottom:11px; }
+.jvtab{ flex:1; border:0; background:transparent; font-family:inherit; font-size:11px; font-weight:800; color:#8a96a6; padding:9px 2px; border-radius:8px; cursor:pointer; }
+.jvtab.on{ background:#143a67; color:#fff; box-shadow:0 2px 6px rgba(20,58,103,.22); }
+.jvv{ display:none; } .jvv.on{ display:block; animation:jvfade .2s ease; }
+@keyframes jvfade{ from{opacity:0;transform:translateY(4px);} to{opacity:1;} }
+.jvnote{ font-size:9.2px; color:#8a7a5c; background:#fffdf5; border:1px solid #f0e6c8; border-radius:8px; padding:5px 9px; margin-bottom:9px; }
+.jv-allok{ background:#eafaf1; border:1px solid #bfe8d0; color:#15803d; border-radius:12px; padding:14px; text-align:center; font-size:12px; font-weight:800; }
+.jvsegbar{ display:flex; gap:4px; margin-bottom:9px; }
+.jvseg{ flex:1; border:1px solid #e9edf2; background:#fff; color:#8a96a6; font-family:inherit; font-size:9.8px; font-weight:800; padding:7px 2px; border-radius:8px; cursor:pointer; }
+.jvseg.on{ background:#143a67; color:#fff; border-color:#143a67; }
+.jvdpc-hint{ font-size:10px; color:#8a96a6; text-align:center; padding:12px 8px; }
+.jvlbl{ font-size:9.6px; font-weight:800; color:#8a96a6; text-transform:uppercase; letter-spacing:.03em; margin:2px 2px 8px; display:flex; align-items:center; }
+.jvlbl .r{ margin-left:auto; color:#b3bccb; font-weight:700; text-transform:none; }
+.jvlbl2{ font-size:9.4px; font-weight:800; color:#8a96a6; margin:9px 2px 4px; }
+.jvpd{ background:#fff; border:1px solid #e9edf2; border-left:3px solid #e0952b; border-radius:10px; padding:8px 10px; margin-bottom:6px; }
+.jvpd-t{ font-size:11px; font-weight:800; color:#143a67; } .jvpd-s{ font-size:9px; color:#8a96a6; }
+.jvetabs{ display:flex; gap:5px; background:#e9edf2; border-radius:10px; padding:4px; margin:6px 0 10px; }
+.jvetabs button{ flex:1; border:0; background:transparent; font-family:inherit; font-size:10.5px; font-weight:800; color:#8a96a6; padding:8px 3px; border-radius:8px; cursor:pointer; }
+.jvetabs button.on{ background:#fff; color:#143a67; box-shadow:0 1px 5px rgba(20,58,103,.16); }
+.jvsel{ width:100%; border:1px solid #e9edf2; border-radius:9px; padding:9px 10px; font-family:inherit; font-size:12px; background:#fff; color:#18212e; }
+.jvinfo{ font-size:9.6px; color:#6b7d97; background:#f5f7f9; border:1px dashed #cdd9e8; border-radius:8px; padding:6px 9px; margin:8px 0 6px; } .jvinfo b{ color:#143a67; }
+.jvbkts{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:8px; }
+.jvbkt{ border:1px solid #e9edf2; border-radius:10px; padding:8px 4px; text-align:center; background:#fff; cursor:pointer; font-family:inherit; }
+.jvbkt.on{ border-color:#143a67; background:#eef4fb; box-shadow:0 0 0 1.5px #143a67 inset; }
+.jvbkt .bn{ font-size:16px; font-weight:900; color:#143a67; line-height:1; } .jvbkt .bl{ font-size:8.2px; font-weight:700; color:#8a96a6; margin-top:2px; } .jvbkt.zero{ opacity:.45; }
+.jvhchips{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:7px; }
+.jvhchip{ font-size:9.8px; font-weight:800; padding:6px 10px; border-radius:9px; border:1px solid #e9edf2; background:#fff; color:#8a96a6; cursor:pointer; font-family:inherit; }
+.jvhchip.on{ background:#143a67; color:#fff; border-color:#143a67; } .jvhchip .c{ opacity:.7; font-size:8.4px; }
+.jvclist{ border:1px solid #e9edf2; border-radius:11px; overflow:hidden; margin-top:4px; max-height:260px; overflow-y:auto; }
+.jvcrow{ display:flex; align-items:center; gap:9px; padding:9px 10px; border-top:1px solid #f0f4f8; cursor:pointer; } .jvcrow:first-child{ border-top:0; } .jvcrow:active{ background:#eef4fb; }
+.jvcno{ font-size:8.2px; font-weight:900; color:#fff; border-radius:6px; padding:3px 6px; flex:none; min-width:52px; text-align:center; }
+.jvcno.c{ background:#2563eb; } .jvcno.rc{ background:#db4d4d; } .jvcno.pe{ background:#7c3aed; } .jvcno.str{ background:#0e8f8f; } .jvcno.sutra{ background:#b45309; } .jvcno.rcomp{ background:#475569; }
+.jvcrow .cmid{ flex:1; min-width:0; } .jvcrow .ct{ font-size:11px; font-weight:800; color:#143a67; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .jvcrow .cs{ font-size:9px; color:#8a96a6; }
+.jvcb{ font-size:8px; font-weight:800; padding:2px 6px; border-radius:6px; flex:none; } .jvcb.att{ background:#eafaf1; color:#15803d; }
+.jvdir-form{ margin-top:10px; }
 .jv-sum{ display:flex; background:#fff; border:1px solid var(--jvline); border-radius:14px; padding:13px 4px; margin-bottom:12px; box-shadow:0 1px 3px rgba(20,40,80,.04); }
 .jv-sumc{ flex:1; text-align:center; position:relative; cursor:pointer; }
 .jv-sumc+.jv-sumc::before{ content:''; position:absolute; left:0; top:16%; height:68%; width:1px; background:var(--jvline); }
@@ -42493,6 +42536,15 @@ function _jvRecent(name,n){
   ups.sort(function(a,b){ return String(b.update_date||b.created_at||'').localeCompare(String(a.update_date||a.created_at||'')); });
   return ups.slice(0,n||2);
 }
+var _jvTab='mon';                    // mon | ios | dir
+var _jvDpcView=null;                  // null | card | matrix | list
+var _jvDir={ mode:'io', ioId:null, ioName:'', head:'complaints' };
+function _jvCnoCls(t){ return t==='rcs'?'rc':(t==='pes'?'pe':(t==='strs'?'str':(t==='sutra'?'sutra':(t==='rcomplaints'?'rcomp':'c')))); }
+function jvTab(which){
+  _jvTab=which;
+  document.querySelectorAll('#jv-board .jvtab').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-t')===which); });
+  document.querySelectorAll('#jv-board .jvv').forEach(function(v){ v.classList.toggle('on', v.id==='jvv-'+which); });
+}
 function renderJvBoard(){
   var host=document.getElementById('jv-board'); if(!host) return;
   if(!_jvDetailInit){ _jvDetailInit=true; ['ovstats-tile-row','ovstats-tile-pragati-merged'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; }); }
@@ -42504,20 +42556,11 @@ function renderJvBoard(){
   var okN=dpc.filter(function(x){return x.ok;}).length, noN=dpc.filter(function(x){return !x.ok;}).length;
   var dirs=window.__jvDirs; if(dirs===undefined){ _jvLoadDirections(); dirs=[]; }
   var nLambit=dirs.filter(function(d){return d.status==='issued';}).length;
-  function sc(cls,val,lbl,onclick){ return '<div class="jv-sumc" onclick="event.stopPropagation();'+(onclick||'')+'"><div class="n '+cls+'">'+val+'</div><div class="l">'+lbl+'</div></div>'; }
-  var strip='<div class="jv-sum">'+
-    sc('g',okN,'आज प्रगति',"ovstatsNavTile('pragati',event)")+
-    sc('r',noN,'आज प्रगति नहीं',"ovstatsNavTile('dpc',event)")+
-    sc('a',nLambit,'निर्देश लंबित','jvScrollIoPatal()')+
-    sc('',active,'कुल सक्रिय',"ovstatsNavTile('enqtype',event)")+
-  '</div>';
-  var defs=dpc.filter(function(x){return !x.ok;});
-  var banner='';
-  if(defs.length){
-    var nms=defs.slice(0,3).map(function(x){ var nm=_jvIoName(x); return _mddEsc((typeof _prStripRank==='function')?_prStripRank(nm):nm); }).join(' · ');
-    if(defs.length>3) nms+=' · +'+(defs.length-3);
-    banner='<div class="jv-alert"><div class="at">🔔 '+defs.length+' विवेचकों ने आज प्रगति नहीं दी</div><div class="as">'+nms+' — रात 8 बजे तक शेष।</div><button class="ab" onclick="event.stopPropagation();jvReminderAll()">🔔 सभी को WhatsApp पर याद दिलाएँ</button></div>';
-  }
+  function kc(cls,val,lbl,t){ return '<button class="jvk '+cls+'" onclick="event.stopPropagation();jvTab(\''+t+'\')"><div class="n">'+val+'</div><div class="l">'+lbl+'</div></button>'; }
+  var kpi='<div class="jvkpi">'+kc('g',okN,'आज प्रगति','mon')+kc('r',noN,'प्रगति नहीं','mon')+kc('a',nLambit,'निर्देश लंबित','dir')+kc('n',active,'कुल सक्रिय','ios')+'</div>';
+  var rule='<div class="jvrule">🎯 दैनिक: <span>2 शिकायत</span> + <span>1 RC</span> + <span>1 सूत्र/STR/PE/R</span> = <b>4</b> · रात 8 बजे तक</div>';
+  function tb(t,lbl){ return '<button class="jvtab'+(_jvTab===t?' on':'')+'" data-t="'+t+'" onclick="jvTab(\''+t+'\')">'+lbl+'</button>'; }
+  var tabs='<div class="jvtabs">'+tb('mon','📊 निगरानी')+tb('ios','👮 विवेचक')+tb('dir','📋 निर्देश')+'</div>';
   var rows=dpc.slice().sort(function(a,b){ return (a.ok?1:0)-(b.ok?1:0); });
   var pal=['#143a67','#1e9e63','#6b4bbd','#0e8f8f','#b45309','#c2410c'];
   var ioHtml=rows.map(function(x,i){
@@ -42534,8 +42577,96 @@ function renderJvBoard(){
       '<div class="jv-iobody"><div class="jv-ioinner" id="jvbody-'+i+'"></div></div>'+
     '</div>';
   }).join('');
-  host.innerHTML=strip+banner+'<div class="jv-lbl" id="jv-io-patal">विवेचक सूची<span class="r">'+dpc.length+' सक्रिय · tap → विवरण</span></div>'+(ioHtml||'<div style="color:#8a96a6;font-size:12px;padding:8px;text-align:center">कोई सक्रिय विवेचक नहीं</div>');
+  var iosView='<div class="jv-lbl" id="jv-io-patal">विवेचक सूची<span class="r">'+dpc.length+' सक्रिय · tap → विवरण</span></div>'+(ioHtml||'<div class="jvdpc-hint">कोई सक्रिय विवेचक नहीं</div>');
+  host.innerHTML=kpi+rule+tabs+
+    '<div class="jvv'+(_jvTab==='mon'?' on':'')+'" id="jvv-mon"></div>'+
+    '<div class="jvv'+(_jvTab==='ios'?' on':'')+'" id="jvv-ios">'+iosView+'</div>'+
+    '<div class="jvv'+(_jvTab==='dir'?' on':'')+'" id="jvv-dir"></div>';
+  _jvRenderMon(); _jvRenderDir();
 }
+// ── निगरानी (defaulter — कार्ड/मैट्रिक्स/सूची) ──
+function jvDpcSetView(v){ _jvDpcView=(_jvDpcView===v)?null:v; _jvRenderMon(); }
+function _jvRenderMon(){
+  var host=document.getElementById('jvv-mon'); if(!host) return;
+  var defs=[]; try{ defs=(typeof _dpcDefaulters==='function')?_dpcDefaulters():[]; }catch(e){}
+  var hr=new Date().getHours();
+  var lock=(typeof DPC_DEADLINE_HR!=='undefined' && hr<DPC_DEADLINE_HR) ? '🕗 शाम 8 बजे तक की स्थिति — तब अंतिम सूची lock होगी' : '🔒 8 बजे बाद — आज की अंतिम डिफॉल्टर सूची';
+  var top='<div class="jvnote">'+lock+'</div>';
+  if(!defs.length){ host.innerHTML=top+'<div class="jv-allok">✅ आज सभी विवेचकों ने निर्धारित प्रगति पूरी कर ली।</div>'; return; }
+  var nms=defs.slice(0,3).map(function(x){ return _mddEsc((typeof _prStripRank==='function')?_prStripRank(x.disp||x.name):(x.disp||x.name)); }).join(' · ');
+  if(defs.length>3) nms+=' · +'+(defs.length-3);
+  var alert='<div class="jv-alert"><div class="at">🔔 '+defs.length+' विवेचकों ने आज प्रगति नहीं दी</div><div class="as">'+nms+' — रात 8 बजे तक शेष</div><button class="ab" onclick="event.stopPropagation();jvReminderAll()">🔔 सभी को WhatsApp पर याद दिलाएँ</button></div>';
+  function seg(v,ic,lb){ return '<button class="jvseg'+(_jvDpcView===v?' on':'')+'" onclick="event.stopPropagation();jvDpcSetView(\''+v+'\')">'+ic+' '+lb+'</button>'; }
+  var segbar='<div class="jvsegbar">'+seg('card','🗂','कार्ड')+seg('matrix','▦','मैट्रिक्स')+seg('list','📋','सूची')+'</div>';
+  var body='';
+  if(_jvDpcView==='card') body='<div class="dpc-vbody">'+_dpcCardHTML(defs)+'</div>';
+  else if(_jvDpcView==='matrix') body='<div class="dpc-vbody">'+_dpcMatrixHTML(defs)+'</div>';
+  else if(_jvDpcView==='list') body='<div class="dpc-vbody">'+_dpcListHTML(defs)+'</div>';
+  else body='<div class="jvdpc-hint">👆 ऊपर से रूप चुनें — कार्ड · मैट्रिक्स · सूची</div>';
+  host.innerHTML=top+alert+segbar+body;
+}
+// ── निर्देश (लंबित + दो-रास्ता composer, मौजूदा dir-engine reuse) ──
+function _jvRenderDir(){
+  var host=document.getElementById('jvv-dir'); if(!host) return;
+  var dirs=window.__jvDirs||[]; var pend=dirs.filter(function(d){return d.status==='issued';});
+  var pendHtml = pend.length ? pend.slice(0,6).map(function(d){
+    return '<div class="jvpd"><div class="jvpd-t">'+_mddEsc(d.io_name||'')+' → '+_mddEsc(d.case_display||'')+'</div><div class="jvpd-s">'+(((d.points&&d.points.length)||0))+' बिंदु · '+_jvRel(d.created_at||d.deadline||'')+'</div></div>';
+  }).join('') : '<div class="jvdpc-hint">कोई लंबित निर्देश नहीं</div>';
+  host.innerHTML='<div class="jvlbl">📋 लंबित निर्देश<span class="r">'+pend.length+'</span></div>'+pendHtml+
+    '<div class="jvlbl" style="margin-top:12px">＋ नया निर्देश — कहाँ से चुनें?</div>'+
+    '<div class="jvetabs"><button data-m="io" class="'+(_jvDir.mode==='io'?'on':'')+'" onclick="jvDirMode(\'io\')">👮 विवेचक अनुसार</button><button data-m="ty" class="'+(_jvDir.mode==='ty'?'on':'')+'" onclick="jvDirMode(\'ty\')">📁 प्रकार अनुसार</button></div>'+
+    '<div id="jvdir-pick"></div>'+
+    '<div id="dir-body" class="jvdir-form"></div>';
+  jvDirRenderPick();
+}
+function jvDirMode(m){ _jvDir.mode=m; _jvDir.ioId=null;
+  document.querySelectorAll('#jvv-dir .jvetabs button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-m')===m); });
+  jvDirRenderPick();
+}
+function jvDirSelIo(id){ _jvDir.ioId=id||null; var io=(state.ioMaster||[]).find(function(s){return s.id===id;}); _jvDir.ioName=io?io.name:''; jvDirRenderPick(); }
+function jvDirHeadPick(h){ _jvDir.head=h; jvDirRenderPick(); }
+function _jvCaseListHTML(list){
+  if(!list.length) return '<div class="jvdpc-hint">इस चयन में कोई प्रकरण नहीं</div>';
+  return '<div class="jvclist">'+list.slice(0,60).map(function(c){
+    var att=(c.attachments&&c.attachments.length)?'<span class="jvcb att">📎'+c.attachments.length+'</span>':'';
+    var ttl=String(c.non_complainant||c.complainant||c.brief||'—').split('\n')[0].slice(0,34);
+    var sub=(c.complainant?_mddEsc(String(c.complainant).slice(0,26)):'')+(c.io_name?(' · 👮 '+_mddEsc((typeof _prStripRank==='function')?_prStripRank(c.io_name):c.io_name)):'');
+    return '<div class="jvcrow" onclick="jvDirPick(\''+c.case_type+'\',\''+c.id+'\')"><span class="jvcno '+_jvCnoCls(c.case_type)+'">'+_mddEsc(c.display)+'</span><div class="cmid"><div class="ct">'+_mddEsc(ttl)+'</div>'+(sub?('<div class="cs">'+sub+'</div>'):'')+'</div>'+att+'</div>';
+  }).join('')+'</div>';
+}
+function jvDirRenderPick(){
+  var host=document.getElementById('jvdir-pick'); if(!host) return;
+  var db=document.getElementById('dir-body'); if(db) db.innerHTML='';
+  var HB=[['complaints','शिकायत'],['rcs','RC/FIR'],['rcomplaints','R-शिका.'],['pes','PE'],['strs','STR'],['sutra','सूत्र']];
+  if(_jvDir.mode==='io'){
+    var ios=(state.ioMaster||[]).filter(function(s){ return s.is_io===true && (s.status==='Active'||!s.status); });
+    if(typeof sortIOsByRank==='function'){ try{ ios=sortIOsByRank(ios); }catch(e){} }
+    var opts='<option value="">— विवेचक चुनें —</option>'+ios.map(function(io){ var nm=(typeof getDisplayIOName==='function')?getDisplayIOName(io):io.name; return '<option value="'+io.id+'"'+(_jvDir.ioId===io.id?' selected':'')+'>'+_mddEsc(nm)+'</option>'; }).join('');
+    var h='<div class="jvlbl2">विवेचक (वरिष्ठता क्रम)</div><select class="jvsel" onchange="jvDirSelIo(this.value)">'+opts+'</select>';
+    if(_jvDir.ioId){
+      var io2=(state.ioMaster||[]).find(function(s){ return s.id===_jvDir.ioId; })||{id:_jvDir.ioId,name:_jvDir.ioName};
+      var cases=_dirIoCases({id:io2.id,name:io2.name});
+      var counts={}; cases.forEach(function(c){ counts[c.case_type]=(counts[c.case_type]||0)+1; });
+      if(!counts[_jvDir.head]){ var firstNZ=HB.filter(function(hb){return counts[hb[0]];})[0]; if(firstNZ) _jvDir.head=firstNZ[0]; }
+      var bkts='<div class="jvbkts">'+HB.map(function(hb){ var n=counts[hb[0]]||0; return '<button class="jvbkt'+(_jvDir.head===hb[0]?' on':'')+(n?'':' zero')+'" onclick="jvDirHeadPick(\''+hb[0]+'\')"><div class="bn">'+n+'</div><div class="bl">'+hb[1]+'</div></button>'; }).join('')+'</div>';
+      var list=cases.filter(function(c){ return c.case_type===_jvDir.head; });
+      h+='<div class="jvinfo">'+_mddEsc((typeof _prStripRank==='function')?_prStripRank(io2.name):io2.name)+' के पास <b>'+cases.length+' प्रकरण</b> — head चुनें, फिर प्रकरण:</div>'+bkts+_jvCaseListHTML(list);
+    }
+    host.innerHTML=h;
+  } else {
+    var chips='<div class="jvhchips">'+HB.map(function(hb){ var n=((state.enquiries||{})[hb[0]]||[]).length; return '<button class="jvhchip'+(_jvDir.head===hb[0]?' on':'')+'" onclick="jvDirHeadPick(\''+hb[0]+'\')">'+hb[1]+' <span class="c">'+n+'</span></button>'; }).join('')+'</div>';
+    var arr=((state.enquiries||{})[_jvDir.head]||[]).slice(0,60).map(function(e){ return _dirFindCase(_jvDir.head, e.id); }).filter(Boolean);
+    host.innerHTML='<div class="jvlbl2">प्रकरण-प्रकार चुनें</div>'+chips+_jvCaseListHTML(arr);
+  }
+}
+function jvDirPick(ct, cid){
+  var c=_dirFindCase(ct, cid); if(!c) return;
+  try{ _dirCSS(); }catch(e){}
+  __dir={ io:{ id:(c.io_id||_jvDir.ioId||null), name:(c.io_name||_jvDir.ioName||'') }, pts:[], caseSel:c, tab:'new', suggestSrc:'' };
+  var host=document.getElementById('dir-body'); if(host){ try{ dirRenderNew(); }catch(e){} try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+}
+// विवेचक accordion से "निर्देश जारी" → निर्देश tab में उसी IO के साथ inline
+function jvGoDirForIo(id, b64){ var nm=''; try{ nm=decodeURIComponent(escape(atob(b64))); }catch(e){} _jvDir.mode='io'; _jvDir.ioId=id||null; _jvDir.ioName=nm; jvTab('dir'); _jvRenderDir(); }
 function jvIoToggle(i){
   var el=document.getElementById('jvio-'+i); if(!el) return;
   var was=el.classList.contains('open');
@@ -42555,7 +42686,7 @@ function jvIoBody(body, el){
   var wa = mob ? ('<a class="jv-act green" href="https://wa.me/91'+mob+'" target="_blank" rel="noopener" onclick="event.stopPropagation();">💬 WhatsApp</a>') : '<span class="jv-act green" style="opacity:.5">💬 नंबर नहीं</span>';
   body.innerHTML='<div class="jv-prg"><div class="pt">हाल की प्रगति / प्रतिवेदन</div>'+prg+'</div>'+
     '<div class="jv-acts">'+
-      '<button class="jv-act gold" onclick="event.stopPropagation();openDirComposeB64(\''+id+'\',\''+b64+'\')">📋 निर्देश जारी</button>'+
+      '<button class="jv-act gold" onclick="event.stopPropagation();jvGoDirForIo(\''+id+'\',\''+b64+'\')">📋 निर्देश जारी</button>'+
       wa+
       '<button class="jv-act blue" onclick="event.stopPropagation();openSecureComposeB64(\''+id+'\',\''+b64+'\')">🔒 संदेश</button>'+
       '<button class="jv-act slate" onclick="event.stopPropagation();openIoPanelB64(\''+id+'\',\''+b64+'\')">📊 पूरी प्रगति</button>'+
