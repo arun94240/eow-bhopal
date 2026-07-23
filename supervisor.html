@@ -24024,8 +24024,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <button class="section-tab" data-section="officers-nav">👮 IOs <span class="count" id="cnt-io-nav">0</span></button>
     <button class="section-tab" data-section="court">Court Cases <span class="count" id="cnt-court">0</span></button>
     <button class="section-tab" data-section="officers" style="display:none;">🔍 Tag Based Search <span class="count" id="cnt-officers">0</span></button>
-    <button class="section-tab" data-section="pragati">📋 प्रगति-Notice</button>
-    <button class="section-tab" data-section="iomaster" data-mobile-priority="secondary">Establishment-Leaves <span class="count" id="cnt-iomaster">0</span></button>
+    <button class="section-tab" data-section="pragati">📋 प्रगति</button>
+    <button class="section-tab" data-section="notice">📨 Notice</button>
+    <button class="section-tab" data-section="iomaster" data-mobile-priority="secondary">🏢 Establishment <span class="count" id="cnt-iomaster">0</span></button>
+    <button class="section-tab" data-section="leaves" data-mobile-priority="secondary">🏖 Leaves <span class="count" id="cnt-leaves">0</span></button>
     <button class="section-tab" data-section="tags" data-mobile-priority="secondary">🏷 Tags <span class="count" id="cnt-tags">0</span></button>
     <button class="section-tab kb-section-tab" data-section="links" data-mobile-priority="secondary">🔗 Links &amp; Forms <span class="count" id="cnt-links-sec">0</span></button>
     <!-- 📚 Knowledge Base & Files tab moved into ⚙️ Settings (v301) -->
@@ -26455,10 +26457,11 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 
   <!-- ESTABLISHMENT (formerly IO Master) -->
   <section id="iomaster" class="section">
-    <div class="section-header"><div><h2>🏢 Establishment - Leaves</h2><div class="desc">SP EOW Office Bhopal — staff database व अवकाश</div></div><div><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
-    <div class="el-seg">
+    <div class="section-header"><div><h2>🏢 Establishment</h2><div class="desc">SP EOW Office Bhopal — staff/IO database (Leaves अब अलग tab में)</div></div><div><button class="btn btn-danger" onclick="openEstabAddMenu(event)">＋ Add</button></div></div>
+    <!-- el-seg toggle छिपाया — Leaves अब tab-bar में अलग tab (v182) -->
+    <div class="el-seg" style="display:none;">
       <button class="el-seg-b el-seg-estab active" id="el-seg-estab" onclick="estabLeavesSwitch('estab')">🏢 Establishment<span class="el-seg-s">staff · IO database</span></button>
-      <button class="el-seg-b el-seg-leaves" id="el-seg-leaves" onclick="estabLeavesSwitch('leaves')">🏖 Leaves<span class="el-seg-s">अवकाश · approvals</span></button>
+      <button class="el-seg-b el-seg-leaves" id="el-seg-leaves" onclick="switchSection('leaves')">🏖 Leaves<span class="el-seg-s">अवकाश · approvals</span></button>
     </div>
     <div id="el-estab-part">
       <div class="toolbar"><input type="search" class="search-input" id="search-io" placeholder="Search name, rank, mobile…" oninput="renderIOMaster()"><select class="filter-select" id="filter-io-status" onchange="renderIOMaster()"><option value="">All</option><option value="io">IOs</option><option value="non-io">Other Staff</option></select></div>
@@ -26655,12 +26658,12 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 
   <!-- PRAGATI PRATIVEDAN (IO Daily Update Form embedded) -->
   <section id="pragati" class="section">
-    <div class="section-header"><div><h2>📋 प्रगति - Notice प्रतिवेदन</h2><div class="desc">IO प्रगति व जारी notice/summons/warrant</div></div><div><button class="btn" onclick="gotoNotices()">📨 Notices →</button></div></div>
+    <div class="section-header"><div><h2 id="pragati-sec-h2">📋 प्रगति प्रतिवेदन</h2><div class="desc" id="pragati-sec-desc">IO दैनिक प्रगति · timeline (Notice अब अलग tab में)</div></div><div><button class="btn" id="pragati-sec-hdrbtn" onclick="switchSection('notice')">📨 Notice →</button></div></div>
 
     <!-- ============ PRAGATI CONTAINER ============ -->
     <div id="pir-pragati-container">
-    <!-- प्रगति / Notice segment split (v181) -->
-    <div class="pn-seg">
+    <!-- प्रगति / Notice segment split (v181) — अब tab-bar में अलग tabs, internal toggle छिपा (v182) -->
+    <div class="pn-seg" style="display:none;">
       <button class="pn-seg-b pn-seg-prag active" id="pn-seg-prag" onclick="pnSwitch('prag')">📋 प्रगति<span class="pn-seg-s">IO updates · timeline</span></button>
       <button class="pn-seg-b pn-seg-not" id="pn-seg-not" onclick="pnSwitch('not')">📨 Notice<span class="pn-seg-s">जारी · तामील · report</span></button>
     </div>
@@ -37748,6 +37751,23 @@ function switchSection(id) {
     toggleIONavInline();
     return;
   }
+  // 📨 Notice tab — separate tab that shows the Notice half of the pragati section (v182)
+  if (id === 'notice') {
+    var curNot = document.querySelector('.section-tab[data-section="notice"]');
+    if (curNot && curNot.classList.contains('active')) { _switchSectionInternal('overview'); renderHomeButton(); return; }
+    _switchSectionInternal('pragati');
+    document.querySelectorAll('.section-tab').forEach(function(t){ t.classList.remove('active'); });
+    if (curNot) curNot.classList.add('active');
+    try { if (typeof pnSwitch === 'function') pnSwitch('not'); } catch(e){}
+    try {
+      var _h2=document.getElementById('pragati-sec-h2'), _ds=document.getElementById('pragati-sec-desc'), _hb=document.getElementById('pragati-sec-hdrbtn');
+      if(_h2) _h2.textContent='📨 Notice / जारी-तामील';
+      if(_ds) _ds.textContent='जारी · तामीली · तामील · अदम-तामील notices';
+      if(_hb){ _hb.textContent='📋 प्रगति →'; _hb.setAttribute('onclick',"switchSection('pragati')"); }
+    } catch(e){}
+    renderHomeButton();
+    return;
+  }
   // 📊 Reports is now an INLINE panel on Home — route the tab there smoothly
   if (id === 'report') {
     _switchSectionInternal('overview');
@@ -37788,7 +37808,18 @@ function _switchSectionInternal(id) {
   // Populate forms when those tabs are opened
   if (id === 'pragati') {
     populatePragatiForm();
-    // Pragati is now its own section — no mega toggle needed
+    // प्रगति tab अब सिर्फ़ प्रगति दिखाए (Notice अपनी अलग tab में) (v182)
+    try { if (typeof pnSwitch === 'function') pnSwitch('prag'); } catch(e){}
+    try {
+      var _ph2=document.getElementById('pragati-sec-h2'), _pds=document.getElementById('pragati-sec-desc'), _phb=document.getElementById('pragati-sec-hdrbtn');
+      if(_ph2) _ph2.textContent='📋 प्रगति प्रतिवेदन';
+      if(_pds) _pds.textContent='IO दैनिक प्रगति · timeline (Notice अब अलग tab में)';
+      if(_phb){ _phb.textContent='📨 Notice →'; _phb.setAttribute('onclick',"switchSection('notice')"); }
+    } catch(e){}
+  }
+  if (id === 'leaves') {
+    try { if (typeof renderLeaveTable === 'function') renderLeaveTable(); } catch(e){}
+    try { if (typeof renderApprovals === 'function') renderApprovals(); } catch(e){}
   }
   if (id === 'iolinks') renderIOLinks();
   if (id === 'report') rbInit();
@@ -42444,10 +42475,8 @@ function refreshEstabTileCounts() {
 var _estabAttFilter = null;  // null | 'present' | 'out' | 'absent'
 
 function mddAttPending(){
-  try{ switchSection('iomaster'); }catch(e){}
-  setTimeout(function(){ try{ if(typeof estabLeavesSwitch==='function') estabLeavesSwitch('leaves'); }catch(e){}
-    setTimeout(function(){ var ap=document.getElementById('approvals-panel')||document.getElementById('leaves-approvals'); if(ap){ try{ ap.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} } },300);
-  },120);
+  try{ switchSection('leaves'); }catch(e){}
+  setTimeout(function(){ var ap=document.getElementById('approvals-panel')||document.getElementById('leaves-approvals'); if(ap){ try{ ap.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} } },300);
 }
 function renderEstabAttendance() {
   var body = document.getElementById('estab-attendance-body');
@@ -60965,6 +60994,8 @@ async function deleteIO() {
 
 var _elLeavesHome=null;
 function estabLeavesSwitch(which){
+  // v182: Leaves अब अपनी स्वतंत्र tab है — 'leaves' अनुरोध को उसी tab पर भेजें
+  if(which==='leaves'){ try{ if(typeof switchSection==='function'){ switchSection('leaves'); return; } }catch(e){} }
   var ep=document.getElementById('el-estab-part'), lp=document.getElementById('el-leaves-part');
   var be=document.getElementById('el-seg-estab'), bl=document.getElementById('el-seg-leaves');
   var lc=document.getElementById('leaves-collapse'); var host=document.getElementById('el-leaves-host');
