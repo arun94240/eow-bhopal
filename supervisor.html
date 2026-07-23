@@ -24030,6 +24030,11 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     <button class="section-tab" data-section="leaves" data-mobile-priority="secondary">🏖 Leaves <span class="count" id="cnt-leaves">0</span></button>
     <button class="section-tab" data-section="tags" data-mobile-priority="secondary">🏷 Tags <span class="count" id="cnt-tags">0</span></button>
     <button class="section-tab kb-section-tab" data-section="links" data-mobile-priority="secondary">🔗 Links &amp; Forms <span class="count" id="cnt-links-sec">0</span></button>
+    <!-- v184: नीचे वाले "Search, Settings & Reports" box के 4 tiles अब अलग tabs -->
+    <button class="section-tab" data-section="searchall" data-mobile-priority="secondary">🔍 Search All</button>
+    <button class="section-tab" data-section="deptsrch" data-mobile-priority="secondary">👮🏛️ Officers &amp; Deptt</button>
+    <button class="section-tab" data-section="reports" data-mobile-priority="secondary">📊 Reports</button>
+    <button class="section-tab" data-section="settings" data-mobile-priority="secondary">⚙️ Settings</button>
     <!-- 📚 Knowledge Base & Files tab moved into ⚙️ Settings (v301) -->
     <button class="section-tab mobile-more-tab" onclick="toggleMobileMore()" title="More tabs" type="button">⋯ More</button>
     <div class="quick-add-wrap quick-add-tab">
@@ -37748,6 +37753,8 @@ function toggleIONavInline(){
   try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
 }
 function switchSection(id) {
+  // 🔍 Search All / Officers&Deptt / Reports / Settings — अब स्वतंत्र tabs (v184)
+  if (typeof _TOOL_TABS !== 'undefined' && _TOOL_TABS.hasOwnProperty(id)) { _openToolTab(id); return; }
   // 👮 IOs tab → open the IO matrix INLINE right under the tab strip (no section jump)
   if (id === 'officers-nav') {
     toggleIONavInline();
@@ -37835,6 +37842,40 @@ if (supa) {
     else if (a === 'add-leave') openLeaveModal();
     else if (a === 'add-io') openIOModal();
   });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// 🔧 TOOL TABS (v184) — "Search, Settings & Reports" box के 4 tiles अब अलग tabs
+//   box (#reports-summary-wrap) को home से निकालकर स्वतंत्र .section बनाया गया;
+//   हर tab उसी box को active कर सम्बंधित panel खोलता है।
+// ═══════════════════════════════════════════════════════════════════════
+var _TOOL_TABS = { searchall: 'openComprehensiveSearch', deptsrch: 'doOpenHub', reports: 'repOpenHub', settings: 'settingsOpenHub' };
+function _toolsTabInit(){
+  try{
+    var box = document.getElementById('reports-summary-wrap');
+    var ov  = document.getElementById('overview');
+    if (box && ov && box.parentNode !== ov.parentNode){
+      box.classList.add('section');      // section framework से hide/show
+      box.classList.remove('active');    // default छिपा — home से हट गया
+      ov.parentNode.insertBefore(box, ov.nextSibling);   // overview के बाद sibling
+    }
+  }catch(e){}
+}
+try{ _toolsTabInit(); }catch(e){}
+function _openToolTab(id){
+  var fnName = _TOOL_TABS[id]; if (!fnName) return;
+  var fn = window[fnName]; if (typeof fn !== 'function') return;
+  var tab = document.querySelector('.section-tab[data-section="'+id+'"]');
+  // toggle-back: वही tab दुबारा दबाने पर Home
+  if (tab && tab.classList.contains('active')){ _switchSectionInternal('overview'); renderHomeButton(); return; }
+  document.querySelectorAll('.section-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  var box = document.getElementById('reports-summary-wrap');
+  if (box){ box.classList.add('active'); box.classList.remove('collapsed'); }
+  if (tab) tab.classList.add('active');
+  try{ fn(); }catch(e){}
+  try{ if(box) box.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){}
+  renderHomeButton();
 }
 
 function updateHeader() {
