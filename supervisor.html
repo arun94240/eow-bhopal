@@ -88,6 +88,17 @@ body.view-mobile .hdr-home-icon { font-size: 20px; }
 .crest-text .tagline { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ffd980; margin-top: 3px; font-weight: 700; }
 .header-meta { text-align: right; font-size: 12px; color: white; }
 .header-meta .date { font-size: 14px; color: white; font-weight: 700; }
+/* 🔍 Header global search (v185) — heading में ही बड़ा search tab */
+.hdr-search-wrap { position: relative; flex: 1 1 320px; min-width: 200px; max-width: 560px; margin: 0 6px; }
+.hdr-search-bar { display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,0.96); border: 2px solid #f5b942; border-radius: 12px; padding: 9px 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.22); }
+.hdr-search-bar:focus-within { box-shadow: 0 0 0 3px rgba(245,185,66,0.35), 0 3px 10px rgba(0,0,0,0.25); }
+.hdr-search-mag { font-size: 16px; opacity: 0.85; flex: none; }
+.hdr-search-bar input { flex: 1; border: none; outline: none; background: transparent; font-size: 14.5px; font-family: inherit; color: #0d2c54; font-weight: 600; }
+.hdr-search-bar input::placeholder { color: #6b7d97; font-weight: 500; }
+.hdr-search-clr { flex: none; border: none; background: #e7edf5; color: #35507a; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 12px; font-weight: 800; line-height: 1; }
+.hdr-search-dd { position: absolute; top: calc(100% + 7px); left: 0; right: 0; max-height: 68vh; overflow-y: auto; background: #fff; border-radius: 13px; box-shadow: 0 14px 40px rgba(0,0,0,0.4); z-index: 120; }
+.hdr-search-dd:empty { display: none; }
+body.view-mobile .hdr-search-wrap { order: 3; flex: 1 1 100%; max-width: 100%; margin: 8px 0 0; }
 #cloud-status { font-size: 11px; color: white; margin-top: 4px; padding: 3px 12px; background: rgba(75,200,120,0.25); border: 1px solid rgba(75,200,120,0.5); border-radius: 12px; display: inline-block; font-weight: 600; }
 
 main { max-width: 1500px; margin: 0 auto; padding: 24px 32px 60px; }
@@ -23999,6 +24010,14 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
         <div class="tagline">Supervisor Dashboard · MP Police</div>
       </div>
     </div>
+    <!-- 🔍 Header global search (v185) — heading में ही live search -->
+    <div class="hdr-search-wrap" id="hdr-search-wrap" onclick="event.stopPropagation();">
+      <div class="hdr-search-bar" id="hdr-search-bar">
+        <span class="hdr-search-mag">🔍</span>
+        <input type="text" id="hdr-search-input" autocomplete="off" placeholder="पूरे database में खोजें — नाम, number, keyword…" oninput="hdrSearchInput(this.value)">
+      </div>
+      <div class="hdr-search-dd" id="hdr-search-dd"></div>
+    </div>
     <div class="header-meta">
       <div class="date" id="hdr-date">—</div>
       <div id="cloud-status">Connecting...</div>
@@ -37877,6 +37896,63 @@ function _openToolTab(id){
   try{ if(box) box.scrollIntoView({block:'start',behavior:'smooth'}); }catch(e){}
   renderHomeButton();
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// 🔍 HEADER GLOBAL SEARCH (v185) — heading में ही live search dropdown
+//   वही engine (_searchAll) जो home Search All उपयोग करता है; अपना अलग
+//   state/dropdown ताकि किसी और search से टकराव न हो।
+// ═══════════════════════════════════════════════════════════════════════
+var _hdrSearchQ = '', _hdrSearchDeb = null, _hdrRowOpenMap = {};
+function _hdrDropdownHTML(q){
+  q = String(q||'').trim();
+  if (!q) return '';
+  var res = _searchAll(q);
+  if (!res.total) return '<div class="cs-hint">"' + _mddEsc(q) + '" — कोई मिलान नहीं</div>';
+  var rom = _csLooseRom(_csDevToRoman(q.toLowerCase()));
+  var html = '<div class="cs-ddhint">💡 <b>' + _mddEsc(q) + '</b>' + ((rom && rom !== q.toLowerCase()) ? (' → रोमन-मिलान <b>' + _mddEsc(rom) + '</b>') : '') + ' — कुल ' + res.total + ' परिणाम</div>';
+  res.groups.forEach(function(g){
+    html += '<div class="cs-grp">' + g.label + ' <span class="cs-gn">' + g.count + '</span></div>';
+    g.items.forEach(function(it){
+      var key = it.scope + '|' + it.id; var open = !!_hdrRowOpenMap[key];
+      html += '<div class="cs-row' + (open ? ' open' : '') + '" onclick="event.stopPropagation();hdrSearchRowToggle(\'' + it.scope + '\',\'' + (it.type || '') + '\',\'' + it.id + '\')">' +
+        '<span class="cs-cat ' + (_CS_SCOPE_CAT[it.scope] || 'c-tag') + '">' + _mddEsc(it.label).slice(0, 22) + '</span>' +
+        '<div class="cs-rmain"><div class="cs-rttl">' + _csHi(it.title, q) + '</div><div class="cs-rsub">' + _csHi(it.sub || '', q) + '</div></div>' +
+        '<span class="cs-rcar">' + (open ? '▴' : '▾') + '</span>' +
+      '</div>';
+      if (open) html += _csInlineBrief(it.scope, it.type, it.id);
+    });
+    if (g.count > g.items.length) html += '<div class="cs-more">…और ' + (g.count - g.items.length) + ' ' + g.label.replace(/^[^ ]+ /, '') + '</div>';
+  });
+  return html;
+}
+function hdrSearchRowToggle(scope, type, id){
+  var key = scope + '|' + id; _hdrRowOpenMap[key] = !_hdrRowOpenMap[key];
+  var dd = document.getElementById('hdr-search-dd'); if (dd) dd.innerHTML = _hdrDropdownHTML(_hdrSearchQ);
+}
+function hdrSearchInput(v){
+  _hdrSearchQ = v;
+  if (_hdrSearchDeb) clearTimeout(_hdrSearchDeb);
+  _hdrSearchDeb = setTimeout(function(){
+    var dd = document.getElementById('hdr-search-dd'); if (dd) dd.innerHTML = _hdrDropdownHTML(_hdrSearchQ);
+    var bar = document.getElementById('hdr-search-bar');
+    if (bar){
+      var has = bar.querySelector('.hdr-search-clr');
+      if (_hdrSearchQ && !has){ var b = document.createElement('button'); b.className = 'hdr-search-clr'; b.type = 'button'; b.textContent = '✕'; b.onclick = function(e){ e.stopPropagation(); hdrSearchClear(); }; bar.appendChild(b); }
+      else if (!_hdrSearchQ && has){ has.remove(); }
+    }
+  }, 170);
+}
+function hdrSearchClear(){
+  _hdrSearchQ = '';
+  var i = document.getElementById('hdr-search-input'); if (i){ i.value = ''; i.focus(); }
+  var dd = document.getElementById('hdr-search-dd'); if (dd) dd.innerHTML = '';
+  var bar = document.getElementById('hdr-search-bar'); if (bar){ var has = bar.querySelector('.hdr-search-clr'); if (has) has.remove(); }
+}
+// बाहर click → header dropdown बंद
+document.addEventListener('click', function(e){
+  var wrap = document.getElementById('hdr-search-wrap');
+  if (wrap && !wrap.contains(e.target)){ var dd = document.getElementById('hdr-search-dd'); if (dd && dd.innerHTML) dd.innerHTML = ''; }
+});
 
 function updateHeader() {
   var d = new Date();
