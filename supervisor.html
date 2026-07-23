@@ -3040,6 +3040,35 @@ tbody tr:hover { background: var(--surface-alt); }
 }
 
 .ov-section-titles { flex: 1; }
+
+/* ═══ Home box uniformity (v200): जाँच एवं विवेचना — white card + navy header,
+   matching the Daily Attendance box (.ap-box). Scoped to #ovstats-summary-wrap
+   so other ov-sections are untouched. ═══ */
+#ovstats-summary-wrap.ov-section{
+  background:#fff !important;
+  border:1px solid #e4ebf3 !important;
+  border-radius:15px !important;
+  box-shadow:0 6px 20px rgba(6,42,82,.16) !important;
+  overflow:hidden;
+}
+#ovstats-summary-wrap.ov-section:hover{
+  box-shadow:0 8px 24px rgba(6,42,82,.20) !important;
+  border-color:#d6e0ec !important;
+}
+#ovstats-summary-wrap.ov-section.collapsed{ box-shadow:0 6px 20px rgba(6,42,82,.14) !important; }
+#ovstats-summary-wrap > .ov-section-header{
+  margin:0 !important; border:0 !important; border-radius:0 !important;
+  padding:0 !important; background:transparent !important;
+}
+#ovstats-summary-wrap > .ov-section-header:hover{ background:transparent !important; }
+#ovstats-summary-wrap .ov-section-titles{ padding:0; }
+/* navy header bar = the title strip only */
+#ovstats-summary-wrap .sup-title-row.dgeow-title-row{
+  background:linear-gradient(135deg,#062a52 0%,#0a3a6e 60%,#134d8a 100%);
+  padding:12px 14px; margin:0; border-radius:0; gap:9px;
+}
+/* light body — board sits on the white card */
+#ovstats-summary-wrap .jv-board{ margin:12px !important; }
 /* Heading uniformity — matches "Daily Review" style (larger + bolder) */
 .ov-section-title { 
   font-size: 16px; 
@@ -15352,6 +15381,15 @@ body.view-mobile .cao-matrix-tile .caom-num {
 #dgeow-summary-wrap, #cc-summary-wrap, #refmon-summary-wrap { display: none !important; }
 /* ═══ 📋 My Daily Dashboard box — below Overview Stats ═══ */
 #mydaily-box{ position:relative; background:linear-gradient(180deg,#0d2c54 0%,#08213f 100%); border:2px solid #0a3e7a; border-radius:16px; padding:18px 20px 20px; box-shadow:0 10px 30px rgba(0,0,0,0.22); margin-bottom:14px; }
+/* ═══ Home box uniformity (v200): Agenda — white card + navy header,
+   matching Daily Attendance (.ap-box). ═══ */
+#mydaily-box{ background:#fff !important; border:1px solid #e4ebf3 !important; border-radius:15px !important; box-shadow:0 6px 20px rgba(6,42,82,.16) !important; padding:0 !important; overflow:hidden; }
+#mydaily-box .agenda-hdr-v2{ background:linear-gradient(135deg,#062a52 0%,#0a3a6e 60%,#134d8a 100%); padding:12px 14px 12px !important; margin:0; }
+#mydaily-box > #mydd-reminder-panel, #mydaily-box > #mydd-calendar-panel{ margin-left:12px !important; margin-right:12px !important; }
+#mydaily-box > .mydd-tiles{ padding:12px !important; margin-top:0 !important; }
+/* master "My Tasks" tile → light theme on the white card (was white-on-navy) */
+#mydaily-box .mydd-tile{ background:#f6f9fd !important; color:#0f2238 !important; border:1px solid #e4ebf3 !important; box-shadow:0 2px 8px rgba(6,42,82,.07) !important; }
+#mydaily-box .mydd-tile .mydd-tlabel, #mydaily-box .mydd-tile .mydd-tnum, #mydaily-box .mydd-dg-toprow .mydd-tlabel{ color:#12263f !important; }
 #mydaily-box .mydd-head{ display:flex; align-items:center; gap:12px; }
 #mydaily-box .mydd-cal{ display:inline-flex; flex-direction:column; align-items:center; line-height:1; background:#fff; border-radius:7px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.25); flex-shrink:0; }
 #mydaily-box .mydd-cal .mc-mo{ background:#dc2626; color:#fff; font-size:10px; font-weight:800; letter-spacing:.5px; padding:2px 9px; }
