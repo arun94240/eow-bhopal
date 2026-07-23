@@ -99,17 +99,15 @@ body.view-mobile .hdr-home-icon { font-size: 20px; }
 .hdr-search-dd { position: absolute; top: calc(100% + 7px); left: 0; right: 0; max-height: 68vh; overflow-y: auto; background: #fff; border-radius: 13px; box-shadow: 0 14px 40px rgba(0,0,0,0.4); z-index: 120; }
 .hdr-search-dd:empty { display: none; }
 body.view-mobile .hdr-search-wrap { order: 3; flex: 1 1 100%; max-width: 100%; margin: 8px 0 0; }
-/* 🔧 Tool overlay (v186) — Search All / Officers&Deptt / Reports / Settings tabs */
-#tools-overlay-backdrop { position: fixed; inset: 0; background: rgba(6,20,40,0.55); z-index: 9000; opacity: 0; pointer-events: none; transition: opacity 0.18s ease; }
-#tools-overlay-backdrop.open { opacity: 1; pointer-events: auto; }
-.tools-box { display: none !important; }
-.tools-box.tools-overlay-open { display: block !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(1060px, 95vw); max-height: 88vh; overflow-y: auto; z-index: 9001; background: #f3f6fb; border: 1px solid rgba(6,42,82,0.15); border-radius: 16px; box-shadow: 0 26px 80px rgba(0,0,0,0.5); padding: 12px 16px 20px; animation: toolsPop 0.2s cubic-bezier(.22,.61,.36,1); }
-@keyframes toolsPop { from { opacity: 0; transform: translate(-50%,-46%) scale(0.98); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
-#tools-overlay-close { display: none; position: sticky; top: 0; float: right; z-index: 5; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; background: #062a52; color: #fff; font-size: 16px; font-weight: 800; line-height: 1; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
-.tools-box.tools-overlay-open #tools-overlay-close { display: flex; align-items: center; justify-content: center; }
+/* 🔧 Tool INLINE dropdown (v187) — Search All / Officers&Deptt / Reports / Settings
+   tab के ठीक नीचे smoothly slide होकर खुले/बंद (modal नहीं) */
+.tools-box { display: block !important; overflow: hidden; max-height: 0; opacity: 0; transform: translateY(-8px); margin: 0 auto; width: 100%; padding: 0 16px; background: #f3f6fb; border: 0 solid rgba(6,42,82,0.14); border-radius: 14px; box-shadow: 0 12px 28px rgba(0,0,0,0.16); position: relative; z-index: 40; transition: max-height 0.36s cubic-bezier(.22,.61,.36,1), opacity 0.28s ease, transform 0.36s cubic-bezier(.22,.61,.36,1), margin 0.3s ease, padding 0.3s ease, border-width 0.2s ease; }
+.tools-box.tools-inline-open { max-height: 82vh; opacity: 1; transform: translateY(0); overflow-y: auto; margin: 4px auto 20px; padding: 10px 16px 18px; border-width: 1px; }
+#tools-overlay-close { display: none; position: sticky; top: 2px; float: right; z-index: 5; width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; background: #062a52; color: #fff; font-size: 15px; font-weight: 800; line-height: 1; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
+.tools-box.tools-inline-open #tools-overlay-close { display: flex; align-items: center; justify-content: center; }
 /* tool tab दबे हुए (open) होने का संकेत */
 .section-tab.tool-open { background: linear-gradient(135deg,#f5b942,#e8a82e) !important; color: #062a52 !important; box-shadow: 0 0 0 2px rgba(245,185,66,0.5) inset; }
-body.view-mobile .tools-box.tools-overlay-open { width: 97vw; max-height: 90vh; border-radius: 14px; padding: 8px 10px 16px; }
+body.view-mobile .tools-box.tools-inline-open { max-height: 84vh; border-radius: 12px; padding: 8px 10px 16px; }
 #cloud-status { font-size: 11px; color: white; margin-top: 4px; padding: 3px 12px; background: rgba(75,200,120,0.25); border: 1px solid rgba(75,200,120,0.5); border-radius: 12px; display: inline-block; font-weight: 600; }
 
 main { max-width: 1500px; margin: 0 auto; padding: 24px 32px 60px; }
@@ -37891,17 +37889,12 @@ function _toolsTabInit(){
   try{
     var box = document.getElementById('reports-summary-wrap');
     if (!box) return;
-    // box को body में ले जाएँ ताकि यह किसी section के अंदर न रहे (home से हटा),
-    // और overlay/modal के रूप में स्वतंत्र दिखे।
     box.classList.add('tools-box');
-    box.classList.remove('active');
-    if (box.parentNode !== document.body) document.body.appendChild(box);
-    // backdrop
-    if (!document.getElementById('tools-overlay-backdrop')){
-      var bd = document.createElement('div');
-      bd.id = 'tools-overlay-backdrop';
-      bd.onclick = function(){ _closeToolOverlay(); };
-      document.body.appendChild(bd);
+    box.classList.remove('active', 'collapsed');
+    // box को tab-पट्टी (.section-tabs) के ठीक नीचे रखें ताकि inline dropdown की तरह खुले
+    var bar = document.querySelector('.section-tabs');
+    if (bar && bar.parentNode && box.previousElementSibling !== bar){
+      bar.parentNode.insertBefore(box, bar.nextSibling);
     }
     // close (✕) button — box के अंदर sticky
     if (!document.getElementById('tools-overlay-close')){
@@ -37911,34 +37904,43 @@ function _toolsTabInit(){
       cb.onclick = function(e){ e.stopPropagation(); _closeToolOverlay(); };
       box.insertBefore(cb, box.firstChild);
     }
+    // बाहर click → inline panel बंद (tab-पट्टी व panel के अंदर click छोड़कर)
+    if (!window._toolsOutsideBound){
+      window._toolsOutsideBound = true;
+      document.addEventListener('click', function(e){
+        if (!_toolOpenId) return;
+        var b = document.getElementById('reports-summary-wrap');
+        var tb = document.querySelector('.section-tabs');
+        if (b && b.contains(e.target)) return;
+        if (tb && tb.contains(e.target)) return;
+        _closeToolOverlay();
+      });
+    }
   }catch(e){}
 }
 try{ _toolsTabInit(); }catch(e){}
 function _closeToolOverlay(){
   var box = document.getElementById('reports-summary-wrap');
-  if (box) box.classList.remove('tools-overlay-open');
-  var bd = document.getElementById('tools-overlay-backdrop'); if (bd) bd.classList.remove('open');
+  if (box) box.classList.remove('tools-inline-open');
   document.querySelectorAll('.section-tab.tool-open').forEach(function(t){ t.classList.remove('tool-open'); });
-  try{ document.body.classList.remove('tools-overlay-active'); }catch(e){}
   _toolOpenId = null;
 }
 function _openToolTab(id){
   var fnName = _TOOL_TABS[id]; if (!fnName) return;
   var fn = window[fnName]; if (typeof fn !== 'function') return;
-  // वही tab दुबारा → बंद (toggle)
+  // वही tab दुबारा → smoothly बंद (toggle)
   if (_toolOpenId === id){ _closeToolOverlay(); return; }
-  // दूसरे tool पर switch या नया खोलना — पहले पिछला overlay-state साफ़
   document.querySelectorAll('.section-tab.tool-open').forEach(function(t){ t.classList.remove('tool-open'); });
   var box = document.getElementById('reports-summary-wrap');
-  if (box){ box.classList.remove('collapsed'); box.classList.add('tools-overlay-open'); box.scrollTop = 0; }
-  var bd = document.getElementById('tools-overlay-backdrop'); if (bd) bd.classList.add('open');
+  if (box){ box.classList.remove('collapsed'); box.scrollTop = 0; box.classList.add('tools-inline-open'); }
   var tab = document.querySelector('.section-tab[data-section="'+id+'"]'); if (tab) tab.classList.add('tool-open');
-  try{ document.body.classList.add('tools-overlay-active'); }catch(e){}
   _toolOpenId = id;
   // header tiles की गिनती ताज़ा करें
   try{ if (typeof renderSearchMatrices === 'function') renderSearchMatrices(); }catch(e){}
   // सम्बंधित panel खोलें (box के भीतर _ssrOpen बाक़ी panels बंद कर देता है)
   try{ fn(); }catch(e){}
+  // panel tab-पट्टी के नीचे दिखे — हल्का scroll
+  try{ setTimeout(function(){ box.scrollIntoView({ block:'nearest', behavior:'smooth' }); }, 40); }catch(e){}
 }
 
 // ═══════════════════════════════════════════════════════════════════════
