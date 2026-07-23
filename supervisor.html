@@ -23480,6 +23480,17 @@ body.view-mobile { padding-bottom:0 !important; }
 .jvk .n{ font-size:18px; font-weight:900; line-height:1; } .jvk .l{ font-size:8.2px; font-weight:700; margin-top:3px; }
 .jvk.g{ background:#eafaf1; border-color:#bfe8d0; color:#1e9e63; } .jvk.r{ background:#fdecec; border-color:#f6cccc; color:#db4d4d; }
 .jvk.a{ background:#fef6e6; border-color:#f3ddab; color:#c2820c; } .jvk.n{ background:#eef2f7; border-color:#dbe4ef; color:#143a67; }
+.jvk.on{ box-shadow:0 0 0 2px #143a67 inset; }
+.jvkpanel{ max-height:0; overflow:hidden; opacity:0; margin:0; transition:max-height .36s cubic-bezier(.22,.61,.36,1), opacity .28s ease, margin .3s ease; }
+.jvkpanel.open{ max-height:62vh; overflow-y:auto; opacity:1; margin:0 0 10px; }
+.jvkp-h{ font-size:10px; font-weight:800; padding:7px 9px; border-radius:8px; margin-bottom:6px; }
+.jvkp-h.g{ background:#eafaf1; color:#15803d; } .jvkp-h.r{ background:#fdecec; color:#b91c1c; }
+.jvkp-row{ display:flex; align-items:center; gap:8px; padding:7px 8px; border-bottom:1px solid #eef2f5; background:#fff; }
+.jvkp-row:first-of-type{ border-radius:9px 9px 0 0; } .jvkp-row:last-child{ border-bottom:0; border-radius:0 0 9px 9px; }
+.jvkp-av{ width:28px; height:28px; border-radius:50%; color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex:none; }
+.jvkp-main{ flex:1; min-width:0; } .jvkp-nm{ font-size:11.5px; font-weight:800; color:#143a67; } .jvkp-rk{ font-size:8.4px; color:#8a96a6; font-weight:600; }
+.jvkp-sub{ font-size:9.4px; color:#8a96a6; }
+.jvkp-wa{ border:none; background:#16a34a; color:#fff; border-radius:7px; font-size:11px; padding:5px 9px; cursor:pointer; flex:none; } .jvkp-ok{ color:#1e9e63; font-weight:900; flex:none; font-size:13px; }
 .jvrule{ font-size:9.2px; color:#6b7d97; background:#fff; border:1px dashed #cdd9e8; border-radius:9px; padding:6px 9px; margin-bottom:10px; }
 .jvrule span{ background:#eef2f7; border-radius:6px; padding:1px 6px; font-weight:800; color:#143a67; } .jvrule b{ color:#143a67; }
 .jvtabs{ display:flex; gap:4px; background:#e9edf2; border-radius:11px; padding:4px; margin-bottom:11px; }
@@ -24377,18 +24388,10 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
               <div class="ov-section-title">🔎 जाँच एवं विवेचना</div>
               <span class="dgeow-total-pill">Total: <strong id="ovstats-cnt-total">0</strong></span>
               <span class="ovstats-bday-chip" id="ovstats-bday-chip" style="display:none;" onclick="event.stopPropagation();" title="आज जन्मदिन"></span>
-              <button class="iodir-btn" id="iodir-btn" onclick="iodirToggle(event)" title="IO को सुरक्षित निजी संदेश भेजें">
-                <span class="iodir-btn-ic">👮</span><span class="iodir-btn-tx">IO को संदेश</span>
-                <span class="iodir-btn-cnt" id="iodir-cnt">0</span><span class="iodir-btn-car" id="iodir-car">▾</span>
-              </button>
             </div>
-            <div class="iodir-panel" id="iodir-panel" style="display:none;" onclick="event.stopPropagation();">
-              <div class="iodir-srch"><span class="iodir-mag">🔎</span><input id="iodir-input" placeholder="IO खोजें — नाम या पद…" oninput="iodirSearch(this.value)"></div>
-              <div class="iodir-list" id="iodir-list"></div>
-            </div>
-            <!-- 🔎 जाँच एवं विवेचना — Board A (KPI + IO पटल) — new monitoring hero -->
+            <!-- v195: "IO को संदेश" pill हटाया; "विस्तृत आँकड़े" toggle हटाया -->
+            <!-- 🔎 जाँच एवं विवेचना — Board (KPI + tabs) -->
             <div class="jv-board" id="jv-board" onclick="event.stopPropagation();"></div>
-            <button class="jv-detail-toggle" id="jv-detail-toggle" onclick="jvToggleDetail(event)">📂 विस्तृत आँकड़े (Year/Type/Court/Staff/Tags) ▾</button>
             <!-- 6 CMD-style wide tiles (Year, Enq, IO, Court, Attendance, Leaves) -->
             <div class="ovstats-tile-row" id="ovstats-tile-row">
               <div class="cmd-metric ovstats-tile ovstats-tile-year ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovstatsNavTile('year',event)">
@@ -42556,8 +42559,13 @@ function renderJvBoard(){
   var okN=dpc.filter(function(x){return x.ok;}).length, noN=dpc.filter(function(x){return !x.ok;}).length;
   var dirs=window.__jvDirs; if(dirs===undefined){ _jvLoadDirections(); dirs=[]; }
   var nLambit=dirs.filter(function(d){return d.status==='issued';}).length;
-  function kc(cls,val,lbl,t){ return '<button class="jvk '+cls+'" onclick="event.stopPropagation();jvTab(\''+t+'\')"><div class="n">'+val+'</div><div class="l">'+lbl+'</div></button>'; }
-  var kpi='<div class="jvkpi">'+kc('g',okN,'आज प्रगति','mon')+kc('r',noN,'प्रगति नहीं','mon')+kc('a',nLambit,'निर्देश लंबित','dir')+kc('n',active,'कुल सक्रिय','ios')+'</div>';
+  function kc(cls,val,lbl,onc,id){ return '<button class="jvk '+cls+'"'+(id?(' id="'+id+'"'):'')+' onclick="event.stopPropagation();'+onc+'"><div class="n">'+val+'</div><div class="l">'+lbl+'</div></button>'; }
+  var kpi='<div class="jvkpi">'+
+    kc('g',okN,'आज प्रगति',"jvKpiToggle('ok')",'jvk-ok')+
+    kc('r',noN,'प्रगति नहीं',"jvKpiToggle('no')",'jvk-no')+
+    kc('a',nLambit,'निर्देश लंबित',"jvTab('dir')")+
+    kc('n',active,'कुल सक्रिय',"jvTab('ios')")+
+  '</div><div class="jvkpanel" id="jv-kpi-panel"></div>';
   var rule='<div class="jvrule">🎯 दैनिक: <span>2 शिकायत</span> + <span>1 RC</span> + <span>1 सूत्र/STR/PE/R</span> = <b>4</b> · रात 8 बजे तक</div>';
   function tb(t,lbl){ return '<button class="jvtab'+(_jvTab===t?' on':'')+'" data-t="'+t+'" onclick="jvTab(\''+t+'\')">'+lbl+'</button>'; }
   var tabs='<div class="jvtabs">'+tb('mon','📊 निगरानी')+tb('ios','👮 विवेचक')+tb('dir','📋 निर्देश')+'</div>';
@@ -42582,7 +42590,39 @@ function renderJvBoard(){
     '<div class="jvv'+(_jvTab==='mon'?' on':'')+'" id="jvv-mon"></div>'+
     '<div class="jvv'+(_jvTab==='ios'?' on':'')+'" id="jvv-ios">'+iosView+'</div>'+
     '<div class="jvv'+(_jvTab==='dir'?' on':'')+'" id="jvv-dir"></div>';
-  _jvRenderMon(); _jvRenderDir();
+  _jvRenderMon(); _jvRenderDir(); _jvRenderKpiPanel();
+}
+// KPI आज प्रगति / प्रगति नहीं — tap-tap inline live सूची (v195)
+var _jvKpiOpen=null, _jvKpiClrT=null;
+function jvKpiToggle(which){ _jvKpiOpen=(_jvKpiOpen===which)?null:which; _jvRenderKpiPanel(); }
+function _jvKpiRow(x, tone, sub){
+  var col=(tone==='green')?'#1e9e63':'#c0392b'; var nm=x.disp||x.name;
+  var right = (tone==='red')
+    ? '<button class="jvkp-wa" onclick="event.stopPropagation();copyLeaveMsgB64(\''+((typeof _b64u==='function')?_b64u(_dpcMsg(x)):'')+'\')" title="WhatsApp reminder copy">📋</button>'
+    : '<span class="jvkp-ok">✓</span>';
+  return '<div class="jvkp-row"><span class="jvkp-av" style="background:'+col+'">'+_mddEsc(_dpcInitials(x.name))+'</span>'+
+    '<div class="jvkp-main"><div class="jvkp-nm">'+_mddEsc((typeof _prStripRank==='function')?_prStripRank(nm):nm)+' <span class="jvkp-rk">'+_mddEsc(x.rank||'')+'</span></div><div class="jvkp-sub">'+_mddEsc(sub)+'</div></div>'+right+'</div>';
+}
+function _jvRenderKpiPanel(){
+  var panel=document.getElementById('jv-kpi-panel'); if(!panel) return;
+  var ok=document.getElementById('jvk-ok'), no=document.getElementById('jvk-no');
+  if(ok) ok.classList.toggle('on', _jvKpiOpen==='ok');
+  if(no) no.classList.toggle('on', _jvKpiOpen==='no');
+  if(!_jvKpiOpen){ panel.classList.remove('open'); clearTimeout(_jvKpiClrT); _jvKpiClrT=setTimeout(function(){ if(!_jvKpiOpen){ var p=document.getElementById('jv-kpi-panel'); if(p) p.innerHTML=''; } },400); return; }
+  var dpc=[]; try{ dpc=(typeof _dpcCompute==='function')?_dpcCompute():[]; }catch(e){}
+  var body;
+  if(_jvKpiOpen==='ok'){
+    var okl=dpc.filter(function(x){ return x.ok; });
+    body='<div class="jvkp-h g">✅ आज निर्धारित प्रगति पूरी करने वाले विवेचक ('+okl.length+')</div>'+
+      (okl.length ? okl.map(function(x){ return _jvKpiRow(x,'green','आज '+x.got+'/'+x.need+' प्रविष्टि'); }).join('') : '<div class="jvdpc-hint">अभी तक किसी ने आज का पूरा target (4) पूरा नहीं किया</div>');
+  } else {
+    var nol=dpc.filter(function(x){ return !x.ok; });
+    body='<div class="jvkp-h r">🔴 आज प्रगति शेष विवेचक ('+nol.length+') — रात 8 बजे तक</div>'+
+      (nol.length ? nol.map(function(x){ var miss=x.missing.map(function(m){return m.lbl;}).join(', '); return _jvKpiRow(x,'red','शेष: '+(miss||'—')+' · दर्ज '+x.got+'/'+x.need); }).join('') : '<div class="jvdpc-hint">✅ आज सभी ने निर्धारित प्रगति पूरी कर ली</div>');
+  }
+  var wasOpen=panel.classList.contains('open');
+  panel.innerHTML=body;
+  if(wasOpen){ panel.classList.add('open'); } else { void panel.offsetWidth; panel.classList.add('open'); }
 }
 // ── निगरानी (defaulter — कार्ड/मैट्रिक्स/सूची) ──
 function jvDpcSetView(v){ _jvDpcView=(_jvDpcView===v)?null:v; _jvRenderMon(); }
