@@ -2317,6 +2317,16 @@ tbody tr:hover { background: var(--surface-alt); }
   transform: scale(1.18);
   box-shadow: 0 3px 7px rgba(99,102,241,0.55);
 }
+/* 📎 दस्तावेज़-संलग्न संकेतक (v192) — केवल तब दिखे जब कोई document attached हो */
+.nd-attach-icon {
+  display: inline-flex; align-items: center; justify-content: center; gap: 1px;
+  margin-left: 5px; min-width: 20px; height: 20px; padding: 0 5px;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #fff;
+  border-radius: 11px; font-size: 11px; cursor: pointer; transition: all 0.14s;
+  box-shadow: 0 1px 3px rgba(22,163,74,0.35); vertical-align: middle; line-height: 1;
+}
+.nd-attach-icon:hover { transform: scale(1.12); box-shadow: 0 3px 7px rgba(22,163,74,0.55); }
+.nd-attach-icon .nd-att-n { font-size: 9px; font-weight: 800; }
 .empty-state { padding: 60px 20px; text-align: center; color: var(--ink-faint); }
 .empty-state h3 { font-size: 16px; color: var(--ink-soft); margin-bottom: 6px; font-weight: 500; }
 
@@ -56418,6 +56428,19 @@ function _docketIsUrgent(r){
   if(!r || !r.tag_ids || !Array.isArray(r.tag_ids) || !r.tag_ids.length) return false;
   return r.tag_ids.some(function(tid){ var t=(typeof getTagById==='function')?getTagById(tid):null; return t && t.name==='URGENT'; });
 }
+// 📎 संलग्न दस्तावेज़ों की गिनती (v192) — jsonb array या string दोनों संभालता है
+function _enqAttachCount(r){
+  var a = r && r.attachments;
+  if (!a) return 0;
+  if (typeof a === 'string'){ try { a = JSON.parse(a); } catch(e){ return 0; } }
+  return Array.isArray(a) ? a.filter(function(x){ return x && (x.url || x.name || x.path); }).length : 0;
+}
+// 📎 icon — केवल तब जब document attached हो; tap → प्रकरण खोलें (देखें/जोड़ें)
+function _enqAttachIcon(type, r){
+  var n = _enqAttachCount(r);
+  if (!n) return '';
+  return '<span class="nd-attach-icon" onclick="event.stopPropagation();preserveScrollContext();openEntryModal(\''+type+'\',\''+r.id+'\')" title="'+n+' दस्तावेज़ संलग्न — देखें/जोड़ें">📎'+(n>1?('<span class="nd-att-n">'+n+'</span>'):'')+'</span>';
+}
 function _docketReviewChip(type, r){
   if (isEntryDimmed(r)) return '<span class="review-chip rc-none">—</span>';
   var rs = getReviewStatus(type, r.id);
@@ -56474,7 +56497,7 @@ function _buildEnquiryRow(type, r, i, scoped) {
         '<div class="docket-sn">'+(i+1)+'</div>'+
         '<div class="stamp-wrap">'+urgentHtml+
           '<div class="stamp">'+
-            '<div class="stamp-no"><div class="no">'+scopedCatChip+escapeHtml(no)+linkIcon+courtIcon+'</div></div>'+
+            '<div class="stamp-no"><div class="no">'+scopedCatChip+escapeHtml(no)+_enqAttachIcon(type,r)+linkIcon+courtIcon+'</div></div>'+
             '<div class="stamp-date">📅 '+fmtDateShort(r.date)+'</div>'+
             '<div class="stamp-cat '+cat.cls+'">'+cat.label+'</div>'+
           '</div>'+
@@ -56566,7 +56589,7 @@ function _buildEnquiryCard(type, r, scoped) {
   return '<div class="enq-card docket-card' + dimCls + '" id="' + pfx + 'enqcard-' + r.id + '">' +
     '<div class="enq-card-head" onclick="event.stopPropagation();' + headHandler + '">' +
       '<div class="c-top">' +
-        '<div class="c-catno ' + cat.cls + '"><div class="cat">' + cat.label + '</div><div class="no">' + scopedCatChip + escapeHtml(no) + '</div></div>' +
+        '<div class="c-catno ' + cat.cls + '"><div class="cat">' + cat.label + '</div><div class="no">' + scopedCatChip + escapeHtml(no) + _enqAttachIcon(type, r) + '</div></div>' +
         '<div class="c-date ' + cat.cls + '">' + fmtDateShort(r.date) + '</div>' +
       '</div>' +
       '<div class="c-body">' +
