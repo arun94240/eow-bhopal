@@ -24397,8 +24397,8 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
             <!-- v195: "IO को संदेश" pill हटाया; "विस्तृत आँकड़े" toggle हटाया -->
             <!-- 🔎 जाँच एवं विवेचना — Board (KPI + tabs) -->
             <div class="jv-board" id="jv-board" onclick="event.stopPropagation();"></div>
-            <!-- 6 CMD-style wide tiles (Year, Enq, IO, Court, Attendance, Leaves) -->
-            <div class="ovstats-tile-row" id="ovstats-tile-row">
+            <!-- 6 CMD-style wide tiles — jv-board redesign द्वारा प्रतिस्थापित; स्थायी रूप से छिपे (v197, refresh-flash रोका) -->
+            <div class="ovstats-tile-row" id="ovstats-tile-row" style="display:none;">
               <div class="cmd-metric ovstats-tile ovstats-tile-year ovstats-tile-compact cmd-metric-wide" onclick="event.stopPropagation();ovstatsNavTile('year',event)">
                 <div class="cmd-metric-top">
                   <div class="cmd-metric-icon" id="ovstats-year-cal"></div>
@@ -24465,7 +24465,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
                    sized to match the attendance-live .mas-pill tiles exactly, so more such
                    compact parameter-pills can be added here later. Each pill keeps its
                    ORIGINAL classes/ids/onclick so ovstatsNavTile()/ovTileToggle() keep working. -->
-              <div class="opm-tile cmd-metric-wide" id="ovstats-tile-pragati-merged">
+              <div class="opm-tile cmd-metric-wide" id="ovstats-tile-pragati-merged" style="display:none;">
                 <div class="opm-hd">📊 Daily Life Monitoring</div>
                 <div class="mas-pills opm-row3">
                   <div class="ovstats-tile ovstats-tile-pragati mas-pill mp-present" onclick="event.stopPropagation();ovstatsNavTile('pragati',event)">
