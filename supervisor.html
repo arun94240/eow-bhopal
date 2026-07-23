@@ -26662,11 +26662,8 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
 
     <!-- ============ PRAGATI CONTAINER ============ -->
     <div id="pir-pragati-container">
-    <!-- प्रगति / Notice segment split (v181) — अब tab-bar में अलग tabs, internal toggle छिपा (v182) -->
-    <div class="pn-seg" style="display:none;">
-      <button class="pn-seg-b pn-seg-prag active" id="pn-seg-prag" onclick="pnSwitch('prag')">📋 प्रगति<span class="pn-seg-s">IO updates · timeline</span></button>
-      <button class="pn-seg-b pn-seg-not" id="pn-seg-not" onclick="pnSwitch('not')">📨 Notice<span class="pn-seg-s">जारी · तामील · report</span></button>
-    </div>
+    <!-- v183: प्रगति व Notice अब पूर्णतः अलग sections — पुराना internal pn-seg toggle हटाया -->
+
     <div id="pn-prag-part">
     <!-- View Toggle Buttons -->
     <div class="pragati-toggle">
@@ -26859,7 +26856,12 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
     </div>
     </div><!-- /pir-pragati-container -->
       </div><!-- /pn-prag-part -->
-    <div id="pn-not-part" style="display:none;">
+</section>
+
+  <!-- ══════ NOTICE — अब स्वतंत्र section, प्रगति से अलग (v183) ══════ -->
+  <section id="notice" class="section">
+    <div class="section-header"><div><h2>📨 Notice / जारी-तामील</h2><div class="desc">जारी · तामीली हेतु · तामील · अदम-तामील notices</div></div><div><button class="btn" onclick="switchSection('pragati')">📋 प्रगति →</button></div></div>
+    <div id="pn-not-part">
       <div class="pn-not-tabs">
         <button class="pn-nt active" data-s="issued" onclick="pnNotSection('issued')">📤 जारी</button>
         <button class="pn-nt" data-s="taameeli" onclick="pnNotSection('taameeli')">⏳ तामीली हेतु</button>
@@ -26869,7 +26871,7 @@ body.view-mobile section[id="sutra"] tbody tr.enq-tr td[data-label]::before{ con
       </div>
       <div id="pn-not-content"></div>
     </div>
-</section>
+  </section>
 
   <!-- IO Review section removed — feature retired pending future redesign -->
 
@@ -37751,23 +37753,6 @@ function switchSection(id) {
     toggleIONavInline();
     return;
   }
-  // 📨 Notice tab — separate tab that shows the Notice half of the pragati section (v182)
-  if (id === 'notice') {
-    var curNot = document.querySelector('.section-tab[data-section="notice"]');
-    if (curNot && curNot.classList.contains('active')) { _switchSectionInternal('overview'); renderHomeButton(); return; }
-    _switchSectionInternal('pragati');
-    document.querySelectorAll('.section-tab').forEach(function(t){ t.classList.remove('active'); });
-    if (curNot) curNot.classList.add('active');
-    try { if (typeof pnSwitch === 'function') pnSwitch('not'); } catch(e){}
-    try {
-      var _h2=document.getElementById('pragati-sec-h2'), _ds=document.getElementById('pragati-sec-desc'), _hb=document.getElementById('pragati-sec-hdrbtn');
-      if(_h2) _h2.textContent='📨 Notice / जारी-तामील';
-      if(_ds) _ds.textContent='जारी · तामीली · तामील · अदम-तामील notices';
-      if(_hb){ _hb.textContent='📋 प्रगति →'; _hb.setAttribute('onclick',"switchSection('pragati')"); }
-    } catch(e){}
-    renderHomeButton();
-    return;
-  }
   // 📊 Reports is now an INLINE panel on Home — route the tab there smoothly
   if (id === 'report') {
     _switchSectionInternal('overview');
@@ -37808,14 +37793,10 @@ function _switchSectionInternal(id) {
   // Populate forms when those tabs are opened
   if (id === 'pragati') {
     populatePragatiForm();
-    // प्रगति tab अब सिर्फ़ प्रगति दिखाए (Notice अपनी अलग tab में) (v182)
-    try { if (typeof pnSwitch === 'function') pnSwitch('prag'); } catch(e){}
-    try {
-      var _ph2=document.getElementById('pragati-sec-h2'), _pds=document.getElementById('pragati-sec-desc'), _phb=document.getElementById('pragati-sec-hdrbtn');
-      if(_ph2) _ph2.textContent='📋 प्रगति प्रतिवेदन';
-      if(_pds) _pds.textContent='IO दैनिक प्रगति · timeline (Notice अब अलग tab में)';
-      if(_phb){ _phb.textContent='📨 Notice →'; _phb.setAttribute('onclick',"switchSection('notice')"); }
-    } catch(e){}
+  }
+  if (id === 'notice') {
+    // Notice अब स्वतंत्र section — मौजूदा उप-टैब render करें (v183)
+    try { if (typeof pnNotSection === 'function') pnNotSection(typeof _pnNotSection!=='undefined' && _pnNotSection ? _pnNotSection : 'issued'); } catch(e){}
   }
   if (id === 'leaves') {
     try { if (typeof renderLeaveTable === 'function') renderLeaveTable(); } catch(e){}
