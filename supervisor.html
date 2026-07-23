@@ -1430,6 +1430,16 @@ body.view-mobile .ql-preview-note {
   margin-left: 8px; font-family: inherit; white-space: nowrap;
 }
 .enq-sort-btn:hover { background: #0a3a6e; }
+/* 📎 दस्तावेज़ filter button (v193) */
+.enq-docf-btn {
+  background: #eef3f9; color: #334e6e; border: 1.5px solid #c9d7e8;
+  padding: 5px 11px; font-size: 11.5px; font-weight: 800;
+  border-radius: 6px; cursor: pointer; transition: all 0.12s;
+  margin-left: 8px; font-family: inherit; white-space: nowrap;
+}
+.enq-docf-btn:hover { filter: brightness(0.97); }
+.enq-docf-btn.df-without { background: #fee2e2; color: #b91c1c; border-color: #f6b4b4; }
+.enq-docf-btn.df-with { background: #dcfce7; color: #15803d; border-color: #a7e3bd; }
 
 /* ═══ Enquiry cards grid ═══ */
 .enq-cards-grid {
@@ -56338,9 +56348,15 @@ function renderTable(type) {
     });
   }
 
+  // 📎 दस्तावेज़-filter (v193): बिना-दस्तावेज़ / दस्तावेज़-सहित
+  var _df = _enqDocFilter[type];
+  if (_df === 'without') rows = rows.filter(function(r){ return _enqAttachCount(r)===0; });
+  else if (_df === 'with') rows = rows.filter(function(r){ return _enqAttachCount(r)>0; });
+  try { _enqDocFilterInit(); _enqDocFilterSync(type); } catch(e){}
+
   var tbody = document.getElementById(type+'-body');
   if (!rows.length) {
-    tbody.innerHTML = '<div class="empty-state"><h3>No entries yet</h3></div>';
+    tbody.innerHTML = _df ? ('<div class="empty-state"><h3>'+(_df==='without'?'सभी प्रकरणों में दस्तावेज़ संलग्न हैं ✅':'कोई दस्तावेज़-संलग्न प्रकरण नहीं')+'</h3><p>यह "📎" filter हटाने के लिए बटन दुबारा दबाएँ</p></div>') : '<div class="empty-state"><h3>No entries yet</h3></div>';
   } else {
     tbody.innerHTML = rows.map(function(r, i){
       return _buildEnquiryRow(type, r, i, false);
@@ -56427,6 +56443,41 @@ var _docketCat = {
 function _docketIsUrgent(r){
   if(!r || !r.tag_ids || !Array.isArray(r.tag_ids) || !r.tag_ids.length) return false;
   return r.tag_ids.some(function(tid){ var t=(typeof getTagById==='function')?getTagById(tid):null; return t && t.name==='URGENT'; });
+}
+// 📎 दस्तावेज़-filter state (v193) — प्रति type: '' | 'without' | 'with'
+var _enqDocFilter = {};
+var _DOC_FILTER_TYPES = ['complaints','rcomplaints','rcs','pes','strs','sutra'];
+function _enqDocBtnLabel(type){
+  var d = _enqDocFilter[type];
+  if (d==='without') return '📎 बिना दस्तावेज़';
+  if (d==='with') return '📎 दस्तावेज़ सहित';
+  return '📎 दस्तावेज़: सभी';
+}
+function _enqDocFilterSync(type){
+  var b = document.getElementById('enq-docf-btn-'+type); if (!b) return;
+  var d = _enqDocFilter[type] || '';
+  b.textContent = _enqDocBtnLabel(type);
+  b.classList.toggle('df-without', d==='without');
+  b.classList.toggle('df-with', d==='with');
+  b.classList.toggle('active', !!d);
+}
+function enqDocFilterToggle(type){
+  var cur = _enqDocFilter[type] || '';               // सभी → बिना दस्तावेज़ → दस्तावेज़ सहित → सभी
+  _enqDocFilter[type] = (cur==='') ? 'without' : (cur==='without' ? 'with' : '');
+  _enqDocFilterSync(type);
+  renderTable(type);
+}
+function _enqDocFilterInit(){
+  _DOC_FILTER_TYPES.forEach(function(type){
+    if (document.getElementById('enq-docf-btn-'+type)) return;
+    var host = document.querySelector('#'+type+' .enq-view-toggle'); if (!host) return;
+    var b = document.createElement('button');
+    b.type='button'; b.className='enq-docf-btn'; b.id='enq-docf-btn-'+type;
+    b.title='दस्तावेज़ अनुसार छानें — सभी / बिना दस्तावेज़ / दस्तावेज़ सहित';
+    b.textContent=_enqDocBtnLabel(type);
+    b.onclick=function(){ enqDocFilterToggle(type); };
+    host.appendChild(b);
+  });
 }
 // 📎 संलग्न दस्तावेज़ों की गिनती (v192) — jsonb array या string दोनों संभालता है
 function _enqAttachCount(r){
