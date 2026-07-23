@@ -103,8 +103,13 @@ body.view-mobile .hdr-search-wrap { order: 3; flex: 1 1 100%; max-width: 100%; m
    tab के ठीक नीचे smoothly slide होकर खुले/बंद (modal नहीं) */
 .tools-box { display: block !important; overflow: hidden; max-height: 0; opacity: 0; transform: translateY(-8px); margin: 0 auto; width: 100%; padding: 0 16px; background: #f3f6fb; border: 0 solid rgba(6,42,82,0.14); border-radius: 14px; box-shadow: 0 12px 28px rgba(0,0,0,0.16); position: relative; z-index: 40; transition: max-height 0.36s cubic-bezier(.22,.61,.36,1), opacity 0.28s ease, transform 0.36s cubic-bezier(.22,.61,.36,1), margin 0.3s ease, padding 0.3s ease, border-width 0.2s ease; }
 .tools-box.tools-inline-open { max-height: 82vh; opacity: 1; transform: translateY(0); overflow-y: auto; margin: 4px auto 20px; padding: 10px 16px 18px; border-width: 1px; }
-#tools-overlay-close { display: none; position: sticky; top: 2px; float: right; z-index: 5; width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; background: #062a52; color: #fff; font-size: 15px; font-weight: 800; line-height: 1; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
-.tools-box.tools-inline-open #tools-overlay-close { display: flex; align-items: center; justify-content: center; }
+/* v190: सिर्फ़ चुने tab का provision दिखे — box का header (4 tiles/title/toggle) व ✕ छिपाएँ */
+#tools-overlay-close { display: none !important; }
+#reports-summary-wrap.tools-box .sup-title-row,
+#reports-summary-wrap.tools-box .reports-counter-stack,
+#reports-summary-wrap.tools-box .ov-section-actions,
+#reports-summary-wrap.tools-box .reports-uni-stack { display: none !important; }
+#reports-summary-wrap.tools-box .ov-section-header { padding: 0 !important; border: 0 !important; background: transparent !important; }
 /* tool tab दबे हुए (open) होने का संकेत */
 .section-tab.tool-open { background: linear-gradient(135deg,#f5b942,#e8a82e) !important; color: #062a52 !important; box-shadow: 0 0 0 2px rgba(245,185,66,0.5) inset; }
 body.view-mobile .tools-box.tools-inline-open { max-height: 84vh; border-radius: 12px; padding: 8px 10px 16px; }
