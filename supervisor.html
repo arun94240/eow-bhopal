@@ -15392,10 +15392,17 @@ body.view-mobile .cao-matrix-tile .caom-num {
 #mydaily-box{ background:#fff !important; border:1px solid #e4ebf3 !important; border-radius:15px !important; box-shadow:0 6px 20px rgba(6,42,82,.16) !important; padding:0 !important; overflow:hidden; }
 /* only the heading row is navy — thin, full-width edge-to-edge (like Daily Attendance) */
 #mydaily-box .agenda-hdr-v2{ background:transparent !important; padding:0 !important; margin:0; }
-#mydaily-box .agenda-hdr-top{ background:linear-gradient(135deg,#062a52 0%,#0a3a6e 60%,#134d8a 100%); padding:10px 12px !important; margin:0 !important; }
-/* tabs move into the white body as multi-colour tiles (matching att / जाँच KPI tiles) */
-#mydaily-box .agenda-tabstrip{ padding:11px 12px 5px !important; margin:0 !important; gap:8px; }
-#mydaily-box .agenda-tab{ background:#f6f9fd; border:1px solid #e4ebf3; border-radius:12px; box-shadow:0 2px 6px rgba(6,42,82,.06); }
+#mydaily-box .agenda-hdr-top{ background:linear-gradient(135deg,#062a52 0%,#0a3a6e 60%,#134d8a 100%); padding:8px 12px !important; margin:0 !important; gap:9px !important; }
+/* cal chip → same small 2-line chip as Daily Attendance (.ap-cal), so the navy strip is equally thin */
+#mydaily-box .agenda-cal{ width:auto !important; min-width:0 !important; height:auto !important; border-radius:8px !important; padding:2px 8px !important; box-shadow:0 2px 6px rgba(0,0,0,.22) !important; }
+#mydaily-box .agenda-cal .m{ font-size:8px !important; }
+#mydaily-box .agenda-cal .d{ font-size:15px !important; margin:0 !important; }
+#mydaily-box .agenda-cal .w{ display:none !important; }
+/* tabs move into the white body as multi-colour tiles — compact pill size like att / जाँच KPI tiles */
+#mydaily-box .agenda-tabstrip{ padding:10px 12px 4px !important; margin:0 !important; gap:7px; }
+#mydaily-box .agenda-tab{ background:#f6f9fd; border:1px solid #e4ebf3; border-radius:11px; box-shadow:0 2px 6px rgba(6,42,82,.06); padding:7px 3px 6px !important; }
+#mydaily-box .agenda-tab .chip{ width:24px !important; height:24px !important; margin:0 auto 3px !important; font-size:13px !important; border-radius:8px !important; }
+#mydaily-box .agenda-tab .l{ font-size:8.6px !important; }
 #mydaily-box .agenda-tab:hover{ background:#eef4fb; }
 #mydaily-box .at-search{ background:#dbeafe !important; border-color:#bfdbfe !important; }
 #mydaily-box .at-search .chip{ background:#bfdbfe !important; } #mydaily-box .at-search .l{ color:#2563eb !important; }
@@ -36141,7 +36148,7 @@ function _agendaUpdateCalBadge(){
   } catch(e){}
   try{
     var cnt = document.getElementById('agenda-total-count');
-    if (cnt) { var n = (state.myOfficeTasks || []).length; cnt.textContent = n ? ('· ' + n) : ''; }
+    if (cnt) { var n = (state.myOfficeTasks || []).filter(function(t){ return !(t.status === 'Done' || t.status === 'पूर्ण'); }).length; cnt.textContent = n ? ('· ' + n + ' pending') : ''; }
   } catch(e){}
 }
 function agendaToggleSearchTab(){
