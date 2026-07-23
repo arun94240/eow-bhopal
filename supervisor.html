@@ -33765,8 +33765,9 @@ function getRankOrder(name) {
 
 // Sort officer names by rank-then-alphabetical
 function sortByRank(names) {
+  // names में rank प्रीफ़िक्स होता है (जैसे "TI रमेश सिंह") — leading rank से वरिष्ठता क्रम (v191)
   return names.slice().sort(function(a, b){
-    var ra = getRankOrder(a), rb = getRankOrder(b);
+    var ra = _masRankOrder(a), rb = _masRankOrder(b);
     if (ra !== rb) return ra - rb;
     return a.localeCompare(b);
   });
@@ -33907,6 +33908,9 @@ async function loadAllFromCloud() {
     var ioRes = await supa.from('io_master').select('*').order('name');
     if (ioRes.error) throw ioRes.error;
     state.ioMaster = ioRes.data || [];
+    // 🔻 वरिष्ठता क्रम में global sort (v191) — जहाँ भी नाम-क्रम से सूची बने वहाँ स्वतः
+    //    DSP → TI → SI → ASI → HC → Constable → अन्य staff (समान rank में नाम अनुसार)
+    try { if (typeof _ioSortByRank === 'function') state.ioMaster.sort(_ioSortByRank); } catch(e){}
 
     // PAGINATED FETCH for enquiries (Supabase API has 1000-row default limit)
     // Use id-based ordering for guaranteed reliable pagination (no NULL issues)
@@ -36762,11 +36766,18 @@ function _mddCombineReminder(dateVal, timeVal){
   var d = new Date(dateVal + 'T' + t);
   return isNaN(d.getTime()) ? null : d.toISOString();
 }
-var _IO_RANK_ORDER = ['ADG','IG','DIG','AIG','SP','ADDL SP','ADDITIONAL SP','ASP','DYSP','DSP','SDOP','INSPECTOR','INSP','SI','SUB INSPECTOR','ASI','HC','HEAD CONSTABLE','CONSTABLE','CT','C'];
+// canonical वरिष्ठता क्रम (v191): DSP → TI → SI → ASI → HC → Constable → अन्य staff (999)
+var _IO_RANK_ORDER = ['ADG','IG','DIG','AIG','SP','ADDL SP','ADDITIONAL SP','ASP','DYSP','DSP','SDOP','TI','TOWN INSPECTOR','INSPECTOR','INSP','SI','SUB INSPECTOR','ASI','HC','HEAD CONSTABLE','PRADHAN','CONSTABLE','CONST','CT','C'];
 function _ioRankScore(rank){
   var r = String(rank||'').toUpperCase().replace(/[.\-]/g,'').replace(/\s+/g,' ').trim();
   for (var i=0;i<_IO_RANK_ORDER.length;i++){ if (r.indexOf(_IO_RANK_ORDER[i])===0) return i; }
   return 999;
+}
+// canonical IO/staff comparator — वरिष्ठता (rank) फिर नाम (v191); सर्वत्र प्रयोग
+function _ioSortByRank(a,b){
+  var ra=_ioRankScore(a&&a.rank), rb=_ioRankScore(b&&b.rank);
+  if (ra!==rb) return ra-rb;
+  return String((a&&a.name)||'').localeCompare(String((b&&b.name)||''));
 }
 function _mddIoOptionsHTML(sel){
   var ios = (state.ioMaster || []).slice();
@@ -43201,8 +43212,8 @@ function renderEstabRoster() {
     });
   }
   
-  staff.sort(function(a,b){ return (a.name || '').localeCompare(b.name || ''); });
-  
+  staff.sort(_ioSortByRank);
+
   // Filter chips
   var allCount = (state.ioMaster || []).filter(function(s){ return s.status !== 'transferred' && s.status !== 'retired'; }).length;
   var ioCount = (state.ioMaster || []).filter(function(s){ return s.is_io === true && s.status !== 'transferred' && s.status !== 'retired'; }).length;
@@ -43512,7 +43523,7 @@ function estabReportCardClick(key) {
     // Full staff list — tap any to expand profile inline
     var allStaff = (state.ioMaster || []).filter(function(s){
       return s.status !== 'transferred' && s.status !== 'retired';
-    }).slice().sort(function(a,b){ return (a.name || '').localeCompare(b.name || ''); });
+    }).slice().sort(_ioSortByRank);
     
     headerHtml = '👥 Staff Directory — ' + allStaff.length + ' members';
     if (!allStaff.length) {
@@ -53153,7 +53164,7 @@ function _buildNoticeBriefContent(n) {
       return rk !== 'DSP' && rk !== 'TI';
     });
     // Sort by rank priority then name
-    var rankOrder = { 'SI':1, 'ASI':2, 'HC':3, 'PA':4, 'STENO':5, 'CONST':6, 'DPO':7, 'PEON':8 };
+    var rankOrder = { 'SI':1, 'ASI':2, 'HC':3, 'CONST':4, 'CONSTABLE':4, 'DPO':5, 'PA':6, 'STENO':7, 'PEON':8 };
     staffList.sort(function(a, b){
       var ra = rankOrder[(a.rank||'').toUpperCase()] || 9;
       var rb = rankOrder[(b.rank||'').toUpperCase()] || 9;
@@ -53936,9 +53947,9 @@ function renderIOCards() {
     return { name: displayName, d: d };
   }).filter(function(p){ return p; });
   
-  // Sort by rank then name
+  // Sort by rank then name (name में rank प्रीफ़िक्स — leading rank पार्स, v191)
   ioData.sort(function(a, b){
-    var ra = getRankOrder(a.name), rb = getRankOrder(b.name);
+    var ra = _masRankOrder(a.name), rb = _masRankOrder(b.name);
     if (ra !== rb) return ra - rb;
     return a.name.localeCompare(b.name);
   });
@@ -65634,8 +65645,8 @@ function renderPragatiIOView() {
     }
   });
   
-  var ioNames = Object.keys(ioGroups).sort();
-  
+  var ioNames = Object.keys(ioGroups).sort(function(a,b){ return (_masRankOrder(a)-_masRankOrder(b)) || a.localeCompare(b); }); // वरिष्ठता क्रम (v191)
+
   if (searchTerm) {
     ioNames = ioNames.filter(function(name){
       return name.toLowerCase().indexOf(searchTerm) > -1;
