@@ -34984,7 +34984,7 @@ function _dirCSS(){
   if(document.getElementById('dir-css')) return;
   var s=document.createElement('style'); s.id='dir-css';
   s.textContent=
-    '.dir-ov{position:fixed;inset:0;z-index:100050;background:rgba(4,12,24,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;}'+
+    '.dir-ov{position:fixed;inset:0;z-index:100050;background:rgba(4,12,24,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}'+
     '.dir-card{width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#0e2c4f,#0a2039);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.55);animation:dirUp .26s cubic-bezier(.2,.8,.2,1);margin:auto;}'+
     '@keyframes dirUp{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}'+
     '.dir-hd{display:flex;align-items:center;gap:9px;padding:13px 14px 10px;border-bottom:1px solid rgba(255,255,255,.08);}'+
@@ -34994,7 +34994,7 @@ function _dirCSS(){
     '.dir-tabs{display:flex;gap:6px;padding:9px 14px 0;}'+
     '.dir-tab{flex:1;border:0;cursor:pointer;font-family:inherit;font-weight:800;font-size:12px;padding:8px;border-radius:9px 9px 0 0;background:rgba(255,255,255,.05);color:#9db4d0;}'+
     '.dir-tab.on{background:rgba(245,185,66,.14);color:#ffd879;box-shadow:inset 0 -2px 0 #f5b942;}'+
-    '.dir-body{flex:1;min-height:0;padding:12px 14px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;}'+
+    '.dir-body{flex:1;min-height:0;padding:12px 14px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scroll-behavior:smooth;}'+
     '.dir-lbl{font-size:11px;font-weight:800;color:#ffd879;text-transform:uppercase;letter-spacing:.3px;margin:12px 0 6px;}'+
     '.dir-in,.dir-brief,.dir-ta{width:100%;background:rgba(4,14,28,.55);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#eaf2fb;font-family:inherit;font-size:12.5px;line-height:1.55;padding:9px 10px;resize:none;}'+
     '.dir-kv{font-size:12px;color:#cfe0f3;line-height:1.6;background:rgba(4,14,28,.4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:9px 11px;}'+
@@ -35199,6 +35199,28 @@ function openDirCompose(ioId, ioName){
     '</div>';
   document.body.appendChild(ov);
   dirTab('new');
+  _dirLockScroll();
+}
+// Robust background scroll-lock (iOS/iPad Safari safe) so the page behind the
+// निर्देश form does NOT scroll while the form is open — smoother, focused typing.
+var _dirScrollY = 0, _dirLocked = false;
+function _dirLockScroll(){
+  if (_dirLocked) return;
+  _dirLocked = true;
+  _dirScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  var b = document.body;
+  b.style.position = 'fixed';
+  b.style.top = (-_dirScrollY) + 'px';
+  b.style.left = '0'; b.style.right = '0'; b.style.width = '100%';
+  b.style.overflow = 'hidden';
+}
+function _dirUnlockScroll(){
+  if (!_dirLocked) return;
+  _dirLocked = false;
+  var b = document.body;
+  b.style.position = ''; b.style.top = ''; b.style.left = '';
+  b.style.right = ''; b.style.width = ''; b.style.overflow = '';
+  try { window.scrollTo(0, _dirScrollY); } catch(_){}
 }
 // Resolve the ACTIVE निर्देश body. Both the modal (openDirCompose) and the jvBoard
 // inline composer use id="dir-body" — when both exist in the DOM, getElementById returns
@@ -35231,7 +35253,7 @@ function openDirComposeForCase(caseType, caseId){
   __dir.caseSel = c;                      // pre-select THIS inquiry
   if(typeof dirTab==='function') dirTab('new'); else if(typeof dirRenderNew==='function') dirRenderNew();
 }
-function dirClose(){ var m=document.getElementById('dir-modal'); if(m) m.remove(); }
+function dirClose(){ var m=document.getElementById('dir-modal'); if(m) m.remove(); _dirUnlockScroll(); }
 function dirTab(which){
   __dir.tab=which;
   var tn=document.getElementById('dir-tab-new'), tr=document.getElementById('dir-tab-rev');
