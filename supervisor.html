@@ -34984,8 +34984,8 @@ function _dirCSS(){
   if(document.getElementById('dir-css')) return;
   var s=document.createElement('style'); s.id='dir-css';
   s.textContent=
-    '.dir-ov{position:fixed;inset:0;z-index:100050;background:rgba(4,12,24,.72);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;}'+
-    '.dir-card{width:100%;max-width:480px;max-height:92vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#0e2c4f,#0a2039);border:1px solid rgba(255,255,255,.12);border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.5);animation:dirUp .26s cubic-bezier(.2,.8,.2,1);}'+
+    '.dir-ov{position:fixed;inset:0;z-index:100050;background:rgba(4,12,24,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;}'+
+    '.dir-card{width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#0e2c4f,#0a2039);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.55);animation:dirUp .26s cubic-bezier(.2,.8,.2,1);margin:auto;}'+
     '@keyframes dirUp{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}'+
     '.dir-hd{display:flex;align-items:center;gap:9px;padding:13px 14px 10px;border-bottom:1px solid rgba(255,255,255,.08);}'+
     '.dir-hd .t{font-size:14px;font-weight:800;color:#fff;line-height:1.2;}'+
@@ -34994,7 +34994,7 @@ function _dirCSS(){
     '.dir-tabs{display:flex;gap:6px;padding:9px 14px 0;}'+
     '.dir-tab{flex:1;border:0;cursor:pointer;font-family:inherit;font-weight:800;font-size:12px;padding:8px;border-radius:9px 9px 0 0;background:rgba(255,255,255,.05);color:#9db4d0;}'+
     '.dir-tab.on{background:rgba(245,185,66,.14);color:#ffd879;box-shadow:inset 0 -2px 0 #f5b942;}'+
-    '.dir-body{padding:12px 14px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;}'+
+    '.dir-body{flex:1;min-height:0;padding:12px 14px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;}'+
     '.dir-lbl{font-size:11px;font-weight:800;color:#ffd879;text-transform:uppercase;letter-spacing:.3px;margin:12px 0 6px;}'+
     '.dir-in,.dir-brief,.dir-ta{width:100%;background:rgba(4,14,28,.55);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#eaf2fb;font-family:inherit;font-size:12.5px;line-height:1.55;padding:9px 10px;resize:none;}'+
     '.dir-kv{font-size:12px;color:#cfe0f3;line-height:1.6;background:rgba(4,14,28,.4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:9px 11px;}'+
@@ -35200,6 +35200,21 @@ function openDirCompose(ioId, ioName){
   document.body.appendChild(ov);
   dirTab('new');
 }
+// Resolve the ACTIVE निर्देश body. Both the modal (openDirCompose) and the jvBoard
+// inline composer use id="dir-body" — when both exist in the DOM, getElementById returns
+// the wrong (hidden jvBoard) one. Prefer the modal's body when the modal is open, and
+// blank any other #dir-body so sub-element ids (#dir-brief, #dir-pts…) never collide.
+function _dirBodyEl(){
+  var m = document.getElementById('dir-modal');
+  if (m){
+    var modalBody = m.querySelector('#dir-body');
+    if (modalBody){
+      try { document.querySelectorAll('#dir-body').forEach(function(el){ if(el!==modalBody) el.innerHTML=''; }); } catch(_){}
+      return modalBody;
+    }
+  }
+  return document.getElementById('dir-body');
+}
 // Open the UNIFIED निर्देश composer directly for a particular inquiry (from any प्रकरण समीक्षा button).
 // Pre-selects that case in the composer so SP can immediately give a निर्देश (or use the समीक्षा tab).
 function openDirComposeForCase(caseType, caseId){
@@ -35225,7 +35240,7 @@ function dirTab(which){
   if(which==='new') dirRenderNew(); else dirRenderReviewList();
 }
 function dirRenderNew(){
-  var body=document.getElementById('dir-body'); if(!body) return;
+  var body=_dirBodyEl(); if(!body) return;
   var cases=_dirIoCases(__dir.io);
   // Ensure a pre-selected case (opened directly from a प्रकरण समीक्षा button) is always in the list
   if(__dir.caseSel && !cases.some(function(c){ return c.id===__dir.caseSel.id; })) cases=[__dir.caseSel].concat(cases);
@@ -35334,7 +35349,7 @@ async function dirIssue(){
 
 /* ---- SP review tab ---- */
 async function dirRenderReviewList(){
-  var body=document.getElementById('dir-body'); if(!body) return;
+  var body=_dirBodyEl(); if(!body) return;
   body.innerHTML='<div class="drv-empty">लोड हो रहे…</div>';
   var io=__dir.io||{};
   try{
@@ -35362,7 +35377,7 @@ async function dirRenderReviewList(){
 var __dirRevCache={};
 function dirOpenReview(id){
   var d=__dirRevCache[id]; if(!d) return;
-  var body=document.getElementById('dir-body'); if(!body) return;
+  var body=_dirBodyEl(); if(!body) return;
   var pts=Array.isArray(d.points)?d.points:[];
   var done=pts.filter(function(p){ return p.status==='done'; }).length;
   var pct=pts.length?Math.round(done*100/pts.length):0;
@@ -42854,7 +42869,7 @@ function _jvCaseListHTML(list){
 }
 function jvDirRenderPick(){
   var host=document.getElementById('jvdir-pick'); if(!host) return;
-  var db=document.getElementById('dir-body'); if(db) db.innerHTML='';
+  var db=_dirBodyEl(); if(db) db.innerHTML='';
   var HB=[['complaints','शिकायत'],['rcs','RC/FIR'],['rcomplaints','R-शिका.'],['pes','PE'],['strs','STR'],['sutra','सूत्र']];
   if(_jvDir.mode==='io'){
     var ios=(state.ioMaster||[]).filter(function(s){ return s.is_io===true && (s.status==='Active'||!s.status); });
@@ -42881,7 +42896,7 @@ function jvDirPick(ct, cid){
   var c=_dirFindCase(ct, cid); if(!c) return;
   try{ _dirCSS(); }catch(e){}
   __dir={ io:{ id:(c.io_id||_jvDir.ioId||null), name:(c.io_name||_jvDir.ioName||'') }, pts:[], caseSel:c, tab:'new', suggestSrc:'' };
-  var host=document.getElementById('dir-body'); if(host){ try{ dirRenderNew(); }catch(e){} try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+  var host=_dirBodyEl(); if(host){ try{ dirRenderNew(); }catch(e){} try{ host.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
 }
 // विवेचक accordion से "निर्देश जारी" → निर्देश tab में उसी IO के साथ inline
 function jvGoDirForIo(id, b64){ var nm=''; try{ nm=decodeURIComponent(escape(atob(b64))); }catch(e){} _jvDir.mode='io'; _jvDir.ioId=id||null; _jvDir.ioName=nm; jvTab('dir'); _jvRenderDir(); }
