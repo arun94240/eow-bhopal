@@ -34995,6 +34995,28 @@ function _dirCSS(){
     '.dir-tab{flex:1;border:0;cursor:pointer;font-family:inherit;font-weight:800;font-size:12px;padding:8px;border-radius:9px 9px 0 0;background:rgba(255,255,255,.05);color:#9db4d0;}'+
     '.dir-tab.on{background:rgba(245,185,66,.14);color:#ffd879;box-shadow:inset 0 -2px 0 #f5b942;}'+
     '.dir-body{flex:1;min-height:0;padding:12px 14px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scroll-behavior:smooth;}'+
+    /* 🧾 प्रवाह chronology (parchment theme) */
+    '.dfl{position:relative;padding-left:20px;}'+
+    '.dfl:before{content:"";position:absolute;left:6px;top:5px;bottom:5px;width:2px;background:#e2d6b6;}'+
+    '.dfl-ev{position:relative;margin-bottom:11px;}'+
+    '.dfl-ev:before{content:"";position:absolute;left:-17px;top:3px;width:11px;height:11px;border-radius:50%;background:#fffdf7;border:2.5px solid #c9b98f;}'+
+    '.dfl-ev.io:before{border-color:#d99312;}.dfl-ev.sp:before{border-color:#178a54;}.dfl-ev.dir:before{border-color:#3a63b8;}'+
+    '.dfl-top{display:flex;align-items:center;gap:7px;}'+
+    '.dfl-who{font-size:11px;font-weight:800;color:#2e2a20;}'+
+    '.dfl-tag{font-size:8.5px;font-weight:800;text-transform:uppercase;border-radius:5px;padding:1px 6px;}'+
+    '.dfl-tag.io{background:#fbeecb;color:#a9781a;}.dfl-tag.sp{background:#e4f7ee;color:#178a54;}.dfl-tag.dir{background:#e7eefb;color:#3a63b8;}'+
+    '.dfl-tm{margin-left:auto;font-size:9px;color:#8a7a5c;font-weight:700;}'+
+    '.dfl-txt{font-size:11.5px;color:#4a4230;line-height:1.55;margin-top:4px;}'+
+    '.dfl-docs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}'+
+    '.dchip{display:inline-flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;background:#eef3fb;border:1px solid #b9d0ee;color:#1560b8;border-radius:8px;padding:4px 8px;font-weight:700;}'+
+    /* 🗂️ दस्तावेज़ folder (parchment theme) */
+    '.dcf-grp{font-size:10.5px;font-weight:800;color:#7a5c1f;margin:12px 0 6px;}.dcf-grp span{color:#8a7a5c;font-weight:700;font-size:9px;}'+
+    '.dcf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}'+
+    '.dcf-doc{position:relative;border:1px solid #e7ddc8;border-radius:10px;overflow:hidden;background:#fffdf7;text-decoration:none;box-shadow:0 2px 8px rgba(120,90,20,.05);}'+
+    '.dcf-th{height:50px;display:flex;align-items:center;justify-content:center;font-size:21px;background:#f6efe0;}'+
+    '.dcf-lb{font-size:8.6px;font-weight:700;color:#2e2a20;padding:4px 5px 5px;line-height:1.25;}.dcf-lb small{display:block;color:#8a7a5c;font-weight:600;}'+
+    '.dcf-src{position:absolute;top:3px;left:3px;font-size:7.2px;font-weight:800;color:#fff;border-radius:5px;padding:1px 5px;z-index:2;}'+
+    '.dcf-src.c{background:#2563eb;}.dcf-src.k{background:#7c3aed;}.dcf-src.j{background:#16a34a;}'+
     '.dir-lbl{font-size:11px;font-weight:800;color:#ffd879;text-transform:uppercase;letter-spacing:.3px;margin:12px 0 6px;}'+
     '.dir-in,.dir-brief,.dir-ta{width:100%;background:rgba(4,14,28,.55);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#eaf2fb;font-family:inherit;font-size:12.5px;line-height:1.55;padding:9px 10px;resize:none;}'+
     '.dir-kv{font-size:12px;color:#cfe0f3;line-height:1.6;background:rgba(4,14,28,.4);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:9px 11px;}'+
@@ -35192,8 +35214,10 @@ function openDirCompose(ioId, ioName){
         '<span class="t">निर्देश पत्रक<small>'+_mddEsc(__dir.io.name||'अधिकारी')+' हेतु</small></span>'+
         '<button class="dir-x" onclick="dirClose()">✕</button></div>'+
       '<div class="dir-tabs">'+
-        '<button class="dir-tab on" id="dir-tab-new" onclick="dirTab(\'new\')">✍️ नया निर्देश</button>'+
-        '<button class="dir-tab" id="dir-tab-rev" onclick="dirTab(\'rev\')">🧾 समीक्षा</button>'+
+        '<button class="dir-tab on" id="dir-tab-new" onclick="dirTab(\'new\')">✍️ नया</button>'+
+        '<button class="dir-tab" id="dir-tab-flow" onclick="dirTab(\'flow\')">🧾 प्रवाह</button>'+
+        '<button class="dir-tab" id="dir-tab-docs" onclick="dirTab(\'docs\')">🗂️ दस्तावेज़</button>'+
+        '<button class="dir-tab" id="dir-tab-rev" onclick="dirTab(\'rev\')">✅ समीक्षा</button>'+
       '</div>'+
       '<div class="dir-body" id="dir-body"></div>'+
     '</div>';
@@ -35237,6 +35261,71 @@ function _dirBodyEl(){
   }
   return document.getElementById('dir-body');
 }
+
+// ══════════════════════════════════════════════════════════════════════
+// प्रकरण साक्ष्य-संग्रह + प्रतिवेदन-प्रवाह (chronology) — read-time aggregation.
+// No new tables: gathers from शिकायत(form) + linked court + IO निर्देश attachments,
+// dedupes by URL so one file never appears twice. Feeds the दस्तावेज़ + प्रवाह tabs.
+// ══════════════════════════════════════════════════════════════════════
+function _evExtType(url, name){
+  var s = String(name||url||'').toLowerCase().split('?')[0];
+  if(/\.(pdf)$/.test(s)) return 'pdf';
+  if(/\.(png|jpg|jpeg|gif|webp|heic|bmp)$/.test(s)) return 'img';
+  if(/\.(xls|xlsx|csv)$/.test(s)) return 'xls';
+  if(/\.(doc|docx|txt|rtf)$/.test(s)) return 'doc';
+  return 'file';
+}
+// Unified evidence folder for a प्रकरण — array of {url,name,type,kind,sources[],meta}
+function _caseEvidence(caseType, caseId){
+  var out=[], seen={};
+  function add(list, source, kind, meta){
+    (Array.isArray(list)?list:[]).forEach(function(a){
+      if(!a || !a.url) return;
+      var k=a.url;
+      if(seen[k]){ if(seen[k].sources.indexOf(source)<0) seen[k].sources.push(source); return; }
+      var rec={ url:a.url, name:a.name||'फ़ाइल', type:a.type||_evExtType(a.url,a.name), kind:kind, sources:[source], meta:meta||'' };
+      seen[k]=rec; out.push(rec);
+    });
+  }
+  if(caseType==='court'){
+    var c=(state.courts||[]).find(function(x){ return x.id===caseId; });
+    if(c){ add(c.attachments,'court','court',''); }
+  } else {
+    var e=((state.enquiries||{})[caseType]||[]).find(function(x){ return x.id===caseId; });
+    if(e){
+      add(e.attachments,'शिकायत','form','');
+      if(typeof getLinkedCourts==='function'){ try{ getLinkedCourts(caseId).forEach(function(ct){ add(ct.attachments,'court','court',((ct.case_type||'')+' '+(ct.case_no||'')).trim()); }); }catch(_){} }
+    }
+  }
+  // IO निर्देश-प्रतिवेदन attachments (all rounds)
+  (state.directions||[]).filter(function(d){ return d.case_id===caseId && d.case_type===caseType; }).forEach(function(d){
+    (Array.isArray(d.points)?d.points:[]).forEach(function(p){ add(p.io_attachments,'जाँच','io',(p.type||'')); });
+  });
+  return out;
+}
+// Chronological प्रतिवेदन प्रवाह for a प्रकरण — derived from all its directions
+function _caseChrono(caseType, caseId){
+  var ev=[];
+  (state.directions||[]).filter(function(d){ return d.case_id===caseId && d.case_type===caseType; }).forEach(function(d){
+    var pts=Array.isArray(d.points)?d.points:[];
+    ev.push({ ts:d.issued_at||d.created_at||'', actor:'sp', kind:'निर्देश',
+      text:pts.length+' बिंदु निर्देश जारी'+(d.brief?(' — '+String(d.brief).slice(0,90)):''), docs:[] });
+    pts.forEach(function(p){
+      var hasNote=(p.io_note&&String(p.io_note).trim()), hasDoc=(Array.isArray(p.io_attachments)&&p.io_attachments.length);
+      if(hasNote||hasDoc){
+        ev.push({ ts:d.reported_at||d.updated_at||d.issued_at||'', actor:'io', kind:'प्रतिवेदन',
+          text:(p.type?('['+p.type+'] '):'')+(p.io_note||'दस्तावेज़ संलग्न'), docs:(p.io_attachments||[]) });
+      }
+    });
+    if(d.reviewed_at){
+      var sat=pts.filter(function(p){ return p.sp_review==='satisfactory'; }).length;
+      ev.push({ ts:d.reviewed_at, actor:'sp', kind:'समीक्षा',
+        text:sat+'/'+pts.length+' बिंदु संतोषजनक'+(d.sp_note?(' — '+String(d.sp_note).slice(0,80)):''), docs:[] });
+    }
+  });
+  ev.sort(function(a,b){ return new Date(a.ts||0) - new Date(b.ts||0); });
+  return ev;
+}
 // Open the UNIFIED निर्देश composer directly for a particular inquiry (from any प्रकरण समीक्षा button).
 // Pre-selects that case in the composer so SP can immediately give a निर्देश (or use the समीक्षा tab).
 function openDirComposeForCase(caseType, caseId){
@@ -35256,10 +35345,56 @@ function openDirComposeForCase(caseType, caseId){
 function dirClose(){ var m=document.getElementById('dir-modal'); if(m) m.remove(); _dirUnlockScroll(); }
 function dirTab(which){
   __dir.tab=which;
-  var tn=document.getElementById('dir-tab-new'), tr=document.getElementById('dir-tab-rev');
-  if(tn) tn.classList.toggle('on', which==='new');
-  if(tr) tr.classList.toggle('on', which==='rev');
-  if(which==='new') dirRenderNew(); else dirRenderReviewList();
+  ['new','flow','docs','rev'].forEach(function(k){ var t=document.getElementById('dir-tab-'+k); if(t) t.classList.toggle('on', which===k); });
+  if(which==='new') dirRenderNew();
+  else if(which==='flow') dirRenderFlow();
+  else if(which==='docs') dirRenderDocs();
+  else dirRenderReviewList();
+}
+// resolve the प्रकरण in context (selected case, else the IO's first case)
+function _dirCaseCtx(){
+  if(__dir.caseSel && __dir.caseSel.id) return { type:__dir.caseSel.case_type, id:__dir.caseSel.id, disp:__dir.caseSel.display };
+  return null;
+}
+// 🧾 प्रवाह — chronological प्रतिवेदन feed for the प्रकरण
+function dirRenderFlow(){
+  var body=_dirBodyEl(); if(!body) return;
+  var ctx=_dirCaseCtx();
+  if(!ctx){ body.innerHTML='<div class="drv-empty">पहले “नया” tab में प्रकरण चुनें — फिर उसका प्रवाह यहाँ दिखेगा।</div>'; return; }
+  var ev=_caseChrono(ctx.type, ctx.id);
+  var head='<div class="dir-kv" style="margin-bottom:10px"><b>🧾 प्रतिवेदन प्रवाह — '+_mddEsc(ctx.disp||'')+'</b><br>जो-जो हुआ, समयक्रम में</div>';
+  if(!ev.length){ body.innerHTML=head+'<div class="drv-empty">अभी कोई निर्देश/प्रतिवेदन नहीं।</div>'; return; }
+  body.innerHTML=head+'<div class="dfl">'+ev.map(function(e){
+    var cls=e.actor==='io'?'io':(e.kind==='निर्देश'?'dir':'sp');
+    var lbl=e.actor==='io'?'IO':'SP';
+    var docs=(Array.isArray(e.docs)&&e.docs.length)?('<div class="dfl-docs">'+e.docs.map(function(a){ return '<a class="dchip" href="'+encodeURI(a.url||'#')+'" target="_blank" rel="noopener">📎 '+_mddEsc(a.name||'फ़ाइल')+'</a>'; }).join('')+'</div>'):'';
+    return '<div class="dfl-ev '+cls+'"><div class="dfl-top"><span class="dfl-who">'+lbl+'</span>'+
+      '<span class="dfl-tag '+cls+'">'+_mddEsc(e.kind)+'</span><span class="dfl-tm">'+_mddEsc(String(e.ts||'').slice(0,10))+'</span></div>'+
+      '<div class="dfl-txt">'+_mddEsc(e.text||'')+'</div>'+docs+'</div>';
+  }).join('')+'</div>';
+}
+// 🗂️ दस्तावेज़ — unified evidence folder (शिकायत + court + जाँच, deduped)
+function dirRenderDocs(){
+  var body=_dirBodyEl(); if(!body) return;
+  var ctx=_dirCaseCtx();
+  if(!ctx){ body.innerHTML='<div class="drv-empty">पहले “नया” tab में प्रकरण चुनें — फिर उसके सभी दस्तावेज़ यहाँ एक जगह दिखेंगे।</div>'; return; }
+  var docs=_caseEvidence(ctx.type, ctx.id);
+  var byKind={ form:[], court:[], io:[] };
+  docs.forEach(function(d){ (byKind[d.kind]||(byKind[d.kind]=[])).push(d); });
+  var head='<div class="dir-kv" style="margin-bottom:8px"><b>🗂️ प्रकरण दस्तावेज़ — '+_mddEsc(ctx.disp||'')+'</b> · '+docs.length+' फ़ाइल<br>'+
+    '<span style="color:#7fe0a6">✓ शिकायत + court + जाँच — सब एक जगह, कोई duplication नहीं</span></div>';
+  if(!docs.length){ body.innerHTML=head+'<div class="drv-empty">अभी कोई दस्तावेज़ संलग्न नहीं।</div>'; return; }
+  function grp(list, title){
+    if(!list.length) return '';
+    return '<div class="dcf-grp">'+title+' <span>· '+list.length+'</span></div><div class="dcf-grid">'+list.map(function(d){
+      var ic=d.type==='pdf'?'📄':(d.type==='img'?'🖼':(d.type==='xls'?'📊':(d.type==='doc'?'📝':'📎')));
+      var sb=d.sources[0]||''; var sc=sb==='शिकायत'?'c':(sb==='court'?'k':'j');
+      return '<a class="dcf-doc '+d.type+'" href="'+encodeURI(d.url)+'" target="_blank" rel="noopener">'+
+        '<span class="dcf-src '+sc+'">'+_mddEsc(sb)+'</span><div class="dcf-th">'+ic+'</div>'+
+        '<div class="dcf-lb">'+_mddEsc(String(d.name).slice(0,22))+(d.meta?('<small>'+_mddEsc(d.meta)+'</small>'):'')+'</div></a>';
+    }).join('')+'</div>';
+  }
+  body.innerHTML=head+grp(byKind.form,'🔵 शिकायत के साथ')+grp(byKind.court,'🟣 court से')+grp(byKind.io,'🟢 IO जाँच में');
 }
 function dirRenderNew(){
   var body=_dirBodyEl(); if(!body) return;
