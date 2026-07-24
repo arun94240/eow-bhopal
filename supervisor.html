@@ -35200,6 +35200,22 @@ function openDirCompose(ioId, ioName){
   document.body.appendChild(ov);
   dirTab('new');
 }
+// Open the UNIFIED निर्देश composer directly for a particular inquiry (from any प्रकरण समीक्षा button).
+// Pre-selects that case in the composer so SP can immediately give a निर्देश (or use the समीक्षा tab).
+function openDirComposeForCase(caseType, caseId){
+  if(!caseType || !caseId){ if(typeof toast==='function') toast('प्रकरण reference नहीं मिला', true); return; }
+  if(typeof _dirFindCase!=='function' || typeof openDirCompose!=='function'){ return; }
+  var c=_dirFindCase(caseType, caseId);
+  if(!c){ if(typeof toast==='function') toast('प्रकरण नहीं मिला', true); return; }
+  var ioId=c.io_id||null, ioName=c.io_name||'';
+  if(caseType==='court'){
+    var court=(state.courts||[]).find(function(x){ return x.id===caseId; });
+    if(court){ ioId=court.incharge_io_id||court.incharge_officer_id||null; ioName=court.incharge_officer||court.incharge_io_name||ioName; }
+  }
+  openDirCompose(ioId, ioName);          // opens the dir-modal (nya निर्देश + समीक्षा tabs) for this IO
+  __dir.caseSel = c;                      // pre-select THIS inquiry
+  if(typeof dirTab==='function') dirTab('new'); else if(typeof dirRenderNew==='function') dirRenderNew();
+}
 function dirClose(){ var m=document.getElementById('dir-modal'); if(m) m.remove(); }
 function dirTab(which){
   __dir.tab=which;
@@ -35211,6 +35227,8 @@ function dirTab(which){
 function dirRenderNew(){
   var body=document.getElementById('dir-body'); if(!body) return;
   var cases=_dirIoCases(__dir.io);
+  // Ensure a pre-selected case (opened directly from a प्रकरण समीक्षा button) is always in the list
+  if(__dir.caseSel && !cases.some(function(c){ return c.id===__dir.caseSel.id; })) cases=[__dir.caseSel].concat(cases);
   var opts='<option value="">— प्रकरण चुनें —</option>'+cases.map(function(c,i){
     var lbl=c.display+(c.complainant?(' · '+String(c.complainant).slice(0,24)):'');
     return '<option value="'+c.case_type+'|'+c.id+'"'+((__dir.caseSel&&__dir.caseSel.id===c.id)?' selected':'')+'>'+_mddEsc(lbl)+'</option>';
@@ -66957,7 +66975,11 @@ function closePragatiCaseInfoCard() {
 // ═══════════════════════════════════════════════════════════════════
 function openReviewModal(caseType, caseId) {
   if (!caseType || !caseId) { toast('Case reference नहीं मिला', true); return; }
-  
+  // ── UNIFIED (user request): हर "प्रकरण समीक्षा" बटन अब सीधे एकीकृत निर्देश composer
+  //    (home dashboard जाँच→निर्देश वाला engine) उस particular inquiry के लिए खोलता है।
+  //    नया निर्देश + समीक्षा दोनों tab उसी एक window में। ──
+  if (typeof openDirComposeForCase === 'function') { return openDirComposeForCase(caseType, caseId); }
+
   // Get case for header display
   var caseObj = null;
   if (caseType === 'court') {
